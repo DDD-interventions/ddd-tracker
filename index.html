@@ -556,7 +556,7 @@ async function checkAuth() {
        S.f.official_role = official.role || '';
        S.f.official_email = official.email || '';
        if (official.province) S.f.province = official.province;
-       if (official.district) S.f.district = official.district;
+       if (official.district && !official.district.includes(',')) S.f.district = official.district;
        initDashFilters();
        S.authState = 'ready';
        resetInactivityTimer();
@@ -645,7 +645,7 @@ async function handleOtpSubmit() {
    S.f.official_role = official.role || '';
    S.f.official_email = S._otpEmail;
    if (official.province) S.f.province = official.province;
-   if (official.district) S.f.district = official.district;
+   if (official.district && !official.district.includes(',')) S.f.district = official.district;
 
    initDashFilters();
    notifyLogin(S.official);
@@ -846,7 +846,7 @@ function render() {
 
  const o = S.official;
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${(()=>{const assigned=getAssignedDistricts();if(assigned.length>1)return' · '+assigned.length+' districts';if(o.district&&o.district!=='EMPTY'&&o.district!=='All')return' · '+esc(o.district);return '';})()}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -965,7 +965,7 @@ function renderForm() {
 }
 function renderFormStart(){
   const hasName=S.official.full_name && S.official.full_name!=='Official';
-  const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ').pop())+'! Ready':'Ready';
+  const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ')[0])+'! Ready':'Ready';
   return `<div class="form-wrap"><div class="section fade-in" style="overflow:visible">
     <div style="padding:28px 22px;text-align:center">
       
@@ -1097,7 +1097,7 @@ document.addEventListener('click',function(e){
 function renderFormStep1(){
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
-    <div class="field-row"><div class="field"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(()=>{const allDist=DISTRICTS[S.f.province]||[];const assigned=getAssignedDistricts();const filtered=assigned.length>0?allDist.filter(d=>assigned.includes(d)):allDist;return filtered.map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('');})()}</select></div></div>
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
     <div class="field"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
@@ -1477,8 +1477,9 @@ function initDashFilters() {
   const scope = getClientScope();
   const realProv = (S.official.province && S.official.province !== 'National' && S.official.province !== 'All') ? S.official.province : 'All';
   const realDist = S.official.district || 'All';
+  const assigned = getAssignedDistricts();
   S.dashFilter = {
-    province: (scope === 'district' || scope === 'own') ? realProv : 'All',
+    province: (scope === 'district' || scope === 'own' || scope === 'multi_district') ? realProv : 'All',
     district: scope === 'own' ? realDist : 'All',
     circuit: 'All',
     school: 'All'
@@ -1488,12 +1489,16 @@ function initDashFilters() {
 function getClientScope() {
   const role = S.official.role || '';
   const prov = S.official.province || '';
+  const dist = (S.official.district || '').trim();
 
   // National scope: explicit national province or national-level roles
   if (prov === 'National' || prov === 'All' || ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager'].includes(role)) return 'national';
 
   // Provincial scope
   if (['Provincial Manager','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Director','Chief Director','Gauteng Provincial Project Manager','North West Junior PM'].includes(role) || role.includes('Provincial')) return 'province';
+
+  // Multi-district: official assigned to specific comma-separated districts
+  if (dist && dist !== 'EMPTY' && dist !== 'All' && !dist.startsWith('All ') && dist.includes(',')) return 'multi_district';
 
   // District scope
   if (['Circuit Manager','Subject Advisor','Cluster Lead','District Director','Senior Education Specialist'].includes(role)) return 'district';
@@ -1502,12 +1507,27 @@ function getClientScope() {
   return 'own';
 }
 
+// Parse official's district field into array of assigned districts
+// Handles: "All", "All XX Districts", "EMPTY", "", single district, comma-separated multi
+function getAssignedDistricts() {
+  const raw = (S.official.district || '').trim();
+  if (!raw || raw === 'EMPTY' || raw === 'All' || raw.startsWith('All ')) return [];
+  return raw.split(',').map(function(d){ return d.trim(); }).filter(Boolean);
+}
+
 function applyDashFilters(decs) {
   const f = S.dashFilter;
+  const scope = getClientScope();
+  const assigned = getAssignedDistricts();
   return decs.filter(d => {
     const det = d.details || {};
     if (f.province !== 'All' && (det.province || '') !== f.province) return false;
-    if (f.district !== 'All' && (det.district || '') !== f.district) return false;
+    // Multi-district: when "All" is selected, restrict to assigned districts only
+    if (f.district !== 'All') {
+      if ((det.district || '') !== f.district) return false;
+    } else if (scope === 'multi_district' && assigned.length > 0) {
+      if (!assigned.includes(det.district || '')) return false;
+    }
     if (f.circuit !== 'All' && (det.circuit || '') !== f.circuit) return false;
     if (f.school !== 'All') {
       const schools = (det.schools || '').split(',').map(s => s.trim());
@@ -1559,8 +1579,14 @@ function renderFilterBar(decs) {
     schools.sort();
   }
 
-  const provLocked = scope === 'district' || scope === 'own';
-  const distLocked = scope === 'own';
+  const provLocked = scope === 'district' || scope === 'own' || scope === 'multi_district';
+  const distLocked = scope === 'own' && S.official.district && S.official.district !== 'All' && !S.official.district.startsWith('All ');
+
+  // For multi-district officials, restrict district dropdown to their assigned districts only
+  const assigned = getAssignedDistricts();
+  if (scope === 'multi_district' && assigned.length > 0) {
+    districts = assigned.filter(function(d){ return districts.includes(d); });
+  }
   const hasFilters = f.province !== 'All' || f.district !== 'All' || f.circuit !== 'All' || f.school !== 'All';
   const filtered = applyDashFilters(decs);
 
