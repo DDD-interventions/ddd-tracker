@@ -362,8 +362,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .doc-link a{color:var(--blue);text-decoration:none}
 .status-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px}
 .sdot{width:6px;height:6px;border-radius:50%;display:inline-block}
-.demo-banner{background:linear-gradient(135deg,var(--blue-lt),var(--teal-lt));border:1px dashed var(--teal);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--teal-dk);text-align:center}
-.demo-banner strong{color:var(--navy)}
+
 
 /* TOOLKIT */
 .tk-wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
@@ -823,48 +822,12 @@ async function loadAll() {
  sb.from('interventions').select('*').order('entity_name')
  ]);
  S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
- // If empty, inject demo data so dashboard is useful immediately
- if (S.decisions.length === 0) injectDemo();
+ // No demo injection — production deployment
  S.loading = false; S.error = null;
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
  } catch(e) { S.error = e.message; S.loading = false; }
  render();
-}
-
-function injectDemo() {
- const demo_decs = [
- {id:'DEMO_D0',ddd_tool:'FET Promotion Profiles, Learner Chart Report',data_viewed:'Grade 10 Maths results — Lejweleputswa',insight:'School B Grade 10 Maths pass rate dropped from 58% to 41% between Term 1 and Term 3 2025. Learner Chart Report showed 35 learners clustered at 25-29% — just below passing threshold.',decision_made:'Target specific learners',contextual_factors:'Teaching outside specialisation | Only 1 qualified Maths educator for 4 Grade 10 classes',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2025-10-14',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School B',term:'Term 4 2025',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Mathematics'],grades:['10'],description:'DDD data review identified School B Grade 10 Maths as critical. 35 learners clustered just below pass mark. Decided to set up targeted after-school support with subject advisor and learner groups by performance level.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Learner Chart Report'],decision_type:'Target specific learners',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 qualified Maths educator for 4 Grade 10 classes. 2 educators teaching Maths outside their specialisation.',learners_reached:35,follow_up:false,follow_up_desc:''}},
- {id:'DEMO_D1',ddd_tool:'School Dashboard, Learner Chart Report',data_viewed:'Maths pass rates for Grade 9 — JTG district',insight:'12 schools below 40% in Maths, concentrated in 3 circuits',decision_made:'Send subject support',contextual_factors:'Vacant post(s), Teaching outside specialisation',made_by:'Mr V Teise (Circuit Manager)',date:'2026-01-28',logged_by:'V Teise',
- details:{province:'Northern Cape',district:'John Taolo Gaetsewe',schools:'School C, School D, School E',term:'Term 1 2026',activity_type:'School support visit',intervention_theme:'District Support',subjects:['Mathematics'],grades:['9'],description:'Targeted support visit to 3 underperforming schools in JTG. Reviewed Maths pass rates and agreed on intervention plan.',ddd_used:'yes-direct',ddd_reports:['School Dashboard','Learner Chart Report'],decision_type:'Send subject support',ctx_staffing:['Vacant post(s)','Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['High absenteeism'],ctx_notes:'No permanent Maths educator at School E since Term 3 2025',learners_reached:340,follow_up:true,follow_up_desc:'Return visit in 2 weeks to check if Subject Improvement Plan has been implemented'}},
- {id:'DEMO_D2',ddd_tool:'FET Promotion Profiles',data_viewed:'Grade 12 promotion predictions — Lejweleputswa',insight:'15% of Grade 12 learners predicted to fail Physical Sciences',decision_made:'Schedule extra classes',contextual_factors:'Infrastructure issues, Overcrowded classrooms',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2026-02-03',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School F, School B, School M',term:'Term 1 2026',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Physical Sciences','Mathematics'],grades:['12'],description:'District data review meeting to identify at-risk Grade 12 learners and plan Saturday classes.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Term 4 Promotion Predictions'],decision_type:'Schedule extra classes',ctx_staffing:['All posts filled'],ctx_resources:['Infrastructure issues'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 lab for 4 Grade 12 Science classes at School B',learners_reached:520,follow_up:true,follow_up_desc:'Monitor Saturday class attendance after first 3 sessions'}},
- {id:'DEMO_D3',ddd_tool:'Senior Phase Promotion Profiles',data_viewed:'Grade 7 English FAL results — Mopani East',insight:'62% of learners below level 4 in English FAL across 5 schools',decision_made:'Redesign lesson approach',contextual_factors:'Language barriers',made_by:'Mr K Makatu (Provincial Manager)',date:'2026-02-10',logged_by:'K Makatu',
- details:{province:'Limpopo',district:'Mopani East',schools:'School K, School N, School J',term:'Term 1 2026',activity_type:'Workshop / training session',intervention_theme:'GET / Intermediate Phase',subjects:['English FAL','English HL'],grades:['7','8'],description:'English literacy workshop for 12 educators. Focused on reading comprehension strategies and scaffolding techniques.',ddd_used:'yes-informed',ddd_reports:['Senior Phase Promotion Profiles','Curriculum Overview'],decision_type:'Redesign lesson approach',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage','No devices/connectivity'],ctx_learners:['Language barriers','Welfare concerns'],ctx_notes:'3 schools in deep rural area with no internet connectivity',learners_reached:890,follow_up:false,follow_up_desc:''}},
- {id:'DEMO_D4',ddd_tool:'',data_viewed:'Routine monitoring visit',insight:'HODs not conducting class visits or checking educator files',decision_made:'Escalate to management',contextual_factors:'Acting principal/HoD',made_by:'Ms P Mtyobo (Cluster Lead)',date:'2026-02-12',logged_by:'P Mtyobo',
- details:{province:'Eastern Cape',district:'Sarah Baartman',schools:'School I, School L',term:'Term 1 2026',activity_type:'Monitoring / follow-up visit',intervention_theme:'District Support',subjects:['Mathematics','Natural Sciences'],grades:['4','5','6'],description:'Monitoring visit found poor curriculum coverage. HODs not conducting class visits. Escalated to District Director.',ddd_used:'no',ddd_reports:[],decision_type:'Escalate to management',ctx_staffing:['Acting principal/HoD','High educator absenteeism'],ctx_resources:['LTSM not delivered'],ctx_learners:['High absenteeism'],ctx_notes:'School has had acting principal for 18 months',learners_reached:210,follow_up:true,follow_up_desc:'District Director to conduct accountability visit within 10 days'}},
- {id:'DEMO_D5',ddd_tool:'Term to Date, School Achievement Report',data_viewed:'SBA vs Exam deviation analysis — Pinetown',insight:'4 schools show 20%+ SBA-Exam gap in Maths Literacy',decision_made:'Analyse SBA-exam deviation gap',contextual_factors:'',made_by:'Ms R Sikhwari (Provincial Manager)',date:'2026-02-14',logged_by:'R Sikhwari',
- details:{province:'KwaZulu-Natal',district:'Pinetown',schools:'School O, School H, School G',term:'Term 1 2026',activity_type:'Lesson observation',intervention_theme:'DBE Mentorship',subjects:['Mathematical Literacy','Mathematics'],grades:['10','11'],description:'Observed 6 Maths Lit lessons to investigate SBA-Exam gap. Found assessments not aligned to exam standards.',ddd_used:'yes-direct',ddd_reports:['Term to Date','School Achievement Report'],decision_type:'Analyse SBA-exam deviation gap',ctx_staffing:['All posts filled'],ctx_resources:['Adequate'],ctx_learners:['No major concerns'],ctx_notes:'',learners_reached:380,follow_up:true,follow_up_desc:'Subject advisors to moderate SBA tasks for Term 2 before administration'}}
- ];
-
- const demo_acts = [
- {id:'DEMO_A0',decision_id:'DEMO_D0',action_taken:'Learner grouping by performance + Extra lessons / revision classes',responsible:'Ms F Moshoeshoe & Mr T Mokoena (Subject Advisor)',status:'Completed',target_date:'2025-11-30',notes:'35 at-risk learners grouped by gap analysis. 3x weekly after-school Maths sessions (Tue/Thu/Sat) for 6 weeks. Focused on algebra, functions, and exam technique. Subject advisor co-taught with educators.',logged_by:'F Moshoeshoe',supporting_doc_url:'https://docs.google.com/spreadsheets/d/demo-learner-profiles-gr10',supporting_doc_name:'Grade 10 Maths Learner Profiles & Attendance'},
- {id:'DEMO_A1',decision_id:'DEMO_D1',action_taken:'Subject improvement plan developed',responsible:'Mr V Teise',status:'In Progress',target_date:'2026-02-14',notes:'Follow-up: Return visit in 2 weeks to check if Subject Improvement Plan has been implemented',logged_by:'V Teise',supporting_doc_url:'https://docs.google.com/document/d/demo-sip-jtg',supporting_doc_name:'Maths SIP — JTG Schools'},
- {id:'DEMO_A2',decision_id:'DEMO_D2',action_taken:'Extra lessons / revision classes',responsible:'Ms F Moshoeshoe',status:'In Progress',target_date:'2026-03-01',notes:'Saturday classes starting 22 Feb, 08:00-12:00',logged_by:'F Moshoeshoe',supporting_doc_url:'',supporting_doc_name:''},
- {id:'DEMO_A3',decision_id:'DEMO_D3',action_taken:'Educator coaching / mentoring',responsible:'Mr K Makatu',status:'Completed',target_date:'2026-02-10',notes:'12 educators trained in reading comprehension strategies',logged_by:'K Makatu',supporting_doc_url:'https://drive.google.com/file/d/demo-register',supporting_doc_name:'Workshop attendance register'},
- {id:'DEMO_A4',decision_id:'DEMO_D4',action_taken:'Referral to SMT / DMT / PED',responsible:'Ms P Mtyobo',status:'Planned',target_date:'2026-02-22',notes:'Follow-up: District Director to conduct accountability visit within 10 days',logged_by:'P Mtyobo',supporting_doc_url:'',supporting_doc_name:''},
- {id:'DEMO_A5',decision_id:'DEMO_D5',action_taken:'SBA target-setting with learners',responsible:'Ms R Sikhwari',status:'In Progress',target_date:'2026-03-15',notes:'Follow-up: Subject advisors to moderate SBA tasks for Term 2',logged_by:'R Sikhwari',supporting_doc_url:'',supporting_doc_name:''}
- ];
-
- const demo_outs = [
- {id:'DEMO_O0',action_id:'DEMO_A0',intervention_id:null,description:'Grade 10 Maths pass rate at School B improved from 41% (Term 3) to 64% (Term 4). Of the 35 targeted learners, 23 moved above the pass threshold — a 66% success rate. Average mark for the group improved by 12 percentage points.',metric:'Pass rate improvement',value:'41% → 64% (+23 percentage points)',evidence:'SA-SAMS Term 4 2025 results, verified against DDD FET Promotion Profiles report. Attendance register confirms 89% attendance across the 18 after-school sessions.',date:'2026-01-20',logged_by:'F Moshoeshoe'},
- {id:'DEMO_O1',action_id:'DEMO_A3',intervention_id:null,description:'8 of 12 educators now using scaffolded reading approach in lessons. Learner participation visibly improved in follow-up observation.',metric:'Educator adoption rate',value:'67% (8/12)',evidence:'Follow-up lesson observations — 24 Feb 2026',date:'2026-02-24',logged_by:'K Makatu'}
- ];
-
- S.decisions = demo_decs;
- S.actions = demo_acts;
- S.outcomes = demo_outs;
 }
 
 // RENDER 
@@ -1693,11 +1656,12 @@ function getClientScope() {
   // Provincial scope
   if (['Provincial Manager','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Director','Chief Director','Gauteng Provincial Project Manager','North West Junior PM'].includes(role) || role.includes('Provincial')) return 'province';
 
-  // District scope
+  // District scope (also the safe default for any district-level official)
   if (['Circuit Manager','Subject Advisor','Cluster Lead','District Director','Senior Education Specialist'].includes(role)) return 'district';
 
-  // Default: own data only
-  return 'own';
+  // Default: district scope — most tracker users are district officials; locking them
+  // to 'own' hides the district dropdown and breaks filtering for unrecognised roles.
+  return 'district';
 }
 
 function applyDashFilters(decs) {
@@ -1805,11 +1769,11 @@ function exportAllDataCSV() {
  const exportAllowed = (S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za';
  if (!exportAllowed) { showToast('Export is restricted to programme administrators'); return; }
 
- const decs = (S.decisions || []).filter(d => !d.id?.startsWith('DEMO_'));
- const acts = (S.actions || []).filter(a => !a.id?.startsWith('DEMO_'));
- const outs = (S.outcomes || []).filter(o => !o.id?.startsWith('DEMO_'));
+ const decs = (S.decisions || []);
+ const acts = (S.actions || []);
+ const outs = (S.outcomes || []);
 
- if (decs.length === 0) { showToast('No real data to export yet — only demo data is loaded'); return; }
+ if (decs.length === 0) { showToast('No data to export yet'); return; }
 
  // Build flat rows: one row per decision+action+outcome combination
  const rows = [];
@@ -1922,7 +1886,6 @@ function renderDashboard() {
  const outs = allOuts.filter(o => actIds.has(o.action_id));
 
  const now = new Date();
- const isDemo = decs[0]?.id?.startsWith('DEMO_');
 
  // ── CORE METRICS ──
  const totalActivities = decs.length;
@@ -2331,7 +2294,6 @@ function closeSchoolsListModal(){
  // RENDER
  // ═══════════════════════════════════
  return `<div class="dash-wrap">
- ${isDemo ? '<div class="demo-banner"><strong>Demo data shown</strong> — log your first activity and this will be replaced with your real data</div>' : ''}
 
  ${renderFilterBar(allDecs)}
 
