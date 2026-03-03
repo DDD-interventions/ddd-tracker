@@ -2127,9 +2127,9 @@ ${tab==='trends'?`
    <div class="dash-section-hdr"><h3>When Are You Most Active?</h3></div>
    <div class="dash-section-body">
      <div class="dash-section-desc">Each bar shows how many activities your team logged that month. Gaps may show periods where school support was paused.</div>
-     ${months.length ? `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px"><div style="display:flex;align-items:flex-end;gap:${months.length>12?'2':'8'}px;height:120px;padding-bottom:28px;position:relative;border-bottom:1px solid #e0e0e0;min-width:${months.length>6?months.length*48+'px':'100%'}">
+     ${months.length ? `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px"><div style="display:flex;align-items:flex-end;gap:${months.length>12?'2':'8'}px;height:140px;padding-bottom:28px;position:relative;border-bottom:1px solid #e0e0e0;min-width:${months.length>6?months.length*48+'px':'100%'}">
        ${months.map(([m,count])=>{
-         const h = Math.max(Math.round((count/maxMonthly)*100), 8);
+         const h = Math.max(Math.round((count/maxMonthly)*95), 8);
          return `<div style="flex:1 0 36px;max-width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
            <div style="font-size:10px;font-weight:700;color:var(--navy)">${count}</div>
            <div style="width:70%;max-width:40px;height:${h}px;background:linear-gradient(180deg,var(--teal),#074445);border-radius:4px 4px 0 0;transition:height .4s"></div>
