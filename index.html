@@ -261,6 +261,21 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .upload-area input[type="file"]{display:none}
 .upload-label{font-size:13px;color:var(--teal);font-weight:600}
 .upload-hint{font-size:11px;color:var(--grey);margin-top:2px}
+
+/* Validation errors */
+.validation-banner{background:#FFF4F2;border:1px solid #E8563B;border-radius:8px;padding:14px 16px;margin-bottom:16px;animation:fadeIn .3s}
+.validation-banner h3{font-size:13px;color:#C22A0E;margin:0 0 10px;display:flex;align-items:center;gap:6px}
+.validation-banner h3::before{content:'\26A0';font-size:15px}
+.validation-missing{list-style:none;padding:0;margin:0}
+.validation-missing li{font-size:12px;color:var(--navy);padding:6px 10px;border-radius:6px;margin-bottom:4px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+.validation-missing li:hover{background:#FDEAE6}
+.validation-missing li .vm-step{font-size:10px;font-weight:700;color:#fff;background:var(--teal);border-radius:10px;padding:1px 7px;flex-shrink:0}
+.validation-missing li .vm-field{font-weight:600}
+.validation-missing li .vm-arrow{margin-left:auto;color:var(--teal);font-size:14px;font-weight:700}
+.field-error select,.field-error input:not([type="checkbox"]):not([type="radio"]){border-color:#E8563B!important;box-shadow:0 0 0 2px rgba(232,86,59,.15)!important}
+.field-error .school-trigger{border-color:#E8563B!important;box-shadow:0 0 0 2px rgba(232,86,59,.15)!important}
+.step-error-dot{width:8px;height:8px;background:#E8563B;border-radius:50%;display:inline-block;margin-left:4px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .file-preview{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--green-lt);border-radius:6px;margin-top:8px;font-size:12px}
 .file-preview .file-name{flex:1;font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-remove{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:2px 6px}
@@ -492,7 +507,7 @@ const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, pipelineDrill:null,
- saving:false, submitted:false, expandedSchool:null,
+ saving:false, submitted:false, expandedSchool:null, _validationErrors:null,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null,
  dStep:0, dChallenge:null, sortBy:'effectiveness', filterCat:'All',
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview',
@@ -964,8 +979,9 @@ function renderForm() {
   if(step===-1) return renderFormStart();
   const steps = ['Where & When','What Happened','DDD Connection','Context & Follow-up','Review'];
   const stepColors = ['var(--teal)','var(--green)','var(--blue)','var(--orange)','var(--navy)'];
+  const allErrs = S._validationErrors || [];
   return `<div class="form-wrap">
-    <div class="form-progress">${steps.map((s,i)=>`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};render()">${i+1}. ${s}</div>`).join('')}</div>
+    <div class="form-progress">${steps.map((s,i)=>{const hasErr=allErrs.some(e=>e.step===i);return`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};render()">${i+1}. ${s}${hasErr?'<span class="step-error-dot"></span>':''}</div>`}).join('')}</div>
     ${step===0?renderFormStep1():step===1?renderFormStep2():step===2?renderFormStep3():step===3?renderFormStep4():renderFormReview()}
   </div>`;
 }
@@ -1104,12 +1120,12 @@ document.addEventListener('click',function(e){
 function renderFormStep1(){
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
-    <div class="field-row"><div class="field"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
-    <div class="field"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}</div>
-    <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
-    <div class="field-row"><div class="field"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','HoD','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your designation..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your specialisation..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
-    <div style="text-align:right;margin-top:12px"><button class="btn btn-teal" onclick="S.f.formStep=1;render()">Next &rarr;</button></div>
+    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}</div>
+    <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
+    <div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','HoD','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your designation..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your specialisation..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
+    <div style="text-align:right;margin-top:12px"><button class="btn btn-teal" onclick="validateAndNext(0,1)">Next &rarr;</button></div>
   </div></div>`;
 }
 function toggleSubject(name){S.f.subjects.includes(name)?S.f.subjects=S.f.subjects.filter(s=>s!==name):S.f.subjects.push(name);render();}
@@ -1147,12 +1163,12 @@ function renderSubjectPicker(){
 }
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
-    <div class="field-row"><div class="field"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the activity type..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${THEMES.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the theme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
+    <div class="field-row"><div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the activity type..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${THEMES.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the theme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
     <div class="field"><label>Subject(s)</label><div class="hint">Search and select subjects</div>${renderSubjectPicker()}</div>
     <div class="field"><label>Grade(s)</label><div class="hint">Tap all that apply</div><div class="tags">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Gr ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>SIP Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="source-tag">From: School Improvement Plan</div><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><textarea rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea></div>
-    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=0;render()">&larr; Back</button><button class="btn btn-teal" onclick="S.f.formStep=2;render()">Next &rarr;</button></div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=0;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(1,2)">Next &rarr;</button></div>
   </div></div>`;
 }
 function getPhaseForGrades(){
@@ -1211,7 +1227,7 @@ function renderFormStep3(){
   return `<div class="section fade-in"><div class="sec-hdr blue" style="border-color:var(--blue)"><div><h2>3. DDD Data Connection</h2><p>Link DDD insight to your decision and action</p></div></div><div class="sec-body">
     <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8f9fa;border-radius:8px;margin-bottom:4px"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap">Open DDD Dashboard</a><div style="font-size:11px;color:var(--grey-dk);line-height:1.5">Open the DDD Dashboard to confirm the performance insights you want to record here</div></div>
     <div style="font-size:10px;color:var(--grey);line-height:1.5;padding:0 14px 10px;margin-bottom:6px">Your DDD login is <strong style="color:var(--teal-dk)">firstname.surname@dbedashboard.co.za</strong> — use your official DDD credentials, not a personal email</div>
-    <div class="field"><label>Was DDD data used?<span class="req">*</span></label><div class="radio-grp">${['Yes \u2014 directly triggered this','Yes \u2014 informed my approach','Partially','No'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
+    <div class="field" id="fld-ddd-used"><label>Was DDD data used?<span class="req">*</span></label><div class="radio-grp">${['Yes \u2014 directly triggered this','Yes \u2014 informed my approach','Partially','No'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
     ${usedDDD ? `
       ${directUse?`<div style="background:linear-gradient(135deg,#E3F2FD,#E0F4F4);border-radius:8px;padding:12px 14px;margin:8px 0;border-left:3px solid var(--blue)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:12px;font-weight:700;color:var(--navy)">Get the numbers from your dashboard</div></div>
@@ -1260,10 +1276,10 @@ function renderFormStep3(){
     ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs DDD data. But next time, try opening the dashboard first. Even a quick look can show you which learners or schools need your help most.</div><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-size:12px;font-weight:600;text-decoration:none;margin-top:6px">Save the DDD Dashboard link for next time \u2192</a></div>`:''}
     ${pc?`<div style="background:var(--blue-lt);border-radius:8px;padding:10px 14px;margin:8px 0;border-left:3px solid var(--blue)"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px">Promotion criteria \u2014 ${phase} Phase (${pc.phases})</div><div style="font-size:9px;color:var(--grey)">${pc.ref}</div></div><div style="margin-top:4px;font-size:11px;color:#37474F;line-height:1.6">${pc.criteria.join(' \u00b7 ')}</div><div style="font-size:10px;color:var(--grey);margin-top:4px">${pc.sba} \u00b7 ${pc.retention}${pc.condonation?' \u00b7 '+pc.condonation:''}</div></div>`:''}
     <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data that made you step in?</div><select onchange="S.f.intervention_trigger=this.value;if(this.value!=='Other')S.f.intervention_trigger_other='';render()"><option value="">Select...</option>${INTERVENTION_TRIGGERS.map(t=>'<option '+(S.f.intervention_trigger===t?'selected':'')+'>'+t+'</option>').join('')}</select>${S.f.intervention_trigger==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe what made you act..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div>
-    <div class="field-row"><div class="field"><label>Planned intervention</label><div class="hint">What planned intervention did you choose based on the data? This is the plan you made.</div><select onchange="S.f.decision_type=this.value;if(this.value!=='Other')S.f.decision_other='';render()"><option value="">Select...</option>${DECISIONS.map(d=>'<option '+(S.f.decision_type===d?'selected':'')+'>'+d+'</option>').join('')}</select>${S.f.decision_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the planned intervention..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field"><label>Action taken<span class="req">*</span></label><div class="hint">What did you actually do on the ground to carry out that decision?</div><select onchange="S.f.action_type=this.value;render()"><option value="">Select...</option>${ACTIONS.map(a=>'<option '+(S.f.action_type===a?'selected':'')+'>'+a+'</option>').join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Planned intervention</label><div class="hint">What planned intervention did you choose based on the data? This is the plan you made.</div><select onchange="S.f.decision_type=this.value;if(this.value!=='Other')S.f.decision_other='';render()"><option value="">Select...</option>${DECISIONS.map(d=>'<option '+(S.f.decision_type===d?'selected':'')+'>'+d+'</option>').join('')}</select>${S.f.decision_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the planned intervention..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field" id="fld-action"><label>Action taken<span class="req">*</span></label><div class="hint">What did you actually do on the ground to carry out that decision?</div><select onchange="S.f.action_type=this.value;render()"><option value="">Select...</option>${ACTIONS.map(a=>'<option '+(S.f.action_type===a?'selected':'')+'>'+a+'</option>').join('')}</select></div></div>
     ${S.f.action_type==='Other'?`<div class="field"><label>Describe action</label><textarea rows="2" placeholder="Describe..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
     
-    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="S.f.formStep=3;render()">Next &rarr;</button></div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(2,3)">Next &rarr;</button></div>
   </div></div>`;
 }
 function renderFormStep4(){
@@ -1292,6 +1308,7 @@ function supLbl(v){const m={'light':'Light touch','regular':'Regular support','i
 function renderFormReview(){
   const f=S.f;
   return`<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--navy)"><div><h2>5. Review & Submit</h2><p>Check your entry before submitting</p></div></div><div class="sec-body">
+    ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('SIP Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_type==='Other'&&f.decision_other?'Other: '+f.decision_other:f.decision_type)}${rvRow('Intervention activity',f.action_type==='Other'&&f.action_other?'Other: '+f.action_other:f.action_type)}</div>
@@ -1308,13 +1325,13 @@ async function uploadSupportingDoc(file, actionId) {
  const ext = file.name.split('.').pop().toLowerCase();
  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
  const path = '%s/%s/%s'.replace('%s', S._officialId || 'unknown').replace('%s', actionId).replace('%s', Date.now() + '_' + safe);
- const { data, error } = await sb.storage.from('supporting-docs').upload(path, file, {
+ const { data, error } = await sb.storage.from('Supporting-Documents').upload(path, file, {
    cacheControl: '3600',
    upsert: false,
    contentType: file.type || 'application/octet-stream'
  });
  if (error) throw new Error('File upload failed: ' + error.message);
- const { data: urlData } = sb.storage.from('supporting-docs').getPublicUrl(path);
+ const { data: urlData } = sb.storage.from('Supporting-Documents').getPublicUrl(path);
  return { url: urlData?.publicUrl || null, name: file.name };
 }
 
@@ -1387,15 +1404,81 @@ function renderSuccess() {
 // 
 // FORM SUBMISSION
 // 
+// Validation system — returns list of {step, field, label, fieldId} for each missing required item
+function getValidationErrors() {
+ const f = S.f, errs = [];
+ // Step 1: Where & When
+ if (!f.province) errs.push({step:0,field:'province',label:'Province',fieldId:'fld-province'});
+ if (!f.district) errs.push({step:0,field:'district',label:'District',fieldId:'fld-district'});
+ if (!f.schools) errs.push({step:0,field:'schools',label:'School(s)',fieldId:'fld-schools'});
+ if (!f.official_email) errs.push({step:0,field:'official_email',label:'Email address',fieldId:'fld-email'});
+ if (!f.official_role) errs.push({step:0,field:'official_role',label:'Designation',fieldId:'fld-role'});
+ if (f.official_role==='Other'&&!f.official_role_other.trim()) errs.push({step:0,field:'official_role_other',label:'Designation (please specify)',fieldId:'fld-role'});
+ if (!f.official_specialisation) errs.push({step:0,field:'official_specialisation',label:'Specialisation',fieldId:'fld-spec'});
+ if (f.official_specialisation==='Other'&&!f.official_specialisation_other.trim()) errs.push({step:0,field:'official_specialisation_other',label:'Specialisation (please specify)',fieldId:'fld-spec'});
+ // Step 2: What Happened
+ if (!f.activity_type) errs.push({step:1,field:'activity_type',label:'Activity type',fieldId:'fld-activity'});
+ if (f.activity_type==='Other'&&!f.activity_type_other.trim()) errs.push({step:1,field:'activity_type_other',label:'Activity type (please describe)',fieldId:'fld-activity'});
+ // Step 3: DDD Connection
+ if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was DDD data used?',fieldId:'fld-ddd-used'});
+ if (!f.action_type) errs.push({step:2,field:'action_type',label:'Intervention activity (action taken)',fieldId:'fld-action'});
+ if (f.action_type==='Other'&&!f.action_other.trim()) errs.push({step:2,field:'action_other',label:'Intervention activity (please describe)',fieldId:'fld-action'});
+ return errs;
+}
+
+// Get errors for a specific step only
+function getStepErrors(stepIdx) {
+ return getValidationErrors().filter(e => e.step === stepIdx);
+}
+
+// Render inline validation banner
+function renderValidationBanner(errors) {
+ if (!errors.length) return '';
+ const stepNames = ['Where & When','What Happened','DDD Connection','Context & Follow-up','Review'];
+ return `<div class="validation-banner">
+   <h3>${errors.length} thing${errors.length>1?'s':''} still needed before you can submit</h3>
+   <ul class="validation-missing">${errors.map(e =>
+     `<li onclick="S.f.formStep=${e.step};S._validationErrors=getValidationErrors();render();setTimeout(()=>{const el=document.getElementById('${e.fieldId}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('field-error');setTimeout(()=>el.classList.remove('field-error'),3000);}},200)">
+       <span class="vm-step">Step ${e.step+1}</span>
+       <span class="vm-field">${e.label}</span>
+       <span class="vm-arrow">\u2192</span>
+     </li>`).join('')}
+   </ul>
+ </div>`;
+}
+
+// Validate current step before allowing "Next" — soft (shows toast + highlights)
+function validateAndNext(currentStep, nextStep) {
+ const errors = getStepErrors(currentStep);
+ if (errors.length > 0) {
+   const names = errors.map(e => e.label).join(', ');
+   showToast('Please complete: ' + names);
+   S._validationErrors = getValidationErrors();
+   render();
+   // Highlight first missing field
+   setTimeout(() => {
+     const el = document.getElementById(errors[0].fieldId);
+     if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('field-error'); setTimeout(()=>el.classList.remove('field-error'),3000); }
+   }, 150);
+   return;
+ }
+ S._validationErrors = null;
+ S.f.formStep = nextStep;
+ render();
+}
+
 async function submitForm() {
- if (!S.f.province || !S.f.district || !S.f.schools || !S.f.official_role || !S.f.official_specialisation || !S.f.official_email) { showToast('Please complete Where & When (including Designation and Specialisation)'); S.openSections[1]=true; render(); setTimeout(()=>{const el=document.getElementById('sec1');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},100); return; }
- if (S.f.official_role==='Other'&&!S.f.official_role_other.trim()) { showToast('Please specify your designation'); S.openSections[1]=true; render(); return; }
- if (S.f.official_specialisation==='Other'&&!S.f.official_specialisation_other.trim()) { showToast('Please specify your specialisation'); S.openSections[1]=true; render(); return; }
- if (!S.f.activity_type) { showToast('Please select an activity type'); S.openSections[2]=true; render(); setTimeout(()=>{const el=document.getElementById('sec2');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},100); return; }
- if (S.f.activity_type==='Other'&&!S.f.activity_type_other.trim()) { showToast('Please describe the activity type'); S.openSections[2]=true; render(); return; }
- if (!S.f.ddd_used) { showToast('Please indicate if DDD data was used'); S.openSections[3]=true; render(); setTimeout(()=>{const el=document.getElementById('sec3');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},100); return; }
- if (!S.f.action_type) { showToast('Please select an action taken'); S.openSections[3]=true; render(); setTimeout(()=>{const el=document.getElementById('sec3');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},100); return; }
- if (S.f.action_type==='Other'&&!S.f.action_other.trim()) { showToast('Please describe the action taken'); S.openSections[3]=true; render(); return; }
+ const errors = getValidationErrors();
+ if (errors.length > 0) {
+   S._validationErrors = errors;
+   // Navigate to the review step so the banner is visible
+   S.f.formStep = 4;
+   render();
+   window.scrollTo({top:0,behavior:'smooth'});
+   showToast(errors.length + ' required field' + (errors.length>1?'s':'') + ' still missing — tap any item to fix it');
+   return;
+ }
+ S._validationErrors = null;
 
  S.saving = true; render();
 
