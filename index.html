@@ -1602,9 +1602,120 @@ function renderFilterBar(decs) {
     '</div>' +
     '<div class="dash-filters-info">' +
       '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' logged activities' + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
+      '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
+      ((S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:10px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
+      '</div>' +
     '</div>' +
   '</div>';
+}
+
+// ── EXPORT ALL DATA AS CSV ──
+function exportAllDataCSV() {
+ const exportAllowed = (S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za';
+ if (!exportAllowed) { showToast('Export is restricted to programme administrators'); return; }
+
+ const decs = (S.decisions || []).filter(d => !d.id?.startsWith('DEMO_'));
+ const acts = (S.actions || []).filter(a => !a.id?.startsWith('DEMO_'));
+ const outs = (S.outcomes || []).filter(o => !o.id?.startsWith('DEMO_'));
+
+ if (decs.length === 0) { showToast('No real data to export yet — only demo data is loaded'); return; }
+
+ // Build flat rows: one row per decision+action+outcome combination
+ const rows = [];
+ decs.forEach(d => {
+   const det = d.details || {};
+   const relActs = acts.filter(a => a.decision_id === d.id);
+   if (relActs.length === 0) {
+     // Decision with no action yet
+     rows.push(buildExportRow(d, det, null, null));
+   } else {
+     relActs.forEach(a => {
+       const relOuts = outs.filter(o => o.action_id === a.id);
+       if (relOuts.length === 0) {
+         rows.push(buildExportRow(d, det, a, null));
+       } else {
+         relOuts.forEach(o => rows.push(buildExportRow(d, det, a, o)));
+       }
+     });
+   }
+ });
+
+ const headers = [
+   'Date','Logged By','Province','District','Circuit','Schools',
+   'Term','Activity Type','Intervention Theme','Subjects','Grades',
+   'Description','DDD Used','DDD Reports','DDD Access Date','DDD Dashboard Confirmed',
+   'Insight','Decision Type','Learners Reached',
+   'Barriers (Staffing)','Barriers (Resources)','Barriers (Learners)','Context Notes',
+   'Follow-Up','Follow-Up Description','SIP Focus Areas','Support Needed','Support Level',
+   'Action Taken','Action Responsible','Action Status','Action Notes',
+   'Supporting Doc','Outcome Metric','Outcome Value','Outcome Description',
+   'Decision ID','Action ID'
+ ];
+
+ const csvContent = [headers, ...rows].map(row =>
+   row.map(cell => {
+     const s = String(cell == null ? '' : cell).replace(/"/g, '""');
+     return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s + '"' : s;
+   }).join(',')
+ ).join('\n');
+
+ const BOM = '\uFEFF';
+ const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ const dateStr = new Date().toISOString().slice(0,10);
+ a.href = url;
+ a.download = 'DDD_Interventions_Export_' + dateStr + '.csv';
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+ URL.revokeObjectURL(url);
+ showToast('Export downloaded — open in Excel');
+}
+
+function buildExportRow(d, det, a, o) {
+ const arrJoin = v => Array.isArray(v) ? v.join('; ') : (v || '');
+ return [
+   d.date || '',
+   d.made_by || det.official_name || '',
+   det.province || '',
+   det.district || '',
+   det.circuit || '',
+   det.schools || '',
+   det.term || '',
+   det.activity_type || '',
+   det.intervention_theme || '',
+   arrJoin(det.subjects),
+   arrJoin(det.grades),
+   det.description || '',
+   det.ddd_used || '',
+   arrJoin(det.ddd_reports),
+   det.ddd_access_date || '',
+   det.ddd_dashboard_confirmed || '',
+   det.insight_statement || det.insight_detail || d.insight || '',
+   det.decision_type || d.decision_made || '',
+   det.learners_reached != null ? det.learners_reached : '',
+   arrJoin(det.ctx_staffing),
+   arrJoin(det.ctx_resources),
+   arrJoin(det.ctx_learners),
+   det.ctx_notes || '',
+   det.follow_up ? 'Yes' : 'No',
+   det.follow_up_desc || '',
+   arrJoin(det.sip_focus_areas),
+   arrJoin(det.support_needed),
+   det.support_level || '',
+   a ? (a.action_taken || '') : '',
+   a ? (a.responsible || '') : '',
+   a ? (a.status || '') : '',
+   a ? (a.notes || '') : '',
+   a ? (a.supporting_doc_name || '') : '',
+   o ? (o.metric || '') : '',
+   o ? (o.value || '') : '',
+   o ? (o.description || '') : '',
+   d.id || '',
+   a ? (a.id || '') : ''
+ ];
 }
 
 function renderDashboard() {
