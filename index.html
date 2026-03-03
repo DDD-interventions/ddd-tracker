@@ -1277,7 +1277,7 @@ function renderFormStep4(){
     <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Attach a plan, report, sign-in register, or SIP \u2014 or paste a link</div>
       <div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)">
-        <div class="upload-label">Tap to upload from your device</div><div class="upload-hint">PDF, Word, Excel, images \u2014 max 10MB</div>
+        <div class="upload-label">Tap to upload from your device</div><div class="upload-hint">PDF, Word, Excel, images \u2014 max 6MB</div>
       </div>
       ${S.f.doc_file?`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_name)}</span><span style="font-size:10px;color:var(--grey)">${(S.f.doc_file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="S.f.doc_file=null;S.f.doc_file_name='';render()" title="Remove">&times;</button></div>`:''}
       <div style="text-align:center;font-size:11px;color:var(--grey);margin:8px 0">\u2014 or paste a link \u2014</div>
@@ -1301,7 +1301,22 @@ function renderFormReview(){
 }
 function handleFileSelect(e){const file=e.target.files[0];if(file)attachFile(file)}
 function handleFileDrop(e){const file=e.dataTransfer.files[0];if(file)attachFile(file)}
-function attachFile(file){if(file.size>10*1024*1024){alert('File too large — maximum 10MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;render()}
+function attachFile(file){if(file.size>6*1024*1024){alert('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;render()}
+
+async function uploadSupportingDoc(file, actionId) {
+ if (!file) return { url: null, name: null };
+ const ext = file.name.split('.').pop().toLowerCase();
+ const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
+ const path = '%s/%s/%s'.replace('%s', S._officialId || 'unknown').replace('%s', actionId).replace('%s', Date.now() + '_' + safe);
+ const { data, error } = await sb.storage.from('supporting-docs').upload(path, file, {
+   cacheControl: '3600',
+   upsert: false,
+   contentType: file.type || 'application/octet-stream'
+ });
+ if (error) throw new Error('File upload failed: ' + error.message);
+ const { data: urlData } = sb.storage.from('supporting-docs').getPublicUrl(path);
+ return { url: urlData?.publicUrl || null, name: file.name };
+}
 
 function secHdr(n, title, sub, color) {
  const open = S.openSections[n];
@@ -1414,6 +1429,20 @@ async function submitForm() {
  const meta = { logged_by:S.f.official_name||S.official.full_name||'User', logged_by_email:S.f.official_email||S.official.email||'' };
 
  try {
+ // Upload supporting doc if attached
+ let docUrl = S.f.doc_url || '';
+ let docName = S.f.doc_name || '';
+ if (S.f.doc_file) {
+   showToast('Uploading document...');
+   try {
+     const uploaded = await uploadSupportingDoc(S.f.doc_file, actId);
+     if (uploaded.url) { docUrl = uploaded.url; docName = uploaded.name || docName; }
+   } catch (uploadErr) {
+     console.warn('File upload failed, continuing without:', uploadErr.message);
+     showToast('File upload failed — entry will be saved without attachment. You can add it later.');
+   }
+ }
+
  // Insert decision
  const dec = {
  id: decId,
@@ -1443,8 +1472,8 @@ async function submitForm() {
  status: 'In Progress',
  target_date: null,
  notes: S.f.follow_up ? 'Follow-up: ' + S.f.follow_up_desc : '',
- supporting_doc_url: S.f.doc_url,
- supporting_doc_name: S.f.doc_name,
+ supporting_doc_url: docUrl,
+ supporting_doc_name: docName,
  ...meta
  };
  const r2 = await sb.from('actions').insert(act);
@@ -1649,7 +1678,7 @@ function exportAllDataCSV() {
    'Barriers (Staffing)','Barriers (Resources)','Barriers (Learners)','Context Notes',
    'Follow-Up','Follow-Up Description','SIP Focus Areas','Support Needed','Support Level',
    'Action Taken','Action Responsible','Action Status','Action Notes',
-   'Supporting Doc','Outcome Metric','Outcome Value','Outcome Description',
+   'Supporting Doc','Supporting Doc URL','Outcome Metric','Outcome Value','Outcome Description',
    'Decision ID','Action ID'
  ];
 
@@ -1710,6 +1739,7 @@ function buildExportRow(d, det, a, o) {
    a ? (a.status || '') : '',
    a ? (a.notes || '') : '',
    a ? (a.supporting_doc_name || '') : '',
+   a ? (a.supporting_doc_url || '') : '',
    o ? (o.metric || '') : '',
    o ? (o.value || '') : '',
    o ? (o.description || '') : '',
