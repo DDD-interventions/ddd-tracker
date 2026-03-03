@@ -823,8 +823,9 @@ async function loadAll() {
  sb.from('interventions').select('*').order('entity_name')
  ]);
  S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
- // If empty, inject demo data so dashboard is useful immediately
- if (S.decisions.length === 0) injectDemo();
+ // If empty, inject demo data so dashboard is useful immediately (unless user dismissed)
+ const demoDismissed=(()=>{try{return localStorage.getItem('ddd_demo_dismissed')==='1'}catch(e){return false}})();
+ if (S.decisions.length === 0 && !demoDismissed) injectDemo();
  S.loading = false; S.error = null;
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
@@ -866,6 +867,8 @@ function injectDemo() {
  S.actions = demo_acts;
  S.outcomes = demo_outs;
 }
+
+function dismissDemo(){try{localStorage.setItem('ddd_demo_dismissed','1')}catch(e){}S.decisions=[];S.actions=[];S.outcomes=[];render();}
 
 // RENDER 
 function render() {
@@ -1641,6 +1644,7 @@ async function submitForm() {
  if (r2.error) throw r2.error;
 
  S.submitted = true;
+    try{localStorage.setItem('ddd_demo_dismissed','1')}catch(e){}
  await loadAll();
  } catch(e) {
  showToast('Error: ' + e.message);
@@ -1696,8 +1700,8 @@ function getClientScope() {
   // District scope
   if (['Circuit Manager','Subject Advisor','Cluster Lead','District Director','Senior Education Specialist'].includes(role)) return 'district';
 
-  // Default: own data only
-  return 'own';
+  // Default: district-level scope so filters remain usable
+  return 'district';
 }
 
 function applyDashFilters(decs) {
@@ -2331,7 +2335,7 @@ function closeSchoolsListModal(){
  // RENDER
  // ═══════════════════════════════════
  return `<div class="dash-wrap">
- ${isDemo ? '<div class="demo-banner"><strong>Demo data shown</strong> — log your first activity and this will be replaced with your real data</div>' : ''}
+ ${isDemo ? '<div class="demo-banner"><strong>Demo data shown</strong> — log your first activity and this will be replaced with your real data <button onclick="dismissDemo()" style="margin-left:8px;background:var(--teal);color:#fff;border:none;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:11px">Dismiss</button></div>' : ''}
 
  ${renderFilterBar(allDecs)}
 
