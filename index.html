@@ -285,6 +285,16 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .form-progress-step.active{background:var(--teal);color:#fff}
 .form-progress-step.done{background:var(--teal-lt);color:var(--teal)}
 .form-progress-step.upcoming{background:#f3f2f1;color:var(--grey)}
+
+/* Live progress bar */
+.form-live-progress{padding:12px 16px 0;margin-bottom:0}
+.form-live-progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.form-live-progress-label{font-size:11px;font-weight:600;color:var(--grey-dk)}
+.form-live-progress-pct{font-size:13px;font-weight:700;color:var(--teal)}
+.form-live-progress-pct.complete{color:var(--green)}
+.form-live-bar{height:6px;background:#e8e6e4;border-radius:3px;overflow:hidden}
+.form-live-bar-fill{height:100%;border-radius:3px;transition:width .4s ease,background .4s ease}
+.form-live-progress-hint{font-size:10px;color:var(--grey);margin-top:5px;line-height:1.4;min-height:14px}
 .review-card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden}
 .review-card-hdr{padding:10px 14px;font-size:12px;font-weight:700;border-bottom:1px solid #f3f2f1}
 .review-row{display:flex;justify-content:space-between;padding:5px 14px;font-size:11px;border-bottom:1px solid #f9f9f9}
@@ -974,6 +984,74 @@ function renderOtpGate() {
 // 
 // FORM
 // 
+// Live form progress — weights: required fields count more
+function getFormProgress() {
+ const f = S.f;
+ // Each item: [filled boolean, weight]  — required=3, important=2, optional=1
+ const checks = [
+   // Step 1: Where & When
+   [!!f.province, 3],
+   [!!f.district, 3],
+   [!!f.schools, 3],
+   [!!f.official_email, 3],
+   [!!f.official_role && (f.official_role !== 'Other' || !!f.official_role_other.trim()), 3],
+   [!!f.official_specialisation && (f.official_specialisation !== 'Other' || !!f.official_specialisation_other.trim()), 3],
+   [!!f.official_name, 2],
+   [!!f.circuit, 1],
+   // Step 2: What Happened
+   [!!f.activity_type && (f.activity_type !== 'Other' || !!f.activity_type_other.trim()), 3],
+   [!!f.intervention_theme, 2],
+   [f.subjects.length > 0, 2],
+   [f.grades.length > 0, 2],
+   [!!f.description, 1],
+   [f.sip_focus_areas.length > 0, 1],
+   // Step 3: DDD Connection
+   [!!f.ddd_used, 3],
+   [!!f.action_type && (f.action_type !== 'Other' || !!f.action_other.trim()), 3],
+   [!!f.decision_type, 2],
+   [!!f.intervention_trigger, 1],
+   // Step 4: Context & Follow-up
+   [f.support_needed.length > 0, 1],
+   [!!f.support_level, 1],
+   [f.ctx_staffing.length > 0, 1],
+   [f.ctx_resources.length > 0, 1],
+   [f.ctx_learners.length > 0, 1],
+   [!!f.learners_reached, 2],
+   [!!f.doc_file || !!f.doc_url, 1],
+ ];
+ // DDD-specific fields only count when DDD was actually used
+ const usedDDD = f.ddd_used && f.ddd_used !== 'no';
+ if (usedDDD) {
+   checks.push([f.ddd_reports.length > 0, 2]);
+   checks.push([!!f.insight_type, 2]);
+   checks.push([!!f.insight_detail, 1]);
+ }
+ let filled = 0, total = 0;
+ for (const [done, w] of checks) { total += w; if (done) filled += w; }
+ return Math.round((filled / total) * 100);
+}
+
+function getProgressHint(pct) {
+ if (pct === 100) return 'All done — ready to submit!';
+ if (pct >= 80) return 'Almost there — just a few more details';
+ if (pct >= 50) return 'Good progress — keep going';
+ if (pct >= 25) return 'Off to a good start';
+ return 'Fill in the fields as you go — your progress is saved';
+}
+
+function renderLiveProgress() {
+ const pct = getFormProgress();
+ const color = pct === 100 ? 'var(--green)' : pct >= 60 ? 'var(--teal)' : pct >= 30 ? 'var(--orange)' : '#c8c6c4';
+ return `<div class="form-live-progress">
+   <div class="form-live-progress-top">
+     <span class="form-live-progress-label">Form progress</span>
+     <span class="form-live-progress-pct ${pct===100?'complete':''}">${pct}%</span>
+   </div>
+   <div class="form-live-bar"><div class="form-live-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+   <div class="form-live-progress-hint">${getProgressHint(pct)}</div>
+ </div>`;
+}
+
 function renderForm() {
   const step = S.f.formStep;
   if(step===-1) return renderFormStart();
@@ -981,6 +1059,7 @@ function renderForm() {
   const stepColors = ['var(--teal)','var(--green)','var(--blue)','var(--orange)','var(--navy)'];
   const allErrs = S._validationErrors || [];
   return `<div class="form-wrap">
+    ${renderLiveProgress()}
     <div class="form-progress">${steps.map((s,i)=>{const hasErr=allErrs.some(e=>e.step===i);return`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};render()">${i+1}. ${s}${hasErr?'<span class="step-error-dot"></span>':''}</div>`}).join('')}</div>
     ${step===0?renderFormStep1():step===1?renderFormStep2():step===2?renderFormStep3():step===3?renderFormStep4():renderFormReview()}
   </div>`;
