@@ -118,11 +118,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 /* DASHBOARD */
 .dash-wrap{max-width:860px;margin:0 auto;padding:16px 16px 40px}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-@media(max-width:600px){.stats-row{grid-template-columns:1fr}.dash-charts-row{grid-template-columns:1fr !important}}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr}}
 @media(min-width:601px) and (max-width:800px){.stats-row{grid-template-columns:1fr 1fr}}
-
 .dash-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
 @media(max-width:600px){.dash-panels{grid-template-columns:1fr}}
+.dash-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:500px){.dash-charts-row{grid-template-columns:1fr !important}}
 
 /* ═══ MOBILE RESPONSIVE OVERRIDES ═══ */
 @media(max-width:500px){
@@ -165,14 +166,13 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   /* Review table values: allow wrapping */
   .review-value{max-width:55%;word-break:break-word}
 }
-.stat-card{background:#fff;border-radius:10px;padding:20px 22px;text-align:left;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #ECEFF1;position:relative}
-.stat-card .stat-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
-.stat-card .stat-desc{font-size:11px;color:var(--grey);line-height:1.4;margin-bottom:16px;font-weight:400}
-.stat-card .stat-num{font-size:36px;font-weight:300;line-height:1;color:var(--teal)}
-.stat-card.green .stat-num{color:var(--green)}
-.stat-card.orange .stat-num{color:var(--orange)}
-.stat-card.red .stat-num{color:var(--red)}
-.stat-card .stat-footer{font-size:9px;color:var(--grey);margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0}
+.stat-card{background:#fff;border-radius:10px;padding:20px 22px;text-align:left;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #ECEFF1}
+.stat-card .st-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.stat-card .st-desc{font-size:11px;color:var(--grey);line-height:1.4;margin-bottom:16px}
+.stat-card .st-num{font-size:36px;font-weight:300;line-height:1;color:var(--teal)}
+.stat-card.green .st-num{color:var(--green-dk)}
+.stat-card.orange .st-num{color:var(--orange)}
+.stat-card .st-foot{font-size:9px;color:var(--grey);margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0}
 
 .dash-section{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
 .dash-section-hdr{padding:14px 16px;border-bottom:1px solid var(--grey-lt);display:flex;justify-content:space-between;align-items:center}
@@ -562,8 +562,7 @@ async function checkAuth() {
        S.f.official_role = official.role || '';
        S.f.official_email = official.email || '';
        if (official.province) S.f.province = official.province;
-       if (!S.f.province) S.f.province = getProvinceFromAssigned() || '';
-       if (official.district && !official.district.includes(',')) S.f.district = official.district;
+       if (official.district) S.f.district = official.district;
        initDashFilters();
        S.authState = 'ready';
        resetInactivityTimer();
@@ -652,8 +651,7 @@ async function handleOtpSubmit() {
    S.f.official_role = official.role || '';
    S.f.official_email = S._otpEmail;
    if (official.province) S.f.province = official.province;
-   if (!S.f.province) S.f.province = getProvinceFromAssigned() || '';
-   if (official.district && !official.district.includes(',')) S.f.district = official.district;
+   if (official.district) S.f.district = official.district;
 
    initDashFilters();
    notifyLogin(S.official);
@@ -854,7 +852,7 @@ function render() {
 
  const o = S.official;
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${(()=>{const assigned=getAssignedDistricts();if(assigned.length>1)return' · '+assigned.length+' districts';if(o.district&&o.district!=='EMPTY'&&o.district!=='All')return' · '+esc(o.district);return '';})()}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -973,7 +971,7 @@ function renderForm() {
 }
 function renderFormStart(){
   const hasName=S.official.full_name && S.official.full_name!=='Official';
-  const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ')[0])+'! Ready':'Ready';
+  const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ').pop())+'! Ready':'Ready';
   return `<div class="form-wrap"><div class="section fade-in" style="overflow:visible">
     <div style="padding:28px 22px;text-align:center">
       
@@ -1105,7 +1103,7 @@ document.addEventListener('click',function(e){
 function renderFormStep1(){
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
-    <div class="field-row"><div class="field"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(()=>{const allDist=DISTRICTS[S.f.province]||[];const assigned=getAssignedDistricts();const filtered=assigned.length>0?allDist.filter(d=>assigned.includes(d)):allDist;return filtered.map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('');})()}</select></div></div>
+    <div class="field-row"><div class="field"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
     <div class="field"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
@@ -1483,16 +1481,10 @@ function resetForm() {
 // ── DASHBOARD SCOPE HELPER ──
 function initDashFilters() {
   const scope = getClientScope();
-  let realProv = (S.official.province && S.official.province !== 'National' && S.official.province !== 'All') ? S.official.province : '';
-  // Auto-detect province from assigned districts if not explicitly set
-  if (!realProv && scope === 'multi_district') {
-    realProv = getProvinceFromAssigned();
-  }
-  realProv = realProv || 'All';
+  const realProv = (S.official.province && S.official.province !== 'National' && S.official.province !== 'All') ? S.official.province : 'All';
   const realDist = S.official.district || 'All';
-  const assigned = getAssignedDistricts();
   S.dashFilter = {
-    province: (scope === 'district' || scope === 'own' || scope === 'multi_district') ? realProv : 'All',
+    province: (scope === 'district' || scope === 'own') ? realProv : 'All',
     district: scope === 'own' ? realDist : 'All',
     circuit: 'All',
     school: 'All'
@@ -1502,16 +1494,12 @@ function initDashFilters() {
 function getClientScope() {
   const role = S.official.role || '';
   const prov = S.official.province || '';
-  const dist = (S.official.district || '').trim();
 
   // National scope: explicit national province or national-level roles
   if (prov === 'National' || prov === 'All' || ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager'].includes(role)) return 'national';
 
   // Provincial scope
   if (['Provincial Manager','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Director','Chief Director','Gauteng Provincial Project Manager','North West Junior PM'].includes(role) || role.includes('Provincial')) return 'province';
-
-  // Multi-district: official assigned to specific comma-separated districts
-  if (dist && dist !== 'EMPTY' && dist !== 'All' && !dist.startsWith('All ') && dist.includes(',')) return 'multi_district';
 
   // District scope
   if (['Circuit Manager','Subject Advisor','Cluster Lead','District Director','Senior Education Specialist'].includes(role)) return 'district';
@@ -1520,49 +1508,12 @@ function getClientScope() {
   return 'own';
 }
 
-// Parse official's district field into array of assigned districts
-// Handles: "All", "All XX Districts", "EMPTY", "", single district, comma-separated multi
-function getAssignedDistricts() {
-  const raw = (S.official.district || '').trim();
-  if (!raw || raw === 'EMPTY' || raw === 'All' || raw.startsWith('All ')) return [];
-  return raw.split(',').map(function(d){ return d.trim(); }).filter(Boolean);
-}
-
-// Find which province a district belongs to from master data
-function getProvinceForDistrict(dist) {
-  const provs = Object.keys(GEO_HIER);
-  for (let i = 0; i < provs.length; i++) {
-    if (GEO_HIER[provs[i]][dist]) return provs[i];
-  }
-  return '';
-}
-
-// Detect province from assigned districts (all must be in same province for lock)
-function getProvinceFromAssigned() {
-  const assigned = getAssignedDistricts();
-  if (assigned.length === 0) return '';
-  const prov = getProvinceForDistrict(assigned[0]);
-  if (!prov) return '';
-  // Only return province if ALL assigned districts are in the same province
-  for (let i = 1; i < assigned.length; i++) {
-    if (getProvinceForDistrict(assigned[i]) !== prov) return '';
-  }
-  return prov;
-}
-
 function applyDashFilters(decs) {
   const f = S.dashFilter;
-  const scope = getClientScope();
-  const assigned = getAssignedDistricts();
   return decs.filter(d => {
     const det = d.details || {};
     if (f.province !== 'All' && (det.province || '') !== f.province) return false;
-    // Multi-district: when "All" is selected, restrict to assigned districts only
-    if (f.district !== 'All') {
-      if ((det.district || '') !== f.district) return false;
-    } else if (scope === 'multi_district' && assigned.length > 0) {
-      if (!assigned.includes(det.district || '')) return false;
-    }
+    if (f.district !== 'All' && (det.district || '') !== f.district) return false;
     if (f.circuit !== 'All' && (det.circuit || '') !== f.circuit) return false;
     if (f.school !== 'All') {
       const schools = (det.schools || '').split(',').map(s => s.trim());
@@ -1590,17 +1541,12 @@ function renderFilterBar(decs) {
   }
 
   // Circuits: from master data, scoped by province + district
-  // When province is 'All' but district is selected, derive province from district
   let circuits = [];
-  let effectiveProv = f.province;
-  if (effectiveProv === 'All' && f.district !== 'All') {
-    effectiveProv = getProvinceForDistrict(f.district);
-  }
-  if (effectiveProv && effectiveProv !== 'All' && f.district !== 'All' && GEO_HIER[effectiveProv] && GEO_HIER[effectiveProv][f.district]) {
-    circuits = GEO_HIER[effectiveProv][f.district].slice().sort();
-  } else if (effectiveProv && effectiveProv !== 'All' && f.district === 'All' && GEO_HIER[effectiveProv]) {
+  if (f.province !== 'All' && f.district !== 'All' && GEO_HIER[f.province] && GEO_HIER[f.province][f.district]) {
+    circuits = GEO_HIER[f.province][f.district].slice().sort();
+  } else if (f.province !== 'All' && f.district === 'All' && GEO_HIER[f.province]) {
     const cs = new Set();
-    Object.values(GEO_HIER[effectiveProv]).forEach(function(circs) { circs.forEach(function(c) { cs.add(c); }); });
+    Object.values(GEO_HIER[f.province]).forEach(function(circs) { circs.forEach(function(c) { cs.add(c); }); });
     circuits = [...cs].sort();
   }
 
@@ -1619,14 +1565,8 @@ function renderFilterBar(decs) {
     schools.sort();
   }
 
-  const provLocked = scope === 'district' || scope === 'own' || scope === 'multi_district';
-  const distLocked = scope === 'own' && S.official.district && S.official.district !== 'All' && !S.official.district.startsWith('All ');
-
-  // For multi-district officials, restrict district dropdown to their assigned districts only
-  const assigned = getAssignedDistricts();
-  if (scope === 'multi_district' && assigned.length > 0) {
-    districts = assigned.filter(function(d){ return districts.includes(d); });
-  }
+  const provLocked = scope === 'district' || scope === 'own';
+  const distLocked = scope === 'own';
   const hasFilters = f.province !== 'All' || f.district !== 'All' || f.circuit !== 'All' || f.school !== 'All';
   const filtered = applyDashFilters(decs);
 
@@ -2024,6 +1964,61 @@ function closeSchoolsListModal(){
   if(el) el.remove();
 }
 
+
+ // ── PRE-COMPUTED OVERVIEW HTML ──
+ var _latestDate = decs.reduce(function(b,d){return(d.date||'')>(b||'')?d.date:b;},'');
+ var _actColors = {'School support visit':'#0B8E8D','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Mentoring / coaching session':'#7B1FA2','Curriculum support':'#00897B','Assessment moderation':'#0097A7'};
+ var _ovActChart = '';
+ if (actTypes.length) {
+   var _mxA = actTypes[0][1];
+   _ovActChart = '<div style="display:grid;gap:10px">';
+   for (var _ai=0; _ai<Math.min(actTypes.length,8); _ai++) {
+     var _t=actTypes[_ai][0], _c=actTypes[_ai][1], _p=Math.max(Math.round((_c/_mxA)*100),6), _cl=_actColors[_t]||'#607D8B';
+     _ovActChart += '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(_t)+'</span><span style="font-size:11px;font-weight:700;color:var(--navy)">'+_c+'</span></div><div style="height:14px;background:#F0F2F5;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+_p+'%;background:'+_cl+';border-radius:3px"></div></div></div>';
+   }
+   _ovActChart += '</div>';
+ } else { _ovActChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No activities logged yet</div>'; }
+
+ var _dddCol = dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)';
+ var _dddTip = dddPct>=60?'Most of your activities are data-informed. This strengthens your evidence for quarterly reports.':dddPct>=40?'You are building a data-informed habit. Try opening DDD Dashboard before each school visit.':'Tip: Open the DDD Dashboard first. Note what you see, then come back to Log Activity.';
+
+ var _narrHTML = '';
+ if (narratives.length) {
+   _narrHTML = '<div style="margin-bottom:16px">';
+   for (var _ni=0; _ni<Math.min(narratives.length,4); _ni++) {
+     var _n=narratives[_ni];
+     _narrHTML += '<div style="background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid '+_n.color+'"><div><div style="font-size:12px;color:var(--navy);line-height:1.6">'+_n.text+'</div>'+(_n.action?'<div style="font-size:11px;color:'+_n.color+';font-weight:600;margin-top:4px">'+_n.action+'</div>':'')+'</div></div>';
+   }
+   _narrHTML += '</div>';
+ }
+
+ var _fuHTML = '';
+ if (followUpsWithAge.length || silentDistricts.length) {
+   _fuHTML = '<div class="dash-section" style="border-left:4px solid var(--orange)"><div class="dash-section-hdr"><h3>Needs Your Attention</h3><span style="font-size:11px;color:var(--grey)">'+(followUpsWithAge.length+silentDistricts.length)+' item'+((followUpsWithAge.length+silentDistricts.length)!==1?'s':'')+'</span></div><div class="dash-section-body">';
+   if (followUpsWithAge.length) {
+     _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Follow-ups Due</div><div style="display:grid;gap:6px;margin-bottom:'+(silentDistricts.length?'14':'0')+'px">';
+     for (var _fi=0; _fi<Math.min(followUpsWithAge.length,5); _fi++) {
+       var _f=followUpsWithAge[_fi];
+       var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
+       var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
+       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div></div>';
+     }
+     if (followUpsWithAge.length>5) _fuHTML += '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ '+(followUpsWithAge.length-5)+' more</div>';
+     _fuHTML += '</div>';
+   }
+   if (silentDistricts.length) {
+     _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Districts With No Recent Activity (30+ days)</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+     for (var _si=0; _si<silentDistricts.length; _si++) {
+       _fuHTML += '<span style="font-size:11px;padding:4px 10px;border-radius:6px;background:var(--red-lt);color:var(--red);font-weight:600;border:1px solid rgba(229,57,53,.15)">'+esc(silentDistricts[_si].district||silentDistricts[_si].province)+'</span>';
+     }
+     _fuHTML += '</div>';
+   }
+   _fuHTML += '</div></div>';
+ } else if (totalActivities > 0) {
+   _fuHTML = '<div style="background:#fff;border-radius:8px;padding:14px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--green);text-align:center"><div style="font-size:13px;color:var(--green-dk);font-weight:600">All clear \u2014 no follow-ups due and all districts active</div></div>';
+ }
+
+
 // ── TAB STATE ──
  const tab = S.dashTab || 'overview';
  if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'update' || tab === 'schools') { S.dashTab = 'overview'; return renderDashboard(); }
@@ -2043,54 +2038,37 @@ function closeSchoolsListModal(){
  </div>
 
 ${tab==='overview'?`
- <!-- ═══ STAT CARDS (reference style) ═══ -->
+ <!-- ═══ STAT CARDS ═══ -->
  <div class="stats-row">
    <div class="stat-card">
-     <div class="stat-title">Activities Logged</div>
-     <div class="stat-desc">The total number of school visits, workshops, and support activities you have carried out and recorded</div>
-     <div class="stat-num">${totalActivities.toLocaleString()}</div>
-     ${decs.length?`<div class="stat-footer">${decs[0].date?'Latest activity on '+fmtDate(decs.sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0].date):''}</div>`:''}
+     <div class="st-title">Activities Logged</div>
+     <div class="st-desc">The total number of school visits, workshops, and support activities you have carried out and recorded</div>
+     <div class="st-num">${totalActivities.toLocaleString()}</div>
+     ${_latestDate?'<div class="st-foot">Latest activity on '+fmtDate(_latestDate)+'</div>':''}
    </div>
    <div class="stat-card green">
-     <div class="stat-title">Schools Supported</div>
-     <div class="stat-desc">The number of unique schools where you have conducted at least one intervention or support activity</div>
-     <div class="stat-num">${schoolSet.size.toLocaleString()}</div>
-     ${districts.length?`<div class="stat-footer">Across ${districts.length} district${districts.length!==1?'s':''} in ${activeProvinces.length} province${activeProvinces.length!==1?'s':''}</div>`:''}
+     <div class="st-title">Schools Supported</div>
+     <div class="st-desc">The number of unique schools where you have conducted at least one intervention or support activity</div>
+     <div class="st-num">${schoolSet.size.toLocaleString()}</div>
+     ${districts.length?'<div class="st-foot">Across '+districts.length+' district'+(districts.length!==1?'s':'')+' in '+activeProvinces.length+' province'+(activeProvinces.length!==1?'s':'')+'</div>':''}
    </div>
    <div class="stat-card orange">
-     <div class="stat-title">Learners Reached</div>
-     <div class="stat-desc">The estimated number of learners who benefited from your intervention activities, based on what you reported</div>
-     <div class="stat-num">${totalLearners.toLocaleString()}</div>
-     ${schoolSet.size?`<div class="stat-footer">Average of ~${schoolSet.size?Math.round(totalLearners/schoolSet.size):0} learners per school</div>`:''}
+     <div class="st-title">Learners Reached</div>
+     <div class="st-desc">The estimated number of learners who benefited from your intervention activities, based on what you reported</div>
+     <div class="st-num">${totalLearners.toLocaleString()}</div>
+     ${schoolSet.size?'<div class="st-foot">Average of ~'+Math.round(totalLearners/(schoolSet.size||1))+' learners per school</div>':''}
    </div>
  </div>
 
- <!-- ═══ CHART PANELS (reference style) ═══ -->
+ <!-- ═══ CHART PANELS ═══ -->
  <div class="dash-panels">
-   <!-- Overview of Interventions -->
    <div class="dash-section" style="margin-bottom:0">
      <div class="dash-section-hdr"><h3>Overview of Interventions</h3></div>
      <div class="dash-section-body">
        <div class="dash-section-desc">The types of support activities you have logged</div>
-       ${actTypes.length ? `<div style="display:grid;gap:10px">${actTypes.slice(0,8).map(([type,count])=>{
-         const maxAct = actTypes[0][1];
-         const pct = Math.max(Math.round((count/maxAct)*100), 6);
-         const colors={'School support visit':'#0B8E8D','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Mentoring / coaching session':'#7B1FA2','Curriculum support':'#00897B','Assessment moderation':'#0097A7'};
-         const c = colors[type]||'#607D8B';
-         return `<div>
-           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-             <span style="font-size:11px;color:var(--navy);font-weight:500">${esc(type)}</span>
-             <span style="font-size:11px;font-weight:700;color:var(--navy)">${count}</span>
-           </div>
-           <div style="height:14px;background:#F0F2F5;border-radius:3px;overflow:hidden">
-             <div style="height:100%;width:${pct}%;background:${c};border-radius:3px;transition:width .4s"></div>
-           </div>
-         </div>`;
-       }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No activities logged yet</div>'}
+       ${_ovActChart}
      </div>
    </div>
-
-   <!-- Data-Informed Practice -->
    <div class="dash-section" style="margin-bottom:0">
      <div class="dash-section-hdr"><h3>Data-Informed Practice</h3></div>
      <div class="dash-section-body">
@@ -2099,10 +2077,10 @@ ${tab==='overview'?`
          <div style="position:relative;width:90px;height:90px;flex-shrink:0">
            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
              <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F0F2F5" stroke-width="3.5"/>
-             <circle cx="18" cy="18" r="15.5" fill="none" stroke="${dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)'}" stroke-width="3.5" stroke-dasharray="${dddPct} ${100-dddPct}" stroke-linecap="round"/>
+             <circle cx="18" cy="18" r="15.5" fill="none" stroke="${_dddCol}" stroke-width="3.5" stroke-dasharray="${dddPct} ${100-dddPct}" stroke-linecap="round"/>
            </svg>
            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-             <div style="font-size:22px;font-weight:300;color:${dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)'}">${dddPct}%</div>
+             <div style="font-size:22px;font-weight:300;color:${_dddCol}">${dddPct}%</div>
            </div>
          </div>
          <div style="flex:1">
@@ -2116,57 +2094,22 @@ ${tab==='overview'?`
                <span style="font-size:13px;font-weight:700;color:var(--green)">${dddUsageCounts.informed}</span>
              </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
-               <span style="font-size:11px;color:var(--grey-dk)">Didn't use DDD</span>
+               <span style="font-size:11px;color:var(--grey-dk)">Did not use DDD</span>
                <span style="font-size:13px;font-weight:700;color:var(--grey)">${dddUsageCounts.none}</span>
              </div>
            </div>
          </div>
        </div>
-       <div style="font-size:10px;color:var(--grey);line-height:1.5;padding:8px 10px;background:#F8F9FA;border-radius:6px">${dddPct>=60?'Most of your activities are data-informed. This strengthens your evidence for quarterly reports.':dddPct>=40?'You're building a data-informed habit. Try opening DDD Dashboard before each school visit.':'Tip: Open the DDD Dashboard first. Note what you see, then come back to Log Activity.'}</div>
+       <div style="font-size:10px;color:var(--grey);line-height:1.5;padding:8px 10px;background:#F8F9FA;border-radius:6px">${_dddTip}</div>
      </div>
    </div>
  </div>
 
  <!-- ═══ SMART NARRATIVES ═══ -->
- ${narratives.length ? `<div style="margin-bottom:16px">${narratives.slice(0,4).map(n=>`
-   <div style="background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid ${n.color}">
-     <div>
-       <div style="font-size:12px;color:var(--navy);line-height:1.6">${n.text}</div>
-       ${n.action?`<div style="font-size:11px;color:${n.color};font-weight:600;margin-top:4px">${n.action}</div>`:''}
-     </div>
-   </div>`).join('')}</div>` : ''}
+ ${_narrHTML}
 
  <!-- ═══ NEEDS YOUR ATTENTION ═══ -->
- ${followUpsWithAge.length || silentDistricts.length ? `<div class="dash-section" style="border-left:4px solid var(--orange)">
-   <div class="dash-section-hdr"><h3>Needs Your Attention</h3><span style="font-size:11px;color:var(--grey)">${followUpsWithAge.length + silentDistricts.length} item${(followUpsWithAge.length + silentDistricts.length)!==1?'s':''}</span></div>
-   <div class="dash-section-body">
-     ${followUpsWithAge.length ? `
-       <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Follow-ups Due</div>
-       <div style="display:grid;gap:6px;margin-bottom:${silentDistricts.length?'14px':'0'}">
-         ${followUpsWithAge.slice(0,5).map(f=>{
-           const urgency = f.daysSince > 30 ? 'var(--red)' : f.daysSince > 14 ? 'var(--orange)' : 'var(--blue)';
-           const schoolArr = (f.schools||'').split(',').map(s=>s.trim()).filter(Boolean);
-           return `<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid ${urgency}">
-             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-               <div style="flex:1;min-width:0">
-                 <div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">${esc(f.desc)}</div>
-                 <div style="font-size:10px;color:var(--grey);margin-top:3px">${schoolArr.length?schoolArr.slice(0,2).join(', ')+(schoolArr.length>2?' +' +(schoolArr.length-2)+' more':''):''}${f.district?' · '+esc(f.district):''}</div>
-               </div>
-               <span style="font-size:10px;font-weight:700;color:${urgency};white-space:nowrap">${f.daysSince}d ago</span>
-             </div>
-           </div>`;
-         }).join('')}
-         ${followUpsWithAge.length > 5 ? '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ ' + (followUpsWithAge.length - 5) + ' more</div>' : ''}
-       </div>` : ''}
-     ${silentDistricts.length ? `
-       <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Districts With No Recent Activity (30+ days)</div>
-       <div style="display:flex;flex-wrap:wrap;gap:6px">
-         ${silentDistricts.map(d=>`<span style="font-size:11px;padding:4px 10px;border-radius:6px;background:var(--red-lt);color:var(--red);font-weight:600;border:1px solid rgba(229,57,53,.15)">${esc(d.district||d.province)}</span>`).join('')}
-       </div>` : ''}
-   </div>
- </div>` : totalActivities > 0 ? `<div style="background:#fff;border-radius:8px;padding:14px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--green);text-align:center">
-   <div style="font-size:13px;color:var(--green-dk);font-weight:600">All clear — no follow-ups due and all districts active</div>
- </div>` : ''}
+ ${_fuHTML}
 
  <!-- ═══ OPEN DDD DASHBOARD CTA ═══ -->
  <div style="background:linear-gradient(135deg,#074445 0%,#0F7B7D 60%,#0A6B4F 100%);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap">
@@ -2174,7 +2117,7 @@ ${tab==='overview'?`
      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">Want stronger entries? Start from the data</div>
      <div style="font-size:11px;color:#B8DCDC;line-height:1.5">Open the DDD Dashboard, note what you see (pass rates, at-risk learners), then come back to Log Activity</div>
    </div>
-   <a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" onclick="markDDDChecked()" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.3);white-space:nowrap">Open Dashboard →</a>
+   <a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" onclick="markDDDChecked()" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.3);white-space:nowrap">Open Dashboard \u2192</a>
  </div>
 `:''}
 
@@ -2201,14 +2144,21 @@ ${tab==='trends'?`
  <div class="dash-section" style="border-left:4px solid var(--teal)">
    <div class="dash-section-hdr"><h3>Which DDD Reports Are You Using?</h3></div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">These are the DDD reports officials referenced when logging. If you're not seeing the reports most relevant to your work, explore the Interventions Toolkit.</div>
+     <div class="dash-section-desc">The DDD reports officials referenced when logging. If you are not seeing the reports most relevant to your work, explore the Interventions Toolkit.</div>
      ${topReports.length ? `<div class="bar-chart">${topReports.slice(0,8).map(([r,count])=>{
        const maxR = topReports[0][1];
        const pct = Math.round((count/maxR)*100);
        const rColors = {'FET Promotion Profiles':'#0B8E8D','Learner Chart Report':'#1565C0','Term 4 Promotion Predictions':'#7B1FA2','School Dashboard':'#E8952E','School Achievement Report':'#0F7B7D','Senior Phase Promotion Profiles':'#7AB648','Grade 6 Performance Insights':'#00897B','Term to Date':'#607D8B','Curriculum Overview':'#E53935'};
        const c = rColors[r] || 'var(--teal)';
        return `<div class="bar-row"><div class="bar-label">${esc(r)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
-     }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD report usage recorded yet</div>'}
+     }).join('')}</div>
+     <div style="margin-top:12px;padding:10px 14px;background:#F5F6FA;border-radius:8px">
+       <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px">
+         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--teal)">${dddUsageCounts.direct}</div><div style="color:var(--grey)">Used DDD directly</div></div>
+         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)">${dddUsageCounts.informed}</div><div style="color:var(--grey)">DDD helped decide</div></div>
+         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--grey)">${dddUsageCounts.none}</div><div style="color:var(--grey)">Did not use DDD</div></div>
+       </div>
+     </div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD report usage recorded yet</div>'}
    </div>
  </div>
 
@@ -2236,99 +2186,22 @@ ${tab==='trends'?`
    </div>
  </div>
 
- <!-- ═══ SUBJECT ANALYSIS ═══ -->
- <div class="dash-section" style="border-left:4px solid var(--teal)">
-   <div class="dash-section-hdr"><h3>Which Subjects Are You Targeting?</h3><span style="font-size:11px;color:var(--grey)">${topSubjects.length} subject${topSubjects.length!==1?'s':''}</span></div>
+ <!-- ═══ ACTIVITY BREAKDOWN ═══ -->
+ ${actTypes.length ? `<div class="dash-section">
+   <div class="dash-section-hdr"><h3>What Types of Support Are You Doing?</h3><span style="font-size:11px;color:var(--grey)">${totalActivities} total</span></div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Subjects that came up most in your interventions. Subjects with high barrier reports may need more focused attention.</div>
-     ${topSubjects.length ? `<div class="bar-chart">${topSubjects.slice(0,10).map(([sub,count])=>{
-       const maxSub = topSubjects[0][1];
-       const pct = Math.round((count/maxSub)*100);
-       const subColors = {'Mathematics':'#1565C0','Mathematical Literacy':'#42A5F5','Physical Sciences':'#E8952E','English HL':'#7B1FA2','English FAL':'#9C27B0','Life Sciences':'#7AB648','Natural Sciences':'#43A047','Accounting':'#00897B','Geography':'#0097A7','IsiZulu HL':'#E53935','Sepedi HL':'#F44336'};
-       const c = subColors[sub] || 'var(--teal)';
-       return `<div class="bar-row"><div class="bar-label">${esc(sub)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
-     }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No subjects recorded yet</div>'}
+     <div class="bar-chart">${actTypes.map(([type,count])=>{
+       const maxAct = actTypes[0][1];
+       const pct = Math.round((count/maxAct)*100);
+       const colors={'School support visit':'#0B8E8D','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Mentoring / coaching session':'#7B1FA2'};
+       const c = colors[type]||'#607D8B';
+       return `<div class="bar-row"><div class="bar-label">${esc(type)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
+     }).join('')}</div>
    </div>
- </div>
-
- <!-- ═══ GEOGRAPHIC COVERAGE ═══ -->
- <div class="dash-section" style="border-left:4px solid var(--blue)">
-   <div class="dash-section-hdr"><h3>Where You're Working</h3><span style="font-size:11px;color:var(--grey)">${districts.length} district${districts.length!==1?'s':''} across ${activeProvinces.length} province${activeProvinces.length!==1?'s':''}</span></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">Districts where you've logged activities. Tap any row to see detail. Districts missing from this list haven't had any logged support yet.</div>
-     ${districts.length ? `<div style="overflow-x:auto"><table class="cov-table" style="width:100%;border-collapse:collapse;font-size:11px">
-       <thead><tr style="background:#F5F6FA">
-         <th style="text-align:left;padding:8px 10px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">Province / District</th>
-         <th style="text-align:center;padding:8px 6px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">Activities</th>
-         <th class="cov-hide" style="text-align:center;padding:8px 6px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">Schools</th>
-         <th class="cov-hide" style="text-align:center;padding:8px 6px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">Learners</th>
-         <th class="cov-hide" style="text-align:center;padding:8px 6px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">DDD %</th>
-         <th style="text-align:right;padding:8px 10px;font-weight:700;color:var(--navy);border-bottom:2px solid #e0e0e0">Last Active</th>
-         <th class="cov-chevron" style="padding:8px 4px;border-bottom:2px solid #e0e0e0;width:28px"></th>
-       </tr></thead>
-       <tbody>${districts.map((d,i)=>{
-         const daysSince = d.lastDate ? Math.floor((now - new Date(d.lastDate))/(1000*60*60*24)) : 999;
-         const freshColor = daysSince<=14?'var(--green)':daysSince<=30?'var(--blue)':daysSince<=60?'var(--orange)':'var(--red)';
-         const dddPctD = d.activities ? Math.round((d.dddUsed/d.activities)*100) : 0;
-         const topBarrierD = {};
-         d.barriers.forEach(b=>{topBarrierD[b]=(topBarrierD[b]||0)+1});
-         const mainBarrier = Object.entries(topBarrierD).sort((a,b)=>b[1]-a[1])[0];
-         const rowId = 'covRow_'+i;
-         return `<tr class="cov-row" style="border-bottom:1px solid #f0f0f0;${i%2===1?'background:#FAFBFC':''}" onclick="toggleCovRow('${rowId}',this)">
-           <td style="padding:8px 10px">
-             <div style="font-weight:600;color:var(--navy)">${esc(d.district||'All')}</div>
-             <div style="font-size:10px;color:var(--grey)">${esc(d.province)}${mainBarrier?' &middot; <span style="color:'+freshColor+'">'+esc(mainBarrier[0])+'</span>':''}</div>
-           </td>
-           <td style="text-align:center;padding:8px 6px;font-weight:700;color:var(--navy)">${d.activities}</td>
-           <td class="cov-hide" style="text-align:center;padding:8px 6px">${d.schools.size}</td>
-           <td class="cov-hide" style="text-align:center;padding:8px 6px">${d.learners>999?(d.learners/1000).toFixed(1)+'k':d.learners}</td>
-           <td class="cov-hide" style="text-align:center;padding:8px 6px"><span style="color:${dddPctD>=60?'var(--green)':dddPctD>=40?'var(--orange)':'var(--red)'};font-weight:600">${dddPctD}%</span></td>
-           <td style="text-align:right;padding:8px 10px"><span style="font-size:10px;font-weight:600;color:${freshColor}">${daysSince<=1?'Today':daysSince+'d ago'}</span></td>
-           <td class="cov-chevron" style="text-align:center;padding:8px 4px"><span class="cov-chev" style="font-size:12px;color:var(--teal);transition:transform .2s;display:inline-block">&#9660;</span></td>
-         </tr>
-         <tr id="${rowId}" class="cov-detail">
-           <td colspan="7" style="padding:0">
-             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px;background:var(--teal-lt);border-bottom:2px solid var(--teal)">
-               <div style="background:#fff;border-radius:6px;padding:8px 10px;text-align:center">
-                 <div style="font-size:18px;font-weight:800;color:var(--navy)">${d.schools.size}</div>
-                 <div style="font-size:10px;font-weight:600;color:var(--grey)">Schools</div>
-               </div>
-               <div style="background:#fff;border-radius:6px;padding:8px 10px;text-align:center">
-                 <div style="font-size:18px;font-weight:800;color:var(--navy)">${d.learners>999?(d.learners/1000).toFixed(1)+'k':d.learners}</div>
-                 <div style="font-size:10px;font-weight:600;color:var(--grey)">Learners</div>
-               </div>
-               <div style="background:#fff;border-radius:6px;padding:8px 10px;text-align:center">
-                 <div style="font-size:18px;font-weight:800;color:${dddPctD>=60?'var(--green)':dddPctD>=40?'var(--orange)':'var(--red)'}">${dddPctD}%</div>
-                 <div style="font-size:10px;font-weight:600;color:var(--grey)">DDD Usage</div>
-               </div>
-               <div style="background:#fff;border-radius:6px;padding:8px 10px;text-align:center">
-                 <div style="font-size:18px;font-weight:800;color:var(--navy)">${d.activities}</div>
-                 <div style="font-size:10px;font-weight:600;color:var(--grey)">Activities</div>
-               </div>
-             </div>
-           </td>
-         </tr>`;
-       }).join('')}</tbody>
-     </table></div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No activities logged yet</div>'}
-   </div>
- </div>
-
- <!-- ═══ PROVINCE SUMMARY ═══ -->
- ${activeProvinces.length > 1 ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">
-   ${Object.entries(provinceCounts).sort((a,b)=>b[1]-a[1]).map(([prov,count])=>{
-     const provDistricts = districts.filter(d=>d.province===prov);
-     const provSchools = new Set();
-     provDistricts.forEach(d=>d.schools.forEach(s=>provSchools.add(s)));
-     const provColors = {'Northern Cape':'#1565C0','Limpopo':'#7AB648','North West':'#E8952E','Free State':'#0097A7','Eastern Cape':'#7B1FA2','KwaZulu-Natal':'#E53935','Gauteng':'#00897B','Mpumalanga':'#FF7043','Western Cape':'#42A5F5'};
-     const c = provColors[prov] || 'var(--teal)';
-     return `<div style="background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:3px solid ${c}">
-       <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px">${esc(prov)}</div>
-       <div style="font-size:24px;font-weight:800;color:var(--navy);margin:4px 0">${count}</div>
-       <div style="font-size:10px;color:var(--grey)">${provSchools.size} schools · ${provDistricts.length} district${provDistricts.length!==1?'s':''}</div>
-     </div>`;
-   }).join('')}
  </div>` : ''}
 `:''}
+
+
 
 </div>`;
 }
