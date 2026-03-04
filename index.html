@@ -629,12 +629,12 @@ const TK_REPORTS = [
 ];
 
 const TK_INTERVENTIONS = [
- {id:1,name:"Attendance Monitoring Plan",category:"Attendance",difficulty:"Quick Win",timeToImpact:"2-4 weeks",dddReports:["lcr","ttd"],policyRef:"SA Schools Act",webinar:{name:"Learner Attendance & Term to Date Walkthrough",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Identify chronically absent learners via DDD Learner Chart, establish daily tracking, and trigger parent engagement at threshold days.",steps:["DDD Dashboard → Reports tab → Select Phase → Learner Chart → Download Data → Sort by 'Days Absent' descending","Flag learners with 10+ days absent","Set up daily register monitoring by class teacher","Trigger parent meeting at 15+ days","Weekly report to SMT on attendance recovery"]},
- {id:2,name:"Targeted Learner Support",category:"Academic Support",difficulty:"Core",timeToImpact:"1 term",dddReports:["fpc","lcr"],policyRef:"Promotion Policy",webinar:{name:"Learner Profiling Using FET Promotion Criteria Profiles",path:"DDD Dashboard → DDD Learning Hub → Book a Webinar"},description:"Use FET Promotion Criteria data to sort learners into groups by achievement level, then give the right support to each group — focusing most effort on learners who just missed one criteria (biggest chance of improvement).",steps:["Download FET Promotion Criteria data from DDD Dashboard","Sort and group learners: 'Level Up' | 'At Risk' | 'Missed One' | 'Missed Multiple'","Give the most support to the 'Missed One' group (best chance of improvement)","Provide targeted support: extra lessons, tailored materials, adjusted teaching","Track movement between groups each term to measure progress"]},
- {id:3,name:"Saturday / Extra Classes Programme",category:"Academic Support",difficulty:"Core",timeToImpact:"1-2 terms",dddReports:["t4p","fpc","lcr"],policyRef:"CAPS",webinar:{name:"Using Term 4 Promotion Predictions for Targeted Support",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Data-driven extra classes targeting predicted non-promoted learners in specific subjects identified via DDD predictions.",steps:["Use Term 4 Predictions to identify FALSE-predicted learners","Cross-reference with FET Profiles for subject gaps","Schedule subject-specific Saturday sessions (08:00-12:00)","Track attendance at each session","Monitor prediction shifts after Term 2 data submission"]},
- {id:4,name:"SBA-Exam Alignment Audit",category:"Assessment Quality",difficulty:"Advanced",timeToImpact:"1 term",dddReports:["sar"],policyRef:"CAPS Assessment",webinar:{name:"School Achievement Report Deep Dive",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Identify schools with 20%+ SBA-Exam gap using School Achievement Report, then moderate assessment tasks.",steps:["Pull School Achievement Report → compare SBA vs Exam marks","Flag subjects with 20%+ gap","Subject advisors to moderate SBA tasks before administration","Conduct lesson observations for assessment alignment","Re-check gap after next formal assessment"]},
- {id:5,name:"Underperforming School Rapid Response",category:"School Support",difficulty:"Advanced",timeToImpact:"1-2 terms",dddReports:["g6p","sar","lcr"],policyRef:"Circular D3",webinar:{name:"Identifying and Supporting Underperforming Schools with DDD",path:"DDD Dashboard → DDD Learning Hub → Book a Webinar"},description:"Comprehensive support for schools meeting Circular D3 underperformance criteria or Section 58B.",steps:["Use Grade 6 Performance Insights → identify 'True' underperforming schools","Or use School Achievement → identify secondary schools with <70% NSC pass rate","Send in circuit manager + subject advisor team","Co-develop Subject Improvement Plan with school","Fortnightly monitoring visits for one term"]},
- {id:6,name:"Parent Engagement Campaign",category:"Community",difficulty:"Quick Win",timeToImpact:"Ongoing",dddReports:["lcr","ttd"],policyRef:"SA Schools Act",webinar:{name:"Using Learner Chart Data for Parent Conversations",path:"DDD Dashboard → DDD Learning Hub → Tip-Sheets and Videos"},description:"Engage parents of learners with poor attendance or declining marks using DDD evidence in conversations.",steps:["DDD Dashboard → Reports tab → Learner Chart → Download Data → Filter for learners with declining marks or high absence","Prepare individual learner evidence sheets","Schedule parent meetings (individual or group)","Share DDD data visually — show attendance and marks side by side","Agree on home-support commitments with follow-up date"]}
+ {id:1,name:"Attendance Monitoring Plan",category:"Attendance",difficulty:"Light Touch",timeToImpact:"2-4 weeks",dddReports:["lcr","ttd"],policyRef:"SA Schools Act",webinar:{name:"Learner Attendance & Term to Date Walkthrough",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Identify chronically absent learners via DDD Learner Chart, establish daily tracking, and trigger parent engagement at threshold days.",steps:["DDD Dashboard → Reports tab → Select Phase → Learner Chart → Download Data → Sort by 'Days Absent' descending","Flag learners with 10+ days absent","Set up daily register monitoring by class teacher","Trigger parent meeting at 15+ days","Weekly report to SMT on attendance recovery"]},
+ {id:2,name:"Targeted Learner Support",category:"Academic Support",difficulty:"Standard",timeToImpact:"1 term",dddReports:["fpc","lcr"],policyRef:"Promotion Policy",webinar:{name:"Learner Profiling Using FET Promotion Criteria Profiles",path:"DDD Dashboard → DDD Learning Hub → Book a Webinar"},description:"Use FET Promotion Criteria data to sort learners into groups by achievement level, then give the right support to each group — focusing most effort on learners who just missed one criteria (biggest chance of improvement).",steps:["Download FET Promotion Criteria data from DDD Dashboard","Sort and group learners: 'Level Up' | 'At Risk' | 'Missed One' | 'Missed Multiple'","Give the most support to the 'Missed One' group (best chance of improvement)","Provide targeted support: extra lessons, tailored materials, adjusted teaching","Track movement between groups each term to measure progress"]},
+ {id:3,name:"Saturday / Extra Classes Programme",category:"Academic Support",difficulty:"Standard",timeToImpact:"1-2 terms",dddReports:["t4p","fpc","lcr"],policyRef:"CAPS",webinar:{name:"Using Term 4 Promotion Predictions for Targeted Support",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Data-driven extra classes targeting predicted non-promoted learners in specific subjects identified via DDD predictions.",steps:["Use Term 4 Predictions to identify FALSE-predicted learners","Cross-reference with FET Profiles for subject gaps","Schedule subject-specific Saturday sessions (08:00-12:00)","Track attendance at each session","Monitor prediction shifts after Term 2 data submission"]},
+ {id:4,name:"SBA-Exam Alignment Audit",category:"Assessment Quality",difficulty:"In-Depth",timeToImpact:"1 term",dddReports:["sar"],policyRef:"CAPS Assessment",webinar:{name:"School Achievement Report Deep Dive",path:"DDD Dashboard → DDD Learning Hub → On-Demand Training Courses"},description:"Identify schools with 20%+ SBA-Exam gap using School Achievement Report, then moderate assessment tasks.",steps:["Pull School Achievement Report → compare SBA vs Exam marks","Flag subjects with 20%+ gap","Subject advisors to moderate SBA tasks before administration","Conduct lesson observations for assessment alignment","Re-check gap after next formal assessment"]},
+ {id:5,name:"Underperforming School Rapid Response",category:"School Support",difficulty:"In-Depth",timeToImpact:"1-2 terms",dddReports:["g6p","sar","lcr"],policyRef:"Circular D3",webinar:{name:"Identifying and Supporting Underperforming Schools with DDD",path:"DDD Dashboard → DDD Learning Hub → Book a Webinar"},description:"Comprehensive support for schools meeting Circular D3 underperformance criteria or Section 58B.",steps:["Use Grade 6 Performance Insights → identify 'True' underperforming schools","Or use School Achievement → identify secondary schools with <70% NSC pass rate","Send in circuit manager + subject advisor team","Co-develop Subject Improvement Plan with school","Fortnightly monitoring visits for one term"]},
+ {id:6,name:"Parent Engagement Campaign",category:"Community",difficulty:"Light Touch",timeToImpact:"Ongoing",dddReports:["lcr","ttd"],policyRef:"SA Schools Act",webinar:{name:"Using Learner Chart Data for Parent Conversations",path:"DDD Dashboard → DDD Learning Hub → Tip-Sheets and Videos"},description:"Engage parents of learners with poor attendance or declining marks using DDD evidence in conversations.",steps:["DDD Dashboard → Reports tab → Learner Chart → Download Data → Filter for learners with declining marks or high absence","Prepare individual learner evidence sheets","Schedule parent meetings (individual or group)","Share DDD data visually — show attendance and marks side by side","Agree on home-support commitments with follow-up date"]}
 ];
 
 const TK_PEERS = []; // Will populate from captured data as officials log activities
@@ -2231,6 +2231,8 @@ function renderDashboard() {
  const districtData = {};
  const monthlyData = {};
  const dddReportCounts = {};
+ const dddTaskCounts = {};
+ const dddCatCounts = {};
  const openLoops = [];
  const impactItems = [];
  const decisionTypes = {};
@@ -2287,6 +2289,16 @@ function renderDashboard() {
    // DDD reports used
    (det.ddd_reports||[]).forEach(r => { dddReportCounts[r] = (dddReportCounts[r]||0)+1; });
 
+   // Reverse-map reports to DDD questions/categories
+   if (det.ddd_reports && det.ddd_reports.length) {
+     DDD_TASKS.forEach(function(task) {
+       if (task.reports.some(function(r){ return det.ddd_reports.includes(r); })) {
+         dddTaskCounts[task.q] = (dddTaskCounts[task.q]||0)+1;
+         dddCatCounts[task.cat] = (dddCatCounts[task.cat]||0)+1;
+       }
+     });
+   }
+
    // Decision types
    if (det.decision_type) decisionTypes[det.decision_type] = (decisionTypes[det.decision_type]||0)+1;
 
@@ -2326,7 +2338,7 @@ function renderDashboard() {
 
  // ── DDD QUALITY ──
  const dddTotal = totalActivities || 1;
- const dddPct = Math.round(((dddUsageCounts.direct+dddUsageCounts.informed)/dddTotal)*100);
+ const dddPct = Math.round(((dddUsageCounts.direct+dddUsageCounts.informed+dddUsageCounts.partial)/dddTotal)*100);
  const withNumbers = decs.filter(d=>{const det=d.details||{};return det.insight_pass_rate||det.insight_learners_affected||det.insight_threshold||det.insight_educator_absent||det.insight_attendance_days||det.insight_sba_exam_gap||det.insight_curriculum_pct}).length;
  const dddEntries = decs.filter(d=>{const det=d.details||{};return det.ddd_used&&det.ddd_used!=='no'}).length;
  const dataQualityPct = dddEntries ? Math.round((withNumbers/dddEntries)*100) : 0;
@@ -2349,6 +2361,9 @@ function renderDashboard() {
  const barriers = Object.entries(barrierCounts).sort((a,b)=>b[1]-a[1]);
  const topSubjects = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
  const topReports = Object.entries(dddReportCounts).sort((a,b)=>b[1]-a[1]);
+ const topTasks = Object.entries(dddTaskCounts).sort((a,b)=>b[1]-a[1]);
+ const topCats = Object.entries(dddCatCounts).sort((a,b)=>b[1]-a[1]);
+ const totalTaskHits = topCats.reduce((s,c)=>s+c[1],0);
  const actTypes = Object.entries(activityByType).sort((a,b)=>b[1]-a[1]);
  const districts = Object.values(districtData).sort((a,b)=>b.activities-a.activities);
  const months = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
@@ -2691,6 +2706,10 @@ ${tab==='overview'?`
                <span style="font-size:11px;color:var(--grey-dk)">DDD helped decide</span>
                <span style="font-size:13px;font-weight:700;color:var(--green)">${dddUsageCounts.informed}</span>
              </div>
+             <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5">
+               <span style="font-size:11px;color:var(--grey-dk)">Partially used DDD</span>
+               <span style="font-size:13px;font-weight:700;color:var(--orange)">${dddUsageCounts.partial}</span>
+             </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
                <span style="font-size:11px;color:var(--grey-dk)">Did not use DDD</span>
                <span style="font-size:13px;font-weight:700;color:var(--grey)">${dddUsageCounts.none}</span>
@@ -2754,9 +2773,57 @@ ${tab==='trends'?`
        <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px">
          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--teal)">${dddUsageCounts.direct}</div><div style="color:var(--grey)">Used DDD directly</div></div>
          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)">${dddUsageCounts.informed}</div><div style="color:var(--grey)">DDD helped decide</div></div>
+         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--orange)">${dddUsageCounts.partial}</div><div style="color:var(--grey)">Partially used DDD</div></div>
          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--grey)">${dddUsageCounts.none}</div><div style="color:var(--grey)">Did not use DDD</div></div>
        </div>
      </div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD report usage recorded yet</div>'}
+   </div>
+ </div>
+
+ <!-- ═══ BARRIERS ANALYSIS ═══ -->
+ <div class="dash-section" style="border-left:4px solid #7B1FA2">
+   <div class="dash-section-hdr"><h3>What Questions Are Driving Your Data Use?</h3><span style="font-size:11px;color:var(--grey)">${topCats.length} categor${topCats.length!==1?'ies':'y'}</span></div>
+   <div class="dash-section-body">
+     <div class="dash-section-desc">When officials use the DDD Dashboard, these are the questions they are trying to answer. This shows where data is driving the most inquiry — and where awareness may need to grow.</div>
+     ${topCats.length ? `
+     <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+       <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+         <svg viewBox="0 0 36 36" style="width:100%;height:100%">
+           ${(function(){
+             var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
+             var offset = 0;
+             return topCats.map(function(c){
+               var pct = totalTaskHits ? (c[1]/totalTaskHits)*100 : 0;
+               var color = catColors[c[0]] || '#999';
+               var s = '<circle cx="18" cy="18" r="15.5" fill="none" stroke="'+color+'" stroke-width="3.5" stroke-dasharray="'+pct+' '+(100-pct)+'" stroke-dashoffset="-'+offset+'" style="transform:rotate(-90deg);transform-origin:center"/>';
+               offset += pct;
+               return s;
+             }).join('');
+           })()}
+         </svg>
+       </div>
+       <div style="flex:1;display:grid;gap:6px">
+         ${topCats.map(function(c){
+           var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
+           var color = catColors[c[0]] || '#999';
+           var pct = totalTaskHits ? Math.round((c[1]/totalTaskHits)*100) : 0;
+           return '<div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:'+color+';flex-shrink:0"></span><span style="font-size:11px;color:var(--navy);flex:1">'+c[0]+'</span><span style="font-size:12px;font-weight:700;color:'+color+'">'+c[1]+' ('+pct+'%)</span></div>';
+         }).join('')}
+       </div>
+     </div>
+     <div style="font-size:10px;font-weight:700;color:#7B1FA2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Questions Officials Are Asking</div>
+     <div style="display:grid;gap:6px">
+       ${topTasks.slice(0,10).map(function(t){
+         var maxT = topTasks[0][1];
+         var pct = Math.max(Math.round((t[1]/maxT)*100), 6);
+         var taskObj = DDD_TASKS.find(function(d){ return d.q === t[0]; });
+         var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
+         var color = taskObj ? (catColors[taskObj.cat] || '#607D8B') : '#607D8B';
+         return '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px"><span style="font-size:11px;color:var(--navy);font-weight:500;flex:1;line-height:1.4">'+t[0]+'</span><span style="font-size:11px;font-weight:700;color:'+color+';white-space:nowrap">'+t[1]+'×</span></div><div style="height:6px;background:#ECEFF1;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width .4s"></div></div></div>';
+       }).join('')}
+     </div>
+     ${topTasks.length === 0 ? '' : '<div style="margin-top:12px;padding:8px 10px;background:#F8F9FA;border-radius:6px;font-size:10px;color:var(--grey);line-height:1.5">These questions map to the task-based report picker in the Log Activity form. If a category is low, officials may need guidance on those DDD reports.</div>'}
+     ` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD data questions recorded yet — officials will see this once they select reports during logging</div>'}
    </div>
  </div>
 
@@ -2809,7 +2876,7 @@ ${tab==='trends'?`
 // TOOLKIT
 // 
 function renderToolkit() {
- return `<div> <div class="tk-tabs"> ${[['navigator','DDD Reports Guide'],['library','What Works'],['peers','What Others Are Doing']].map(([id,l])=>`<button class="tk-tab ${S.tkTab===id?'on':''}" onclick="S.tkTab='${id}';render()">${l}</button>`).join('')}
+ return `<div> <div class="tk-tabs"> ${[['navigator','DDD Reports Guide'],['library','Suggested Intervention Ideas'],['peers','What Others Are Doing']].map(([id,l])=>`<button class="tk-tab ${S.tkTab===id?'on':''}" onclick="S.tkTab='${id}';render()">${l}</button>`).join('')}
  </div> <div class="tk-wrap" style="padding-top:12px"> ${S.tkTab==='navigator'?tkNavigator():S.tkTab==='library'?tkLibrary():tkPeers()}
  </div></div>`;
 }
@@ -2868,7 +2935,7 @@ function tkDesignerResponse(){
  const ch=S.dChallenge;
  const matched=TK_INTERVENTIONS.filter(i=>{if(ch==='attendance')return i.category==='Attendance'||i.category==='Community';if(ch==='performance'||ch==='promotion')return i.category==='Academic Support'||i.category==='Assessment Quality';return i.category==='Academic Support'||i.category==='School Support'});
  return`<div style="font-size:13px;font-weight:700;color:#1A2332;margin-bottom:4px">What can you do about it?</div><div style="font-size:11px;color:#607D8B;margin-bottom:12px">These are intervention approaches that work well with DDD data. Tap any one to see how it works step by step.</div> ${matched.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);return`
- <div class="tk-iv${sel?' sel':''}" onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()"> <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;font-size:13px;color:#1A2332">${iv.name}</div><div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${iv.difficulty==='Quick Win'?'#E8F5E9':iv.difficulty==='Core'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Quick Win'?'#4CAF50':iv.difficulty==='Core'?'#1565C0':'#E8952E'};font-weight:600">${iv.difficulty}</span></div></div> <div style="font-size:11px;color:#607D8B;margin-top:4px">${iv.description}</div> <div style="font-size:10px;color:#0B8E8D;margin-top:4px">Takes ${iv.timeToImpact} · Reports: ${reps.map(r=>r.name).join(', ')}</div> ${sel?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e1dfdd"> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div> <div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">HOW TO DO IT</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
+ <div class="tk-iv${sel?' sel':''}" onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()"> <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;font-size:13px;color:#1A2332">${iv.name}</div><div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${iv.difficulty==='Light Touch'?'#E8F5E9':iv.difficulty==='Standard'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#E8952E'};font-weight:600">${iv.difficulty}</span></div></div> <div style="font-size:11px;color:#607D8B;margin-top:4px">${iv.description}</div> <div style="font-size:10px;color:#0B8E8D;margin-top:4px">Takes ${iv.timeToImpact} · Reports: ${reps.map(r=>r.name).join(', ')}</div> ${sel?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e1dfdd"> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div> <div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
  <div style="margin-top:6px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> </div>`:''}
  </div>`}).join('')}
  <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-sm btn-outline" onclick="S.dStep=1;render()">\u2190 Back</button><button class="btn btn-sm btn-teal" style="flex:1" onclick="S.dStep=3;render()">Ready to act \u2192</button></div>`;}
@@ -2906,11 +2973,11 @@ function tkLibrary(){
    });
  });
  const filtered=TK_INTERVENTIONS.filter(i=>S.filterCat==='All'||i.category===S.filterCat);
- return`<p style="font-size:12px;color:#607D8B;margin-bottom:12px;line-height:1.6">A curated set of <strong>intervention approaches</strong> that work well with DDD data. Each includes step-by-step guidance, which DDD reports to use, and relevant policy references.</p>
+ return`<p style="font-size:12px;color:#607D8B;margin-bottom:12px;line-height:1.6">A collection of <strong>intervention ideas</strong> that officials across the programme have found useful when working with DDD data. Each includes suggested steps, which DDD reports to reference, and relevant policy context.<br><br><span style="font-size:11px;color:#999;font-style:italic">These are suggestions, not prescriptions — results will depend on your local context and how you adapt them to your schools.</span></p>
  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${cats.map(c=>`<button class="tk-filt${S.filterCat===c?' on':''}" onclick="S.filterCat='${c}';render()">${c}</button>`).join('')}</div>
  ${filtered.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);const myCount=usageCounts[iv.id]||0;return`
- <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Quick Win'?'#E8F5E9':iv.difficulty==='Core'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Quick Win'?'#4CAF50':iv.difficulty==='Core'?'#1565C0':'#E8952E'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:11px;color:#607D8B">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:10px;color:#607D8B">${iv.timeToImpact}</span><span style="font-size:10px;color:#607D8B">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for implementation steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">HOW TO DO IT</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
- <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:12px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:11px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:10px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E0F4F4;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#074445">Ready to start?</div><div style="font-size:11px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
+ <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E8F5E9':iv.difficulty==='Standard'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#E8952E'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:11px;color:#607D8B">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:10px;color:#607D8B">${iv.timeToImpact}</span><span style="font-size:10px;color:#607D8B">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
+ <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:12px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:11px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:10px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E0F4F4;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#074445">Want to try this approach?</div><div style="font-size:11px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
  </div>`}).join('')}`; 
 }
 
