@@ -89,6 +89,31 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .tag-orange input:checked+span{color:#E07B2A}
 .tag-grp-title{font-size:11px;font-weight:600;color:#4A6B6B;display:flex;align-items:center;min-width:60px}
 
+/* Task-based report selection */
+.tq-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#9ca3af;margin:14px 0 6px;padding-left:2px}
+.tq-list{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.tq-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #e1dfdd;border-radius:6px;cursor:pointer;transition:.18s;background:#fff;user-select:none}
+.tq-card:hover{border-color:var(--teal);background:var(--teal-lt)}
+.tq-card.sel{border-color:var(--teal);background:var(--teal-lt);box-shadow:inset 0 0 0 1px var(--teal)}
+.tq-chk{flex-shrink:0;width:18px;height:18px;border:2px solid #d1d5db;border-radius:4px;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.tq-card.sel .tq-chk{background:var(--teal);border-color:var(--teal)}
+.tq-chk svg{opacity:0;transition:opacity .12s}
+.tq-card.sel .tq-chk svg{opacity:1}
+.tq-q{font-size:13px;font-weight:600;color:#1A2332;line-height:1.35}
+.tq-map{font-size:10px;color:#9ca3af;margin-top:2px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.tq-badge{display:inline-block;padding:0 5px;background:#f3f4f6;border-radius:3px;font-size:9.5px;font-weight:600;color:#6b7280;letter-spacing:.2px}
+.tq-expand{display:flex;align-items:center;gap:6px;padding:10px 0 2px;cursor:pointer;user-select:none}
+.tq-expand>span:first-of-type{font-size:12px;font-weight:600;color:var(--teal)}
+.tq-cnt{font-size:10px;font-weight:600;color:#9ca3af;background:#f3f4f6;padding:1px 7px;border-radius:10px}
+.tq-expand svg{transition:transform .2s;color:var(--teal)}
+.tq-expand.open svg{transform:rotate(180deg)}
+.tq-extra{overflow:hidden;max-height:0;transition:max-height .4s ease}
+.tq-extra.open{max-height:1200px}
+.tq-other{margin-top:8px}
+.tq-other input{width:100%;padding:8px 10px;border:1px solid #e1dfdd;border-radius:4px;font-size:12px;font-family:inherit;color:#374151;outline:none;transition:border-color .15s}
+.tq-other input:focus{border-color:var(--teal)}
+.tq-other input::placeholder{color:#9ca3af}
+
 /* Radio group */
 .radio-grp{display:flex;flex-direction:column;gap:5px}
 .radio-grp label{display:flex;align-items:center;gap:8px;font-size:13px;padding:7px 10px;border:1px solid #e1dfdd;border-radius:4px;cursor:pointer;font-weight:400}
@@ -446,7 +471,73 @@ const PROMO_CRITERIA = {
 const INTERVENTION_TRIGGERS = ["Learners below 30% (not passing)","Learners at 30-39% (close to passing)","Learners missing one thing they need to be promoted","Big gap between SBA marks and exam marks","Learners absent a lot and doing badly","Progressed learners who need extra support","School flagged as underperforming (Circular D3)","Subject pass rate dropping from one term to the next","Parts of the curriculum not being covered","High educator absenteeism","Educator teaching outside their specialisation","Vacant educator post(s) affecting delivery","Educator not covering the curriculum on time","Educator needing subject content support","Educator not using data to inform teaching","High learner dropout or transfers out","Late or missing SA-SAMS submissions","School leadership or governance concerns","Other"];
 
 // PAM duty alignment (lightweight — what mandate does this action fulfil?)
-const DDD_TOOLS = ["School Dashboard","Learner Chart Report","Promotion by Grade","Term to Date","FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles","Term 4 Promotion Predictions","School Achievement Report","Grade 6 Performance Insights","Curriculum Overview","Management & Governance Overview","Over-age Learners","Educator Info","Other"];
+const DDD_TOOLS = ["School Dashboard","Learner Chart Report","Promotion by Grade","Term to Date","FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles","Term 4 Promotion Predictions","School Achievement Report","Grade 6 Performance Insights","Curriculum Overview","Management & Governance Overview","Over-age Learners","Educator Info","Schools Outstanding","Attrition Information","Subject Trends","Promotions By Year","Enrolment By Year","Learner Promotion Rate","Attendance Trend","General Overview","Principal Overview","Other"];
+
+const DDD_TASKS = [
+ {q:"Which learners are at risk of not being promoted?",cat:"Performance & Promotion",primary:true,reports:["FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles"],mapping:"Promotion Profiles (FET / Senior / Intermediate)",tab:"Reports"},
+ {q:"How are learners performing across grades or subjects?",cat:"Performance & Promotion",primary:true,reports:["Promotion by Grade","School Achievement Report"],mapping:"Promotion by Grade \u00b7 School Achievement",tab:"Achievement"},
+ {q:"How is a specific learner doing across their subjects?",cat:"Performance & Promotion",primary:true,reports:["Learner Chart Report"],mapping:"Learner Chart Report",tab:"Reports"},
+ {q:"How is the school or district performing overall?",cat:"Performance & Promotion",primary:true,reports:["School Dashboard"],mapping:"School Dashboard \u00b7 Detail tab",tab:"Detail"},
+ {q:"What are the predicted year-end promotion numbers?",cat:"Performance & Promotion",primary:true,reports:["Term 4 Promotion Predictions"],mapping:"Term 4 Promotion Predictions",tab:"Reports"},
+ {q:"Are learners and educators attending? How are weekly numbers tracking?",cat:"Attendance",primary:true,reports:["Term to Date"],mapping:"Term to Date \u00b7 Attendance \u00b7 Weekly data",tab:"Term to Date"},
+ {q:"What does curriculum coverage and subject performance look like?",cat:"Subjects & Curriculum",primary:false,reports:["Curriculum Overview"],mapping:"Curriculum Overview",tab:"Role-Specific"},
+ {q:"How are Grade 6 learners performing?",cat:"Subjects & Curriculum",primary:false,reports:["Grade 6 Performance Insights"],mapping:"Grade 6 Performance Insights",tab:"Reports"},
+ {q:"How is the school doing on management and governance?",cat:"Management & Staffing",primary:false,reports:["Management & Governance Overview"],mapping:"Management & Governance Overview",tab:"Role-Specific"},
+ {q:"What is the staffing and educator picture at the school?",cat:"Management & Staffing",primary:false,reports:["Educator Info"],mapping:"Educator Information",tab:"Detail / Reports"},
+ {q:"Which learners are over-age for their grade?",cat:"Management & Staffing",primary:false,reports:["Over-age Learners"],mapping:"Over-age Learners",tab:"Detail"},
+ {q:"How do results compare to previous years?",cat:"Trends & Year-on-Year",primary:false,reports:["Promotions By Year","Enrolment By Year","Learner Promotion Rate"],mapping:"Promotions \u00b7 Enrolment \u00b7 Promotion Rate",tab:"Trends"},
+ {q:"Are subject results or attendance improving over time?",cat:"Trends & Year-on-Year",primary:false,reports:["Subject Trends","Attendance Trend"],mapping:"Subject Trends \u00b7 Attendance Trend",tab:"Trends"},
+ {q:"Which schools have not submitted data, or what is the attrition?",cat:"Trends & Year-on-Year",primary:false,reports:["Schools Outstanding","Attrition Information"],mapping:"Schools Outstanding \u00b7 Attrition",tab:"Reports"}
+];
+
+var _tqOpen = false;
+function toggleDDDTask(idx) {
+  var task = DDD_TASKS[idx];
+  var allSel = task.reports.every(function(r){ return S.f.ddd_reports.includes(r); });
+  if (allSel) {
+    task.reports.forEach(function(r) {
+      var usedByOther = DDD_TASKS.some(function(t, ti) {
+        if (ti === idx) return false;
+        return t.reports.includes(r) && t.reports.every(function(tr){ return S.f.ddd_reports.includes(tr); });
+      });
+      if (!usedByOther) { var i = S.f.ddd_reports.indexOf(r); if (i !== -1) S.f.ddd_reports.splice(i, 1); }
+    });
+  } else {
+    task.reports.forEach(function(r) { if (!S.f.ddd_reports.includes(r)) S.f.ddd_reports.push(r); });
+  }
+  render();
+}
+function isDDDTaskSel(idx) { return DDD_TASKS[idx].reports.every(function(r){ return S.f.ddd_reports.includes(r); }); }
+function toggleDDDExpand() { _tqOpen = !_tqOpen; var el=document.getElementById('tqExpand'); var ex=document.getElementById('tqExtra'); if(el)el.classList.toggle('open'); if(ex)ex.classList.toggle('open'); }
+
+function renderDDDTasks() {
+  var chk = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.5 9L10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var h = '', lastCat = '', exH = '', lastExCat = '', exCount = 0;
+  for (var i = 0; i < DDD_TASKS.length; i++) {
+    var t = DDD_TASKS[i], sel = isDDDTaskSel(i) ? ' sel' : '';
+    var card = '<div class="tq-card' + sel + '" onclick="toggleDDDTask(' + i + ')">'
+      + '<div class="tq-chk">' + chk + '</div>'
+      + '<div><div class="tq-q">' + t.q + '</div>'
+      + '<div class="tq-map"><span class="tq-badge">' + t.tab + '</span> ' + t.mapping + '</div></div></div>';
+    if (t.primary) {
+      if (t.cat !== lastCat) { if (lastCat) h += '</div>'; h += '<div class="tq-cat">' + t.cat + '</div><div class="tq-list">'; lastCat = t.cat; }
+      h += card;
+    } else {
+      exCount++;
+      if (t.cat !== lastExCat) { if (lastExCat) exH += '</div>'; exH += '<div class="tq-cat">' + t.cat + '</div><div class="tq-list">'; lastExCat = t.cat; }
+      exH += card;
+    }
+  }
+  if (lastCat) h += '</div>';
+  if (lastExCat) exH += '</div>';
+  exH += '<div class="tq-other"><input type="text" placeholder="Looked at something else? Describe briefly\u2026" value="' + ((S.f.ddd_reports_other || '').replace(/"/g,'&quot;')) + '" oninput="S.f.ddd_reports_other=this.value" onchange="if(this.value&&!S.f.ddd_reports.includes(\'Other\'))S.f.ddd_reports.push(\'Other\');render()"></div>';
+  h += '<div class="tq-expand' + (_tqOpen ? ' open' : '') + '" id="tqExpand" onclick="toggleDDDExpand()">'
+    + '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    + '<span>More options</span><span class="tq-cnt">' + exCount + ' more</span></div>';
+  h += '<div class="tq-extra' + (_tqOpen ? ' open' : '') + '" id="tqExtra">' + exH + '</div>';
+  return h;
+}
+
 const SUBJECT_GROUPS = [
  {label:"Mathematics",items:["Mathematics","Mathematical Literacy","Technical Mathematics"]},
  {label:"Sciences",items:["Physical Sciences","Life Sciences","Natural Sciences","Technical Sciences","Agricultural Sciences","Marine Sciences"]},
@@ -1315,7 +1406,7 @@ function renderFormStep3(){
         <div style="font-size:11px;color:var(--grey-dk);line-height:1.6;margin-bottom:8px">The fields below ask for numbers you saw on DDD. If you haven't opened the dashboard yet, do it now \u2014 it takes 2 minutes and makes your entry much stronger.</div>
         <a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600">Open Dashboard</a>
       </div>`:''}
-      <div class="field"><label>Which reports from DDD did you use to inform your decisions and actions?</label><div class="tags">${DDD_TOOLS.map(t=>{const te=t.replace(/'/g,"\\\\'");return`<label class="tag"><input type="checkbox" ${S.f.ddd_reports.includes(t)?'checked':''} onchange="togArr(S.f.ddd_reports,'${te}',this.checked);render()"><span>${t}</span></label>`}).join('')}</div></div>
+      <div class="field"><label>What were you looking at on DDD?</label><div style="font-size:11px;color:var(--grey);margin:-4px 0 10px;line-height:1.4">Select everything that applies — pick the questions you were trying to answer</div>${renderDDDTasks()}</div>
       <div class="field"><label>When did you access this report?</label><input type="date" value="${S.f.ddd_access_date||''}" max="${today()}" onchange="S.f.ddd_access_date=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
       <div class="field"><label>Did you log in to the DDD Dashboard?<span class="req">*</span></label><div class="radio-grp">${['Yes','No'].map(v=>{const val=v.toLowerCase();return`<label><input type="radio" name="dddConfirmed" value="${val}" ${S.f.ddd_dashboard_confirmed===val?'checked':''} onchange="S.f.ddd_dashboard_confirmed=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
       ${S.f.ddd_dashboard_confirmed==='no'?`<div style="background:#FFF3E0;border-radius:8px;padding:12px 14px;margin:4px 0 8px;border-left:3px solid #E8952E"><div style="font-size:12px;color:#E65100;line-height:1.6">We recommend logging into the DDD Dashboard before completing this form. The data will help you give stronger, evidence-based entries.</div><div style="font-size:10px;color:#E65100;line-height:1.5;margin-top:4px">Your login is <strong>firstname.surname@dbedashboard.co.za</strong> — not your personal email.</div><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;margin-top:6px">Open DDD Dashboard</a></div>`:''}
@@ -1658,7 +1749,7 @@ function resetForm() {
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
- ddd_used:'', ddd_reports:[], ddd_access_date:'', ddd_dashboard_confirmed:'', decision_type:'', decision_other:'', action_type:'', action_other:'',
+ ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', decision_type:'', decision_other:'', action_type:'', action_other:'',
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  learners_reached:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'',
