@@ -735,8 +735,8 @@ async function checkAuth() {
        initDashFilters();
        S.authState = 'ready';
        resetInactivityTimer();
-       // Show welcome screen on first login
-       try { S.showWelcome = !localStorage.getItem('ddd_welcome_seen'); } catch(e) { S.showWelcome = true; }
+       // Show welcome screen on every login
+       S.showWelcome = true;
        render();
        await loadAll();
        return;
@@ -831,8 +831,8 @@ async function handleOtpSubmit() {
    S.gateError = '';
    S.gateLoading = false;
    resetInactivityTimer();
-   // Show welcome screen on first login
-   try { S.showWelcome = !localStorage.getItem('ddd_welcome_seen'); } catch(e) { S.showWelcome = true; }
+   // Show welcome screen on every login
+   S.showWelcome = true;
    S.loading = true;
    render();
    await loadAll();
@@ -1228,7 +1228,6 @@ function renderForm() {
 
 // ═══ WELCOME SCREEN ═══
 function dismissWelcome() {
-  try { localStorage.setItem('ddd_welcome_seen', '1'); } catch(e) {}
   S.showWelcome = false;
   render();
 }
@@ -1238,6 +1237,19 @@ function renderWelcome() {
   if (S.official.full_name && S.official.full_name !== 'Official') {
     firstName = esc(S.official.full_name.split(' ')[0]);
   }
+  // Compute real stats from logged decisions
+  var wpSchoolSet = new Set();
+  var wpProvSet = new Set();
+  for (var wi = 0; wi < S.decisions.length; wi++) {
+    var wd = S.decisions[wi];
+    if (wd.details && wd.details.province) wpProvSet.add(wd.details.province);
+    if (wd.details && wd.details.schools) {
+      var wss = wd.details.schools.split(',');
+      for (var wj = 0; wj < wss.length; wj++) { var ws = wss[wj].trim(); if (ws) wpSchoolSet.add(ws); }
+    }
+  }
+  var wpSchools = wpSchoolSet.size;
+  var wpProvs = wpProvSet.size;
   var cards = '';
   var cardData = [
     ['📊', 'Show the impact of your support', 'Every activity you log connects your work to real learner outcomes — giving you evidence of what\u2019s working.', 'var(--teal)'],
@@ -1258,11 +1270,10 @@ function renderWelcome() {
     '<div class="welcome-cards">' + cards + '</div>' +
     '<div class="welcome-proof" style="animation:fadeUp .4s ease .55s both">' +
       '<div class="wp-icon">🏫</div>' +
-      '<div class="wp-text"><strong>740+ schools</strong> across 9 provinces are already being supported through DDD interventions this year.</div>' +
+      '<div class="wp-text"><strong>' + (wpSchools > 0 ? wpSchools.toLocaleString() + ' school' + (wpSchools !== 1 ? 's' : '') : '740+ schools') + '</strong> across ' + (wpProvs > 1 ? wpProvs + ' provinces' : '9 provinces') + ' are already being supported through DDD Data Informed interventions this year.</div>' +
     '</div>' +
     '<div class="welcome-cta" style="animation:fadeUp .4s ease .65s both">' +
       '<button class="btn-go" onclick="dismissWelcome()">Let\u2019s Go →</button>' +
-      '<div style="font-size:10.5px;color:var(--grey);margin-top:8px">You won\u2019t see this screen again</div>' +
     '</div>' +
   '</div></div>';
 }
