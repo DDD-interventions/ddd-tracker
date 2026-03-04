@@ -1858,7 +1858,7 @@ async function submitForm() {
  activity_type:S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type,
  intervention_theme:S.f.intervention_theme==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:S.f.intervention_theme,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
- ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null,
+ ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null,
  insight_type:S.f.insight_type,
  insight_detail:S.f.insight_detail,
  intervention_trigger_other:S.f.intervention_trigger_other,
@@ -1867,6 +1867,8 @@ async function submitForm() {
  insight_sba_exam_gap:S.f.insight_sba_exam_gap?parseFloat(S.f.insight_sba_exam_gap):null,
  insight_curriculum_pct:S.f.insight_curriculum_pct?parseFloat(S.f.insight_curriculum_pct):null,
  insight_statement:buildInsightStatement(),
+ insight_pass_rate:S.f.insight_pass_rate?parseFloat(S.f.insight_pass_rate):null,
+ insight_learners_affected:S.f.insight_learners_affected?parseInt(S.f.insight_learners_affected):null,
  decision_type:S.f.decision_type==='Other'&&S.f.decision_other?'Other: '+S.f.decision_other:S.f.decision_type,
  ctx_staffing:S.f.ctx_staffing, ctx_resources:S.f.ctx_resources, ctx_learners:S.f.ctx_learners, ctx_notes:S.f.ctx_notes,
  learners_reached:S.f.learners_reached ? parseInt(S.f.learners_reached) : null,
@@ -2130,6 +2132,7 @@ function exportAllDataCSV() {
    'Term','Activity Type','Intervention Theme','Subjects','Grades',
    'Description','DDD Used','DDD Reports','DDD Access Date','DDD Dashboard Confirmed',
    'Insight','Decision Type','Learners Reached',
+   'Insight Type','Insight Pass Rate','Insight Learners Affected','Insight Educator Absent','Insight Attendance Days','Insight SBA-Exam Gap','Insight Curriculum Pct','Intervention Trigger',
    'Barriers (Staffing)','Barriers (Resources)','Barriers (Learners)','Context Notes',
    'Follow-Up','Follow-Up Description','SIP Focus Areas','Support Needed','Support Level',
    'Action Taken','Action Responsible','Action Status','Action Notes',
@@ -2180,6 +2183,14 @@ function buildExportRow(d, det, a, o) {
    det.insight_statement || det.insight_detail || d.insight || '',
    det.decision_type || d.decision_made || '',
    det.learners_reached != null ? det.learners_reached : '',
+   det.insight_type || '',
+   det.insight_pass_rate != null ? det.insight_pass_rate : '',
+   det.insight_learners_affected != null ? det.insight_learners_affected : '',
+   det.insight_educator_absent != null ? det.insight_educator_absent : '',
+   det.insight_attendance_days != null ? det.insight_attendance_days : '',
+   det.insight_sba_exam_gap != null ? det.insight_sba_exam_gap : '',
+   det.insight_curriculum_pct != null ? det.insight_curriculum_pct : '',
+   det.intervention_trigger || '',
    arrJoin(det.ctx_staffing),
    arrJoin(det.ctx_resources),
    arrJoin(det.ctx_learners),
@@ -2225,14 +2236,16 @@ function renderDashboard() {
  const followUps = [];
  const barrierCounts = {};
  const activityByType = {};
+ const themeCounts = {};
+ const dddTaskCountsDirect = {};
+ const dddCatCountsDirect = {};
  const dddUsageCounts = {direct:0,informed:0,partial:0,none:0};
  const subjectCounts = {};
  const provinceCounts = {};
  const districtData = {};
  const monthlyData = {};
  const dddReportCounts = {};
- const dddTaskCounts = {};
- const dddCatCounts = {};
+
  const openLoops = [];
  const impactItems = [];
  const decisionTypes = {};
@@ -2252,6 +2265,25 @@ function renderDashboard() {
 
    // Activity types
    if (det.activity_type) activityByType[det.activity_type] = (activityByType[det.activity_type]||0)+1;
+
+   // Intervention theme
+   if (det.intervention_theme) themeCounts[det.intervention_theme] = (themeCounts[det.intervention_theme]||0)+1;
+
+   // DDD tasks/questions - prefer stored ddd_tasks, fall back to reverse-mapping
+   if (det.ddd_tasks && det.ddd_tasks.length) {
+     det.ddd_tasks.forEach(function(q) { dddTaskCountsDirect[q] = (dddTaskCountsDirect[q]||0)+1; });
+   }
+   if (det.ddd_task_cats && det.ddd_task_cats.length) {
+     det.ddd_task_cats.forEach(function(c) { dddCatCountsDirect[c] = (dddCatCountsDirect[c]||0)+1; });
+   } else if (det.ddd_reports && det.ddd_reports.length) {
+     // Fallback reverse-mapping for old entries without stored tasks
+     DDD_TASKS.forEach(function(task) {
+       if (task.reports.some(function(r){ return det.ddd_reports.includes(r); })) {
+         dddTaskCountsDirect[task.q] = (dddTaskCountsDirect[task.q]||0)+1;
+         dddCatCountsDirect[task.cat] = (dddCatCountsDirect[task.cat]||0)+1;
+       }
+     });
+   }
 
    // DDD usage
    if (det.ddd_used==='yes-direct') dddUsageCounts.direct++;
@@ -2289,15 +2321,7 @@ function renderDashboard() {
    // DDD reports used
    (det.ddd_reports||[]).forEach(r => { dddReportCounts[r] = (dddReportCounts[r]||0)+1; });
 
-   // Reverse-map reports to DDD questions/categories
-   if (det.ddd_reports && det.ddd_reports.length) {
-     DDD_TASKS.forEach(function(task) {
-       if (task.reports.some(function(r){ return det.ddd_reports.includes(r); })) {
-         dddTaskCounts[task.q] = (dddTaskCounts[task.q]||0)+1;
-         dddCatCounts[task.cat] = (dddCatCounts[task.cat]||0)+1;
-       }
-     });
-   }
+
 
    // Decision types
    if (det.decision_type) decisionTypes[det.decision_type] = (decisionTypes[det.decision_type]||0)+1;
@@ -2361,9 +2385,11 @@ function renderDashboard() {
  const barriers = Object.entries(barrierCounts).sort((a,b)=>b[1]-a[1]);
  const topSubjects = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
  const topReports = Object.entries(dddReportCounts).sort((a,b)=>b[1]-a[1]);
- const topTasks = Object.entries(dddTaskCounts).sort((a,b)=>b[1]-a[1]);
- const topCats = Object.entries(dddCatCounts).sort((a,b)=>b[1]-a[1]);
+ const topTasks = Object.entries(dddTaskCountsDirect).sort((a,b)=>b[1]-a[1]);
+ const topCats = Object.entries(dddCatCountsDirect).sort((a,b)=>b[1]-a[1]);
  const totalTaskHits = topCats.reduce((s,c)=>s+c[1],0);
+ const topThemes = Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]);
+ const topTriggers = Object.entries(triggerCounts).sort((a,b)=>b[1]-a[1]);
  const actTypes = Object.entries(activityByType).sort((a,b)=>b[1]-a[1]);
  const districts = Object.values(districtData).sort((a,b)=>b.activities-a.activities);
  const months = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
@@ -2592,6 +2618,30 @@ function closeSchoolsListModal(){
    _ovActChart += '</div>';
  } else { _ovActChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No activities logged yet</div>'; }
 
+ var _themeColors = {'Underperforming Schools':'#E53935','DBE Mentorship':'#1565C0','District Support':'#0B8E8D','GET / Intermediate Phase':'#7AB648'};
+ var _ovThemeChart = '';
+ if (topThemes.length) {
+   var _totalTh = topThemes.reduce(function(s,t){return s+t[1]},0);
+   _ovThemeChart = '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px">';
+   _ovThemeChart += '<div style="position:relative;width:90px;height:90px;flex-shrink:0"><svg viewBox="0 0 36 36" style="width:100%;height:100%">';
+   var _thOff = 0;
+   for (var _ti2=0; _ti2<topThemes.length; _ti2++) {
+     var _thN=topThemes[_ti2][0], _thC=topThemes[_ti2][1];
+     var _thPct = _totalTh ? (_thC/_totalTh)*100 : 0;
+     var _thCol = _themeColors[_thN] || '#607D8B';
+     _ovThemeChart += '<circle cx="18" cy="18" r="15.5" fill="none" stroke="'+_thCol+'" stroke-width="3.5" stroke-dasharray="'+_thPct+' '+(100-_thPct)+'" stroke-dashoffset="-'+_thOff+'" style="transform:rotate(-90deg);transform-origin:center"/>';
+     _thOff += _thPct;
+   }
+   _ovThemeChart += '</svg></div><div style="flex:1;display:grid;gap:6px">';
+   for (var _ti3=0; _ti3<topThemes.length; _ti3++) {
+     var _thN2=topThemes[_ti3][0], _thC2=topThemes[_ti3][1];
+     var _thCol2 = _themeColors[_thN2] || '#607D8B';
+     var _thPct2 = _totalTh ? Math.round((_thC2/_totalTh)*100) : 0;
+     _ovThemeChart += '<div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:'+_thCol2+';flex-shrink:0"></span><span style="font-size:11px;color:var(--navy);flex:1">'+esc(_thN2)+'</span><span style="font-size:12px;font-weight:700;color:'+_thCol2+'">'+_thC2+' ('+_thPct2+'%)</span></div>';
+   }
+   _ovThemeChart += '</div></div>';
+ } else { _ovThemeChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No intervention themes logged yet</div>'; }
+
  var _dddCol = dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)';
  var _dddTip = dddPct>=60?'Most of your activities are data-informed. This strengthens your evidence for quarterly reports.':dddPct>=40?'You are building a data-informed habit. Try opening DDD Dashboard before each school visit.':'Tip: Open the DDD Dashboard first. Note what you see, then come back to Log Activity.';
 
@@ -2722,6 +2772,15 @@ ${tab==='overview'?`
    </div>
  </div>
 
+ <!-- ═══ INTERVENTION THEME ═══ -->
+ <div class="dash-section">
+   <div class="dash-section-hdr"><h3>Which Programme Streams Are Active?</h3></div>
+   <div class="dash-section-body">
+     <div class="dash-section-desc">The intervention themes officials selected when logging their activities — shows which programme streams are receiving the most on-the-ground support</div>
+     ${_ovThemeChart}
+   </div>
+ </div>
+
  <!-- ═══ SMART NARRATIVES ═══ -->
  ${_narrHTML}
 
@@ -2824,6 +2883,19 @@ ${tab==='trends'?`
      </div>
      ${topTasks.length === 0 ? '' : '<div style="margin-top:12px;padding:8px 10px;background:#F8F9FA;border-radius:6px;font-size:10px;color:var(--grey);line-height:1.5">These questions map to the task-based report picker in the Log Activity form. If a category is low, officials may need guidance on those DDD reports.</div>'}
      ` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD data questions recorded yet — officials will see this once they select reports during logging</div>'}
+   </div>
+ </div>
+
+ <!-- ═══ INTERVENTION TRIGGERS ═══ -->
+ <div class="dash-section" style="border-left:4px solid #E8952E">
+   <div class="dash-section-hdr"><h3>What Made Officials Decide to Act?</h3><span style="font-size:11px;color:var(--grey)">${topTriggers.length} trigger${topTriggers.length!==1?'s':''}</span></div>
+   <div class="dash-section-body">
+     <div class="dash-section-desc">The reasons officials gave for stepping in — what they saw in the data or context that prompted action. Understanding triggers helps the programme target support where it matters most.</div>
+     ${topTriggers.length ? `<div style="display:grid;gap:6px">${topTriggers.slice(0,12).map(function([t,count]){
+       const maxTr = topTriggers[0][1];
+       const pct = Math.max(Math.round((count/maxTr)*100), 6);
+       return '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px"><span style="font-size:11px;color:var(--navy);font-weight:500;flex:1;line-height:1.4">' + esc(t) + '</span><span style="font-size:11px;font-weight:700;color:#E8952E;white-space:nowrap">' + count + '\u00d7</span></div><div style="height:6px;background:#ECEFF1;border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:#E8952E;border-radius:3px;transition:width .4s"></div></div></div>';
+     }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No intervention triggers recorded yet</div>'}
    </div>
  </div>
 
