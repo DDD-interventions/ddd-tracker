@@ -136,6 +136,59 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* Success */
 .success{text-align:center;padding:40px 20px}
+
+/* WELCOME SCREEN */
+.welcome-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
+.welcome-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden;animation:fadeUp .5s ease}
+.welcome-hero{text-align:center;padding:28px 22px 0}
+.welcome-wave{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--teal-lt),#d4f0f0);margin-bottom:14px;font-size:28px}
+.welcome-hero h2{font-size:19px;color:var(--navy);margin:0 0 4px;font-weight:700;line-height:1.3}
+.welcome-hero p{font-size:13px;color:var(--grey);line-height:1.6;margin:0 auto 20px;max-width:400px}
+.welcome-cards{padding:0 18px 6px;display:flex;flex-direction:column;gap:10px}
+.wc-card{display:flex;gap:14px;padding:14px 16px;background:#fff;border-radius:10px;border:1px solid #f0eeec;border-left-width:3px}
+.wc-card .wc-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px}
+.wc-card .wc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.wc-card .wc-desc{font-size:11.5px;color:var(--grey);line-height:1.55}
+.welcome-proof{margin:16px 18px 0;padding:11px 14px;background:var(--green-lt);border-radius:8px;display:flex;align-items:center;gap:10px}
+.welcome-proof .wp-icon{font-size:18px}
+.welcome-proof .wp-text{font-size:11.5px;color:#2E7D32;line-height:1.5}
+.welcome-cta{padding:20px 18px 24px;text-align:center}
+.welcome-cta .btn-go{background:linear-gradient(135deg,var(--teal-dk),#0F7B7D);color:#fff;border:none;border-radius:10px;padding:13px 40px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(11,142,141,.35);transition:transform .15s,box-shadow .15s;min-width:200px}
+.welcome-cta .btn-go:active{transform:scale(.97)}
+.welcome-cta .btn-go:hover{box-shadow:0 4px 16px rgba(11,142,141,.45)}
+
+/* FEEDBACK FORM */
+.fb-section{margin:16px 0 0;padding:18px 16px;background:#fff;border-radius:10px;border:1px solid #e8e6e4;animation:fadeUp .4s ease .2s both}
+.fb-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.fb-header .fb-icon{font-size:18px}
+.fb-header .fb-title{font-size:14px;font-weight:700;color:var(--navy)}
+.fb-header .fb-sub{font-size:11px;color:var(--grey)}
+.fb-question{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px}
+.fb-rating{display:flex;gap:6px;margin-bottom:16px}
+.fb-rate-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:8px;border:2px solid #e8e6e4;background:#fff;cursor:pointer;transition:all .15s;font-family:inherit}
+.fb-rate-btn:hover{border-color:var(--teal-md)}
+.fb-rate-btn.sel{border-color:var(--teal);background:var(--teal-lt)}
+.fb-rate-btn .fb-emoji{font-size:22px}
+.fb-rate-btn .fb-label{font-size:9px;font-weight:600;color:#999;line-height:1.2}
+.fb-rate-btn.sel .fb-label{color:var(--teal-dk)}
+.fb-checks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fb-check{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:1.5px solid #e8e6e4;background:#fff;cursor:pointer;transition:all .15s;font-size:12.5px;color:var(--navy)}
+.fb-check:hover{border-color:var(--teal-md)}
+.fb-check.sel{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk);font-weight:600}
+.fb-tick{width:18px;height:18px;border-radius:4px;flex-shrink:0;border:1.5px solid #c8c6c4;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;transition:all .15s}
+.fb-check.sel .fb-tick{background:var(--teal);border-color:var(--teal)}
+.fb-textarea{width:100%;padding:9px 11px;border:1px solid #c8c6c4;border-radius:6px;font-size:12.5px;font-family:inherit;color:var(--navy);resize:vertical;outline:none;box-sizing:border-box;line-height:1.55;min-height:60px}
+.fb-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.fb-actions{display:flex;gap:10px;margin-top:16px}
+.fb-submit{flex:1;padding:11px 16px;border-radius:8px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.fb-submit:disabled{background:#d0d4db;cursor:not-allowed;opacity:.6}
+.fb-skip{padding:11px 16px;border-radius:8px;border:1px solid #d0d7de;background:#fff;color:var(--grey);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.fb-skip:hover{background:#f8f7f6}
+.fb-anon{text-align:center;font-size:10px;color:#b0b0b0;margin-top:10px}
+.fb-thankyou{text-align:center;padding:24px 16px;animation:fadeUp .4s ease}
+.fb-thankyou .fb-ty-icon{font-size:36px;margin-bottom:8px}
+.fb-thankyou h3{font-size:16px;color:var(--navy);margin:0 0 6px}
+.fb-thankyou p{font-size:12px;color:var(--grey);line-height:1.6;max-width:340px;margin:0 auto}
 .success-icon{font-size:48px;margin-bottom:12px}
 .success h2{font-size:22px;color:var(--teal-dk);margin-bottom:8px}
 .success p{font-size:13px;color:var(--grey)}
@@ -608,7 +661,7 @@ const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, pipelineDrill:null,
- saving:false, submitted:false, expandedSchool:null, _validationErrors:null,
+ saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null,
  dStep:0, dChallenge:null, sortBy:'effectiveness', filterCat:'All',
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview',
@@ -682,6 +735,8 @@ async function checkAuth() {
        initDashFilters();
        S.authState = 'ready';
        resetInactivityTimer();
+       // Show welcome screen on first login
+       try { S.showWelcome = !localStorage.getItem('ddd_welcome_seen'); } catch(e) { S.showWelcome = true; }
        render();
        await loadAll();
        return;
@@ -776,6 +831,8 @@ async function handleOtpSubmit() {
    S.gateError = '';
    S.gateLoading = false;
    resetInactivityTimer();
+   // Show welcome screen on first login
+   try { S.showWelcome = !localStorage.getItem('ddd_welcome_seen'); } catch(e) { S.showWelcome = true; }
    S.loading = true;
    render();
    await loadAll();
@@ -970,6 +1027,16 @@ function render() {
  if (S.error) { app.innerHTML = `<div class="loading"><div style="font-size:48px"></div><div style="color:var(--red)">${esc(S.error)}</div><button class="btn btn-teal btn-sm" onclick="S.loading=true;render();loadAll()">Retry</button></div>`; return; }
 
  const o = S.official;
+
+ // Welcome screen shown once after first login
+ if (S.showWelcome) {
+   app.innerHTML = `
+   <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Welcome!</div> </div> </div> </header>
+   ${renderWelcome()}
+   <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div>`;
+   return;
+ }
+
  app.innerHTML = `
  <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
@@ -1158,6 +1225,126 @@ function renderForm() {
     ${step===0?renderFormStep1():step===1?renderFormStep2():step===2?renderFormStep3():step===3?renderFormStep4():renderFormReview()}
   </div>`;
 }
+
+// ═══ WELCOME SCREEN ═══
+function dismissWelcome() {
+  try { localStorage.setItem('ddd_welcome_seen', '1'); } catch(e) {}
+  S.showWelcome = false;
+  render();
+}
+
+function renderWelcome() {
+  var firstName = 'there';
+  if (S.official.full_name && S.official.full_name !== 'Official') {
+    firstName = esc(S.official.full_name.split(' ')[0]);
+  }
+  var cards = '';
+  var cardData = [
+    ['📊', 'Show the impact of your support', 'Every activity you log connects your work to real learner outcomes — giving you evidence of what\u2019s working.', 'var(--teal)'],
+    ['⏱️', 'Less than 5 minutes per entry', 'Quick, guided logging that fits into your day. No lengthy forms — just what matters.', 'var(--green-dk)'],
+    ['🔍', 'See patterns across your schools', 'Your dashboard shows trends, follow-ups due, and where your interventions are moving the needle.', 'var(--orange)']
+  ];
+  for (var ci = 0; ci < cardData.length; ci++) {
+    var cd = cardData[ci];
+    cards += '<div class="wc-card" style="border-left-color:' + cd[3] + ';animation:fadeUp .4s ease ' + (.15 + ci * .1) + 's both"><div class="wc-icon">' + cd[0] + '</div><div><div class="wc-title">' + cd[1] + '</div><div class="wc-desc">' + cd[2] + '</div></div></div>';
+  }
+
+  return '<div class="welcome-wrap"><div class="welcome-card">' +
+    '<div class="welcome-hero">' +
+      '<div class="welcome-wave">👋</div>' +
+      '<h2>Welcome, ' + firstName + '!</h2>' +
+      '<p>This tracker helps you <strong style="color:var(--teal-dk)">build a record of the difference you\u2019re making</strong> — so your work with schools doesn\u2019t go unnoticed.</p>' +
+    '</div>' +
+    '<div class="welcome-cards">' + cards + '</div>' +
+    '<div class="welcome-proof" style="animation:fadeUp .4s ease .55s both">' +
+      '<div class="wp-icon">🏫</div>' +
+      '<div class="wp-text"><strong>740+ schools</strong> across 9 provinces are already being supported through DDD interventions this year.</div>' +
+    '</div>' +
+    '<div class="welcome-cta" style="animation:fadeUp .4s ease .65s both">' +
+      '<button class="btn-go" onclick="dismissWelcome()">Let\u2019s Go →</button>' +
+      '<div style="font-size:10.5px;color:var(--grey);margin-top:8px">You won\u2019t see this screen again</div>' +
+    '</div>' +
+  '</div></div>';
+}
+
+// ═══ FEEDBACK FORM ═══
+function fbSetRating(val) { S.fbRating = val; render(); }
+function fbToggleCheck(val) {
+  var idx = S.fbChecks.indexOf(val);
+  if (idx > -1) S.fbChecks.splice(idx, 1);
+  else S.fbChecks.push(val);
+  render();
+}
+function fbSetComment(val) { S.fbComment = val; }
+function fbSkip() { S.fbSkipped = true; render(); }
+async function fbSubmit() {
+  S.fbSubmitted = true;
+  render();
+  // Save feedback to Supabase
+  try {
+    await sb.from('tracker_feedback').insert({
+      official_id: S._officialId,
+      rating: S.fbRating,
+      useful_features: S.fbChecks,
+      comment: S.fbComment || null,
+      logged_by: S.official.full_name || 'User'
+    });
+  } catch(e) { console.warn('Feedback save failed:', e); }
+}
+
+function renderFeedbackSection() {
+  // If skipped or submitted, don't show
+  if (S.fbSkipped) return '';
+  if (S.fbSubmitted) {
+    return '<div class="fb-thankyou"><div class="fb-ty-icon">🙏</div><h3>Thanks for your feedback!</h3><p>Your input helps us build a tracker that actually works for you. We read every response.</p></div>';
+  }
+
+  var ratingHtml = '';
+  var ratings = [
+    [1, '😫', 'Frustrating'],
+    [2, '😐', 'Okay'],
+    [3, '🙂', 'Good'],
+    [4, '😊', 'Great'],
+    [5, '🤩', 'Loved it']
+  ];
+  for (var ri = 0; ri < ratings.length; ri++) {
+    var r = ratings[ri];
+    var isSel = S.fbRating === r[0];
+    ratingHtml += '<button class="fb-rate-btn' + (isSel ? ' sel' : '') + '" onclick="fbSetRating(' + r[0] + ')"><span class="fb-emoji">' + r[1] + '</span><span class="fb-label">' + r[2] + '</span></button>';
+  }
+
+  var checksHtml = '';
+  var checkOpts = [
+    ['reminders', '🔔  Reminders for follow-up visits'],
+    ['compare', '📈  Compare my schools\u2019 progress over time'],
+    ['share', '🤝  Share what\u2019s working with other officials'],
+    ['reports', '📄  Generate reports for my line manager'],
+    ['templates', '📋  Pre-filled templates for common interventions'],
+    ['mobile', '📱  Easier mobile experience']
+  ];
+  for (var ci = 0; ci < checkOpts.length; ci++) {
+    var opt = checkOpts[ci];
+    var isSel = S.fbChecks.indexOf(opt[0]) > -1;
+    checksHtml += '<div class="fb-check' + (isSel ? ' sel' : '') + '" onclick="fbToggleCheck(\'' + opt[0] + '\')"><div class="fb-tick">' + (isSel ? '✓' : '') + '</div><span>' + opt[1] + '</span></div>';
+  }
+
+  return '<div class="fb-section">' +
+    '<div class="fb-header"><span class="fb-icon">💬</span><div><div class="fb-title">Quick feedback</div><div class="fb-sub">Help us make this tracker work better for you</div></div></div>' +
+    '<div class="fb-question">How was your experience logging this activity?</div>' +
+    '<div class="fb-rating">' + ratingHtml + '</div>' +
+    '<div class="fb-question">What would make this tracker more useful to you?</div>' +
+    '<div class="fb-checks">' + checksHtml + '</div>' +
+    '<div style="margin-bottom:16px"><div class="fb-question">Anything else? <span style="font-weight:400;color:var(--grey)">(optional)</span></div>' +
+      '<textarea class="fb-textarea" placeholder="e.g. \'I wish I could log for multiple schools at once\' or \'The school picker was confusing\'" rows="3" oninput="fbSetComment(this.value)">' + esc(S.fbComment) + '</textarea>' +
+    '</div>' +
+    '<div class="fb-actions">' +
+      '<button class="fb-submit"' + (S.fbRating ? '' : ' disabled') + ' onclick="fbSubmit()">Send Feedback</button>' +
+      '<button class="fb-skip" onclick="fbSkip()">Skip</button>' +
+    '</div>' +
+    '<div class="fb-anon">Your feedback is anonymous and helps the DDD team improve this tool</div>' +
+  '</div>';
+}
+
 function renderFormStart(){
   const hasName=S.official.full_name && S.official.full_name!=='Official';
   const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ')[0])+'! Ready':'Ready';
@@ -1570,7 +1757,8 @@ function renderSuccess() {
  <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:12px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> at <strong>${esc(S.f.schools)}</strong><br> ${S.f.district}, ${S.f.province} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
  ${S.f.action_type ? 'Intervention activity: ' + esc(S.f.action_type) : ''}
  ${S.f.learners_reached ? ' \u00b7 ~' + S.f.learners_reached + ' learners' : ''}
- </div> </div> <div style="display:flex;gap:10px;justify-content:center;margin-top:20px"> <button class="btn btn-teal" onclick="resetForm()">Log Another</button> <button class="btn btn-outline" onclick="S.view='dashboard';render()">View Dashboard</button> </div> </div></div></div>`;
+ </div> </div> ${renderFeedbackSection()}
+ <div style="display:flex;gap:10px;justify-content:center;margin-top:20px"> <button class="btn btn-teal" onclick="resetForm()">Log Another</button> <button class="btn btn-outline" onclick="S.view='dashboard';render()">View Dashboard</button> </div> </div></div></div>`;
 }
 
 // 
@@ -1745,7 +1933,7 @@ async function submitForm() {
 }
 
 function resetForm() {
- S.submitted = false;
+ S.submitted = false; S.fbRating = null; S.fbChecks = []; S.fbComment = ''; S.fbSubmitted = false; S.fbSkipped = false;
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
