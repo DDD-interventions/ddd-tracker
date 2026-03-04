@@ -664,7 +664,7 @@ const S = {
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null,
  dStep:0, dChallenge:null, sortBy:'effectiveness', filterCat:'All',
- dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview',
+ dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
@@ -2079,7 +2079,15 @@ function renderFilterBar(decs) {
       '</select>';
   }
 
-  return '<div class="dash-filters">' +
+  var _scopeHtml = '<div style="display:flex;gap:0;margin-bottom:10px;border:1.5px solid var(--teal);border-radius:8px;overflow:hidden;font-size:11px">';
+  ['all','mine','colleagues'].forEach(function(v){
+    var lbl = v==='all'?'All Activities':v==='mine'?'My Activities':"Colleagues' Activities";
+    var sel = S.dashViewScope === v;
+    _scopeHtml += '<button onclick="S.dashViewScope=\''+v+'\';render()" style="flex:1;padding:8px 6px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:'+(sel?'700':'500')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--teal)')+';transition:.15s">'+lbl+'</button>';
+  });
+  _scopeHtml += '</div>';
+
+  return '<div class="dash-filters">' + _scopeHtml +
     '<div class="dash-filters-row">' +
       '<div class="dash-filter-grp"><label>Province</label>' + sel(provinces, f.province, 'province', provLocked) + '</div>' +
       '<div class="dash-filter-grp"><label>District</label>' + sel(districts, f.district, 'district', distLocked) + '</div>' +
@@ -2087,7 +2095,7 @@ function renderFilterBar(decs) {
       '<div class="dash-filter-grp"><label>School</label>' + sel(schools, f.school, 'school', false) + '</div>' +
     '</div>' +
     '<div class="dash-filters-info">' +
-      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' logged activities' + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
+      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (colleagues\\')":"") + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
       '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
       ((S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:10px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
@@ -2220,7 +2228,19 @@ function renderDashboard() {
  const allOuts = S.outcomes;
 
  // Apply client-side filters
- const decs = applyDashFilters(allDecs);
+ var _geoFiltered = applyDashFilters(allDecs);
+ // Apply scope filter (My / Colleagues / All)
+ var decs;
+ if (S.dashViewScope === 'mine') { decs = _geoFiltered.filter(function(d){ return d.official_id === S._officialId; }); }
+ else if (S.dashViewScope === 'colleagues') { decs = _geoFiltered.filter(function(d){ return d.official_id !== S._officialId; }); }
+ else { decs = _geoFiltered; }
+ // Dynamic label helpers
+ var _isMine = S.dashViewScope === 'mine';
+ var _isColl = S.dashViewScope === 'colleagues';
+ var _lYou = _isMine ? 'you' : _isColl ? 'colleagues' : 'officials';
+ var _lYour = _isMine ? 'your' : _isColl ? "your colleagues'" : "officials'";
+ var _lYouCap = _isMine ? 'You' : _isColl ? 'Colleagues' : 'Officials';
+ var _lAre = _isMine ? 'Are You' : _isColl ? 'Are Colleagues' : 'Are Officials';
  const decIds = new Set(decs.map(d => d.id));
  const acts = allActs.filter(a => decIds.has(a.decision_id));
  const actIds = new Set(acts.map(a => a.id));
@@ -2256,7 +2276,7 @@ function renderDashboard() {
    const schools = det.schools ? det.schools.split(',').map(s=>s.trim()).filter(Boolean) : [];
    schools.forEach(s => schoolSet.add(s));
    if (det.learners_reached) totalLearners += parseInt(det.learners_reached)||0;
-   if (det.follow_up && det.follow_up_desc) followUps.push({desc:det.follow_up_desc, date:d.date, schools:det.schools, district:det.district, id:d.id});
+   if (det.follow_up && det.follow_up_desc && !det.follow_up_completed) followUps.push({desc:det.follow_up_desc, date:d.date, schools:det.schools, district:det.district, id:d.id, loggedBy:d.made_by||det.official_name||''});
 
    // Barriers
    (det.ctx_staffing||[]).forEach(b => { if(b!=='All posts filled') barrierCounts[b] = (barrierCounts[b]||0)+1; });
@@ -2401,8 +2421,8 @@ function renderDashboard() {
 
  // Pipeline insight — balanced: celebrate effort, gently note gaps
  if (chainsTotal >= 2) {
-   if (chainsTotal >= 5) narratives.push({color:'var(--green)',text:`You have logged <strong>${chainsTotal} interventions</strong> across <strong>${schoolSet.size} school${schoolSet.size!==1?'s':''}</strong>${activeProvinces.length>1?' in '+activeProvinces.length+' provinces':''}. That level of activity makes a real difference.`,action:''});
-   else narratives.push({color:'var(--blue)',text:`You've logged <strong>${chainsTotal}</strong> intervention${chainsTotal!==1?'s':''} so far${schoolSet.size?' reaching '+schoolSet.size+' school'+(schoolSet.size!==1?'s':''):''}. Each one builds your evidence portfolio.`,action:''});
+   if (chainsTotal >= 5) narratives.push({color:'var(--green)',text:`${_lYouCap} have logged <strong>${chainsTotal} interventions</strong> across <strong>${schoolSet.size} school${schoolSet.size!==1?'s':''}</strong>${activeProvinces.length>1?' in '+activeProvinces.length+' provinces':''}. That level of activity makes a real difference.`,action:''});
+   else narratives.push({color:'var(--blue)',text:`${_lYouCap} have logged <strong>${chainsTotal}</strong> intervention${chainsTotal!==1?'s':''} so far${schoolSet.size?' reaching '+schoolSet.size+' school'+(schoolSet.size!==1?'s':''):''}. Each one builds your evidence portfolio.`,action:''});
  }
 
  // Geographic insight
@@ -2416,7 +2436,7 @@ function renderDashboard() {
 
  // Follow-up insight
  if (followUps.length > 0) {
-   narratives.push({color:'var(--orange)',text:`You have <strong>${followUps.length}</strong> recommended follow-up${followUps.length!==1?'s':''} pending. Staying in touch with schools shows commitment and strengthens your support relationship.`,action:''});
+   narratives.push({color:'var(--orange)',text:`There are <strong>${followUps.length}</strong> recommended follow-up${followUps.length!==1?'s':''} pending. Staying in touch with schools shows commitment and strengthens support relationships.`,action:''});
  }
 
  // Subject insight
@@ -2430,16 +2450,16 @@ function renderDashboard() {
    });
    const mostBarrierSub = Object.entries(subWithBarriers).sort((a,b)=>b[1]-a[1])[0];
    if (mostBarrierSub && mostBarrierSub[0] !== topSub[0]) {
-     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is your most targeted subject (${topSub[1]} activities), but <strong>${mostBarrierSub[0]}</strong> has the most barrier reports (${mostBarrierSub[1]}). It may need more focused support.`,action:''});
+     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is the most targeted subject (${topSub[1]} activities), but <strong>${mostBarrierSub[0]}</strong> has the most barrier reports (${mostBarrierSub[1]}). It may need more focused support.`,action:''});
    } else {
-     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is your most targeted subject with <strong>${topSub[1]}</strong> activities${topSubjects.length>1?', followed by '+topSubjects[1][0]+' ('+topSubjects[1][1]+')':''}.`,action:''});
+     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is the most targeted subject with <strong>${topSub[1]}</strong> activities${topSubjects.length>1?', followed by '+topSubjects[1][0]+' ('+topSubjects[1][1]+')':''}.`,action:''});
    }
  }
 
  // DDD usage insight — balanced
  if (totalActivities >= 3) {
    if (dddPct < 50) {
-     narratives.push({color:'var(--orange)',text:`<strong>${dddPct}%</strong> of your activities used DDD data. Starting from the data helps you target the right schools and subjects.`,action:'Try opening the DDD Dashboard before your next school visit.'});
+     narratives.push({color:'var(--orange)',text:`<strong>${dddPct}%</strong> of ${_lYour} activities used DDD data. Starting from the data helps target the right schools and subjects.`,action:'Try opening the DDD Dashboard before your next school visit.'});
    } else if (dddPct >= 75) {
      narratives.push({color:'var(--green)',text:`Excellent — <strong>${dddPct}%</strong> of your activities are data-informed. ${dataQualityPct>=60?'And '+dataQualityPct+'% include specific numbers from DDD reports — that\'s strong evidence.':'Including specific numbers (pass rates, learner counts) strengthens your entries further.'}`,action:''});
    }
@@ -2451,7 +2471,7 @@ function renderDashboard() {
    const distinctDistricts = new Set();
    decs.forEach(d=>{const det=d.details||{};const allB=[...(det.ctx_staffing||[]),...(det.ctx_resources||[]),...(det.ctx_learners||[])];if(allB.includes(topBarrier[0])&&det.district)distinctDistricts.add(det.district)});
    if (distinctDistricts.size > 1) {
-     narratives.push({color:'#E53935',text:`<strong>"${topBarrier[0]}"</strong> is your most reported barrier (${topBarrier[1]} times across ${distinctDistricts.size} districts). This is a widespread problem worth raising to higher levels.`,action:''});
+     narratives.push({color:'#E53935',text:`<strong>"${topBarrier[0]}"</strong> is the most reported barrier (${topBarrier[1]} times across ${distinctDistricts.size} districts). This is a widespread problem worth raising to higher levels.`,action:''});
    }
  }
 
@@ -2643,7 +2663,7 @@ function closeSchoolsListModal(){
  } else { _ovThemeChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No intervention themes logged yet</div>'; }
 
  var _dddCol = dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)';
- var _dddTip = dddPct>=60?'Most of your activities are data-informed. This strengthens your evidence for quarterly reports.':dddPct>=40?'You are building a data-informed habit. Try opening DDD Dashboard before each school visit.':'Tip: Open the DDD Dashboard first. Note what you see, then come back to Log Activity.';
+ var _dddTip = dddPct>=60?'Most activities are data-informed. This strengthens evidence for quarterly reports.':dddPct>=40?'A data-informed habit is building. Try opening DDD Dashboard before each school visit.':'Tip: Open the DDD Dashboard first. Note what you see, then come back to Log Activity.';
 
  var _narrHTML = '';
  if (narratives.length) {
@@ -2657,14 +2677,14 @@ function closeSchoolsListModal(){
 
  var _fuHTML = '';
  if (followUpsWithAge.length || silentDistricts.length) {
-   _fuHTML = '<div class="dash-section" style="border-left:4px solid var(--orange)"><div class="dash-section-hdr"><h3>Needs Your Attention</h3><span style="font-size:11px;color:var(--grey)">'+(followUpsWithAge.length+silentDistricts.length)+' item'+((followUpsWithAge.length+silentDistricts.length)!==1?'s':'')+'</span></div><div class="dash-section-body">';
+   _fuHTML = '<div class="dash-section" style="border-left:4px solid var(--orange)"><div class="dash-section-hdr"><h3>Needs Attention</h3><span style="font-size:11px;color:var(--grey)">'+(followUpsWithAge.length+silentDistricts.length)+' item'+((followUpsWithAge.length+silentDistricts.length)!==1?'s':'')+'</span></div><div class="dash-section-body">';
    if (followUpsWithAge.length) {
      _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Follow-ups Due</div><div style="display:grid;gap:6px;margin-bottom:'+(silentDistricts.length?'14':'0')+'px">';
      for (var _fi=0; _fi<Math.min(followUpsWithAge.length,5); _fi++) {
        var _f=followUpsWithAge[_fi];
        var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
        var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
-       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div></div>';
+       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+(_f.loggedBy?' &middot; '+esc(_f.loggedBy):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div><div style="display:flex;gap:6px;margin-top:8px"><button onclick="markFollowUpDone(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit">✓ Done</button><button onclick="logFollowUpVisit(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit">Log Follow-up</button></div></div>';
      }
      if (followUpsWithAge.length>5) _fuHTML += '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ '+(followUpsWithAge.length-5)+' more</div>';
      _fuHTML += '</div>';
@@ -2705,19 +2725,19 @@ ${tab==='overview'?`
  <div class="stats-row">
    <div class="stat-card">
      <div class="st-title">Activities Logged</div>
-     <div class="st-desc">The total number of school visits, workshops, and support activities you have carried out and recorded</div>
+     <div class="st-desc">The total number of school visits, workshops, and support activities ${_lYou} carried out and recorded</div>
      <div class="st-num">${totalActivities.toLocaleString()}</div>
      ${_latestDate?'<div class="st-foot">Latest activity on '+fmtDate(_latestDate)+'</div>':''}
    </div>
    <div class="stat-card green">
      <div class="st-title">Schools Supported</div>
-     <div class="st-desc">The number of unique schools where you have conducted at least one intervention or support activity</div>
+     <div class="st-desc">The number of unique schools where ${_lYou} conducted at least one intervention or support activity</div>
      <div class="st-num">${schoolSet.size.toLocaleString()}</div>
      ${districts.length?'<div class="st-foot">Across '+districts.length+' district'+(districts.length!==1?'s':'')+' in '+activeProvinces.length+' province'+(activeProvinces.length!==1?'s':'')+'</div>':''}
    </div>
    <div class="stat-card orange">
      <div class="st-title">Learners Reached</div>
-     <div class="st-desc">The estimated number of learners who benefited from your intervention activities, based on what you reported</div>
+     <div class="st-desc">The estimated number of learners who benefited from ${_lYour} intervention activities, based on what was reported</div>
      <div class="st-num">${totalLearners.toLocaleString()}</div>
      ${schoolSet.size?'<div class="st-foot">Average of ~'+Math.round(totalLearners/(schoolSet.size||1))+' learners per school</div>':''}
    </div>
@@ -2728,14 +2748,14 @@ ${tab==='overview'?`
    <div class="dash-section" style="margin-bottom:0">
      <div class="dash-section-hdr"><h3>Overview of Interventions</h3></div>
      <div class="dash-section-body">
-       <div class="dash-section-desc">The types of support activities you have logged</div>
+       <div class="dash-section-desc">The types of support activities ${_lYou} have logged</div>
        ${_ovActChart}
      </div>
    </div>
    <div class="dash-section" style="margin-bottom:0">
      <div class="dash-section-hdr"><h3>Data-Informed Practice</h3></div>
      <div class="dash-section-body">
-       <div class="dash-section-desc">How often you use DDD dashboard data before taking action</div>
+       <div class="dash-section-desc">How often ${_lYou} use DDD dashboard data before taking action</div>
        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
          <div style="position:relative;width:90px;height:90px;flex-shrink:0">
            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
@@ -2800,9 +2820,9 @@ ${tab==='overview'?`
 ${tab==='trends'?`
  <!-- ═══ MONTHLY TIMELINE ═══ -->
  <div class="dash-section" style="border-left:4px solid var(--navy)">
-   <div class="dash-section-hdr"><h3>When Are You Most Active?</h3></div>
+   <div class="dash-section-hdr"><h3>When ${_lAre} Most Active?</h3></div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Each bar shows how many activities your team logged that month. Gaps may show periods where school support was paused.</div>
+     <div class="dash-section-desc">Each bar shows how many activities ${_lYou} logged that month. Gaps may show periods where school support was paused.</div>
      ${months.length ? `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px"><div style="display:flex;align-items:flex-end;gap:${months.length>12?'2':'8'}px;height:140px;padding-bottom:28px;position:relative;border-bottom:1px solid #e0e0e0;min-width:${months.length>6?months.length*48+'px':'100%'}">
        ${months.map(([m,count])=>{
          const h = Math.max(Math.round((count/maxMonthly)*95), 8);
@@ -2813,29 +2833,6 @@ ${tab==='trends'?`
          </div>`;
        }).join('')}
      </div></div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No timeline data yet</div>'}
-   </div>
- </div>
-
- <!-- ═══ DDD REPORT USAGE ═══ -->
- <div class="dash-section" style="border-left:4px solid var(--teal)">
-   <div class="dash-section-hdr"><h3>Which DDD Reports Are You Using?</h3></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">The DDD reports officials referenced when logging. If you are not seeing the reports most relevant to your work, explore the Interventions Toolkit.</div>
-     ${topReports.length ? `<div class="bar-chart">${topReports.slice(0,8).map(([r,count])=>{
-       const maxR = topReports[0][1];
-       const pct = Math.round((count/maxR)*100);
-       const rColors = {'FET Promotion Profiles':'#0B8E8D','Learner Chart Report':'#1565C0','Term 4 Promotion Predictions':'#7B1FA2','School Dashboard':'#E8952E','School Achievement Report':'#0F7B7D','Senior Phase Promotion Profiles':'#7AB648','Grade 6 Performance Insights':'#00897B','Term to Date':'#607D8B','Curriculum Overview':'#E53935'};
-       const c = rColors[r] || 'var(--teal)';
-       return `<div class="bar-row"><div class="bar-label">${esc(r)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
-     }).join('')}</div>
-     <div style="margin-top:12px;padding:10px 14px;background:#F5F6FA;border-radius:8px">
-       <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:11px">
-         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--teal)">${dddUsageCounts.direct}</div><div style="color:var(--grey)">Used DDD directly</div></div>
-         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)">${dddUsageCounts.informed}</div><div style="color:var(--grey)">DDD helped decide</div></div>
-         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--orange)">${dddUsageCounts.partial}</div><div style="color:var(--grey)">Partially used DDD</div></div>
-         <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--grey)">${dddUsageCounts.none}</div><div style="color:var(--grey)">Did not use DDD</div></div>
-       </div>
-     </div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD report usage recorded yet</div>'}
    </div>
  </div>
 
@@ -2903,7 +2900,7 @@ ${tab==='trends'?`
  <div class="dash-section" style="border-left:4px solid var(--red)">
    <div class="dash-section-hdr"><h3>What Challenges Are Schools Facing?</h3><span style="font-size:11px;color:var(--grey)">${barriers.length} type${barriers.length!==1?'s':''} reported</span></div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Problems you flagged during school visits. When the same challenge appears across multiple districts, it may need to be escalated.</div>
+     <div class="dash-section-desc">Problems ${_lYou} flagged during school visits. When the same challenge appears across multiple districts, it may need to be escalated.</div>
      ${barriers.length ? `<div style="display:grid;gap:8px">${barriers.slice(0,10).map(([b,count])=>{
        const maxB = barriers[0][1];
        const pct = Math.round((count/maxB)*100);
@@ -3069,6 +3066,42 @@ function tkPeers(){
      </div>
    </div>
  </div>`;
+}
+
+// FOLLOW-UP ACTIONS
+async function markFollowUpDone(decId) {
+  var dec = S.decisions.find(function(d){ return d.id === decId; });
+  if (!dec) { showToast('Could not find this activity'); return; }
+  var det = dec.details || {};
+  det.follow_up_completed = true;
+  det.follow_up_completed_date = new Date().toISOString().slice(0,10);
+  det.follow_up_completed_by = S.official.full_name || 'Unknown';
+  var r = await sb.from('decisions').update({ details: det }).eq('id', decId);
+  if (r.error) { showToast('Could not update — check your connection and try again'); return; }
+  dec.details = det;
+  showToast('Follow-up marked as done');
+  render();
+}
+
+function logFollowUpVisit(decId) {
+  var dec = S.decisions.find(function(d){ return d.id === decId; });
+  if (!dec) { showToast('Could not find this activity'); return; }
+  var det = dec.details || {};
+  S.view = 'log';
+  S.submitted = false;
+  S.f.formStep = 0;
+  S.f.province = det.province || '';
+  S.f.district = det.district || '';
+  S.f.circuit = det.circuit || '';
+  S.f.schools = det.schools || '';
+  S.f.activity_type = 'Monitoring / follow-up visit';
+  S.f.intervention_theme = det.intervention_theme || '';
+  S.f.subjects = Array.isArray(det.subjects) ? det.subjects.slice() : [];
+  S.f.grades = Array.isArray(det.grades) ? det.grades.slice() : [];
+  S.f.description = 'Follow-up visit for: ' + (det.follow_up_desc || det.description || '');
+  showToast('Form pre-filled from original activity — review and complete');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // POLICY MODAL 
