@@ -2079,15 +2079,7 @@ function renderFilterBar(decs) {
       '</select>';
   }
 
-  var _scopeHtml = '<div style="display:flex;gap:0;margin-bottom:10px;border:1.5px solid var(--teal);border-radius:8px;overflow:hidden;font-size:11px">';
-  ['all','mine','colleagues'].forEach(function(v){
-    var lbl = v==='all'?'All Activities':v==='mine'?'My Activities':"Colleagues' Activities";
-    var sel = S.dashViewScope === v;
-    _scopeHtml += '<button onclick="S.dashViewScope=\''+v+'\';render()" style="flex:1;padding:8px 6px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:'+(sel?'700':'500')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--teal)')+';transition:.15s">'+lbl+'</button>';
-  });
-  _scopeHtml += '</div>';
-
-  return '<div class="dash-filters">' + _scopeHtml +
+  return '<div class="dash-filters">' +
     '<div class="dash-filters-row">' +
       '<div class="dash-filter-grp"><label>Province</label>' + sel(provinces, f.province, 'province', provLocked) + '</div>' +
       '<div class="dash-filter-grp"><label>District</label>' + sel(districts, f.district, 'district', distLocked) + '</div>' +
@@ -2095,7 +2087,7 @@ function renderFilterBar(decs) {
       '<div class="dash-filter-grp"><label>School</label>' + sel(schools, f.school, 'school', false) + '</div>' +
     '</div>' +
     '<div class="dash-filters-info">' +
-      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (colleagues\\')":"") + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
+      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":"") + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
       '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
       ((S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:10px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
@@ -2718,6 +2710,15 @@ function closeSchoolsListModal(){
  <div class="dash-subnav">
    <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Overview</button>
    <button class="${tab==='trends'?'active':''}" onclick="S.dashTab='trends';render()">Trends</button>
+ </div>
+
+ <div style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;flex-wrap:wrap">
+   <span style="font-size:11px;color:var(--grey);font-weight:600;white-space:nowrap">Showing:</span>
+   ${['all','mine','colleagues'].map(function(v){
+     var lbl = v==='all'?'📋 All Activities':v==='mine'?'👤 My Activities':"👥 My Colleagues' Activities";
+     var sel = S.dashViewScope === v;
+     return '<button onclick="S.dashViewScope=\''+v+'\';render()" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:'+(sel?'700':'500')+';border:'+(sel?'2px solid var(--teal)':'1.5px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'#4A5568')+';cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:'+(sel?'0 2px 8px rgba(11,142,141,.3)':'0 1px 3px rgba(0,0,0,.08)')+'">' + lbl + '</button>';
+   }).join('')}
  </div>
 
 ${tab==='overview'?`
