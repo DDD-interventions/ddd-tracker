@@ -225,6 +225,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .pipeline-metric{flex-direction:row !important;justify-content:space-between;padding:8px 12px !important;border-radius:8px;background:#fff}
   .pipeline-metric .pm-num{font-size:20px !important}
   .pipeline-metric .pm-label{font-size:11px !important;text-align:left !important}
+  /* Tracker two-col responsive */
+  @media(max-width:560px){.dash-section [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr !important}}
   /* Schools stats row */
   .schools-stats{grid-template-columns:1fr 1fr 1fr !important}
   .schools-stats>div{padding:10px 8px !important}
@@ -588,18 +590,11 @@ function getSelHint(val, hints) { return val && val !== 'Other' && hints[val] ? 
 
 
 // Promotion Criteria by Phase
-const PROMO_CRITERIA = {
-  "Foundation":{phases:"Gr R-3",criteria:["Level 4 (50%) in Home Language","Level 3 (40%) in First Additional Language","Level 3 (40%) in Mathematics"],sba:"100% SBA",retention:"Max once in phase (4 years)",ref:"§7"},
-  "Intermediate":{phases:"Gr 4-6",criteria:["Level 4 (50%) in Home Language","Level 3 (40%) in FAL","Level 3 (40%) in Mathematics","Level 3 (40%) in 2 other subjects"],sba:"75% SBA / 25% Exam",retention:"Max once in phase (4 years)",ref:"§14"},
-  "Senior":{phases:"Gr 7-9",criteria:["Level 4 (50%) in Home Language","Level 3 (40%) in FAL","Level 3 (40%) in Mathematics","Level 3 (40%) in 3 other subjects","Level 2 (30%) in 2 other subjects"],sba:"40% SBA / 60% Exam",retention:"Max once in phase (4 years)",ref:"§21"},
-  "FET":{phases:"Gr 10-12",criteria:["40% in 3 subjects (including HL)","30% in 3 additional subjects","SBA component submitted in all subjects"],sba:"25% SBA / 75% Exam (LO: 100% SBA)",retention:"Max once in phase (4 years)",condonation:"Max 2% in 1 subject (Gr 12 only)",ref:"§29"}
-};
 
 // What triggered the intervention
 const INTERVENTION_TRIGGERS = ["Learners below 30% (not passing)","Learners at 30-39% (close to passing)","Learners missing one thing they need to be promoted","Big gap between SBA marks and exam marks","Learners absent a lot and doing badly","Progressed learners who need extra support","School flagged as underperforming (Circular D3)","Subject pass rate dropping from one term to the next","Parts of the curriculum not being covered","High educator absenteeism","Educator teaching outside their specialisation","Vacant educator post(s) affecting delivery","Educator not covering the curriculum on time","Educator needing subject content support","Educator not using data to inform teaching","High learner dropout or transfers out","Late or missing SA-SAMS submissions","School leadership or governance concerns","Other"];
 
 // PAM duty alignment (lightweight — what mandate does this action fulfil?)
-const DDD_TOOLS = ["School Dashboard","Learner Chart Report","Promotion by Grade","Term to Date","FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles","Term 4 Promotion Predictions","School Achievement Report","Grade 6 Performance Insights","Curriculum Overview","Management & Governance Overview","Over-age Learners","Educator Info","Schools Outstanding","Attrition Information","Subject Trends","Promotions By Year","Enrolment By Year","Learner Promotion Rate","Attendance Trend","General Overview","Principal Overview","Other"];
 
 const DDD_TASKS = [
  {q:"Which learners are at risk of not being promoted?",cat:"Performance & Promotion",primary:true,reports:["FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles"],mapping:"Promotion Profiles (FET / Senior / Intermediate)",tab:"Reports"},
@@ -679,7 +674,6 @@ const SUBJECT_GROUPS = [
  {label:"Hospitality & Tourism",items:["Tourism","Hospitality Studies","Consumer Studies"]},
  {label:"Arts",items:["Creative Arts","Visual Arts","Dramatic Arts","Dance Studies","Design","Music"]},
 ];
-const SUBJECTS = SUBJECT_GROUPS.flatMap(g=>g.items).concat(["Other"]);
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
 const SIP_FOCUS_AREAS = ["Reading and literacy","Maths and numeracy","Improving specific subjects","Learner attendance and keeping learners in school","Covering the curriculum on time","Tests, exams and marking","Educator training and mentoring","School leadership and management","Working with parents and the community"];
 const SUPPORT_NEEDED = ["More visits from subject advisors","A specialist to help with a specific subject","Help for progressed learners","Mentoring for the principal or HoDs","Staffing problem \u2014 needs to go to HR/PED","Learning materials and resources","Learner welfare or psychosocial support","Building or infrastructure problem","On track \u2014 keep doing what we're doing"];
@@ -712,7 +706,6 @@ const TK_INTERVENTIONS = [
  {id:6,name:"Parent Engagement Campaign",category:"Community",difficulty:"Light Touch",timeToImpact:"Ongoing",dddReports:["lcr","ttd"],policyRef:"SA Schools Act",webinar:{name:"Using Learner Chart Data for Parent Conversations",path:"DDD Dashboard → DDD Learning Hub → Tip-Sheets and Videos"},description:"Engage parents of learners with poor attendance or declining marks using DDD evidence in conversations.",steps:["DDD Dashboard → Reports tab → Learner Chart → Download Data → Filter for learners with declining marks or high absence","Prepare individual learner evidence sheets","Schedule parent meetings (individual or group)","Share DDD data visually — show attendance and marks side by side","Agree on home-support commitments with follow-up date"]}
 ];
 
-const TK_PEERS = []; // Will populate from captured data as officials log activities
 
 const TK_POLICIES = {
  "Promotion Policy":{full:"National Policy Pertaining to Programme and Promotion Requirements (NCS Grades R-12)",criteria:["FET (Gr 10-12): 40% in 3 subjects (inc HL) + 30% in 3 subjects","Senior Phase (Gr 7-9): Level 4 in HL, Level 3 in FAL + Maths + 3 others, Level 2 in 2 others","Intermediate (Gr 4-6): Level 4 in HL, Level 3 in FAL + Maths + 2 others","Foundation (Gr R-3): Level 4 in HL, Level 3 in FAL + Maths","SBA Weightings: Foundation 100% | Intermediate 75/25 | Senior 40/60 | FET 25/75","Retention: Max once per phase (4 years max)","Condonation: Max 2% in 1 subject (Gr 12 only)","Progressed learners MUST receive support in the next grade"]},
@@ -735,7 +728,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, pipelineDrill:null,
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all',
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null,
  dStep:0, dChallenge:null, sortBy:'effectiveness', filterCat:'All',
@@ -976,10 +969,16 @@ function resetInactivityTimer() {
 // STATUS UPDATE & OUTCOME RECORDING
 async function updateActionStatus(actionId, newStatus) {
  try {
+   const act = S.actions.find(a => a.id === actionId);
+   if (!act) { showToast('Action not found'); return; }
+   // Ownership check — only the person who logged it can update
+   if (act.official_id && act.official_id !== S._officialId) {
+     showToast('Only the official who logged this action can update its status');
+     return;
+   }
    const { error } = await sb.from('actions').update({ status: newStatus }).eq('id', actionId);
    if (error) throw error;
-   const act = S.actions.find(a => a.id === actionId);
-   if (act) act.status = newStatus;
+   act.status = newStatus;
    showToast('Status updated to ' + newStatus);
    render();
  } catch(e) {
@@ -987,23 +986,6 @@ async function updateActionStatus(actionId, newStatus) {
  }
 }
 
-function openOutcomeModal(actionId) {
- const act = S.actions.find(a => a.id === actionId);
- const dec = act ? S.decisions.find(d => d.id === act.decision_id) : null;
- S.outcomeModal = {
-   actionId: actionId,
-   actionText: act ? act.action_taken : '',
-   schools: dec && dec.details ? dec.details.schools || '' : '',
-   description: '',
-   metric: '',
-   value: '',
-   evidence: '',
-   date: today(),
-   saving: false,
-   error: ''
- };
- render();
-}
 
 function closeOutcomeModal() {
  S.outcomeModal = null;
@@ -1015,6 +997,12 @@ async function saveOutcome() {
  if (!m) return;
  if (!m.description.trim()) {
    m.error = 'Please describe what happened.';
+   render(); return;
+ }
+ // Ownership check
+ const parentAct = S.actions.find(a => a.id === m.actionId);
+ if (parentAct && parentAct.official_id && parentAct.official_id !== S._officialId) {
+   m.error = 'Only the official who logged this action can record an outcome.';
    render(); return;
  }
  m.saving = true; m.error = ''; render();
@@ -1084,12 +1072,12 @@ function injectDemo() {
  ];
 
  const demo_acts = [
- {id:'DEMO_A0',decision_id:'DEMO_D0',action_taken:'Learner grouping by performance + Extra lessons / revision classes',responsible:'Ms F Moshoeshoe & Mr T Mokoena (Subject Advisor)',status:'Completed',target_date:'2025-11-30',notes:'35 at-risk learners grouped by gap analysis. 3x weekly after-school Maths sessions (Tue/Thu/Sat) for 6 weeks. Focused on algebra, functions, and exam technique. Subject advisor co-taught with educators.',logged_by:'F Moshoeshoe',supporting_doc_url:'https://docs.google.com/spreadsheets/d/demo-learner-profiles-gr10',supporting_doc_name:'Grade 10 Maths Learner Profiles & Attendance'},
+ {id:'DEMO_A0',decision_id:'DEMO_D0',action_taken:'Learner grouping by performance',responsible:'Ms F Moshoeshoe & Mr T Mokoena (Subject Advisor)',status:'Completed',target_date:'2025-11-30',notes:'35 at-risk learners grouped by gap analysis. 3x weekly after-school Maths sessions (Tue/Thu/Sat) for 6 weeks. Focused on algebra, functions, and exam technique. Subject advisor co-taught with educators.',logged_by:'F Moshoeshoe',supporting_doc_url:'https://docs.google.com/spreadsheets/d/demo-learner-profiles-gr10',supporting_doc_name:'Grade 10 Maths Learner Profiles & Attendance'},
  {id:'DEMO_A1',decision_id:'DEMO_D1',action_taken:'Subject improvement plan developed',responsible:'Mr V Teise',status:'In Progress',target_date:'2026-02-14',notes:'Follow-up: Return visit in 2 weeks to check if Subject Improvement Plan has been implemented',logged_by:'V Teise',supporting_doc_url:'https://docs.google.com/document/d/demo-sip-jtg',supporting_doc_name:'Maths SIP — JTG Schools'},
  {id:'DEMO_A2',decision_id:'DEMO_D2',action_taken:'Extra lessons / revision classes',responsible:'Ms F Moshoeshoe',status:'In Progress',target_date:'2026-03-01',notes:'Saturday classes starting 22 Feb, 08:00-12:00',logged_by:'F Moshoeshoe',supporting_doc_url:'',supporting_doc_name:''},
  {id:'DEMO_A3',decision_id:'DEMO_D3',action_taken:'Educator coaching / mentoring',responsible:'Mr K Makatu',status:'Completed',target_date:'2026-02-10',notes:'12 educators trained in reading comprehension strategies',logged_by:'K Makatu',supporting_doc_url:'https://drive.google.com/file/d/demo-register',supporting_doc_name:'Workshop attendance register'},
  {id:'DEMO_A4',decision_id:'DEMO_D4',action_taken:'Referral to SMT / DMT / PED',responsible:'Ms P Mtyobo',status:'Planned',target_date:'2026-02-22',notes:'Follow-up: District Director to conduct accountability visit within 10 days',logged_by:'P Mtyobo',supporting_doc_url:'',supporting_doc_name:''},
- {id:'DEMO_A5',decision_id:'DEMO_D5',action_taken:'SBA target-setting with learners',responsible:'Ms R Sikhwari',status:'In Progress',target_date:'2026-03-15',notes:'Follow-up: Subject advisors to moderate SBA tasks for Term 2',logged_by:'R Sikhwari',supporting_doc_url:'',supporting_doc_name:''}
+ {id:'DEMO_A5',decision_id:'DEMO_D5',action_taken:'SBA targets set with learners',responsible:'Ms R Sikhwari',status:'In Progress',target_date:'2026-03-15',notes:'Follow-up: Subject advisors to moderate SBA tasks for Term 2',logged_by:'R Sikhwari',supporting_doc_url:'',supporting_doc_name:''}
  ];
 
  const demo_outs = [
@@ -1791,10 +1779,6 @@ async function uploadSupportingDoc(file, actionId) {
  return { url: urlData?.publicUrl || null, name: file.name };
 }
 
-function secHdr(n, title, sub, color) {
- const open = S.openSections[n];
- return `<div class="sec-hdr ${color||''}" onclick="S.openSections[${n}]=!S.openSections[${n}];render()"> <div><h2>${title}</h2><p>${sub}</p>${!open?'<div class="tap-hint" style="margin-top:4px">Tap here to open this section</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${open?'180':'0'}deg)">${open?'&#9650;':'&#9660;'}</span> </div>`;
-}
 
 function togArr(arr, val, add) {
  const i = arr.indexOf(val);
@@ -2420,7 +2404,6 @@ function renderDashboard() {
    (det.ddd_reports||[]).forEach(r => { dddReportCounts[r] = (dddReportCounts[r]||0)+1; });
 
 
-
    // Decision types
    if (det.decision_type) decisionTypes[det.decision_type] = (decisionTypes[det.decision_type]||0)+1;
 
@@ -2455,8 +2438,6 @@ function renderDashboard() {
    const dActs = acts.filter(a => a.decision_id === d.id);
    return dActs.some(a => outs.some(o => o.action_id === a.id));
  }).length;
- const pipelineActionPct = chainsTotal ? Math.round((chainsWithAction/chainsTotal)*100) : 0;
- const pipelineOutcomePct = chainsTotal ? Math.round((chainsWithOutcome/chainsTotal)*100) : 0;
 
  // ── DDD QUALITY ──
  const dddTotal = totalActivities || 1;
@@ -2553,50 +2534,6 @@ function renderDashboard() {
    }
  }
 
- // ── HELPER: funnel bar ──
- function funnelBar(label, count, total, color, drillKey) {
-   const pct = total ? Math.round((count/total)*100) : 0;
-   const width = total ? Math.max(Math.round((count/total)*100), 8) : 8;
-
-   const clickable = !!drillKey && count > 0;
-
-   const commonInner = `
-     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-       <div style="display:flex;align-items:center;gap:10px">
-         <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;margin-top:4px"></span>
-         <div style="font-weight:800;color:var(--navy);font-size:16px">${label}</div>
-       </div>
-       <div style="display:flex;align-items:baseline;gap:6px;white-space:nowrap">
-         <div style="font-size:26px;font-weight:900;color:var(--navy)">${count}</div>
-         <div style="font-size:13px;color:var(--grey)">(${pct}%)</div>
-         ${clickable ? `<span aria-hidden="true" style="margin-left:6px;color:var(--navy);font-weight:900">›</span>` : ``}
-       </div>
-     </div>
-
-     <div style="margin-top:10px;background:#eee;border-radius:8px;height:18px;overflow:hidden">
-       <div style="height:100%;background:${color};width:${width}%;border-radius:8px;transition:width .5s"></div>
-     </div>
-
-     ${clickable ? `<div style="font-size:12px;color:${color};margin-top:8px;font-weight:800;text-align:right">Tap to see details ▸</div>` : ``}
-   `;
-
-   if(clickable){
-     // Use a real <button> for maximum cross-device tap reliability (phone + laptop + WebView)
-     return `
-       <button type="button"
-         data-pipeline-drill="${drillKey}"
-         aria-label="Open ${label} details"
-         style="width:100%;text-align:left;background:#fff;border:2px solid ${color};border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(11,142,141,.15)"
-         >
-         ${commonInner}
-       </button>`;
-   }
-
-   return `
-     <div style="background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;padding:12px 14px;margin-bottom:10px">
-       ${commonInner}
-     </div>`;
- }
 
  // ── HELPER: month label ──
  function monthLabel(ym) {
@@ -2653,15 +2590,6 @@ function renderSchoolsExpandableTable(prefix, schoolArr){
   `;
 }
 
-function toggleSchoolsTable(actionId){
-  S.showSchoolsTable = (S.showSchoolsTable===actionId) ? null : actionId;
-  render();
-}
-function toggleImpactSchools(outId){
-  S.showImpactSchools = (S.showImpactSchools===outId) ? null : outId;
-  render();
-}
-
 
 // ── SIMPLE SCHOOLS LIST MODAL (re-used across Dashboard / Pipeline / Insights) ──
 function parseSchoolsList(str){
@@ -2716,7 +2644,7 @@ function closeSchoolsListModal(){
    _ovActChart += '</div>';
  } else { _ovActChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:12px">No activities logged yet</div>'; }
 
- var _themeColors = {'Underperforming Schools':'#E53935','DBE Mentorship':'#1565C0','District Support':'#0B8E8D','GET / Intermediate Phase':'#7AB648'};
+ var _themeColors = {'Underperforming Schools':'#E53935','DBE Mentorship Programme':'#1565C0','District Support':'#0B8E8D','Intermediate & GET Phase':'#7AB648'};
  var _ovThemeChart = '';
  if (topThemes.length) {
    var _totalTh = topThemes.reduce(function(s,t){return s+t[1]},0);
@@ -2782,7 +2710,7 @@ function closeSchoolsListModal(){
 
 // ── TAB STATE ──
  const tab = S.dashTab || 'overview';
- if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'update' || tab === 'schools') { S.dashTab = 'overview'; return renderDashboard(); }
+ if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'schools') { S.dashTab = 'overview'; return renderDashboard(); }
 
  // ═══════════════════════════════════
  // RENDER
@@ -2795,6 +2723,7 @@ function closeSchoolsListModal(){
  <div class="dash-subnav-hint">Choose a view below</div>
  <div class="dash-subnav">
    <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Overview</button>
+   <button class="${tab==='tracker'?'active':''}" onclick="S.dashTab='tracker';render()">Intervention Activity Tracker</button>
    <button class="${tab==='trends'?'active':''}" onclick="S.dashTab='trends';render()">Trends</button>
  </div>
 
@@ -3020,8 +2949,124 @@ ${tab==='trends'?`
      }).join('')}</div>
    </div>
  </div>` : ''}
-`:''}
 
+${tab==='tracker'?`
+ <!-- ═══ INTERVENTION ACTIVITY TRACKER ═══ -->
+ <div class="dash-section" style="border-left: 4px solid var(--teal)">
+   <div class="dash-section-hdr">
+     <h3>From Decisions to Action</h3>
+     <span style="font-size:11px;color:var(--grey)">${acts.length} action${acts.length!==1?'s':''} logged</span>
+   </div>
+   <div class="dash-section-body">
+     <div class="dash-section-desc">Tracks the journey from what ${_lYou} planned to what happened on the ground. Each logged activity creates a chain: a decision was made, an action was taken, and a status shows how far it has progressed.</div>
+
+     <!-- Progress segments -->
+     <div style="display:flex;gap:6px;margin-bottom:18px">
+       ${[
+         {label:'Planned',count:planned,color:'var(--blue)'},
+         {label:'In Progress',count:inProgress,color:'var(--orange)'},
+         {label:'Completed',count:completed,color:'var(--green)'}
+       ].map(s => {
+         const pct = acts.length ? Math.round((s.count/acts.length)*100) : 0;
+         return '<div style="flex:1;text-align:center"><div style="height:6px;border-radius:3px;background:#ECEFF1;overflow:hidden;margin-bottom:6px"><div style="height:100%;border-radius:3px;background:'+s.color+';width:'+pct+'%;transition:width .5s"></div></div><div style="font-size:18px;font-weight:800;color:var(--navy);line-height:1">'+s.count+'</div><div style="font-size:10px;color:var(--grey);font-weight:600">'+s.label+'</div></div>';
+       }).join('')}
+     </div>
+
+     <!-- Two-column breakdown -->
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+       <div>
+         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);margin-bottom:10px">What Was Decided</div>
+         ${Object.entries(decisionTypes).sort((a,b)=>b[1]-a[1]).length ? Object.entries(decisionTypes).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count]) => {
+           const maxD = Object.values(decisionTypes).reduce((a,b)=>Math.max(a,b),1);
+           const pct = Math.max(Math.round((count/maxD)*100), 6);
+           return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(type)+'</span><span style="font-size:11px;font-weight:700;color:var(--teal)">'+count+'×</span></div><div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--teal);border-radius:4px;transition:width .5s"></div></div></div>';
+         }).join('') : '<div style="text-align:center;color:var(--grey);padding:12px;font-size:11px">No decisions recorded yet</div>'}
+       </div>
+       <div>
+         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);margin-bottom:10px">What Was Done</div>
+         ${(function(){
+           var actionCounts = {};
+           acts.forEach(a => { if(a.action_taken) actionCounts[a.action_taken] = (actionCounts[a.action_taken]||0)+1; });
+           var sorted = Object.entries(actionCounts).sort((a,b)=>b[1]-a[1]);
+           if (!sorted.length) return '<div style="text-align:center;color:var(--grey);padding:12px;font-size:11px">No actions recorded yet</div>';
+           var maxA = sorted[0][1];
+           return sorted.slice(0,6).map(([type,count]) => {
+             var pct = Math.max(Math.round((count/maxA)*100), 6);
+             return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(type)+'</span><span style="font-size:11px;font-weight:700;color:var(--green)">'+count+'×</span></div><div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4CAF50;border-radius:4px;transition:width .5s"></div></div></div>';
+           }).join('');
+         })()}
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <!-- ═══ ACTION CARDS ═══ -->
+ <div class="dash-section">
+   <div class="dash-section-hdr">
+     <h3>Action Status</h3>
+     <div style="display:flex;gap:4px;flex-wrap:wrap">
+       ${['all','in-progress','planned','completed'].map(f => {
+         var cnt = f==='all'? acts.length : f==='in-progress'? inProgress : f==='planned'? planned : completed;
+         var lbl = f==='all'?'All':f==='in-progress'?'In Progress':f==='planned'?'Planned':'Completed';
+         var sel = (S._trackerFilter||'all') === f;
+         return '<button onclick="S._trackerFilter=\\''+f+'\\';render()" style="font-family:inherit;font-size:10px;font-weight:'+(sel?'700':'500')+';padding:4px 10px;border-radius:14px;border:'+(sel?'1.5px solid var(--teal)':'1px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--grey-dk)')+';cursor:pointer">'+lbl+' ('+cnt+')</button>';
+       }).join('')}
+     </div>
+   </div>
+   <div class="dash-section-body" style="padding:10px 16px">
+     ${(function(){
+       var trackerFilter = S._trackerFilter || 'all';
+       var filteredActs = acts;
+       if (trackerFilter === 'in-progress') filteredActs = acts.filter(a => a.status === 'In Progress');
+       else if (trackerFilter === 'planned') filteredActs = acts.filter(a => a.status === 'Planned');
+       else if (trackerFilter === 'completed') filteredActs = acts.filter(a => a.status === 'Completed');
+
+       if (!filteredActs.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No actions to show' + (trackerFilter!=='all'?' for this filter':'') + '</div>';
+
+       return filteredActs.map(a => {
+         var parentDec = decs.find(d => d.id === a.decision_id);
+         var det = parentDec ? (parentDec.details || {}) : {};
+         var decLabel = det.decision_type || parentDec?.decision_made || '';
+         var schools = det.schools || '';
+         var district = det.district || '';
+         var isMine = a.official_id === S._officialId;
+         var isDemo = (a.id||'').startsWith('DEMO_');
+
+         var statusClass = a.status === 'Completed' ? 'completed' : a.status === 'Planned' ? 'planned' : 'in-progress';
+         var statusColor = a.status === 'Completed' ? 'var(--green)' : a.status === 'Planned' ? 'var(--blue)' : 'var(--orange)';
+         var statusBg = a.status === 'Completed' ? 'var(--green-lt)' : a.status === 'Planned' ? '#E3F2FD' : '#FFF3E0';
+         var statusIcon = a.status === 'Completed' ? '✓' : '●';
+         var statusText = a.status || 'In Progress';
+
+         var card = '<div style="background:var(--off);border-radius:8px;padding:12px 14px;margin-bottom:8px;border-left:3px solid '+statusColor+'">';
+         card += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
+         card += '<div style="flex:1;min-width:0">';
+         if (decLabel) card += '<div style="font-size:10px;color:var(--grey);margin-bottom:4px;line-height:1.5">Decided: <b style=\\"color:var(--navy);font-weight:600\\">' + esc(decLabel) + '</b>' + (district ? ' · ' + esc(district) : '') + '</div>';
+         card += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">' + esc(a.action_taken || '') + '</div>';
+         card += '<div style="font-size:10px;color:var(--grey)">' + (schools ? esc(schools.length > 60 ? schools.slice(0,57)+'...' : schools) + ' · ' : '') + (a.responsible ? esc(a.responsible) : '') + (parentDec && parentDec.date ? ' · ' + fmtDate(parentDec.date) : '') + '</div>';
+         card += '</div>';
+         card += '<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;background:'+statusBg+';color:'+statusColor+'">' + statusIcon + ' ' + statusText + '</span>';
+         card += '</div>';
+
+         // Action buttons — only for owner
+         if (isMine && !isDemo && a.status !== 'Completed') {
+           card += '<div style="display:flex;gap:6px;margin-top:8px">';
+           if (a.status === 'Planned') {
+             card += '<button onclick="updateActionStatus(\\''+a.id+'\\',\\'In Progress\\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s">Start</button>';
+           }
+           card += '<button onclick="updateActionStatus(\\''+a.id+'\\',\\'Completed\\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s">✓ Mark Complete</button>';
+           card += '</div>';
+         } else if (!isMine && !isDemo && a.status !== 'Completed') {
+           card += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only ' + esc(a.responsible || 'the person who logged this') + ' can update this action</div>';
+         }
+
+         card += '</div>';
+         return card;
+       }).join('');
+     })()}
+   </div>
+ </div>
+`:''}
 
 
 </div>`;
@@ -3159,6 +3204,11 @@ function tkPeers(){
 async function markFollowUpDone(decId) {
   var dec = S.decisions.find(function(d){ return d.id === decId; });
   if (!dec) { showToast('Could not find this activity'); return; }
+  // Ownership check
+  if (dec.official_id && dec.official_id !== S._officialId) {
+    showToast('Only the official who logged this activity can mark it as done');
+    return;
+  }
   var det = dec.details || {};
   det.follow_up_completed = true;
   det.follow_up_completed_date = new Date().toISOString().slice(0,10);
@@ -3215,22 +3265,7 @@ function renderPolicyModal(){
 
 // UTILITIES 
 
-// Pipeline drill functions — replaced by inline table, kept as no-ops for safety
-function openPipelineDrill(){} 
-window.openPipelineDrill = openPipelineDrill;
-function closePipelineDrill(){ const el=document.getElementById('pipeline-drill-overlay'); if(el)el.remove(); }
-function renderPipelineDrillModal(){}
-function openPipelineChain(id){
-  S.view = 'log';
-  S.expandedChains = S.expandedChains || {};
-  S.expandedChains[id] = true;
-  toast('Opening the selected item in Activity Log…');
-  render();
-  setTimeout(()=>{
-    const el = document.querySelector('[data-chain-id="'+id+'"]') || document.getElementById(id);
-    if(el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'});
-  }, 150);
-}
+
 function renderOutcomeModal(){
  const m=S.outcomeModal;if(!m)return;
  const existing=document.getElementById('outcome-modal-overlay');
@@ -3282,23 +3317,6 @@ function renderOutcomeModal(){
 }
 
 // Coverage table row expand/collapse (mobile only)
-function toggleCovRow(rowId, triggerRow) {
-  if (window.innerWidth > 500) return;
-  const detailRow = document.getElementById(rowId);
-  if (!detailRow) return;
-  const isOpen = detailRow.classList.contains('open');
-  // Close all other open detail rows first
-  document.querySelectorAll('.cov-detail.open').forEach(r => {
-    r.classList.remove('open');
-    const prevRow = r.previousElementSibling;
-    if (prevRow) { const ch = prevRow.querySelector('.cov-chev'); if (ch) ch.style.transform = 'rotate(0deg)'; }
-  });
-  if (!isOpen) {
-    detailRow.classList.add('open');
-    const chev = triggerRow.querySelector('.cov-chev');
-    if (chev) chev.style.transform = 'rotate(180deg)';
-  }
-}
 
 function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
