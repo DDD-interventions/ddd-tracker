@@ -545,7 +545,7 @@ const DECISION_HINTS = {
  "Investigate SBA-exam gap":"Look into why school-based assessment marks differ significantly from exam results",
  "Send in subject support":"Deploy a subject advisor or specialist to support a school or group of schools",
  "Adjust teaching strategy":"Direct educators to change their approach based on what the data shows",
- "Move resources where they\u2019re needed":"Shift LTSM, educators, or other resources to where the need is greatest",
+ "Move resources where they're needed":"Shift LTSM, educators, or other resources to where the need is greatest",
  "Set up extra classes":"Arrange Saturday classes, afternoon sessions, or revision camps for targeted learners",
  "Set performance targets":"Agree on specific pass rate or promotion targets for a school, grade, or subject",
  "Activate attendance monitoring":"Put a tracking system in place to monitor learner or educator attendance",
@@ -2704,7 +2704,7 @@ function closeSchoolsListModal(){
 
  // ── PRE-COMPUTED OVERVIEW HTML ──
  var _latestDate = decs.reduce(function(b,d){return(d.date||'')>(b||'')?d.date:b;},'');
- var _actColors = {'School support visit':'#0B8E8D','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','District / circuit review meeting':'#546E7A'};
+ var _actColors = {'School support visit':'#0B8E8D','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
  var _ovActChart = '';
  if (actTypes.length) {
    var _mxA = actTypes[0][1];
@@ -3014,7 +3014,7 @@ ${tab==='trends'?`
      <div class="bar-chart">${actTypes.map(([type,count])=>{
        const maxAct = actTypes[0][1];
        const pct = Math.round((count/maxAct)*100);
-       const colors={'School support visit':'#0B8E8D','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7'};
+       const colors={'School support visit':'#0B8E8D','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
        const c = colors[type]||'#607D8B';
        return `<div class="bar-row"><div class="bar-label">${esc(type)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
      }).join('')}</div>
