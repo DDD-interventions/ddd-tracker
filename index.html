@@ -2949,6 +2949,7 @@ ${tab==='trends'?`
      }).join('')}</div>
    </div>
  </div>` : ''}
+`:''}
 
 ${tab==='tracker'?`
  <!-- ═══ INTERVENTION ACTIVITY TRACKER ═══ -->
@@ -3009,7 +3010,7 @@ ${tab==='tracker'?`
          var cnt = f==='all'? acts.length : f==='in-progress'? inProgress : f==='planned'? planned : completed;
          var lbl = f==='all'?'All':f==='in-progress'?'In Progress':f==='planned'?'Planned':'Completed';
          var sel = (S._trackerFilter||'all') === f;
-         return '<button onclick="S._trackerFilter=\\''+f+'\\';render()" style="font-family:inherit;font-size:10px;font-weight:'+(sel?'700':'500')+';padding:4px 10px;border-radius:14px;border:'+(sel?'1.5px solid var(--teal)':'1px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--grey-dk)')+';cursor:pointer">'+lbl+' ('+cnt+')</button>';
+         return '<button onclick="S._trackerFilter=\''+f+'\';render()" style="font-family:inherit;font-size:10px;font-weight:'+(sel?'700':'500')+';padding:4px 10px;border-radius:14px;border:'+(sel?'1.5px solid var(--teal)':'1px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--grey-dk)')+';cursor:pointer">'+lbl+' ('+cnt+')</button>';
        }).join('')}
      </div>
    </div>
@@ -3041,7 +3042,7 @@ ${tab==='tracker'?`
          var card = '<div style="background:var(--off);border-radius:8px;padding:12px 14px;margin-bottom:8px;border-left:3px solid '+statusColor+'">';
          card += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
          card += '<div style="flex:1;min-width:0">';
-         if (decLabel) card += '<div style="font-size:10px;color:var(--grey);margin-bottom:4px;line-height:1.5">Decided: <b style=\\"color:var(--navy);font-weight:600\\">' + esc(decLabel) + '</b>' + (district ? ' · ' + esc(district) : '') + '</div>';
+         if (decLabel) card += '<div style="font-size:10px;color:var(--grey);margin-bottom:4px;line-height:1.5">Decided: <b style=\"color:var(--navy);font-weight:600\">' + esc(decLabel) + '</b>' + (district ? ' · ' + esc(district) : '') + '</div>';
          card += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">' + esc(a.action_taken || '') + '</div>';
          card += '<div style="font-size:10px;color:var(--grey)">' + (schools ? esc(schools.length > 60 ? schools.slice(0,57)+'...' : schools) + ' · ' : '') + (a.responsible ? esc(a.responsible) : '') + (parentDec && parentDec.date ? ' · ' + fmtDate(parentDec.date) : '') + '</div>';
          card += '</div>';
@@ -3052,9 +3053,9 @@ ${tab==='tracker'?`
          if (isMine && !isDemo && a.status !== 'Completed') {
            card += '<div style="display:flex;gap:6px;margin-top:8px">';
            if (a.status === 'Planned') {
-             card += '<button onclick="updateActionStatus(\\''+a.id+'\\',\\'In Progress\\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s">Start</button>';
+             card += '<button onclick="updateActionStatus(\''+a.id+'\',\'In Progress\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s">Start</button>';
            }
-           card += '<button onclick="updateActionStatus(\\''+a.id+'\\',\\'Completed\\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s">✓ Mark Complete</button>';
+           card += '<button onclick="updateActionStatus(\''+a.id+'\',\'Completed\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s">✓ Mark Complete</button>';
            card += '</div>';
          } else if (!isMine && !isDemo && a.status !== 'Completed') {
            card += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only ' + esc(a.responsible || 'the person who logged this') + ' can update this action</div>';
