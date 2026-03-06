@@ -1,0 +1,45 @@
+name: Weekly Data Backup
+
+on:
+  schedule:
+    # Runs every Monday at 5:00 AM UTC (7:00 AM SAST)
+    - cron: '0 5 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Export all tables
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          mkdir -p backups
+          DATE=$(date -u +"%Y-%m-%d")
+
+          for TABLE in officials decisions actions outcomes interventions; do
+            echo "Exporting $TABLE..."
+            curl -s \
+              "${SUPABASE_URL}/rest/v1/${TABLE}?select=*" \
+              -H "apikey: ${SUPABASE_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_KEY}" \
+              -H "Accept: text/csv" \
+              -o "backups/${TABLE}_${DATE}.csv"
+            ROWS=$(wc -l < "backups/${TABLE}_${DATE}.csv")
+            echo "  → ${TABLE}: $((ROWS - 1)) rows exported"
+          done
+
+          echo ""
+          echo "=== Backup Summary ==="
+          ls -lh backups/
+
+      - name: Upload backup as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ddd-backup-${{ github.run_id }}
+          path: backups/
+          retention-days: 90
