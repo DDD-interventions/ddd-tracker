@@ -238,10 +238,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .tk-tabs{gap:4px;padding:8px 8px}
   .tk-tab{padding:8px 10px;font-size:11px}
   /* Toolkit designer: challenge grid single column on small screens */
-  .tk-ch-grid{grid-template-columns:1fr !important}
   /* Toolkit progress steps */
-  .tk-prog{flex-wrap:wrap}
-  .tk-prog-s{font-size:9px;padding:5px 4px}
   /* Form 2-col grids: single column */
   .form-grid-2{grid-template-columns:1fr !important}
   /* Review table values: allow wrapping */
@@ -467,12 +464,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .tk-steps{counter-reset:step}
 .tk-step{display:flex;gap:8px;margin-bottom:4px;font-size:12px;color:var(--grey-dk);line-height:1.5}
 .tk-sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:var(--teal-lt);color:var(--teal)}
-.tk-prog{display:flex;gap:4px;margin-bottom:14px}
-.tk-prog-s{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;transition:all .2s}
-.tk-ch{border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;border:2px solid transparent}
-.tk-ch:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.tk-ch:active{transform:scale(.97)}
-.tk-ch.sel{border-color:currentColor}
+
 .tk-iv{background:var(--off);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .tk-iv:active{transform:scale(.995)}
 .tk-iv.sel{border-color:var(--teal);background:#fff}
@@ -730,13 +722,12 @@ const S = {
  official:{full_name:'User',role:'',province:'',district:'',email:''},
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all',
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
- tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null,
- dStep:0, dChallenge:null, sortBy:'effectiveness', filterCat:'All',
+ tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
+ filterCat:'All',
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
- dIn:{school:'',district:'',grade:'',subject:'',passRate:'',learnersAffected:'',detail:''},
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,term:'Term 1 2026',activity_date:today(),
@@ -3075,10 +3066,207 @@ ${tab==='tracker'?`
 
 
 // 
+// NLF ACCESS CHECK
+function isNLFUser() {
+ return (S.official?.email || '').toLowerCase().endsWith('@newleaders.co.za');
+}
+
+// INTERVENTION CYCLE GUIDE DATA
+const CYCLE_PHASES = [
+ {
+  id:0, num:'1', name:'SETUP', title:'Plan, Align, and Secure Commitment',
+  duration:'2\u20134 weeks', timing:'Term 1', lead:'PM + Intervention Owner + MERL Manager',
+  color:'#1565C0',
+  intro:'This is the foundation phase. Everything that follows depends on getting this right. You are establishing the intervention scope, securing buy-in from the provincial or district, and creating a baseline from which to measure change.',
+  tip:'Provinces that completed setup early had significantly stronger implementation than those that started late.',
+  checklist:[
+   {action:'Identify and agree on intervention focus', role:'Prepare school or learner categorisation analysis from DDD dashboard. Present options to intervention owner.', detail:'Use DDD data to identify underperforming schools, learners, grades, and subjects. Align with PED priorities and existing programmes.'},
+   {action:'Compile the school master list', role:'Pull school data from DDD dashboard. Validate with district. Record in Interventions Tracker.', detail:'Finalise the list of schools included in the intervention. This becomes the scope against which everything is tracked.'},
+   {action:'Secure intervention sign-off', role:'Prepare sign-off document. Follow up until signed. Log sign-off status in Tracker.', detail:'Get formal agreement from the intervention owner: named owner, targeted grades, subjects, schools, timeline, and expected outcomes.'},
+   {action:'Establish baselines', role:'Generate baseline reports from DDD dashboard. Save and attach to intervention record in Tracker. Data Analytics Lead to provide support.', detail:'Pull baseline performance data for intervention schools: pass rates, promotion stats, subject performance. This is the \u201cbefore\u201d picture.'},
+   {action:'Register intervention in Tracker', role:'Complete all setup fields in the Tracker: province, district, theme, owner, schools, grades, sign-off status.', detail:'Create the intervention entry in the DDD Interventions Tracker with all setup details captured.'}
+  ]
+ },
+ {
+  id:1, num:'2', name:'ACTIVATE', title:'Train, Profile, and Equip Officials',
+  duration:'2\u20136 weeks', timing:'Term 1\u20133', lead:'PM with Master Trainers',
+  color:'#7AB648',
+  intro:'This is where you equip district and school officials with the skills to use DDD data for learner profiling and intervention planning. Trainings should be anchored on practical application, NOT generic dashboard navigation.',
+  tip:'Combining DDD trainings with other directorate trainings leads to information overload and diluted impact. Push for dedicated DDD sessions.',
+  checklist:[
+   {action:'Conduct login clinics', role:'Coordinate with EMIS officials. Run login clinics (face-to-face or virtual). Track who can and cannot log in.', detail:'Ensure all targeted officials and school leaders can access the DDD dashboard before any training takes place.'},
+   {action:'Run profiling trainings', role:'Prepare training materials anchored on FET/GET promotion criteria tools and Term 4 Promotion Predictions. Conduct or co-facilitate trainings.', detail:'Train officials on using DDD promotion criteria tools to profile learners by performance category (at-risk, progressed, high-flyers).'},
+   {action:'Support school categorisation', role:'Generate school achievement reports and heatmaps from the DDD dashboard. Walk officials through the categorisation process.', detail:'Categorise schools against policy criteria using DDD data. Apply Circular D3 underperformance criteria or equivalent provincial benchmarks.'},
+   {action:'Brief master trainers', role:'Conduct master trainer support sessions. Equip them with training materials and pre-prepared DDD reports.', detail:'Where master trainers exist, equip them to cascade trainings and provide ongoing school-level support.'},
+   {action:'Agree on support schedule', role:'Co-develop the activity schedule. Align dates with district calendars. Record planned activities in the Tracker.', detail:'Work with the intervention owner to set the cadence for support visits, check-ins, and follow-up activities.'}
+  ]
+ },
+ {
+  id:2, num:'3', name:'SUPPORT & CAPTURE', title:'Implement, Monitor, and Log What Happens',
+  duration:'Longest phase', timing:'Term 2\u20133', lead:'District Official + PM',
+  color:'#E8952E',
+  intro:'This is the HEART of the intervention, where officials direct support to schools and learners. It is also where the current \u201cblack box\u201d exists: officials are taking action, but those actions are not being systematically captured. This is the phase where the Tracker becomes essential.',
+  tip:'Every Tracker entry during this phase should answer: What DDD data triggered this? What did the official decide? What action was taken? Which schools and learners were affected? What follow-up is needed?',
+  checklist:[
+   {action:'Implement intervention activities', role:'Coordinate activity schedules with intervention owner. Attend key activities where possible to observe and provide data support.', detail:'District officials implement the planned support: school visits, follow-up trainings, data analysis sessions, support meetings, or last-push programmes.'},
+   {action:'Provide updated performance data', role:'Pull updated reports from the DDD dashboard. Compare to baseline. Share insights with intervention owner.', detail:'As each term\u2019s results become available, generate updated performance data for intervention schools and compare to baseline.'},
+   {action:'Log activities in the Tracker', role:'Complete the Tracker entry for each activity within 3\u20134 days.', detail:'After each support activity, record what was done: which school, what action, who was involved, what DDD data was used, and whether follow-up is needed.'},
+   {action:'Conduct check-in meetings', role:'Prepare data packs for meetings. Facilitate discussions. Capture decisions and follow-ups in Tracker.', detail:'Regular check-in meetings with district officials to review progress, discuss challenges, and plan next steps.'},
+   {action:'Prepare and share DDD reports for officials', role:'Pull and package relevant DDD reports ahead of planned activities. Share with officials and walk them through the data.', detail:'Not all officials will log in to the DDD dashboard directly. PMs need to prepare and package DDD reports so data-informed support still reaches schools.'},
+   {action:'Monitor and flag risks', role:'Review Tracker weekly. Flag overdue activities. Escalate to intervention owner if patterns emerge.', detail:'Track whether activities are happening as planned. Identify delays, attendance issues, or disengagement early.'}
+  ]
+ },
+ {
+  id:3, num:'4', name:'MEASURE', title:'Analyse Performance and Compare to Baseline',
+  duration:'2\u20134 weeks', timing:'Term 2\u20134', lead:'DDD Team (Interventions & MERL Manager)',
+  color:'#7B1FA2',
+  intro:'This is where data from Phase 3 meets the baseline from Phase 1. The goal is to determine whether intervention schools are showing measurable improvement relative to where they started.',
+  tip:'Be honest about where activities did not go as planned. The value is in accuracy, not in looking good.',
+  checklist:[
+   {action:'Pull and compare performance data', role:'Pull updated reports from the DDD dashboard. Ensure all intervention schools are correctly tagged. Flag schools that joined or left mid-year.', detail:'Generate the latest performance data for all intervention schools and compare to baseline. Look at both the overall trend and term-on-term movement.'},
+   {action:'Cross-reference with Tracker, training, and usage data', role:'Ensure Tracker entries are complete. Compile training attendance records. Work with analytics team to pull usage data.', detail:'Link performance changes to documented activities, training records, and DDD dashboard usage data. Cross-check self-reported data against DDD analytics.'},
+   {action:'Identify contribution stories', role:'Recommend strong cases based on your on-the-ground knowledge. Share quotes or observations from officials gathered during activities.', detail:'Select 4\u20136 cases where there is a clear evidence chain from DDD data through decisions and actions to measurable outcome change.'}
+  ]
+ },
+ {
+  id:4, num:'5', name:'EVIDENCE & LEARN', title:'Report, Reflect, and Prepare for the Next Cycle',
+  duration:'1\u20134 weeks', timing:'Term 4', lead:'Collective effort',
+  color:'#E53935',
+  intro:'This is where the cycle comes full circle. The evidence gathered in Phase 4 is packaged into contribution reports, impact stories, and recommendations. Equally important, this phase captures lessons learned.',
+  tip:'PM reflections and intervention owner feedback are among the most valuable inputs for refining the approach. Be candid \u2014 the goal is improvement, not compliance.',
+  checklist:[
+   {action:'Compile contribution evidence reports', role:'Submit your provincial reflections by the agreed deadline. Share quotes or observations from officials.', detail:'Write up 4\u20136 documented cases showing the evidence chain from DDD data through decisions and actions to outcomes.'},
+   {action:'Prepare intervention closeout report', role:'Complete your provincial section: PM rating (out of 10), honest reflection on what worked and what did not, and recommendations.', detail:'A comprehensive report on each intervention: what was planned, what was delivered, what changed, and what we learned.'},
+   {action:'Collect feedback from intervention owners', role:'Follow up with intervention owners to ensure they complete the survey. Provide your own assessment as a complement.', detail:'Distribute structured feedback surveys to intervention owners to assess DDD support value, tool usefulness, and areas for improvement.'},
+   {action:'Facilitate lessons learned session', role:'Come prepared with specific examples from your province. What worked? What would you do differently?', detail:'A facilitated session with PMs, intervention owners, and the MERL team to capture what to keep, stop, and start.'},
+   {action:'Close out interventions in the Tracker', role:'Mark your interventions as completed. Add year-end notes. Flag which interventions should continue, be restructured, or not be repeated.', detail:'All intervention entries are closed with final outcomes, status, and notes for the following year.'}
+  ]
+ }
+];
+
+const QUALITY_CHECKLIST = [
+ {num:'1', criterion:'Connected to DDD data', check:'Can you name the specific DDD report that triggered or informed this intervention?', level:'MUST HAVE'},
+ {num:'2', criterion:'Targeted schools or learners', check:'Is there a defined list of schools selected using data \u2014 not a blanket activity?', level:'MUST HAVE'},
+ {num:'3', criterion:'Named district owner', check:'Is there a specific district official accountable, not just the PM coordinating?', level:'MUST HAVE'},
+ {num:'4', criterion:'Aligned to existing programme', check:'Is this embedded within a district or PED plan, not a standalone NLF initiative?', level:'BUILDING TOWARDS'},
+ {num:'5', criterion:'Structured activity plan', check:'Are there clear steps from identification to support to follow-up with checkpoints?', level:'BUILDING TOWARDS'},
+ {num:'6', criterion:'Formally signed off', check:'Is there documented commitment with a start date, outcomes, and named lead?', level:'BUILDING TOWARDS'}
+];
+
+// CYCLE GUIDE RENDERER
+function tkCycleGuide() {
+ if (!isNLFUser()) return '';
+ var open = S.cycleGuideOpen;
+ var phasesHtml = '';
+ if (open) {
+  // Cycle overview bar
+  var overviewItems = '';
+  for (var oi = 0; oi < CYCLE_PHASES.length; oi++) {
+   var op = CYCLE_PHASES[oi];
+   var isActive = S.cyclePhase === op.id;
+   if (oi > 0) overviewItems += '<div style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;flex-shrink:0;min-width:10px">\u25B6</div>';
+   overviewItems += '<div onclick="S.cyclePhase=' + (isActive ? 'null' : op.id) + ';render()" style="flex:1;text-align:center;padding:10px 6px;cursor:pointer;border-radius:8px;background:' + (isActive ? op.color + '15' : '#f8f9fa') + ';border:1.5px solid ' + (isActive ? op.color : 'transparent') + ';transition:.2s;min-width:70px">' +
+    '<div style="font-size:18px;font-weight:800;color:' + op.color + '">' + op.num + '</div>' +
+    '<div style="font-size:10px;font-weight:700;color:' + op.color + ';letter-spacing:.5px">' + op.name + '</div>' +
+    '<div style="font-size:9px;color:#607D8B;margin-top:2px">' + op.duration + '</div>' +
+   '</div>';
+  }
+  // Phase detail
+  var phaseDetail = '';
+  if (S.cyclePhase !== null && S.cyclePhase !== undefined) {
+   var ph = CYCLE_PHASES[S.cyclePhase];
+   var checkRows = '';
+   for (var ci = 0; ci < ph.checklist.length; ci++) {
+    var item = ph.checklist[ci];
+    checkRows += '<div style="padding:12px 14px;border-bottom:1px solid #f3f2f1">' +
+     '<div style="display:flex;gap:10px;align-items:flex-start">' +
+      '<div style="min-width:22px;height:22px;border-radius:50%;border:2px solid ' + ph.color + '40;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:' + ph.color + ';margin-top:1px">' + (ci + 1) + '</div>' +
+      '<div style="flex:1">' +
+       '<div style="font-size:13px;font-weight:700;color:#1A2332;line-height:1.4">' + item.action + '</div>' +
+       '<div style="font-size:11px;color:#607D8B;line-height:1.5;margin-top:4px">' + item.detail + '</div>' +
+       '<div style="margin-top:8px;padding:8px 10px;background:' + ph.color + '08;border-radius:6px;border-left:3px solid ' + ph.color + '40">' +
+        '<div style="font-size:10px;font-weight:700;color:' + ph.color + ';text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">PM Role</div>' +
+        '<div style="font-size:11px;color:#37474F;line-height:1.5">' + item.role + '</div>' +
+       '</div>' +
+      '</div>' +
+     '</div>' +
+    '</div>';
+   }
+   phaseDetail = '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:12px;border-top:3px solid ' + ph.color + '">' +
+    '<div style="padding:16px">' +
+     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">' +
+      '<span style="font-size:13px;font-weight:800;color:' + ph.color + ';background:' + ph.color + '15;padding:3px 10px;border-radius:6px;letter-spacing:.5px">PHASE ' + ph.num + '</span>' +
+      '<span style="font-size:14px;font-weight:700;color:#1A2332">' + ph.title + '</span>' +
+     '</div>' +
+     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 12px">' +
+      '<span style="font-size:10px;color:#607D8B">' + ph.duration + '</span>' +
+      '<span style="font-size:10px;color:#607D8B">' + ph.timing + '</span>' +
+      '<span style="font-size:10px;color:#607D8B">' + ph.lead + '</span>' +
+     '</div>' +
+     '<div style="font-size:12px;color:#37474F;line-height:1.6;margin-bottom:12px">' + ph.intro + '</div>' +
+     '<div style="background:#FFF8E1;border-radius:8px;padding:10px 12px;border-left:3px solid ' + ph.color + ';margin-bottom:4px">' +
+      '<div style="font-size:10px;font-weight:700;color:' + ph.color + ';margin-bottom:3px">FROM THE FIELD</div>' +
+      '<div style="font-size:11px;color:#37474F;line-height:1.5">' + ph.tip + '</div>' +
+     '</div>' +
+    '</div>' +
+    '<div style="border-top:1px solid #f3f2f1">' +
+     '<div style="padding:12px 16px 8px;font-size:11px;font-weight:700;color:' + ph.color + ';text-transform:uppercase;letter-spacing:.5px">Checklist</div>' +
+     checkRows +
+    '</div>' +
+   '</div>';
+  }
+  // Quality checklist
+  var qualityRows = '';
+  for (var qi = 0; qi < QUALITY_CHECKLIST.length; qi++) {
+   var qItem = QUALITY_CHECKLIST[qi];
+   var isMust = qItem.level === 'MUST HAVE';
+   qualityRows += '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;' + (qi < QUALITY_CHECKLIST.length - 1 ? 'border-bottom:1px solid #f3f2f1' : '') + '">' +
+    '<div style="min-width:22px;height:22px;border-radius:50%;background:' + (isMust ? '#E53935' : '#E8952E') + '15;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:' + (isMust ? '#E53935' : '#E8952E') + '">' + qItem.num + '</div>' +
+    '<div style="flex:1">' +
+     '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
+      '<span style="font-size:12px;font-weight:700;color:#1A2332">' + qItem.criterion + '</span>' +
+      '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (isMust ? '#FFEBEE' : '#FFF3E0') + ';color:' + (isMust ? '#E53935' : '#E8952E') + ';font-weight:700">' + qItem.level + '</span>' +
+     '</div>' +
+     '<div style="font-size:11px;color:#607D8B;line-height:1.4;margin-top:2px">' + qItem.check + '</div>' +
+    '</div>' +
+   '</div>';
+  }
+  phasesHtml = '<div style="margin-top:14px">' +
+   '<div style="font-size:12px;color:#37474F;line-height:1.6;margin-bottom:14px">Every DDD intervention follows the same five-phase cycle. The phases are sequential but the duration is flexible. Tap a phase below to see the full checklist and PM guidance.</div>' +
+   '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">' + overviewItems + '</div>' +
+   phaseDetail +
+   '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:16px;border-top:3px solid #0B8E8D">' +
+    '<div style="padding:14px 16px">' +
+     '<div style="font-size:13px;font-weight:700;color:#074445;margin-bottom:10px">Intervention Quality Checklist</div>' +
+     '<div style="font-size:11px;color:#607D8B;line-height:1.5;margin-bottom:10px">Before you consider an intervention fully set up, check it against these six criteria. The first three are non-negotiable.</div>' +
+     qualityRows +
+    '</div>' +
+   '</div>' +
+   '<div style="margin-top:12px;padding:10px 14px;background:#E0F4F4;border-radius:8px;border-left:3px solid #0B8E8D">' +
+    '<div style="font-size:11px;color:#074445;line-height:1.6"><strong>How this fits together:</strong> This guide is the process map. The Tracker is where you log what happens. The MERL Strategy explains why we measure what we measure. Together, they form the DDD Interventions Toolkit.</div>' +
+   '</div>' +
+  '</div>';
+ }
+ return '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden;border:1.5px solid ' + (open ? '#0B8E8D' : '#e0e0e0') + '">' +
+  '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#074445,#0F7B7D)' : '#f8f9fa') + '">' +
+   '<div style="flex:1">' +
+    '<div style="font-size:14px;font-weight:700;color:' + (open ? '#fff' : '#1A2332') + '">DDD Intervention Cycle Guide</div>' +
+    '<div style="font-size:11px;color:' + (open ? '#B8DCDC' : '#607D8B') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
+   '</div>' +
+   '<div style="display:flex;align-items:center;gap:6px">' +
+    '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (open ? 'rgba(255,255,255,.15)' : '#E0F4F4') + ';color:' + (open ? '#fff' : '#0B8E8D') + ';font-weight:600">NLF Team</span>' +
+    '<span style="font-size:16px;color:' + (open ? '#B8DCDC' : '#999') + '">' + (open ? '\u25B2' : '\u25BC') + '</span>' +
+   '</div>' +
+  '</div>' +
+  (open ? '<div style="padding:0 16px 16px">' + phasesHtml + '</div>' : '') +
+ '</div>';
+}
+
 // TOOLKIT
 // 
 function renderToolkit() {
- return `<div> <div class="tk-tabs"> ${[['navigator','DDD Reports Guide'],['library','Suggested Intervention Ideas'],['peers','What Others Are Doing']].map(([id,l])=>`<button class="tk-tab ${S.tkTab===id?'on':''}" onclick="S.tkTab='${id}';render()">${l}</button>`).join('')}
+ var cycleGuideHtml = tkCycleGuide();
+ return `<div> ${cycleGuideHtml} <div class="tk-tabs"> ${[['navigator','DDD Reports Guide'],['library','Suggested Intervention Ideas'],['peers','What Others Are Doing']].map(([id,l])=>`<button class="tk-tab ${S.tkTab===id?'on':''}" onclick="S.tkTab='${id}';render()">${l}</button>`).join('')}
  </div> <div class="tk-wrap" style="padding-top:12px"> ${S.tkTab==='navigator'?tkNavigator():S.tkTab==='library'?tkLibrary():tkPeers()}
  </div></div>`;
 }
@@ -3091,76 +3279,6 @@ function tkNavigator() {
 }
 
 // DESIGNER 
-function tkDesigner() {
- const chs=[{id:'attendance',label:'Learner Attendance',desc:'Learners missing too many school days',color:'#E53935',report:'Learner Chart Report & Term to Date'},{id:'performance',label:'Low Performance',desc:'Learners scoring below pass mark',color:'#E8952E',report:'Learner Chart Report'},{id:'promotion',label:'At-Risk Promotion',desc:'Learners missing promotion requirements',color:'#1565C0',report:'FET Promotion Criteria Profiles'},{id:'prediction',label:'Predicted Not to Pass',desc:'Learners predicted not to be promoted',color:'#7B1FA2',report:'Term 4 Promotion Predictions'}];
- const steps=['What is the challenge?','What did you see?','What can you do?','Ready to act'];
- return`<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:16px"> <div style="padding:14px 16px;border-bottom:1px solid #f3f2f1"><h3 style="font-size:15px;font-weight:700;color:#1A2332;margin:0">Design an Intervention</h3><p style="font-size:11px;color:#607D8B;margin:4px 0 0">Use your DDD data to plan a response that fits your schools</p></div> <div style="padding:16px">
- <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8f9fa;border-radius:8px;margin-bottom:4px"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:7px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap">Open DDD Dashboard</a><div style="font-size:11px;color:var(--grey-dk);line-height:1.5">Open the dashboard in another tab \u2014 you will need the numbers from there to fill in Step 2</div></div>
- <div style="font-size:10px;color:var(--grey);line-height:1.5;padding:0 14px 10px">Log in with <strong style="color:var(--teal-dk)">firstname.surname@dbedashboard.co.za</strong> — not your personal email</div>
- <div class="tk-prog">${steps.map((s,i)=>`<div class="tk-prog-s" style="background:${S.dStep===i?'#0B8E8D':S.dStep>i?'#E8F5E9':'#f3f2f1'};color:${S.dStep===i?'#fff':S.dStep>i?'#7AB648':'#607D8B'}" onclick="S.dStep=${i};render()">${i+1}. ${s}</div>`).join('')}</div> ${S.dStep===0?`<div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1A2332">What challenge are you seeing at your school(s)?</div><div class="tk-ch-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${chs.map(c=>`<div class="tk-ch${S.dChallenge===c.id?' sel':''}" onclick="S.dChallenge='${c.id}';S.dStep=1;render()" style="background:${S.dChallenge===c.id?c.color+'10':'#f7f9fc'};${S.dChallenge===c.id?'border-color:'+c.color+'':''};color:${c.color}"><div style="font-size:13px;font-weight:700;color:#1A2332">${c.label}</div><div style="font-size:11px;color:#607D8B;margin-top:4px">${c.desc}</div><div style="font-size:10px;color:${c.color};margin-top:6px;font-weight:600">Use: ${c.report}</div><div class="tap-hint" style="color:${c.color};opacity:.7;margin-top:6px">Tap to select</div></div>`).join('')}</div>`:''}
- ${S.dStep===1?tkDesignerData():''}
- ${S.dStep===2?tkDesignerResponse():''}
- ${S.dStep===3?tkDesignerPlan():''}
- </div></div>`;
-}
-
-function tkStatCard(v,l,c,sub){return`<div style="background:#fff;border-radius:10px;padding:16px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid ${c};flex:1;min-width:120px"><div style="font-size:28px;font-weight:800;color:#1A2332;line-height:1">${v}</div><div style="font-size:10px;font-weight:600;color:#607D8B;text-transform:uppercase;letter-spacing:.5px;margin-top:4px">${l}</div>${sub?`<div style="font-size:10px;color:${c};margin-top:2px;font-weight:600">${sub}</div>`:''}</div>`}
-
-function tkDashCTA(path,reportName){return`<div style="margin-top:14px;background:linear-gradient(135deg,#074445,#0F7B7D);border-radius:10px;padding:14px 16px;text-align:center"><div style="font-size:11px;color:#B8DCDC;margin-bottom:6px;font-weight:600">Get the full learner-level detail on the DDD Dashboard</div><div style="font-size:13px;color:#fff;font-weight:700;margin-bottom:10px">Open ${reportName}</div><div class="tk-path" style="background:rgba(255,255,255,.12);color:#fff;margin:0 0 10px;justify-content:center"><span style="font-family:monospace;color:#B8DCDC">${path}</span></div><div style="font-size:10px;color:#B8DCDC;line-height:1.5">Log in with <strong style="color:#fff">firstname.surname@dbedashboard.co.za</strong> — not your personal email</div></div>`}
-
-function tkDesignerData(){
- if(!S.dChallenge)return`<div class="empty">\u2190 Please pick a challenge in Step 1 first</div>`;
- const di=S.dIn;
- const chConf={
-  attendance:{title:'Learner Attendance',color:'#E53935',report:'Learner Chart Report',path:'DDD Dashboard \u2192 Reports tab \u2192 Select Phase \u2192 Learner Chart \u2192 Download Data \u2192 Sort by Days Absent',tip:'Look for learners with 10+ days absent. Sort the downloaded data by "Days Absent" to find the worst cases. If they also have low marks, they are your highest priority.',fields:[{key:'passRate',label:'How many days absent on average?',placeholder:'e.g. 12',hint:'Average days absent for the learners you are worried about'},{key:'learnersAffected',label:'How many learners have high absence?',placeholder:'e.g. 29',hint:'Count of learners with 10+ days absent'}]},
-  performance:{title:'Low Performance',color:'#E8952E',report:'Learner Chart Report',path:'DDD Dashboard \u2192 Reports tab \u2192 Select Phase \u2192 Learner Chart \u2192 Download Data',tip:'Look at the pass rate for the subject and grade you are worried about. Download the Learner Chart and look at how many learners are below 30% or between 30-39%. The colour coding (red/yellow/green) shows you at a glance.',fields:[{key:'passRate',label:'What was the pass rate you saw?',placeholder:'e.g. 41',suffix:'%',hint:'The pass rate for the subject and grade you checked'},{key:'learnersAffected',label:'How many learners are below the pass mark?',placeholder:'e.g. 35',hint:'Count of learners below 30% or 40%'}]},
-  promotion:{title:'At-Risk Promotion',color:'#1565C0',report:'FET Promotion Criteria Profiles',path:'DDD Dashboard \u2192 Select School \u2192 FET Promotion Criteria Profiles',tip:'Look at how many learners missed just ONE promotion requirement \u2014 these are the ones closest to passing and where your support will make the biggest difference. Also check how many missed multiple requirements \u2014 they need more intensive help.',fields:[{key:'passRate',label:'How many missed just ONE requirement?',placeholder:'e.g. 45',hint:'Learners who are one subject or one criteria away from being promoted'},{key:'learnersAffected',label:'How many missed multiple requirements?',placeholder:'e.g. 80',hint:'Learners who need more support across several subjects'}]},
-  prediction:{title:'Predicted Not to Pass',color:'#7B1FA2',report:'Term 4 Promotion Predictions',path:'DDD Dashboard \u2192 Select School \u2192 Term 4 Promotion Predictions',tip:'Look at how many learners are predicted NOT to be promoted (FALSE). Cross-reference with the FET Promotion Profiles to find which of these learners are closest to meeting the criteria \u2014 those are where targeted support will have the biggest effect.',fields:[{key:'passRate',label:'How many are predicted NOT to pass?',placeholder:'e.g. 120',hint:'Learners with a FALSE prediction for promotion'},{key:'learnersAffected',label:'Of those, how many are close to making it?',placeholder:'e.g. 45',hint:'Learners predicted to fail but only missing one thing'}]}
- }[S.dChallenge];
-
- return`<div style="font-size:13px;font-weight:700;color:#1A2332;margin-bottom:4px">${chConf.title} \u2014 What did you see on the dashboard?</div>
- <div style="font-size:11px;color:#607D8B;margin-bottom:12px">Open the <strong>${chConf.report}</strong> and write down what you find</div>
- <div style="background:#f8f9fa;border-radius:8px;padding:10px 12px;margin-bottom:12px;border-left:2px solid var(--teal-md)"><div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Where to look</div><div style="font-size:11px;color:var(--grey-dk);font-family:monospace;line-height:1.6">${chConf.path}</div></div>
- <div style="background:${chConf.color}08;border-radius:8px;padding:12px;margin-bottom:14px;border-left:3px solid ${chConf.color}"><div style="font-size:10px;font-weight:700;color:${chConf.color};margin-bottom:4px">WHAT TO LOOK FOR</div><div style="font-size:12px;color:#37474F;line-height:1.6">${chConf.tip}</div></div>
- <div style="background:#fff;border:1px solid #e1dfdd;border-radius:8px;padding:14px;margin-bottom:12px">
-   <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">Your numbers from the dashboard</div>
-   <div style="margin-bottom:10px"><label style="font-size:12px;font-weight:600;color:#323130;display:block;margin-bottom:4px">School(s)</label><input type="text" placeholder="e.g. School B, School C" value="${esc(di.school)}" oninput="S.dIn.school=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-   <div class="field-row" style="gap:8px;margin-bottom:10px"><div><label style="font-size:12px;font-weight:600;color:#323130;display:block;margin-bottom:4px">District</label><input type="text" placeholder="e.g. Lejweleputswa" value="${esc(di.district)}" oninput="S.dIn.district=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div><div><label style="font-size:12px;font-weight:600;color:#323130;display:block;margin-bottom:4px">Grade & Subject</label><input type="text" placeholder="e.g. Grade 10 Maths" value="${esc(di.grade)}" oninput="S.dIn.grade=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div></div>
-   ${chConf.fields.map(f=>`<div style="margin-bottom:10px"><label style="font-size:12px;font-weight:600;color:#323130;display:block;margin-bottom:4px">${f.label}</label><div style="font-size:10px;color:var(--grey);margin-bottom:4px">${f.hint}</div><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" placeholder="${f.placeholder}" value="${di[f.key]}" oninput="S.dIn.${f.key}=this.value;render()" style="width:100px;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center">${f.suffix?`<span style="font-size:13px;color:var(--grey);font-weight:600">${f.suffix}</span>`:''}</div></div>`).join('')}
-   <div style="margin-bottom:6px"><label style="font-size:12px;font-weight:600;color:#323130;display:block;margin-bottom:4px">Anything else you noticed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea rows="2" placeholder="e.g. Concentrated in 3 schools, mainly in algebra..." oninput="S.dIn.detail=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit;resize:vertical">${esc(di.detail)}</textarea></div>
- </div>
- ${di.passRate||di.learnersAffected?`<div style="background:var(--green-lt);border-radius:8px;padding:10px 12px;margin-bottom:12px;border-left:3px solid var(--green)"><div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.6">${di.school?esc(di.school):''} ${di.grade?'('+esc(di.grade)+')':''} ${di.district?'\u2014 '+esc(di.district):''}<br>${chConf.fields.map(f=>di[f.key]?f.label.replace('How many ','').replace('What was the ','').replace(' you saw?','').replace('?','')+': <strong>'+esc(di[f.key])+(f.suffix||'')+'</strong>':'').filter(Boolean).join(' \u00b7 ')}${di.detail?' \u00b7 '+esc(di.detail):''}</div></div>`:''}
- <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-sm btn-outline" onclick="S.dStep=0;render()">\u2190 Back</button><button class="btn btn-sm btn-teal" style="flex:1" onclick="S.dStep=2;render()">See what you can do \u2192</button></div>`;}
-
-
-function tkDesignerResponse(){
- const ch=S.dChallenge;
- const matched=TK_INTERVENTIONS.filter(i=>{if(ch==='attendance')return i.category==='Attendance'||i.category==='Community';if(ch==='performance'||ch==='promotion')return i.category==='Academic Support'||i.category==='Assessment Quality';return i.category==='Academic Support'||i.category==='School Support'});
- return`<div style="font-size:13px;font-weight:700;color:#1A2332;margin-bottom:4px">What can you do about it?</div><div style="font-size:11px;color:#607D8B;margin-bottom:12px">These are intervention approaches that work well with DDD data. Tap any one to see how it works step by step.</div> ${matched.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);return`
- <div class="tk-iv${sel?' sel':''}" onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()"> <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;font-size:13px;color:#1A2332">${iv.name}</div><div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${iv.difficulty==='Light Touch'?'#E8F5E9':iv.difficulty==='Standard'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#E8952E'};font-weight:600">${iv.difficulty}</span></div></div> <div style="font-size:11px;color:#607D8B;margin-top:4px">${iv.description}</div> <div style="font-size:10px;color:#0B8E8D;margin-top:4px">Takes ${iv.timeToImpact} · Reports: ${reps.map(r=>r.name).join(', ')}</div> ${sel?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e1dfdd"> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div> <div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
- <div style="margin-top:6px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> </div>`:''}
- </div>`}).join('')}
- <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-sm btn-outline" onclick="S.dStep=1;render()">\u2190 Back</button><button class="btn btn-sm btn-teal" style="flex:1" onclick="S.dStep=3;render()">Ready to act \u2192</button></div>`;}
-
-
-function tkDesignerPlan(){
- const di=S.dIn;
- const hasSomeData=di.school||di.passRate||di.learnersAffected;
- return`<div style="font-size:13px;font-weight:700;color:#1A2332;margin-bottom:8px">Ready to act</div>
- ${hasSomeData?`<div style="background:var(--green-lt);border-radius:8px;padding:14px;margin-bottom:12px;border-left:3px solid var(--green)">
-   <div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Your data summary</div>
-   <div style="font-size:12px;color:var(--navy);line-height:1.6">${di.school?'<strong>School(s):</strong> '+esc(di.school)+'<br>':''}${di.district?'<strong>District:</strong> '+esc(di.district)+'<br>':''}${di.grade?'<strong>Grade / Subject:</strong> '+esc(di.grade)+'<br>':''}${di.passRate?'<strong>Key number:</strong> '+esc(di.passRate)+'<br>':''}${di.learnersAffected?'<strong>Learners affected:</strong> '+esc(di.learnersAffected)+'<br>':''}${di.detail?esc(di.detail):''}</div>
- </div>`:'<div style="background:var(--orange-lt);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--orange)"><div style="font-size:12px;color:#37474F;line-height:1.6">You have not entered any numbers yet. Go back to Step 2 and fill in what you saw on the dashboard \u2014 it makes your plan much stronger.</div></div>'}
- <div style="background:#E8F5E9;border-radius:10px;padding:16px;margin-bottom:12px">
-   <div style="font-size:11px;font-weight:700;color:#7AB648;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">The chain you are building</div>
-   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"> ${[{l:'DDD Data',bg:'#E3F2FD',fg:'#1565C0'},{a:true},{l:'What you saw',bg:'#FFF8E1',fg:'#E8952E'},{a:true},{l:'Your decision',bg:'#E3F2FD',fg:'#1565C0'},{a:true},{l:'What you did',bg:'#FFF3E0',fg:'#E8952E'},{a:true},{l:'The result',bg:'#E8F5E9',fg:'#7AB648'}].map(s=>s.a?'<span style="color:#607D8B;font-size:14px">\u2192</span>':`<div style="background:${s.bg};color:${s.fg};padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600">${s.l}</div>`).join('')}
-   </div>
- </div>
- <div style="font-size:12px;color:#37474F;line-height:1.7;margin-bottom:12px">Now go and carry out your intervention. When you do, log it in the tracker so you have a proper record of what you did and what happened. The numbers you entered will be saved in your entry.</div>
- <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-sm btn-outline" onclick="S.dStep=2;render()">\u2190 Back</button><button class="btn btn-sm" style="flex:1;background:#7AB648;color:#fff" onclick="prefillFromDesigner()">Log this in the tracker</button></div>`;
-}
-
-// WHAT WORKS 
 function tkLibrary(){
  const cats=['All',...new Set(TK_INTERVENTIONS.map(i=>i.category))];
  const myActs = S.actions||[];
@@ -3322,21 +3440,6 @@ function renderOutcomeModal(){
 function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function markDDDChecked(){S.ddd_last_checked=today();try{localStorage.setItem('ddd_last_checked',S.ddd_last_checked)}catch(e){}render();}
-function prefillFromDesigner(){
- const di=S.dIn;
- S.f.schools=di.school||S.f.schools;
- S.f.district=di.district||S.f.district;
- S.f.ddd_used='yes-direct';
- S.f.insight_type=di.passRate?'subject-performance':'';
- S.f.insight_pass_rate=di.passRate||'';
- S.f.insight_learners_affected=di.learnersAffected||'';
- S.f.insight_detail=di.detail||'';
- S.f.formStep=0;
- S.dStep=0;S.dChallenge=null;
- S.view='log';S.submitted=false;
- render();window.scrollTo({top:0,behavior:'smooth'});
-}
-
 // ═══════════════════════════════════
 // AUTO-UPDATE SYSTEM
 // ═══════════════════════════════════
