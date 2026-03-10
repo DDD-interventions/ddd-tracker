@@ -2319,8 +2319,6 @@ function renderDashboard() {
  const monthlyData = {};
  const dddReportCounts = {};
 
- const openLoops = [];
- const impactItems = [];
  const decisionTypes = {};
  const triggerCounts = {};
 
@@ -2402,33 +2400,10 @@ function renderDashboard() {
    if (det.intervention_trigger) triggerCounts[det.intervention_trigger] = (triggerCounts[det.intervention_trigger]||0)+1;
  });
 
- // Actions & outcomes linkage
- acts.forEach(a => {
-   const hasOutcome = outs.some(o => o.action_id === a.id);
-   if (!hasOutcome && a.status !== 'Planned') {
-     const parentDec = decs.find(d => d.id === a.decision_id);
-     const det = parentDec ? parentDec.details || {} : {};
-     openLoops.push({action: a.action_taken, schools: det.schools||'', district: det.district||'', date: a.target_date || parentDec?.date || '', status: a.status, id: a.id});
-   }
- });
 
- outs.forEach(o => {
-   const parentAct = acts.find(a => a.id === o.action_id);
-   const parentDec = parentAct ? decs.find(d => d.id === parentAct.decision_id) : null;
-   const det = parentDec ? parentDec.details || {} : {};
-   impactItems.push({description: o.description, metric: o.metric, value: o.value, evidence: o.evidence, schools: det.schools||'', date: o.date, learners: parseInt(det.learners_reached)||0, district: det.district||''});
-   // Count outcomes per district
-   const dk = (det.province||'')+'|'+(det.district||'');
-   if (districtData[dk]) districtData[dk].outcomes++;
- });
 
  // ── PIPELINE METRICS ──
  const chainsTotal = decs.length;
- const chainsWithAction = decs.filter(d => acts.some(a => a.decision_id === d.id)).length;
- const chainsWithOutcome = decs.filter(d => {
-   const dActs = acts.filter(a => a.decision_id === d.id);
-   return dActs.some(a => outs.some(o => o.action_id === a.id));
- }).length;
 
  // ── DDD QUALITY ──
  const dddTotal = totalActivities || 1;
@@ -2437,19 +2412,17 @@ function renderDashboard() {
  const dddEntries = decs.filter(d=>{const det=d.details||{};return det.ddd_used&&det.ddd_used!=='no'}).length;
  const dataQualityPct = dddEntries ? Math.round((withNumbers/dddEntries)*100) : 0;
 
- // ── COMPLETION STATS ──
+ // ── COMPLETION STATS ── (normalize unexpected statuses)
+ acts.forEach(function(a){ if (a.status !== 'Planned' && a.status !== 'In Progress' && a.status !== 'Completed') a.status = 'In Progress'; });
  const planned = acts.filter(a=>a.status==='Planned').length;
  const inProgress = acts.filter(a=>a.status==='In Progress').length;
  const completed = acts.filter(a=>a.status==='Completed').length;
- const withOutcome = acts.filter(a=>outs.some(o=>o.action_id===a.id)).length;
- const completionPct = acts.length ? Math.round((completed/acts.length)*100) : 0;
 
  // ── FOLLOW-UPS ──
  const followUpsWithAge = followUps.map(f => {
    const daysSince = Math.floor((now - new Date(f.date)) / (1000*60*60*24));
    return {...f, daysSince};
  }).sort((a,b) => b.daysSince - a.daysSince);
- const attentionCount = openLoops.length + followUpsWithAge.length;
 
  // ── SORTED DATA ──
  const barriers = Object.entries(barrierCounts).sort((a,b)=>b[1]-a[1]);
@@ -2709,7 +2682,7 @@ function closeSchoolsListModal(){
  return `<div class="dash-wrap">
  ${isDemo ? '<div class="demo-banner"><strong>Demo data shown</strong> — log your first activity and this will be replaced with your real data <button onclick="dismissDemo()" style="margin-left:8px;background:var(--teal);color:#fff;border:none;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:11px">Dismiss</button></div>' : ''}
 
- ${renderFilterBar(allDecs)}
+ ${renderFilterBar(decs)}
 
  <div class="dash-subnav-hint">Choose a view below</div>
  <div class="dash-subnav">
