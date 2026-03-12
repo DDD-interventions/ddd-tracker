@@ -67,7 +67,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-dd-filter{padding:6px 8px;border-bottom:1px solid #e8e6e4}
 .school-dd-filter input{width:100%;padding:6px 8px;border:1px solid #e8e6e4;border-radius:3px;font-size:12px;font-family:inherit}
 .school-dd-filter input:focus{outline:none;border-color:var(--teal)}
-.school-dd-list{max-height:200px;overflow-y:auto}
+.school-dd-list{max-height:300px;overflow-y:auto}
 .school-dd-item{padding:6px 10px;font-size:12px;color:#323130;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f8f7f6}
 .school-dd-item:hover{background:var(--teal-lt)}
 .school-dd-item.checked{background:#f0faf9;font-weight:600}
@@ -154,7 +154,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .welcome-proof .wp-icon{font-size:18px}
 .welcome-proof .wp-text{font-size:11.5px;color:#2E7D32;line-height:1.5}
 .welcome-cta{padding:20px 18px 24px;text-align:center}
-.welcome-cta .btn-go{background:linear-gradient(135deg,var(--teal-dk),#0F7B7D);color:#fff;border:none;border-radius:10px;padding:13px 40px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(11,142,141,.35);transition:transform .15s,box-shadow .15s;min-width:200px}
+.welcome-cta .btn-go{background:linear-gradient(135deg,var(--teal-dk),#0F7B7D);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(11,142,141,.35);transition:transform .15s,box-shadow .15s;min-width:220px;-webkit-tap-highlight-color:rgba(11,142,141,.2);touch-action:manipulation}
 .welcome-cta .btn-go:active{transform:scale(.97)}
 .welcome-cta .btn-go:hover{box-shadow:0 4px 16px rgba(11,142,141,.45)}
 
@@ -257,6 +257,28 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-section-hdr h3{font-size:14px;font-weight:700;color:var(--navy)}
 .dash-section-body{padding:14px 16px}
 .dash-section-desc{font-size:12px;color:var(--grey-dk);line-height:1.6;margin-bottom:12px}
+.d2a-matrix{border:1px solid #E0E3E8;border-radius:8px;overflow:hidden;margin-bottom:4px}
+.d2a-district{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;background:#FAFBFC;border-bottom:1px solid #E8EBF0;user-select:none;transition:background .15s}
+.d2a-district:hover{background:#F0F3F6}
+.d2a-district .d2a-chevron{font-size:10px;color:var(--grey);transition:transform .2s;width:14px;text-align:center;flex-shrink:0}
+.d2a-district .d2a-chevron.open{transform:rotate(90deg)}
+.d2a-district .d2a-entity{flex:1;min-width:0}
+.d2a-district .d2a-prov{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);line-height:1}
+.d2a-district .d2a-name{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px;line-height:1.3}
+.d2a-district .d2a-pills{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
+.d2a-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.d2a-pill.p{background:#E3F2FD;color:var(--blue)}.d2a-pill.ip{background:#FFF3E0;color:var(--orange)}.d2a-pill.c{background:var(--green-lt);color:var(--green-dk)}
+.d2a-school-cnt{font-size:10px;color:var(--grey);font-weight:500;flex-shrink:0;margin-right:4px}
+.d2a-rows{background:#fff;border-bottom:1px solid #E8EBF0}
+.d2a-row{display:grid;grid-template-columns:minmax(90px,.8fr) minmax(100px,1.2fr) minmax(100px,1.2fr) 80px 72px;gap:0;padding:8px 14px 8px 36px;border-top:1px solid #F0F2F5;font-size:11px;align-items:center}
+.d2a-row:first-child{border-top:none}
+.d2a-row-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);padding:6px 14px 4px 36px;background:#F8F9FB;border-top:1px solid #E8EBF0}
+.d2a-row-hdr>span{display:inline}
+.d2a-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--navy)}
+.d2a-cell.school{font-weight:600;color:var(--grey-dk)}.d2a-cell.decision{color:var(--teal);font-weight:600}.d2a-cell.action{color:var(--navy)}
+.d2a-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.d2a-badge.Planned{background:#E3F2FD;color:var(--blue)}.d2a-badge.In-Progress{background:#FFF3E0;color:var(--orange)}.d2a-badge.Completed{background:var(--green-lt);color:var(--green-dk)}
+@media(max-width:700px){.d2a-row{grid-template-columns:1fr;gap:2px;padding:8px 14px 8px 28px}.d2a-row-hdr{display:none}.d2a-cell::before{content:attr(data-label);font-size:9px;font-weight:600;color:var(--grey);margin-right:4px}.d2a-district{flex-wrap:wrap}}
 [role="button"]:active{background:#F0F8F8 !important;transform:scale(.99)}
 .dash-subnav{display:flex;flex-wrap:wrap;gap:6px;overflow-x:visible;padding:8px 16px 6px;position:sticky;top:0;z-index:50;background:#fff;margin:0 -16px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-bottom:1px solid #e0e0e0}
 .dash-subnav::-webkit-scrollbar{display:none}
@@ -739,7 +761,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all',
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _d2aExpanded:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -753,7 +775,7 @@ const S = {
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
- learners_reached:'',follow_up:false,follow_up_desc:'',
+ educators_supported:'',follow_up:false,follow_up_desc:'',
  doc_url:'',doc_name:'',
     sip_focus_areas:[],support_needed:[],support_level:'',doc_file:null,doc_file_name:'',
     formStep:-1,intervention_trigger:'',intervention_trigger_other:'',official_name:'',official_role:'',official_specialisation:'',official_email:'',
@@ -816,6 +838,7 @@ async function checkAuth() {
        // Show welcome screen on every login
        S.showWelcome = true;
        render();
+       window.scrollTo({top:0,behavior:'instant'});
        await loadAll();
        return;
      }
@@ -913,6 +936,7 @@ async function handleOtpSubmit() {
    S.showWelcome = true;
    S.loading = true;
    render();
+   window.scrollTo({top:0,behavior:'instant'});
    await loadAll();
  } catch(e) {
    console.error('PIN error:', e);
@@ -977,6 +1001,7 @@ function resetInactivityTimer() {
 );
 
 // STATUS UPDATE & OUTCOME RECORDING
+function toggleD2a(key){S._d2aExpanded[key]=!S._d2aExpanded[key];render();}
 async function updateActionStatus(actionId, newStatus) {
  try {
    const act = S.actions.find(a => a.id === actionId);
@@ -1068,17 +1093,17 @@ async function loadAll() {
 function injectDemo() {
  const demo_decs = [
  {id:'DEMO_D0',ddd_tool:'FET Promotion Profiles, Learner Chart Report',data_viewed:'Grade 10 Maths results — Lejweleputswa',insight:'School B Grade 10 Maths pass rate dropped from 58% to 41% between Term 1 and Term 3 2025. Learner Chart Report showed 35 learners clustered at 25-29% — just below passing threshold.',decision_made:'Target specific learners',contextual_factors:'Teaching outside specialisation | Only 1 qualified Maths educator for 4 Grade 10 classes',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2025-10-14',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School B',term:'Term 4 2025',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Mathematics'],grades:['10'],description:'DDD data review identified School B Grade 10 Maths as critical. 35 learners clustered just below pass mark. Decided to set up targeted after-school support with subject advisor and learner groups by performance level.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Learner Chart Report'],decision_type:'Target specific learners',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 qualified Maths educator for 4 Grade 10 classes. 2 educators teaching Maths outside their specialisation.',learners_reached:35,follow_up:false,follow_up_desc:''}},
+ details:{province:'Free State',district:'Lejweleputswa',schools:'School B',term:'Term 4 2025',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Mathematics'],grades:['10'],description:'DDD data review identified School B Grade 10 Maths as critical. 35 learners clustered just below pass mark. Decided to set up targeted after-school support with subject advisor and learner groups by performance level.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Learner Chart Report'],decision_type:'Target specific learners',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 qualified Maths educator for 4 Grade 10 classes. 2 educators teaching Maths outside their specialisation.',educators_supported:3,follow_up:false,follow_up_desc:'',support_needed:['A specialist to help with a specific subject','Mentoring for the principal or HoDs']}},
  {id:'DEMO_D1',ddd_tool:'School Dashboard, Learner Chart Report',data_viewed:'Maths pass rates for Grade 9 — JTG district',insight:'12 schools below 40% in Maths, concentrated in 3 circuits',decision_made:'Send in subject support',contextual_factors:'Vacant post(s), Teaching outside specialisation',made_by:'Mr V Teise (Circuit Manager)',date:'2026-01-28',logged_by:'V Teise',
- details:{province:'Northern Cape',district:'John Taolo Gaetsewe',schools:'School C, School D, School E',term:'Term 1 2026',activity_type:'School support visit',intervention_theme:'District Support',subjects:['Mathematics'],grades:['9'],description:'Targeted support visit to 3 underperforming schools in JTG. Reviewed Maths pass rates and agreed on intervention plan.',ddd_used:'yes-direct',ddd_reports:['School Dashboard','Learner Chart Report'],decision_type:'Send in subject support',ctx_staffing:['Vacant post(s)','Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['High absenteeism'],ctx_notes:'No permanent Maths educator at School E since Term 3 2025',learners_reached:340,follow_up:true,follow_up_desc:'Return visit in 2 weeks to check if Subject Improvement Plan has been implemented'}},
+ details:{province:'Northern Cape',district:'John Taolo Gaetsewe',schools:'School C, School D, School E',term:'Term 1 2026',activity_type:'School support visit',intervention_theme:'District Support',subjects:['Mathematics'],grades:['9'],description:'Targeted support visit to 3 underperforming schools in JTG. Reviewed Maths pass rates and agreed on intervention plan.',ddd_used:'yes-direct',ddd_reports:['School Dashboard','Learner Chart Report'],decision_type:'Send in subject support',ctx_staffing:['Vacant post(s)','Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['High absenteeism'],ctx_notes:'No permanent Maths educator at School E since Term 3 2025',educators_supported:8,follow_up:true,follow_up_desc:'Return visit in 2 weeks to check if Subject Improvement Plan has been implemented',support_needed:['Staffing problem \u2014 needs to go to HR/PED','More visits from subject advisors']}},
  {id:'DEMO_D2',ddd_tool:'FET Promotion Profiles',data_viewed:'Grade 12 promotion predictions — Lejweleputswa',insight:'15% of Grade 12 learners predicted to fail Physical Sciences',decision_made:'Set up extra classes',contextual_factors:'Infrastructure issues, Overcrowded classrooms',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2026-02-03',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School F, School B, School M',term:'Term 1 2026',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Physical Sciences','Mathematics'],grades:['12'],description:'District data review meeting to identify at-risk Grade 12 learners and plan Saturday classes.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Term 4 Promotion Predictions'],decision_type:'Set up extra classes',ctx_staffing:['All posts filled'],ctx_resources:['Infrastructure issues'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 lab for 4 Grade 12 Science classes at School B',learners_reached:520,follow_up:true,follow_up_desc:'Monitor Saturday class attendance after first 3 sessions'}},
+ details:{province:'Free State',district:'Lejweleputswa',schools:'School F, School B, School M',term:'Term 1 2026',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Physical Sciences','Mathematics'],grades:['12'],description:'District data review meeting to identify at-risk Grade 12 learners and plan Saturday classes.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Term 4 Promotion Predictions'],decision_type:'Set up extra classes',ctx_staffing:['All posts filled'],ctx_resources:['Infrastructure issues'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 lab for 4 Grade 12 Science classes at School B',educators_supported:12,follow_up:true,follow_up_desc:'Monitor Saturday class attendance after first 3 sessions',support_needed:['Building or infrastructure problem','Learning materials and resources']}},
  {id:'DEMO_D3',ddd_tool:'Senior Phase Promotion Profiles',data_viewed:'Grade 7 English FAL results — Mopani East',insight:'62% of learners below level 4 in English FAL across 5 schools',decision_made:'Adjust teaching strategy',contextual_factors:'Language barriers',made_by:'Mr K Makatu (Provincial Manager)',date:'2026-02-10',logged_by:'K Makatu',
- details:{province:'Limpopo',district:'Mopani East',schools:'School K, School N, School J',term:'Term 1 2026',activity_type:'Workshop / training session',intervention_theme:'Intermediate & GET Phase',subjects:['English FAL','English HL'],grades:['7','8'],description:'English literacy workshop for 12 educators. Focused on reading comprehension strategies and scaffolding techniques.',ddd_used:'yes-informed',ddd_reports:['Senior Phase Promotion Profiles','Curriculum Overview'],decision_type:'Adjust teaching strategy',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage','No devices/connectivity'],ctx_learners:['Language barriers','Welfare concerns'],ctx_notes:'3 schools in deep rural area with no internet connectivity',learners_reached:890,follow_up:false,follow_up_desc:''}},
+ details:{province:'Limpopo',district:'Mopani East',schools:'School K, School N, School J',term:'Term 1 2026',activity_type:'Workshop / training session',intervention_theme:'Intermediate & GET Phase',subjects:['English FAL','English HL'],grades:['7','8'],description:'English literacy workshop for 12 educators. Focused on reading comprehension strategies and scaffolding techniques.',ddd_used:'yes-informed',ddd_reports:['Senior Phase Promotion Profiles','Curriculum Overview'],decision_type:'Adjust teaching strategy',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage','No devices/connectivity'],ctx_learners:['Language barriers','Welfare concerns'],ctx_notes:'3 schools in deep rural area with no internet connectivity',educators_supported:12,follow_up:false,follow_up_desc:'',support_needed:['Learning materials and resources','A specialist to help with a specific subject']}},
  {id:'DEMO_D4',ddd_tool:'',data_viewed:'Routine monitoring visit',insight:'HODs not conducting class visits or checking educator files',decision_made:'Escalate to management',contextual_factors:'Acting principal/HoD',made_by:'Ms P Mtyobo (Cluster Lead)',date:'2026-02-12',logged_by:'P Mtyobo',
- details:{province:'Eastern Cape',district:'Sarah Baartman',schools:'School I, School L',term:'Term 1 2026',activity_type:'Monitoring / follow-up visit',intervention_theme:'District Support',subjects:['Mathematics','Natural Sciences'],grades:['4','5','6'],description:'Monitoring visit found poor curriculum coverage. HODs not conducting class visits. Escalated to District Director.',ddd_used:'no',ddd_reports:[],decision_type:'Escalate to management',ctx_staffing:['Acting principal/HoD','High educator absenteeism'],ctx_resources:['LTSM not delivered'],ctx_learners:['High absenteeism'],ctx_notes:'School has had acting principal for 18 months',learners_reached:210,follow_up:true,follow_up_desc:'District Director to conduct accountability visit within 10 days'}},
+ details:{province:'Eastern Cape',district:'Sarah Baartman',schools:'School I, School L',term:'Term 1 2026',activity_type:'Monitoring / follow-up visit',intervention_theme:'District Support',subjects:['Mathematics','Natural Sciences'],grades:['4','5','6'],description:'Monitoring visit found poor curriculum coverage. HODs not conducting class visits. Escalated to District Director.',ddd_used:'no',ddd_reports:[],decision_type:'Escalate to management',ctx_staffing:['Acting principal/HoD','High educator absenteeism'],ctx_resources:['LTSM not delivered'],ctx_learners:['High absenteeism'],ctx_notes:'School has had acting principal for 18 months',educators_supported:4,follow_up:true,follow_up_desc:'District Director to conduct accountability visit within 10 days',support_needed:['Mentoring for the principal or HoDs','Staffing problem \u2014 needs to go to HR/PED','Learner welfare or psychosocial support']}},
  {id:'DEMO_D5',ddd_tool:'Term to Date, School Achievement Report',data_viewed:'SBA vs Exam deviation analysis — Pinetown',insight:'4 schools show 20%+ SBA-Exam gap in Maths Literacy',decision_made:'Investigate SBA-exam gap',contextual_factors:'',made_by:'Ms R Sikhwari (Provincial Manager)',date:'2026-02-14',logged_by:'R Sikhwari',
- details:{province:'KwaZulu-Natal',district:'Pinetown',schools:'School O, School H, School G',term:'Term 1 2026',activity_type:'Lesson observation',intervention_theme:'DBE Mentorship Programme',subjects:['Mathematical Literacy','Mathematics'],grades:['10','11'],description:'Observed 6 Maths Lit lessons to investigate SBA-Exam gap. Found assessments not aligned to exam standards.',ddd_used:'yes-direct',ddd_reports:['Term to Date','School Achievement Report'],decision_type:'Investigate SBA-exam gap',ctx_staffing:['All posts filled'],ctx_resources:['Adequate'],ctx_learners:['No major concerns'],ctx_notes:'',learners_reached:380,follow_up:true,follow_up_desc:'Subject advisors to moderate SBA tasks for Term 2 before administration'}}
+ details:{province:'KwaZulu-Natal',district:'Pinetown',schools:'School O, School H, School G',term:'Term 1 2026',activity_type:'Lesson observation',intervention_theme:'DBE Mentorship Programme',subjects:['Mathematical Literacy','Mathematics'],grades:['10','11'],description:'Observed 6 Maths Lit lessons to investigate SBA-Exam gap. Found assessments not aligned to exam standards.',ddd_used:'yes-direct',ddd_reports:['Term to Date','School Achievement Report'],decision_type:'Investigate SBA-exam gap',ctx_staffing:['All posts filled'],ctx_resources:['Adequate'],ctx_learners:['No major concerns'],ctx_notes:'',educators_supported:6,follow_up:true,follow_up_desc:'Subject advisors to moderate SBA tasks for Term 2 before administration',support_needed:['More visits from subject advisors']}}
  ];
 
  const demo_acts = [
@@ -1122,7 +1147,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="S.view='log';S.submitted=false;if(S.f.formStep===-1)S.f.formStep=0;render()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="navToLog()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -1261,7 +1286,7 @@ function getFormProgress() {
    [f.ctx_staffing.length > 0, 1],
    [f.ctx_resources.length > 0, 1],
    [f.ctx_learners.length > 0, 1],
-   [!!f.learners_reached, 2],
+   [!!f.educators_supported, 2],
    [!!f.doc_file || !!f.doc_url, 1],
  ];
  // DDD-specific fields only count when DDD was actually used
@@ -1314,6 +1339,19 @@ function renderForm() {
 function dismissWelcome() {
   S.showWelcome = false;
   render();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function navToLog() {
+  // If previous submission exists or form was completed, reset to clean state
+  if (S.submitted || S.f.formStep === 4) {
+    resetForm();
+  }
+  S.view = 'log';
+  S.submitted = false;
+  if (S.f.formStep === -1) S.f.formStep = 0;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function renderWelcome() {
@@ -1356,7 +1394,7 @@ function renderWelcome() {
       '<div class="wp-icon">🏫</div>' +
       '<div class="wp-text"><strong>' + (wpSchools > 0 ? wpSchools.toLocaleString() + ' school' + (wpSchools !== 1 ? 's' : '') : '740+ schools') + '</strong> across ' + (wpProvs > 1 ? wpProvs + ' provinces' : '9 provinces') + ' are already being supported through DDD Data Informed interventions this year.</div>' +
     '</div>' +
-    '<div class="welcome-cta" style="animation:fadeUp .4s ease .65s both">' +
+    '<div class="welcome-cta">' +
       '<button class="btn-go" onclick="dismissWelcome()">Let\u2019s Go →</button>' +
     '</div>' +
   '</div></div>';
@@ -1468,8 +1506,9 @@ function renderFormStart(){
 // School picker helpers
 const PHASE_LABELS={P:'Primary',S:'Secondary',C:'Combined',I:'Intermediate'};
 function parseSchoolsArr(){return S.f.schools?S.f.schools.split(',').map(s=>s.trim()).filter(Boolean):[];}
-function addSchool(name){const arr=parseSchoolsArr();if(!arr.includes(name)){arr.push(name);S.f.schools=arr.join(', ');}render();}
-function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();}
+function addSchool(name){const arr=parseSchoolsArr();if(!arr.includes(name)){arr.push(name);S.f.schools=arr.join(', ');}render();_refocusSchoolFilter();}
+function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();_refocusSchoolFilter();}
+function _refocusSchoolFilter(){if(S.f._schoolDDOpen){setTimeout(function(){const el=document.getElementById('spFilter');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}},30);}}
 function toggleSchool(name){parseSchoolsArr().includes(name)?removeSchool(name):addSchool(name);}
 
 function getPrev2Terms(currentTerm) {
@@ -1590,9 +1629,45 @@ function bulkSelectPhase(phase){
   const arr=parseSchoolsArr();
   const toAdd=phase==='ALL'?schools:schools.filter(s=>s[1]===phase);
   for(const s of toAdd){if(!arr.includes(s[0]))arr.push(s[0]);}
-  S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();
+  S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();_refocusSchoolFilter();
 }
 let _spItems=[];
+let _spFilterTimer=null;
+function schoolFilterInput(val){
+  S.f._schoolQ=val;
+  // Debounce: update the dropdown list only, not the full page
+  if(_spFilterTimer)clearTimeout(_spFilterTimer);
+  _spFilterTimer=setTimeout(function(){
+    _spFilterTimer=null;
+    // Get the dropdown list container and update only its content
+    const listEl=document.querySelector('.school-dd-list');
+    const footEl=document.querySelector('.school-dd-foot');
+    if(!listEl)return;
+    const allSchools=getAvailableSchools();
+    const selected=parseSchoolsArr();
+    const q=(S.f._schoolQ||'').toLowerCase();
+    const filtered=q?allSchools.filter(function(s){return s[0].toLowerCase().includes(q)}):allSchools;
+    _spItems=filtered;
+    let html='';
+    if(filtered.length===0){
+      html='<div class="school-dd-hint">No schools match \u201c'+esc(S.f._schoolQ)+'\u201d</div>';
+    }else{
+      const shown=filtered.slice(0,120);
+      for(let i=0;i<shown.length;i++){
+        const s=shown[i];
+        const isChecked=selected.includes(s[0]);
+        const phaseBadge=s[1]?'<span style="font-size:9px;color:#999;margin-left:auto;flex-shrink:0">'+(PHASE_LABELS[s[1]]||'')+'</span>':'';
+        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'\u2713':'')+'</span><span style="flex:1;min-width:0">'+esc(s[0])+'</span>'+phaseBadge+'</div>';
+      }
+      if(filtered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+filtered.length+' \u2014 filter to see more</div>';
+    }
+    listEl.innerHTML=html;
+    if(footEl){
+      const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
+      footEl.innerHTML='<span>'+scope+' \xb7 '+allSchools.length+' schools</span><span>'+selected.length+' selected</span>';
+    }
+  },120);
+}
 function schoolPickerHTML(){
   const selected=parseSchoolsArr();
   const q=(S.f._schoolQ||'').toLowerCase();
@@ -1636,20 +1711,20 @@ function schoolPickerHTML(){
 
     // Filter input
     if(allSchools.length>20){
-      dd+='<div class="school-dd-filter"><input type="text" placeholder="Filter '+allSchools.length.toLocaleString()+' schools..." value="'+esc(S.f._schoolQ)+'" oninput="S.f._schoolQ=this.value;render()" id="spFilter"></div>';
+      dd+='<div class="school-dd-filter"><input type="text" placeholder="Filter '+allSchools.length.toLocaleString()+' schools..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
     }
     dd+='<div class="school-dd-list">';
     if(filtered.length===0){
       dd+='<div class="school-dd-hint">No schools match \u201c'+esc(S.f._schoolQ)+'\u201d</div>';
     }else{
-      const shown=filtered.slice(0,80);
+      const shown=filtered.slice(0,120);
       for(let i=0;i<shown.length;i++){
         const s=shown[i];
         const isChecked=selected.includes(s[0]);
         const phaseBadge=s[1]?'<span style="font-size:9px;color:#999;margin-left:auto;flex-shrink:0">'+(PHASE_LABELS[s[1]]||'')+'</span>':'';
         dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><span style="flex:1;min-width:0">'+esc(s[0])+'</span>'+phaseBadge+'</div>';
       }
-      if(filtered.length>80)dd+='<div class="school-dd-hint">Showing 80 of '+filtered.length+' \u2014 filter to see more</div>';
+      if(filtered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+filtered.length+' \u2014 filter to see more</div>';
     }
     dd+='</div>';
     const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
@@ -1691,6 +1766,19 @@ function renderFormStep1(){
 }
 function toggleSubject(name){S.f.subjects.includes(name)?S.f.subjects=S.f.subjects.filter(s=>s!==name):S.f.subjects.push(name);render();}
 function removeSubject(name){S.f.subjects=S.f.subjects.filter(s=>s!==name);render();}
+let _subjFilterTimer=null;
+function subjectFilterInput(val){
+  S.f._subjectQ=val;
+  if(_subjFilterTimer)clearTimeout(_subjFilterTimer);
+  _subjFilterTimer=setTimeout(function(){
+    _subjFilterTimer=null;
+    render();
+    setTimeout(function(){
+      const el=document.querySelector('.school-dd-filter input');
+      if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}
+    },20);
+  },150);
+}
 function renderSubjectPicker(){
   const sel=S.f.subjects;
   const open=S.f._subjectDDOpen;
@@ -1717,7 +1805,7 @@ function renderSubjectPicker(){
       items+=`<div class="school-dd-item ${otherChecked?'checked':''}" onclick="toggleSubject('Other')"><div class="tick">${otherChecked?'\u2713':''}</div>Other (specify below)</div>`;
     }
     if(!items)items=`<div class="school-dd-hint">No subjects match your search</div>`;
-    dd=`<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Type to search subjects..." value="${esc(S.f._subjectQ)}" oninput="S.f._subjectQ=this.value;render()" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:250px">${items}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span></div></div>`;
+    dd=`<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Type to search subjects..." value="${esc(S.f._subjectQ)}" oninput="subjectFilterInput(this.value)" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:250px">${items}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span></div></div>`;
   }
   const other=sel.includes('Other')?`<div style="margin-top:6px"><input type="text" placeholder="Please specify the subject..." value="${esc(S.f.subjects_other)}" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>`:'';
   return `<div class="school-picker">${tags}${trigger}${dd}</div>${other}`;
@@ -1816,7 +1904,7 @@ function renderFormStep3(){
         ${S.f.insight_type==='sba-exam-gap'?`
         <div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">SBA-Exam gap size</label><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" max="100" placeholder="e.g. 22" value="${S.f.insight_sba_exam_gap}" oninput="S.f.insight_sba_exam_gap=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center"><span style="font-size:13px;color:var(--grey);font-weight:600">%</span></div></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 120" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
+          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 8" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
         </div>`:''}
         ${S.f.insight_type==='curriculum-coverage'?`
         <div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
@@ -1848,7 +1936,7 @@ function renderFormStep4(){
     <div class="field"><label>How Much Support Is Needed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">How much help does this school need?</div><div class="radio-grp"><label><input type="radio" name="supportLvl" value="light" ${S.f.support_level==='light'?'checked':''} onchange="S.f.support_level='light';render()"><span><strong>Light touch</strong> \u2014 school is coping, just needs a check-in now and then</span></label><label><input type="radio" name="supportLvl" value="regular" ${S.f.support_level==='regular'?'checked':''} onchange="S.f.support_level='regular';render()"><span><strong>Regular support</strong> \u2014 needs regular visits, e.g. every two weeks</span></label><label><input type="radio" name="supportLvl" value="intensive" ${S.f.support_level==='intensive'?'checked':''} onchange="S.f.support_level='intensive';render()"><span><strong>Intensive support</strong> \u2014 serious challenges, needs a team effort from multiple people</span></label></div></div>
     <div class="field"><label>School context</label><div class="hint">Tap all that apply across schools visited</div><div style="margin-bottom:8px"><span class="tag-grp-title">Staffing:</span><div class="tags" style="display:inline-flex">${CTX_STAFFING.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_staffing.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_staffing,'${s}',this.checked,'staffing')"><span>${s}</span></label>`).join('')}</div></div><div style="margin-bottom:8px"><span class="tag-grp-title">Resources:</span><div class="tags" style="display:inline-flex">${CTX_RESOURCES.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_resources.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_resources,'${s}',this.checked,'resources')"><span>${s}</span></label>`).join('')}</div></div><div><span class="tag-grp-title">Learners:</span><div class="tags" style="display:inline-flex">${CTX_LEARNERS.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_learners.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_learners,'${s}',this.checked,'learners')"><span>${s}</span></label>`).join('')}</div></div></div>
     <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025..." oninput="S.f.ctx_notes=this.value">${esc(S.f.ctx_notes)}</textarea></div>
-    <div class="field-row"><div class="field"><label>Learners reached</label><div class="hint">Approximate number impacted</div><input type="number" placeholder="e.g. 120" min="0" value="${S.f.learners_reached}" oninput="S.f.learners_reached=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
+    <div class="field-row"><div class="field"><label>Educators / staff supported</label><div class="hint">Number of educators or officials you worked with</div><input type="number" placeholder="e.g. 8" min="0" value="${S.f.educators_supported}" oninput="S.f.educators_supported=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
     ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><textarea rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation..." oninput="S.f.follow_up_desc=this.value">${esc(S.f.follow_up_desc)}</textarea></div>`:''}
     <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Attach a plan, report, sign-in register, or SIP \u2014 or paste a link</div>
       <div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
@@ -1872,7 +1960,7 @@ function renderFormReview(){
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('SIP Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_type==='Other'&&f.decision_other?'Other: '+f.decision_other:f.decision_type)}${rvRow('Intervention activity',f.action_type==='Other'&&f.action_other?'Other: '+f.action_other:f.action_type)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${rvRow('Learners Reached',f.learners_reached)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving?'disabled':''} style="min-width:160px">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
   </div></div>`;
 }
@@ -1953,7 +2041,7 @@ function renderSuccess() {
  </div>`}
  <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:12px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> at <strong>${esc(S.f.schools)}</strong><br> ${S.f.district}, ${S.f.province} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
  ${S.f.action_type ? 'Intervention activity: ' + esc(S.f.action_type) : ''}
- ${S.f.learners_reached ? ' \u00b7 ~' + S.f.learners_reached + ' learners' : ''}
+ ${S.f.educators_supported ? ' \u00b7 ~' + S.f.educators_supported + ' educators' : ''}
  </div> </div> ${renderFeedbackSection()}
  <div style="display:flex;gap:10px;justify-content:center;margin-top:20px"> <button class="btn btn-teal" onclick="resetForm()">Log Another</button> <button class="btn btn-outline" onclick="S.view='dashboard';render()">View Dashboard</button> </div> </div></div></div>`;
 }
@@ -2057,7 +2145,7 @@ async function submitForm() {
  insight_learners_affected:S.f.insight_learners_affected?parseInt(S.f.insight_learners_affected):null,
  decision_type:S.f.decision_type==='Other'&&S.f.decision_other?'Other: '+S.f.decision_other:S.f.decision_type,
  ctx_staffing:S.f.ctx_staffing, ctx_resources:S.f.ctx_resources, ctx_learners:S.f.ctx_learners, ctx_notes:S.f.ctx_notes,
- learners_reached:S.f.learners_reached ? parseInt(S.f.learners_reached) : null,
+ educators_supported:S.f.educators_supported ? parseInt(S.f.educators_supported) : null,
  follow_up:S.f.follow_up, follow_up_desc:S.f.follow_up_desc,
       sip_focus_areas:S.f.sip_focus_areas, support_needed:S.f.support_needed, support_level:S.f.support_level,
       intervention_trigger:S.f.intervention_trigger,
@@ -2123,6 +2211,7 @@ async function submitForm() {
 
  S.submitted = true;
     try{localStorage.setItem('ddd_demo_dismissed','1')}catch(e){}
+    try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
  await loadAll();
  } catch(e) {
  showToast('Error: ' + e.message);
@@ -2133,12 +2222,14 @@ async function submitForm() {
 
 function resetForm() {
  S.submitted = false; S.fbRating = null; S.fbChecks = []; S.fbComment = ''; S.fbSubmitted = false; S.fbSkipped = false;
+ S._validationErrors = null;
+ try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', decision_type:'', decision_other:'', action_type:'', action_other:'',
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
- learners_reached:'', follow_up:false, follow_up_desc:'',
+ educators_supported:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'',
     sip_focus_areas:[], support_needed:[], support_level:'', doc_file:null, doc_file_name:'',
     formStep:-1, intervention_trigger:'', intervention_trigger_other:'',  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, official_specialisation_other:S.f.official_specialisation_other,
@@ -2317,7 +2408,7 @@ function exportAllDataCSV() {
    'Date','Logged By','Province','District','Circuit','Schools',
    'Term','Activity Type','Intervention Theme','Subjects','Grades',
    'Description','DDD Used','DDD Reports','DDD Access Date','DDD Dashboard Confirmed',
-   'Insight','Decision Type','Learners Reached',
+   'Insight','Decision Type','Educators Supported',
    'Insight Type','Insight Pass Rate','Insight Learners Affected','Insight Educator Absent','Insight Attendance Days','Insight SBA-Exam Gap','Insight Curriculum Pct','Intervention Trigger',
    'Barriers (Staffing)','Barriers (Resources)','Barriers (Learners)','Context Notes',
    'Follow-Up','Follow-Up Description','SIP Focus Areas','Support Needed','Support Level',
@@ -2368,7 +2459,7 @@ function buildExportRow(d, det, a, o) {
    det.ddd_dashboard_confirmed || '',
    det.insight_statement || det.insight_detail || d.insight || '',
    det.decision_type || d.decision_made || '',
-   det.learners_reached != null ? det.learners_reached : '',
+   det.educators_supported != null ? det.educators_supported : '',
    det.insight_type || '',
    det.insight_pass_rate != null ? det.insight_pass_rate : '',
    det.insight_learners_affected != null ? det.insight_learners_affected : '',
@@ -2430,7 +2521,7 @@ function renderDashboard() {
  // ── CORE METRICS ──
  const totalActivities = decs.length;
  const schoolSet = new Set();
- let totalLearners = 0;
+ let totalEducators = 0;
  const followUps = [];
  const barrierCounts = {};
  const activityByType = {};
@@ -2446,13 +2537,14 @@ function renderDashboard() {
 
  const decisionTypes = {};
  const triggerCounts = {};
+ const supportRequests = [];
 
  decs.forEach(d => {
    const det = d.details || {};
    const schools = det.schools ? det.schools.split(',').map(s=>s.trim()).filter(Boolean) : [];
    schools.forEach(s => schoolSet.add(s));
-   if (det.learners_reached) totalLearners += parseInt(det.learners_reached)||0;
-   if (det.follow_up && det.follow_up_desc && !det.follow_up_completed) followUps.push({desc:det.follow_up_desc, date:d.date, schools:det.schools, district:det.district, id:d.id, loggedBy:d.made_by||det.official_name||''});
+   if (det.educators_supported) totalEducators += parseInt(det.educators_supported)||0;
+   if (det.follow_up && det.follow_up_desc && !det.follow_up_completed) followUps.push({desc:det.follow_up_desc, date:d.date, schools:det.schools, district:det.district, id:d.id, officialId:d.official_id||'', loggedBy:d.made_by||det.official_name||''});
 
    // Barriers
    (det.ctx_staffing||[]).forEach(b => { if(b!=='All posts filled') barrierCounts[b] = (barrierCounts[b]||0)+1; });
@@ -2496,10 +2588,10 @@ function renderDashboard() {
    if (prov) {
      provinceCounts[prov] = (provinceCounts[prov]||0)+1;
      const dk = prov+'|'+dist;
-     if (!districtData[dk]) districtData[dk] = {province:prov, district:dist, activities:0, schools:new Set(), learners:0, lastDate:'', dddUsed:0, outcomes:0, barriers:[]};
+     if (!districtData[dk]) districtData[dk] = {province:prov, district:dist, activities:0, schools:new Set(), educators:0, lastDate:'', dddUsed:0, outcomes:0, barriers:[]};
      districtData[dk].activities++;
      schools.forEach(s => districtData[dk].schools.add(s));
-     districtData[dk].learners += parseInt(det.learners_reached)||0;
+     districtData[dk].educators += parseInt(det.educators_supported)||0;
      if (!districtData[dk].lastDate || d.date > districtData[dk].lastDate) districtData[dk].lastDate = d.date;
      if (det.ddd_used && det.ddd_used !== 'no') districtData[dk].dddUsed++;
      // Collect barriers for district
@@ -2523,6 +2615,15 @@ function renderDashboard() {
 
    // Triggers
    if (det.intervention_trigger) triggerCounts[det.intervention_trigger] = (triggerCounts[det.intervention_trigger]||0)+1;
+
+   // Support requests
+   if (det.support_needed && det.support_needed.length) {
+     var sSchools = det.schools || '';
+     det.support_needed.forEach(function(sn){
+       if (sn === 'On track \u2014 keep doing what we\'re doing') return;
+       supportRequests.push({need:sn, schools:sSchools, district:det.district||'', province:det.province||'', date:d.date||'', loggedBy:d.made_by||det.official_name||'', subjects:det.subjects||[]});
+     });
+   }
  });
 
 
@@ -2779,7 +2880,14 @@ function closeSchoolsListModal(){
        var _f=followUpsWithAge[_fi];
        var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
        var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
-       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+(_f.loggedBy?' &middot; '+esc(_f.loggedBy):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div><div style="display:flex;gap:6px;margin-top:8px"><button onclick="markFollowUpDone(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit">✓ Done</button><button onclick="logFollowUpVisit(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit">Log Follow-up</button></div></div>';
+       var _isOwner = !_f.officialId || _f.officialId === S._officialId || (_f.id||'').startsWith('DEMO_');
+       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+(_f.loggedBy?' &middot; '+esc(_f.loggedBy):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div>';
+       if (_isOwner) {
+         _fuHTML += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="markFollowUpDone(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit">✓ Done</button><button onclick="logFollowUpVisit(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit">Log Follow-up</button></div>';
+       } else {
+         _fuHTML += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only '+esc(_f.loggedBy||'the person who logged this')+' can complete this follow-up</div>';
+       }
+       _fuHTML += '</div>';
      }
      if (followUpsWithAge.length>5) _fuHTML += '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ '+(followUpsWithAge.length-5)+' more</div>';
      _fuHTML += '</div>';
@@ -2794,6 +2902,41 @@ function closeSchoolsListModal(){
    _fuHTML += '</div></div>';
  } else if (totalActivities > 0) {
    _fuHTML = '<div style="background:#fff;border-radius:8px;padding:14px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--green);text-align:center"><div style="font-size:13px;color:var(--green-dk);font-weight:600">All clear \u2014 no follow-ups due and all districts active</div></div>';
+ }
+
+ // ── RECOMMENDED SUPPORT ──
+ var _supHTML = '';
+ if (supportRequests.length) {
+   // Group by support type, collect schools under each
+   var supByType = {};
+   supportRequests.forEach(function(sr){
+     if (!supByType[sr.need]) supByType[sr.need] = {schools:new Set(), districts:new Set(), count:0, entries:[]};
+     supByType[sr.need].count++;
+     var sArr = sr.schools.split(',').map(function(s){return s.trim()}).filter(Boolean);
+     sArr.forEach(function(s){supByType[sr.need].schools.add(s)});
+     if (sr.district) supByType[sr.need].districts.add(sr.district);
+     supByType[sr.need].entries.push(sr);
+   });
+   var supSorted = Object.entries(supByType).sort(function(a,b){return b[1].count - a[1].count});
+
+
+   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+supportRequests.length+' request'+(supportRequests.length!==1?'s':'')+' from '+supSorted.length+' categor'+(supSorted.length!==1?'ies':'y')+'</span></div><div class="dash-section-body">';
+   _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during their visits. These highlight where specialist help, additional resources, or escalation may be required.</div>';
+   _supHTML += '<div style="display:grid;gap:8px">';
+   supSorted.forEach(function(entry){
+     var type = entry[0], data = entry[1];
+     var schoolArr = Array.from(data.schools);
+     var distArr = Array.from(data.districts);
+     var schoolPreview = schoolArr.slice(0,3).join(', ') + (schoolArr.length>3 ? ' +' + (schoolArr.length-3) + ' more' : '');
+     _supHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 14px;border:1px solid #EDE7F6">';
+     _supHTML += '<div style="flex:1;min-width:0">';
+     _supHTML += '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-size:12px;font-weight:700;color:var(--navy);line-height:1.4">'+esc(type)+'</div><span style="font-size:10px;font-weight:700;color:#7E57C2;background:#EDE7F6;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0">'+data.count+'× flagged</span></div>';
+     _supHTML += '<div style="font-size:10px;color:var(--grey);margin-top:3px;line-height:1.5">';
+     if (schoolArr.length) _supHTML += '<span style="font-weight:600">Schools:</span> '+esc(schoolPreview);
+     if (distArr.length) _supHTML += ' &middot; <span style="font-weight:600">'+(distArr.length===1?'District':'Districts')+':</span> '+esc(distArr.join(', '));
+     _supHTML += '</div></div></div>';
+   });
+   _supHTML += '</div></div></div>';
  }
 
 
@@ -2841,10 +2984,10 @@ ${tab==='overview'?`
      ${districts.length?'<div class="st-foot">Across '+districts.length+' district'+(districts.length!==1?'s':'')+' in '+activeProvinces.length+' province'+(activeProvinces.length!==1?'s':'')+'</div>':''}
    </div>
    <div class="stat-card orange">
-     <div class="st-title">Learners Reached</div>
+     <div class="st-title">Educators Supported</div>
      <div class="st-desc">The estimated number of learners who benefited from ${_lYour} intervention activities, based on what was reported</div>
-     <div class="st-num">${totalLearners.toLocaleString()}</div>
-     ${schoolSet.size?'<div class="st-foot">Average of ~'+Math.round(totalLearners/(schoolSet.size||1))+' learners per school</div>':''}
+     <div class="st-num">${totalEducators.toLocaleString()}</div>
+     ${schoolSet.size?'<div class="st-foot">Average of ~'+Math.round(totalEducators/(schoolSet.size||1))+' educators per school</div>':''}
    </div>
  </div>
 
@@ -2911,6 +3054,9 @@ ${tab==='overview'?`
 
  <!-- ═══ NEEDS YOUR ATTENTION ═══ -->
  ${_fuHTML}
+
+ <!-- ═══ RECOMMENDED SUPPORT ═══ -->
+ ${_supHTML}
 
  <!-- ═══ OPEN DDD DASHBOARD CTA ═══ -->
  <div style="background:linear-gradient(135deg,#074445 0%,#0F7B7D 60%,#0A6B4F 100%);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap">
@@ -3062,31 +3208,68 @@ ${tab==='tracker'?`
        }).join('')}
      </div>
 
-     <!-- Two-column breakdown -->
-     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-       <div>
-         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);margin-bottom:10px">What Was Decided</div>
-         ${Object.entries(decisionTypes).sort((a,b)=>b[1]-a[1]).length ? Object.entries(decisionTypes).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count]) => {
-           const maxD = Object.values(decisionTypes).reduce((a,b)=>Math.max(a,b),1);
-           const pct = Math.max(Math.round((count/maxD)*100), 6);
-           return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(type)+'</span><span style="font-size:11px;font-weight:700;color:var(--teal)">'+count+'×</span></div><div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--teal);border-radius:4px;transition:width .5s"></div></div></div>';
-         }).join('') : '<div style="text-align:center;color:var(--grey);padding:12px;font-size:11px">No decisions recorded yet</div>'}
-       </div>
-       <div>
-         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);margin-bottom:10px">What Was Done</div>
-         ${(function(){
-           var actionCounts = {};
-           acts.forEach(a => { if(a.action_taken) actionCounts[a.action_taken] = (actionCounts[a.action_taken]||0)+1; });
-           var sorted = Object.entries(actionCounts).sort((a,b)=>b[1]-a[1]);
-           if (!sorted.length) return '<div style="text-align:center;color:var(--grey);padding:12px;font-size:11px">No actions recorded yet</div>';
-           var maxA = sorted[0][1];
-           return sorted.slice(0,6).map(([type,count]) => {
-             var pct = Math.max(Math.round((count/maxA)*100), 6);
-             return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(type)+'</span><span style="font-size:11px;font-weight:700;color:var(--green)">'+count+'×</span></div><div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4CAF50;border-radius:4px;transition:width .5s"></div></div></div>';
-           }).join('');
-         })()}
-       </div>
-     </div>
+     <!-- Decision → Action matrix by entity -->
+     ${(function(){
+       // Group chains by district
+       var entityMap = {};
+       decs.forEach(function(d){
+         var det = d.details || {};
+         var dist = det.district || 'Unknown';
+         var prov = det.province || '';
+         var key = prov + '|' + dist;
+         if (!entityMap[key]) entityMap[key] = {province:prov, district:dist, chains:[], schoolSet:new Set()};
+         var schools = det.schools ? det.schools.split(',').map(function(s){return s.trim()}).filter(Boolean) : [];
+         schools.forEach(function(s){entityMap[key].schoolSet.add(s)});
+         var matchActs = acts.filter(function(a){return a.decision_id === d.id});
+         if (matchActs.length) {
+           matchActs.forEach(function(a){
+             entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'—'),action:a.action_taken||'—',status:a.status||'In Progress',date:d.date||'',schools:schools.join(', '),responsible:a.responsible||''});
+           });
+         } else {
+           entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'—'),action:'(no action logged)',status:'Planned',date:d.date||'',schools:schools.join(', '),responsible:''});
+         }
+       });
+       var entities = Object.entries(entityMap).sort(function(a,b){return b[1].chains.length - a[1].chains.length});
+       if (!entities.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No decision chains recorded yet</div>';
+       return '<div style="display:flex;flex-direction:column;gap:6px">' + entities.map(function(entry){
+         var key = entry[0], e = entry[1];
+         var isOpen = S._d2aExpanded[key];
+         var pCnt = e.chains.filter(function(c){return c.status==='Planned'}).length;
+         var ipCnt = e.chains.filter(function(c){return c.status==='In Progress'}).length;
+         var cCnt = e.chains.filter(function(c){return c.status==='Completed'}).length;
+         var html = '<div class="d2a-matrix">';
+         // District header
+         html += '<div class="d2a-district" onclick="toggleD2a(\''+esc(key.replace(/'/g,"\\'"))+'\')">';
+         html += '<span class="d2a-chevron'+(isOpen?' open':'')+'">▸</span>';
+         html += '<div class="d2a-entity"><div class="d2a-prov">'+esc(e.province)+'</div><div class="d2a-name">'+esc(e.district)+'</div></div>';
+         html += '<span class="d2a-school-cnt">'+e.schoolSet.size+' school'+(e.schoolSet.size!==1?'s':'')+'</span>';
+         html += '<div class="d2a-pills">';
+         if(pCnt) html += '<span class="d2a-pill p">'+pCnt+' Planned</span>';
+         if(ipCnt) html += '<span class="d2a-pill ip">'+ipCnt+' In Progress</span>';
+         if(cCnt) html += '<span class="d2a-pill c">'+cCnt+' Done</span>';
+         html += '</div></div>';
+         // Expanded rows
+         if (isOpen) {
+           html += '<div class="d2a-row-hdr"><span style="display:inline-grid;grid-template-columns:minmax(90px,.8fr) minmax(100px,1.2fr) minmax(100px,1.2fr) 80px 72px;gap:0;width:100%"><span>School(s)</span><span>Decided</span><span>Action</span><span>Status</span><span>Date</span></span></div>';
+           html += '<div class="d2a-rows">';
+           e.chains.forEach(function(c){
+             var sCls = c.status.replace(/\s+/g,'-');
+             var sIcon = c.status==='Completed'?'✓':c.status==='Planned'?'○':'●';
+             var shortSchool = c.schools.length > 28 ? c.schools.slice(0,25)+'…' : c.schools;
+             html += '<div class="d2a-row">';
+             html += '<div class="d2a-cell school" data-label="School(s): " title="'+esc(c.schools)+'">'+esc(shortSchool||'—')+'</div>';
+             html += '<div class="d2a-cell decision" data-label="Decided: " title="'+esc(c.decision)+'">'+esc(c.decision)+'</div>';
+             html += '<div class="d2a-cell action" data-label="Action: " title="'+esc(c.action)+'">'+esc(c.action)+'</div>';
+             html += '<div class="d2a-cell" data-label=""><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span></div>';
+             html += '<div class="d2a-cell" data-label="Date: " style="font-size:10px;color:var(--grey)">'+fmtDate(c.date)+'</div>';
+             html += '</div>';
+           });
+           html += '</div>';
+         }
+         html += '</div>';
+         return html;
+       }).join('') + '</div>';
+     })()}
    </div>
  </div>
 
@@ -3551,7 +3734,7 @@ function isFormDirty() {
     || f.action_type || f.decision_type || f.ddd_used
     || f.schools || f.insight_detail || f.insight_pass_rate
     || (f.subjects && f.subjects.length) || (f.grades && f.grades.length)
-    || (f.ddd_reports && f.ddd_reports.length) || f.learners_reached
+    || (f.ddd_reports && f.ddd_reports.length) || f.educators_supported
     || f.follow_up_desc || f.doc_url);
 }
 
