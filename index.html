@@ -474,6 +474,25 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal-box{background:#fff;border-radius:12px;max-width:400px;width:100%;max-height:85vh;overflow-y:auto;animation:modalIn .2s}
 @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+
+/* Visit history card */
+.visit-history-card{background:#f0f7f7;border:1px solid #d0e4e4;border-radius:8px;padding:12px 14px;margin-top:8px;margin-bottom:4px}
+.visit-history-card .vh-title{font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.visit-history-card .vh-summary{display:flex;gap:14px;margin-bottom:8px;padding:6px 10px;background:#e4f2f2;border-radius:6px;font-size:11.5px;color:var(--navy)}
+.visit-history-card .vh-summary span{display:flex;flex-direction:column;align-items:center}
+.visit-history-card .vh-summary strong{font-size:16px;font-weight:700;color:var(--teal-dk);line-height:1.1}
+.visit-history-card .vh-summary em{font-size:10px;font-style:normal;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px}
+.visit-history-card .vh-rows{max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#b0d0d0 transparent}
+.visit-history-card .vh-rows::-webkit-scrollbar{width:4px}
+.visit-history-card .vh-rows::-webkit-scrollbar-thumb{background:#b0d0d0;border-radius:2px}
+.visit-history-card .vh-rows.vh-collapsed{max-height:0;overflow:hidden}
+.visit-history-card .vh-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e0eded;font-size:12.5px;color:var(--navy)}
+.visit-history-card .vh-row:last-child{border-bottom:none}
+.visit-history-card .vh-school{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:10px}
+.visit-history-card .vh-count{font-size:11.5px;color:var(--navy);text-align:right;white-space:nowrap}
+.visit-history-card .vh-zero{color:#b0aeac;font-style:italic}
+.visit-history-card .vh-toggle{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;color:var(--teal-dk);cursor:pointer;background:none;border:none;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.visit-history-card .vh-toggle:hover{color:var(--navy)}
 </style>
 </head>
 <body>
@@ -1450,8 +1469,114 @@ function renderFormStart(){
 const PHASE_LABELS={P:'Primary',S:'Secondary',C:'Combined',I:'Intermediate'};
 function parseSchoolsArr(){return S.f.schools?S.f.schools.split(',').map(s=>s.trim()).filter(Boolean):[];}
 function addSchool(name){const arr=parseSchoolsArr();if(!arr.includes(name)){arr.push(name);S.f.schools=arr.join(', ');}render();}
-function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');render();}
+function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();}
 function toggleSchool(name){parseSchoolsArr().includes(name)?removeSchool(name):addSchool(name);}
+
+function getPrev2Terms(currentTerm) {
+  var parts = currentTerm.split(' ');
+  var termNum = parseInt(parts[1]) || 1;
+  var year = parseInt(parts[2]) || 2026;
+  var terms = [];
+  for (var i = 0; i < 2; i++) {
+    termNum = termNum - 1;
+    if (termNum < 1) { termNum = 4; year = year - 1; }
+    terms.push('Term ' + termNum + ' ' + year);
+  }
+  return terms;
+}
+function getSchoolVisitHistory(schoolNames) {
+  var lookbackTerms = getPrev2Terms(S.f.term);
+  var results = [];
+  for (var si = 0; si < schoolNames.length; si++) {
+    var school = schoolNames[si];
+    var byYou = 0;
+    var byColleagues = 0;
+    for (var di = 0; di < S.decisions.length; di++) {
+      var dec = S.decisions[di];
+      if (!dec.details || !dec.details.term) continue;
+      if (lookbackTerms.indexOf(dec.details.term) === -1) continue;
+      var decSchools = (dec.details.schools || '').split(',');
+      var match = false;
+      for (var k = 0; k < decSchools.length; k++) {
+        if (decSchools[k].trim() === school) { match = true; break; }
+      }
+      if (!match) continue;
+      if (dec.official_id && dec.official_id === S._officialId) { byYou++; }
+      else { byColleagues++; }
+    }
+    results.push({ school: school, byYou: byYou, byColleagues: byColleagues, total: byYou + byColleagues });
+  }
+  return results;
+}
+function renderVisitHistoryCard() {
+  var schools = parseSchoolsArr();
+  if (schools.length === 0) return '';
+  var history = getSchoolVisitHistory(schools);
+  var lookback = getPrev2Terms(S.f.term);
+  var tLabels = [];
+  for (var li = lookback.length - 1; li >= 0; li--) {
+    var lp = lookback[li].split(' ');
+    tLabels.push('T' + lp[1]);
+  }
+  var termLabel = tLabels.join(' & ');
+  var yearStart = lookback[lookback.length - 1].split(' ')[2];
+  var yearEnd = lookback[0].split(' ')[2];
+  var yearLabel = yearStart === yearEnd ? yearStart : yearStart + '\u2013' + yearEnd;
+
+  // Compute summary stats
+  var totalVisited = 0, totalNever = 0, grandTotal = 0, grandByYou = 0;
+  for (var j = 0; j < history.length; j++) {
+    if (history[j].total > 0) totalVisited++;
+    else totalNever++;
+    grandTotal += history[j].total;
+    grandByYou += history[j].byYou;
+  }
+
+  var COLLAPSE_THRESHOLD = 6;
+  var manySchools = schools.length > COLLAPSE_THRESHOLD;
+  var isCollapsed = manySchools && !S.f._vhExpanded;
+
+  var summaryBar = '';
+  if (manySchools) {
+    summaryBar = '<div class="vh-summary">'
+      + '<span><strong>' + schools.length + '</strong><em>Schools</em></span>'
+      + '<span><strong>' + totalVisited + '</strong><em>With visits</em></span>'
+      + '<span><strong>' + totalNever + '</strong><em>Not visited</em></span>'
+      + '<span><strong>' + grandTotal + '</strong><em>Total visits</em></span>'
+      + (grandByYou > 0 ? '<span><strong>' + grandByYou + '</strong><em>By you</em></span>' : '')
+      + '</div>';
+  }
+
+  var rows = '';
+  for (var i = 0; i < history.length; i++) {
+    var h = history[i];
+    var countText = '';
+    if (h.total === 0) {
+      countText = '<span class="vh-zero">No prior visits logged</span>';
+    } else {
+      var parts = [];
+      if (h.byYou > 0) parts.push(h.byYou + ' by you');
+      if (h.byColleagues > 0) parts.push(h.byColleagues + ' by colleague' + (h.byColleagues !== 1 ? 's' : ''));
+      countText = h.total + ' visit' + (h.total !== 1 ? 's' : '') + ' <span style="color:var(--grey);font-size:11px">(' + parts.join(', ') + ')</span>';
+    }
+    rows += '<div class="vh-row"><span class="vh-school">' + esc(h.school) + '</span><span class="vh-count">' + countText + '</span></div>';
+  }
+
+  var toggleBtn = '';
+  if (manySchools) {
+    toggleBtn = '<button class="vh-toggle" onclick="S.f._vhExpanded=!' + (S.f._vhExpanded ? 'true' : 'false') + ';render()">'
+      + (isCollapsed ? '&#9660; Show all ' + schools.length + ' schools' : '&#9650; Collapse school list')
+      + '</button>';
+  }
+
+  return '<div class="visit-history-card">'
+    + '<div class="vh-title">&#128203; Recent support at selected schools (' + termLabel + ' ' + yearLabel + ')</div>'
+    + summaryBar
+    + '<div class="vh-rows' + (isCollapsed ? ' vh-collapsed' : '') + '">' + rows + '</div>'
+    + toggleBtn
+    + '</div>';
+}
+
 function getAvailableSchools(){
   const d=S.f.district,c=S.f.circuit;
   if(!d||!SCHOOLS_MAP[d])return[];
@@ -1465,7 +1590,7 @@ function bulkSelectPhase(phase){
   const arr=parseSchoolsArr();
   const toAdd=phase==='ALL'?schools:schools.filter(s=>s[1]===phase);
   for(const s of toAdd){if(!arr.includes(s[0]))arr.push(s[0]);}
-  S.f.schools=arr.join(', ');render();
+  S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();
 }
 let _spItems=[];
 function schoolPickerHTML(){
@@ -1558,7 +1683,7 @@ function renderFormStep1(){
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
     <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
-    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}</div>
+    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${renderVisitHistoryCard()}</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
     <div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','HoD','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your designation..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your specialisation..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
     <div style="text-align:right;margin-top:12px"><button class="btn btn-teal" onclick="validateAndNext(0,1)">Next &rarr;</button></div>
