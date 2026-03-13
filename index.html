@@ -1435,12 +1435,12 @@ function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.
 function _refocusSchoolFilter(){if(S.f._schoolDDOpen){setTimeout(function(){const el=document.getElementById('spFilter');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}},30);}}
 function toggleSchool(name){parseSchoolsArr().includes(name)?removeSchool(name):addSchool(name);}
 
-function getPrev2Terms(currentTerm) {
+function getLookbackTerms(currentTerm) {
   var parts = currentTerm.split(' ');
   var termNum = parseInt(parts[1]) || 1;
   var year = parseInt(parts[2]) || 2026;
-  var terms = [];
-  for (var i = 0; i < 2; i++) {
+  var terms = [currentTerm];
+  for (var i = 0; i < 3; i++) {
     termNum = termNum - 1;
     if (termNum < 1) { termNum = 4; year = year - 1; }
     terms.push('Term ' + termNum + ' ' + year);
@@ -1448,7 +1448,7 @@ function getPrev2Terms(currentTerm) {
   return terms;
 }
 function getSchoolVisitHistory(schoolNames) {
-  var lookbackTerms = getPrev2Terms(S.f.term);
+  var lookbackTerms = getLookbackTerms(S.f.term);
   var results = [];
   for (var si = 0; si < schoolNames.length; si++) {
     var school = schoolNames[si];
@@ -1475,16 +1475,10 @@ function renderVisitHistoryCard() {
   var schools = parseSchoolsArr();
   if (schools.length === 0) return '';
   var history = getSchoolVisitHistory(schools);
-  var lookback = getPrev2Terms(S.f.term);
-  var tLabels = [];
-  for (var li = lookback.length - 1; li >= 0; li--) {
-    var lp = lookback[li].split(' ');
-    tLabels.push('T' + lp[1]);
-  }
-  var termLabel = tLabels.join(' & ');
-  var yearStart = lookback[lookback.length - 1].split(' ')[2];
-  var yearEnd = lookback[0].split(' ')[2];
-  var yearLabel = yearStart === yearEnd ? yearStart : yearStart + '\u2013' + yearEnd;
+  var lookback = getLookbackTerms(S.f.term);
+  var oldest = lookback[lookback.length - 1].split(' ');
+  var newest = lookback[0].split(' ');
+  var termLabel = 'T' + oldest[1] + ' ' + oldest[2] + ' \u2013 T' + newest[1] + ' ' + newest[2];
 
   // Compute summary stats
   var totalVisited = 0, totalNever = 0, grandTotal = 0, grandByYou = 0;
@@ -1533,7 +1527,7 @@ function renderVisitHistoryCard() {
   }
 
   return '<div class="visit-history-card">'
-    + '<div class="vh-title">&#128203; Recent support at selected schools (' + termLabel + ' ' + yearLabel + ')</div>'
+    + '<div class="vh-title">&#128203; Recent support at selected schools (' + termLabel + ')</div>'
     + summaryBar
     + '<div class="vh-rows' + (isCollapsed ? ' vh-collapsed' : '') + '">' + rows + '</div>'
     + toggleBtn
