@@ -3057,9 +3057,9 @@ ${tab==='tracker'?`
            entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'\u2014'),action:'(no action logged)',status:'Planned',date:d.date||'',schools:schools.join(', '),responsible:''});
          }
        });
-       var entities = Object.entries(entityMap).sort(function(a,b){return b[1].chains.length - a[1].chains.length});
+       var entities = Object.entries(entityMap).sort(function(a,b){var dA=a[1].district,dB=b[1].district;var natA=(!dA||dA==='All'||dA==='Unknown')?1:0;var natB=(!dB||dB==='All'||dB==='Unknown')?1:0;if(natA!==natB)return natA-natB;return dA.localeCompare(dB)});
        if (!entities.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No decision chains recorded yet</div>';
-       var mx = entities[0][1].chains.length || 1;
+       var mx = Math.max.apply(null,entities.map(function(e){return e[1].chains.length}))||1;
        var html = '';
        entities.forEach(function(entry){
          var key = entry[0], e = entry[1];
@@ -3072,7 +3072,7 @@ ${tab==='tracker'?`
          var cPct = Math.round((cCnt/mx)*100);
          var keyEsc = esc(key.replace(/'/g,"\\'"));
          html += '<div class="d2a-row'+(isOpen?' open':'')+'" onclick="toggleD2a(\''+keyEsc+'\')">';
-         html += '<div class="d2a-entity"><div class="d2a-prov">'+esc(e.province)+'</div><div class="d2a-name">'+esc(e.district)+'</div></div>';
+         html += '<div class="d2a-entity"><div class="d2a-prov">'+esc(e.province==='National'||!e.province?'National':e.province)+'</div><div class="d2a-name">'+esc(!e.district||e.district==='All'||e.district==='Unknown'?'All Districts':e.district)+'</div></div>';
          html += '<div class="d2a-right"><div class="d2a-bar">'+(pCnt?'<div class="d2a-bar-seg" style="width:'+pPct+'%;background:var(--blue)"></div>':'')+(ipCnt?'<div class="d2a-bar-seg" style="width:'+ipPct+'%;background:var(--orange)"></div>':'')+(cCnt?'<div class="d2a-bar-seg" style="width:'+cPct+'%;background:var(--green)"></div>':'')+'</div>';
          html += '<div class="d2a-counts">';
          if(ipCnt) html += '<span class="d2a-cnt ip"><span class="d2a-dot"></span>'+ipCnt+' In Progress</span>';
@@ -3084,7 +3084,9 @@ ${tab==='tracker'?`
            e.chains.forEach(function(c){
              var sCls = c.status.replace(/\s+/g,'-');
              var sIcon = c.status==='Completed'?'\u2713':c.status==='Planned'?'\u25CB':'\u25CF';
-             html += '<div class="d2a-chain"><div class="d2a-chain-school">'+esc(c.schools||'\u2014')+'</div><div class="d2a-chain-dec">Decided: '+esc(c.decision)+'</div><div class="d2a-chain-act">Action: '+esc(c.action)+'</div><div class="d2a-chain-foot"><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span><span class="d2a-chain-date">'+fmtDate(c.date)+'</span></div></div>';
+             var sArr = (c.schools||'').split(',').map(function(x){return x.trim()}).filter(Boolean);
+             var schoolLabel = sArr.length <= 3 ? esc(sArr.join(', ')||'\u2014') : '<strong>'+sArr.length+' schools</strong>';
+             html += '<div class="d2a-chain"><div class="d2a-chain-school">'+schoolLabel+'</div><div class="d2a-chain-dec">Decided: '+esc(c.decision)+'</div><div class="d2a-chain-act">Action: '+esc(c.action)+'</div><div class="d2a-chain-foot"><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span><span class="d2a-chain-date">'+fmtDate(c.date)+'</span></div></div>';
            });
            html += '</div>';
          }
