@@ -390,8 +390,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .chain{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:12px;overflow:hidden}
 .tap-hint{font-size:11px;color:var(--teal-md);font-weight:600;letter-spacing:.3px;margin-top:3px}
 .tap-chevron{font-size:18px;color:var(--teal);transition:transform .2s;font-weight:700}
-.demo-banner{background:linear-gradient(135deg,var(--blue-lt),var(--teal-lt));border:1px dashed var(--teal);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--teal-dk);text-align:center}
-.demo-banner strong{color:var(--navy)}
 
 /* TOOLKIT */
 .tk-wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
@@ -551,6 +549,20 @@ function getSelHint(val, hints) { return val && val !== 'Other' && hints[val] ? 
 // What triggered the intervention
 const INTERVENTION_TRIGGERS = ["Learners below 30% (not passing)","Learners at 30-39% (close to passing)","Learners missing one thing they need to be promoted","Big gap between SBA marks and exam marks","Learners absent a lot and doing badly","Progressed learners who need extra support","School flagged as underperforming (Circular D3)","Subject pass rate dropping from one term to the next","Parts of the curriculum not being covered","High educator absenteeism","Educator teaching outside their specialisation","Vacant educator post(s) affecting delivery","Educator not covering the curriculum on time","Educator needing subject content support","Educator not using data to inform teaching","High learner dropout or transfers out","Late or missing SA-SAMS submissions","School leadership or governance concerns","Other"];
 
+// School Observation Checklist
+const SCHOOL_OBS = [
+ {group:'APIP',key:'apip_current',label:'School has a current APIP with timelines and strategies'},
+ {group:'APIP',key:'apip_implemented',label:'SMT is actively implementing the APIP'},
+ {group:'Curriculum',key:'cur_plans',label:'Educators have lesson plans and assessment plans'},
+ {group:'Curriculum',key:'cur_dh_monitor',label:'DHs are monitoring lesson plans and curriculum coverage'},
+ {group:'Learner Work',key:'lw_sufficient',label:'Sufficient formal and informal activities in learner books'},
+ {group:'Learner Work',key:'lw_marking',label:'Educators are marking work and corrections are being done'},
+ {group:'Time Management',key:'tm_registers',label:'Time book and period register are well-managed'},
+ {group:'Time Management',key:'tm_learner_att',label:'Learner attendance is being tracked'},
+ {group:'Time Management',key:'tm_educator_att',label:'Educator attendance and leave control is in place'},
+ {group:'Time Management',key:'tm_departures',label:'No early departures or late arrivals unaccounted for'}
+];
+
 // PAM duty alignment (lightweight — what mandate does this action fulfil?)
 
 const DDD_TASKS = [
@@ -697,6 +709,7 @@ const S = {
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
+ obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
  doc_url:'',doc_name:'',
     sip_focus_areas:[],support_needed:[],support_level:'',doc_file:null,doc_file_name:'',
@@ -1002,52 +1015,12 @@ async function loadAll() {
  sb.from('interventions').select('*').order('entity_name')
  ]);
  S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
- // If empty, inject demo data so dashboard is useful immediately (unless user dismissed)
- const demoDismissed=(()=>{try{return localStorage.getItem('ddd_demo_dismissed')==='1'}catch(e){return false}})();
- if (S.decisions.length === 0 && !demoDismissed) injectDemo();
  S.loading = false; S.error = null;
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
  } catch(e) { S.error = e.message; S.loading = false; }
  render();
 }
-
-function injectDemo() {
- const demo_decs = [
- {id:'DEMO_D0',ddd_tool:'FET Promotion Profiles, Learner Chart Report',data_viewed:'Grade 10 Maths results — Lejweleputswa',insight:'School B Grade 10 Maths pass rate dropped from 58% to 41% between Term 1 and Term 3 2025. Learner Chart Report showed 35 learners clustered at 25-29% — just below passing threshold.',decision_made:'Provide targeted support to identified learners',contextual_factors:'Teaching outside specialisation | Only 1 qualified Maths educator for 4 Grade 10 classes',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2025-10-14',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School B',term:'Term 4 2025',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Mathematics'],grades:['10'],description:'DDD data review identified School B Grade 10 Maths as critical. 35 learners clustered just below pass mark. Decided to set up targeted after-school support with subject advisor and learner groups by performance level.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Learner Chart Report'],decision_type:'Provide targeted support to identified learners',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 qualified Maths educator for 4 Grade 10 classes. 2 educators teaching Maths outside their specialisation.',educators_supported:3,follow_up:false,follow_up_desc:'',support_needed:['A specialist to help with a specific subject','Mentoring for the principal or HoDs']}},
- {id:'DEMO_D1',ddd_tool:'School Dashboard, Learner Chart Report',data_viewed:'Maths pass rates for Grade 9 — JTG district',insight:'12 schools below 40% in Maths, concentrated in 3 circuits',decision_made:'Send in subject support',contextual_factors:'Vacant post(s), Teaching outside specialisation',made_by:'Mr V Teise (Circuit Manager)',date:'2026-01-28',logged_by:'V Teise',
- details:{province:'Northern Cape',district:'John Taolo Gaetsewe',schools:'School C, School D, School E',term:'Term 1 2026',activity_type:'School support visit',intervention_theme:'District Support',subjects:['Mathematics'],grades:['9'],description:'Targeted support visit to 3 underperforming schools in JTG. Reviewed Maths pass rates and agreed on intervention plan.',ddd_used:'yes-direct',ddd_reports:['School Dashboard','Learner Chart Report'],decision_type:'Send in subject support',ctx_staffing:['Vacant post(s)','Teaching outside specialisation'],ctx_resources:['Textbook shortage'],ctx_learners:['High absenteeism'],ctx_notes:'No permanent Maths educator at School E since Term 3 2025',educators_supported:8,follow_up:true,follow_up_desc:'Return visit in 2 weeks to check if Subject Improvement Plan has been implemented',support_needed:['Staffing problem \u2014 needs to go to HR/PED','More visits from subject advisors']}},
- {id:'DEMO_D2',ddd_tool:'FET Promotion Profiles',data_viewed:'Grade 12 promotion predictions — Lejweleputswa',insight:'15% of Grade 12 learners predicted to fail Physical Sciences',decision_made:'Set up extra classes',contextual_factors:'Infrastructure issues, Overcrowded classrooms',made_by:'Ms F Moshoeshoe (Cluster Lead)',date:'2026-02-03',logged_by:'F Moshoeshoe',
- details:{province:'Free State',district:'Lejweleputswa',schools:'School F, School B, School M',term:'Term 1 2026',activity_type:'Data review meeting',intervention_theme:'Underperforming Schools',subjects:['Physical Sciences','Mathematics'],grades:['12'],description:'District data review meeting to identify at-risk Grade 12 learners and plan Saturday classes.',ddd_used:'yes-direct',ddd_reports:['FET Promotion Profiles','Term 4 Promotion Predictions'],decision_type:'Set up extra classes',ctx_staffing:['All posts filled'],ctx_resources:['Infrastructure issues'],ctx_learners:['Overcrowded classrooms'],ctx_notes:'Only 1 lab for 4 Grade 12 Science classes at School B',educators_supported:12,follow_up:true,follow_up_desc:'Monitor Saturday class attendance after first 3 sessions',support_needed:['Building or infrastructure problem','Learning materials and resources']}},
- {id:'DEMO_D3',ddd_tool:'Senior Phase Promotion Profiles',data_viewed:'Grade 7 English FAL results — Mopani East',insight:'62% of learners below level 4 in English FAL across 5 schools',decision_made:'Adjust teaching strategy',contextual_factors:'Language barriers',made_by:'Mr K Makatu (Provincial Manager)',date:'2026-02-10',logged_by:'K Makatu',
- details:{province:'Limpopo',district:'Mopani East',schools:'School K, School N, School J',term:'Term 1 2026',activity_type:'Workshop / training session',intervention_theme:'Intermediate & GET Phase',subjects:['English FAL','English HL'],grades:['7','8'],description:'English literacy workshop for 12 educators. Focused on reading comprehension strategies and scaffolding techniques.',ddd_used:'yes-informed',ddd_reports:['Senior Phase Promotion Profiles','Curriculum Overview'],decision_type:'Adjust teaching strategy',ctx_staffing:['Teaching outside specialisation'],ctx_resources:['Textbook shortage','No devices/connectivity'],ctx_learners:['Language barriers','Welfare concerns'],ctx_notes:'3 schools in deep rural area with no internet connectivity',educators_supported:12,follow_up:false,follow_up_desc:'',support_needed:['Learning materials and resources','A specialist to help with a specific subject']}},
- {id:'DEMO_D4',ddd_tool:'',data_viewed:'Routine monitoring visit',insight:'HODs not conducting class visits or checking educator files',decision_made:'Escalate to management',contextual_factors:'Acting principal/HoD',made_by:'Ms P Mtyobo (Cluster Lead)',date:'2026-02-12',logged_by:'P Mtyobo',
- details:{province:'Eastern Cape',district:'Sarah Baartman',schools:'School I, School L',term:'Term 1 2026',activity_type:'Monitoring / follow-up visit',intervention_theme:'District Support',subjects:['Mathematics','Natural Sciences'],grades:['4','5','6'],description:'Monitoring visit found poor curriculum coverage. HODs not conducting class visits. Escalated to District Director.',ddd_used:'no',ddd_reports:[],decision_type:'Escalate to management',ctx_staffing:['Acting principal/HoD','High educator absenteeism'],ctx_resources:['LTSM not delivered'],ctx_learners:['High absenteeism'],ctx_notes:'School has had acting principal for 18 months',educators_supported:4,follow_up:true,follow_up_desc:'District Director to conduct accountability visit within 10 days',support_needed:['Mentoring for the principal or HoDs','Staffing problem \u2014 needs to go to HR/PED','Learner welfare or psychosocial support']}},
- {id:'DEMO_D5',ddd_tool:'Term to Date, School Achievement Report',data_viewed:'SBA vs Exam deviation analysis — Pinetown',insight:'4 schools show 20%+ SBA-Exam gap in Maths Literacy',decision_made:'Investigate SBA-exam gap',contextual_factors:'',made_by:'Ms R Sikhwari (Provincial Manager)',date:'2026-02-14',logged_by:'R Sikhwari',
- details:{province:'KwaZulu-Natal',district:'Pinetown',schools:'School O, School H, School G',term:'Term 1 2026',activity_type:'Lesson observation',intervention_theme:'DBE Mentorship Programme',subjects:['Mathematical Literacy','Mathematics'],grades:['10','11'],description:'Observed 6 Maths Lit lessons to investigate SBA-Exam gap. Found assessments not aligned to exam standards.',ddd_used:'yes-direct',ddd_reports:['Term to Date','School Achievement Report'],decision_type:'Investigate SBA-exam gap',ctx_staffing:['All posts filled'],ctx_resources:['Adequate'],ctx_learners:['No major concerns'],ctx_notes:'',educators_supported:6,follow_up:true,follow_up_desc:'Subject advisors to moderate SBA tasks for Term 2 before administration',support_needed:['More visits from subject advisors']}}
- ];
-
- const demo_acts = [
- {id:'DEMO_A0',decision_id:'DEMO_D0',action_taken:'Learners grouped into support bands',responsible:'Ms F Moshoeshoe & Mr T Mokoena (Subject Advisor)',status:'Completed',target_date:'2025-11-30',notes:'35 at-risk learners grouped by gap analysis. 3x weekly after-school Maths sessions (Tue/Thu/Sat) for 6 weeks. Focused on algebra, functions, and exam technique. Subject advisor co-taught with educators.',logged_by:'F Moshoeshoe',supporting_doc_url:'https://docs.google.com/spreadsheets/d/demo-learner-profiles-gr10',supporting_doc_name:'Grade 10 Maths Learner Profiles & Attendance'},
- {id:'DEMO_A1',decision_id:'DEMO_D1',action_taken:'Curriculum pacing support',responsible:'Mr V Teise',status:'In Progress',target_date:'2026-02-14',notes:'Follow-up: Return visit in 2 weeks to check if Subject Improvement Plan has been implemented',logged_by:'V Teise',supporting_doc_url:'https://docs.google.com/document/d/demo-sip-jtg',supporting_doc_name:'Maths SIP — JTG Schools'},
- {id:'DEMO_A2',decision_id:'DEMO_D2',action_taken:'Extra lessons / revision classes',responsible:'Ms F Moshoeshoe',status:'In Progress',target_date:'2026-03-01',notes:'Saturday classes starting 22 Feb, 08:00-12:00',logged_by:'F Moshoeshoe',supporting_doc_url:'',supporting_doc_name:''},
- {id:'DEMO_A3',decision_id:'DEMO_D3',action_taken:'Educator coaching / mentoring',responsible:'Mr K Makatu',status:'Completed',target_date:'2026-02-10',notes:'12 educators trained in reading comprehension strategies',logged_by:'K Makatu',supporting_doc_url:'https://drive.google.com/file/d/demo-register',supporting_doc_name:'Workshop attendance register'},
- {id:'DEMO_A4',decision_id:'DEMO_D4',action_taken:'Referral to SMT / DMT / PED',responsible:'Ms P Mtyobo',status:'Planned',target_date:'2026-02-22',notes:'Follow-up: District Director to conduct accountability visit within 10 days',logged_by:'P Mtyobo',supporting_doc_url:'',supporting_doc_name:''},
- {id:'DEMO_A5',decision_id:'DEMO_D5',action_taken:'SBA targets set with learners',responsible:'Ms R Sikhwari',status:'In Progress',target_date:'2026-03-15',notes:'Follow-up: Subject advisors to moderate SBA tasks for Term 2',logged_by:'R Sikhwari',supporting_doc_url:'',supporting_doc_name:''}
- ];
-
- const demo_outs = [
- {id:'DEMO_O0',action_id:'DEMO_A0',intervention_id:null,description:'Grade 10 Maths pass rate at School B improved from 41% (Term 3) to 64% (Term 4). Of the 35 targeted learners, 23 moved above the pass threshold — a 66% success rate. Average mark for the group improved by 12 percentage points.',metric:'Pass rate improvement',value:'41% → 64% (+23 percentage points)',evidence:'SA-SAMS Term 4 2025 results, verified against DDD FET Promotion Profiles report. Attendance register confirms 89% attendance across the 18 after-school sessions.',date:'2026-01-20',logged_by:'F Moshoeshoe'},
- {id:'DEMO_O1',action_id:'DEMO_A3',intervention_id:null,description:'8 of 12 educators now using scaffolded reading approach in lessons. Learner participation visibly improved in follow-up observation.',metric:'Educator adoption rate',value:'67% (8/12)',evidence:'Follow-up lesson observations — 24 Feb 2026',date:'2026-02-24',logged_by:'K Makatu'}
- ];
-
- S.decisions = demo_decs;
- S.actions = demo_acts;
- S.outcomes = demo_outs;
-}
-
-function dismissDemo(){try{localStorage.setItem('ddd_demo_dismissed','1')}catch(e){}S.decisions=[];S.actions=[];S.outcomes=[];render();}
 
 // RENDER 
 function render() {
@@ -1854,6 +1827,7 @@ function renderFormStep4(){
     <div class="field"><label>How Much Support Is Needed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">How much help does this school need?</div><div class="radio-grp"><label><input type="radio" name="supportLvl" value="light" ${S.f.support_level==='light'?'checked':''} onchange="S.f.support_level='light';render()"><span><strong>Light touch</strong> \u2014 school is coping, just needs a check-in now and then</span></label><label><input type="radio" name="supportLvl" value="regular" ${S.f.support_level==='regular'?'checked':''} onchange="S.f.support_level='regular';render()"><span><strong>Regular support</strong> \u2014 needs regular visits, e.g. every two weeks</span></label><label><input type="radio" name="supportLvl" value="intensive" ${S.f.support_level==='intensive'?'checked':''} onchange="S.f.support_level='intensive';render()"><span><strong>Intensive support</strong> \u2014 serious challenges, needs a team effort from multiple people</span></label></div></div>
     <div class="field"><label>School context</label><div class="hint">Tap all that apply across schools visited</div><div style="margin-bottom:8px"><span class="tag-grp-title">Staffing:</span><div class="tags" style="display:inline-flex">${CTX_STAFFING.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_staffing.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_staffing,'${s}',this.checked,'staffing')"><span>${s}</span></label>`).join('')}</div></div><div style="margin-bottom:8px"><span class="tag-grp-title">Resources:</span><div class="tags" style="display:inline-flex">${CTX_RESOURCES.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_resources.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_resources,'${s}',this.checked,'resources')"><span>${s}</span></label>`).join('')}</div></div><div><span class="tag-grp-title">Learners:</span><div class="tags" style="display:inline-flex">${CTX_LEARNERS.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_learners.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_learners,'${s}',this.checked,'learners')"><span>${s}</span></label>`).join('')}</div></div></div>
     <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025..." oninput="S.f.ctx_notes=this.value">${esc(S.f.ctx_notes)}</textarea></div>
+    ${(S.f.activity_type==='School support visit'||S.f.activity_type==='Monitoring / follow-up visit')?`<div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:12px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:10px;color:var(--grey);margin-top:1px">Optional — quick check of school management systems</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:10px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E8F5E9':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:11px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\\x27\\x27":"\\x27yes\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\\x27\\x27":"\\x27no\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>`:''}
     <div class="field-row"><div class="field"><label>Educators / staff supported</label><div class="hint">Number of educators or officials you worked with</div><input type="number" placeholder="e.g. 8" min="0" value="${S.f.educators_supported}" oninput="S.f.educators_supported=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
     ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><textarea rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation..." oninput="S.f.follow_up_desc=this.value">${esc(S.f.follow_up_desc)}</textarea></div>`:''}
     <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Attach a plan, report, sign-in register, or SIP \u2014 or paste a link</div>
@@ -1878,7 +1852,7 @@ function renderFormReview(){
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('SIP Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_type==='Other'&&f.decision_other?'Other: '+f.decision_other:f.decision_type)}${rvRow('Intervention activity',f.action_type==='Other'&&f.action_other?'Other: '+f.action_other:f.action_type)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving?'disabled':''} style="min-width:160px">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
   </div></div>`;
 }
@@ -2062,6 +2036,7 @@ async function submitForm() {
  insight_learners_affected:S.f.insight_learners_affected?parseInt(S.f.insight_learners_affected):null,
  decision_type:S.f.decision_type==='Other'&&S.f.decision_other?'Other: '+S.f.decision_other:S.f.decision_type,
  ctx_staffing:S.f.ctx_staffing, ctx_resources:S.f.ctx_resources, ctx_learners:S.f.ctx_learners, ctx_notes:S.f.ctx_notes,
+ obs:Object.assign({},S.f.obs),
  educators_supported:S.f.educators_supported ? parseInt(S.f.educators_supported) : null,
  follow_up:S.f.follow_up, follow_up_desc:S.f.follow_up_desc,
       sip_focus_areas:S.f.sip_focus_areas, support_needed:S.f.support_needed, support_level:S.f.support_level,
@@ -2127,7 +2102,6 @@ async function submitForm() {
  if (r2.error) throw r2.error;
 
  S.submitted = true;
-    try{localStorage.setItem('ddd_demo_dismissed','1')}catch(e){}
     try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
  await loadAll();
  } catch(e) {
@@ -2146,6 +2120,7 @@ function resetForm() {
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', decision_type:'', decision_other:'', action_type:'', action_other:'',
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
+ obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'',
     sip_focus_areas:[], support_needed:[], support_level:'', doc_file:null, doc_file_name:'',
@@ -2295,9 +2270,9 @@ function exportAllDataCSV() {
  const exportAllowed = (S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za';
  if (!exportAllowed) { showToast('Export is restricted to programme administrators'); return; }
 
- const decs = (S.decisions || []).filter(d => !d.id?.startsWith('DEMO_'));
- const acts = (S.actions || []).filter(a => !a.id?.startsWith('DEMO_'));
- const outs = (S.outcomes || []).filter(o => !o.id?.startsWith('DEMO_'));
+ const decs = S.decisions || [];
+ const acts = S.actions || [];
+ const outs = S.outcomes || [];
 
  if (decs.length === 0) { showToast('No real data to export yet — only demo data is loaded'); return; }
 
@@ -2328,6 +2303,7 @@ function exportAllDataCSV() {
    'Insight','Decision Type','Educators Supported',
    'Insight Type','Insight Pass Rate','Insight Learners Affected','Insight Educator Absent','Insight Attendance Days','Insight SBA-Exam Gap','Insight Curriculum Pct','Intervention Trigger',
    'Barriers (Staffing)','Barriers (Resources)','Barriers (Learners)','Context Notes',
+   'Obs: APIP Current','Obs: APIP Implemented','Obs: Lesson Plans','Obs: DH Monitoring','Obs: Learner Activities','Obs: Marking Done','Obs: Time Registers','Obs: Learner Attendance','Obs: Educator Attendance','Obs: Departures Controlled',
    'Follow-Up','Follow-Up Description','SIP Focus Areas','Support Needed','Support Level',
    'Action Taken','Action Responsible','Action Status','Action Notes',
    'Supporting Doc','Supporting Doc URL','Outcome Metric','Outcome Value','Outcome Description',
@@ -2389,6 +2365,7 @@ function buildExportRow(d, det, a, o) {
    arrJoin(det.ctx_resources),
    arrJoin(det.ctx_learners),
    det.ctx_notes || '',
+   (det.obs||{}).apip_current||'',(det.obs||{}).apip_implemented||'',(det.obs||{}).cur_plans||'',(det.obs||{}).cur_dh_monitor||'',(det.obs||{}).lw_sufficient||'',(det.obs||{}).lw_marking||'',(det.obs||{}).tm_registers||'',(det.obs||{}).tm_learner_att||'',(det.obs||{}).tm_educator_att||'',(det.obs||{}).tm_departures||'',
    det.follow_up ? 'Yes' : 'No',
    det.follow_up_desc || '',
    arrJoin(det.sip_focus_areas),
@@ -2433,7 +2410,6 @@ function renderDashboard() {
  const outs = allOuts.filter(o => actIds.has(o.action_id));
 
  const now = new Date();
- const isDemo = decs[0]?.id?.startsWith('DEMO_');
 
  // ── CORE METRICS ──
  const totalActivities = decs.length;
@@ -2453,6 +2429,7 @@ function renderDashboard() {
  const monthlyData = {};
  const triggerCounts = {};
  const supportRequests = [];
+ const obsYes = {}, obsNo = {}, obsSchools = {};
 
  decs.forEach(d => {
    const det = d.details || {};
@@ -2537,6 +2514,15 @@ function renderDashboard() {
      det.support_needed.forEach(function(sn){
        if (sn === 'On track \u2014 keep doing what we\'re doing') return;
        supportRequests.push({need:sn, schools:sSchools, district:det.district||'', province:det.province||'', date:d.date||'', loggedBy:d.made_by||det.official_name||'', subjects:det.subjects||[]});
+     });
+   }
+   // Collect school observations
+   if (det.obs) {
+     const oSchool = det.schools || '(unknown)';
+     SCHOOL_OBS.forEach(function(o){
+       var v = det.obs[o.key];
+       if (v === 'yes') { obsYes[o.key] = (obsYes[o.key]||0)+1; }
+       if (v === 'no') { obsNo[o.key] = (obsNo[o.key]||0)+1; if(!obsSchools[o.key])obsSchools[o.key]=[];obsSchools[o.key].push(oSchool); }
      });
    }
  });
@@ -2705,7 +2691,7 @@ function renderDashboard() {
        var _f=followUpsWithAge[_fi];
        var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
        var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
-       var _isOwner = !_f.officialId || _f.officialId === S._officialId || (_f.id||'').startsWith('DEMO_');
+       var _isOwner = !_f.officialId || _f.officialId === S._officialId;
        _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+(_f.loggedBy?' &middot; '+esc(_f.loggedBy):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div>';
        if (_isOwner) {
          _fuHTML += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="markFollowUpDone(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit">✓ Done</button><button onclick="logFollowUpVisit(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit">Log Follow-up</button></div>';
@@ -2771,7 +2757,7 @@ function renderDashboard() {
  // RENDER
  // ═══════════════════════════════════
  return `<div class="dash-wrap">
- ${isDemo ? '<div class="demo-banner"><strong>Demo data shown</strong> — log your first activity and this will be replaced with your real data <button onclick="dismissDemo()" style="margin-left:8px;background:var(--teal);color:#fff;border:none;border-radius:4px;padding:2px 10px;cursor:pointer;font-size:11px">Dismiss</button></div>' : ''}
+
 
  ${renderFilterBar(decs)}
 
@@ -3010,6 +2996,9 @@ ${tab==='trends'?`
    </div>
  </div>
 
+ <!-- ═══ SCHOOL OBSERVATIONS ═══ -->
+ ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));return '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>School Observation Findings</h3><span style="font-size:11px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc">On-the-ground findings from school visits — what DDD data cannot show you.</div>'+(issues.length?'<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Issues found</div><div style="display:grid;gap:4px;margin-bottom:12px">'+issues.map(o=>{const n=obsNo[o.key]||0;const schools=(obsSchools[o.key]||[]).join(', ');return '<div style="padding:8px 10px;border-radius:6px;background:#FFEBEE;border-left:3px solid var(--red)"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1;line-height:1.4">'+esc(o.label)+'</span><span style="font-size:11px;font-weight:700;color:var(--red);white-space:nowrap">'+n+'× not in place</span></div>'+(schools?'<div style="font-size:10px;color:var(--grey);margin-top:3px">'+esc(schools)+'</div>':'')+'</div>';}).join('')+'</div>':'')+(inPlace.length?'<div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">In place</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+inPlace.map(o=>'<span style="font-size:11px;background:#E8F5E9;color:var(--green-dk);padding:3px 8px;border-radius:4px;line-height:1.4">'+esc(o.label)+' ('+obsYes[o.key]+'×)</span>').join('')+'</div>':'')+'</div></div>';})()}
+
  <!-- ═══ ACTIVITY BREAKDOWN ═══ -->
  ${actTypes.length ? `<div class="dash-section">
    <div class="dash-section-hdr"><h3>What Types of Support Are You Doing?</h3><span style="font-size:11px;color:var(--grey)">${totalActivities} total</span></div>
@@ -3142,8 +3131,7 @@ ${tab==='tracker'?`
          var schools = det.schools || '';
          var district = det.district || '';
          var isMine = a.official_id === S._officialId;
-         var isDemo = (a.id||'').startsWith('DEMO_');
-
+ 
          var statusClass = a.status === 'Completed' ? 'completed' : a.status === 'Planned' ? 'planned' : 'in-progress';
          var statusColor = a.status === 'Completed' ? 'var(--green)' : a.status === 'Planned' ? 'var(--blue)' : 'var(--orange)';
          var statusBg = a.status === 'Completed' ? 'var(--green-lt)' : a.status === 'Planned' ? '#E3F2FD' : '#FFF3E0';
@@ -3161,14 +3149,14 @@ ${tab==='tracker'?`
          card += '</div>';
 
          // Action buttons — only for owner
-         if (isMine && !isDemo && a.status !== 'Completed') {
+         if (isMine && a.status !== 'Completed') {
            card += '<div style="display:flex;gap:6px;margin-top:8px">';
            if (a.status === 'Planned') {
              card += '<button onclick="updateActionStatus(\''+a.id+'\',\'In Progress\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s">Start</button>';
            }
            card += '<button onclick="updateActionStatus(\''+a.id+'\',\'Completed\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s">✓ Mark Complete</button>';
            card += '</div>';
-         } else if (!isMine && !isDemo && a.status !== 'Completed') {
+         } else if (!isMine && a.status !== 'Completed') {
            card += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only ' + esc(a.responsible || 'the person who logged this') + ' can update this action</div>';
          }
 
