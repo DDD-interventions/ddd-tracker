@@ -124,7 +124,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .btn.secondary{background:#fff;border:1px solid #D0D7DE;color:#111827}
 .btn.secondary:hover{background:#F3F4F6}
 .btn.secondary:active{transform:translateY(1px)}
-.btn.pill{border-radius:999px;padding:10px 14px}
 .btn.pill.btn-sm{padding:8px 12px}
 
 .btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:var(--teal-dk)}
@@ -229,28 +228,33 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-section-hdr h3{font-size:14px;font-weight:700;color:var(--navy)}
 .dash-section-body{padding:14px 16px}
 .dash-section-desc{font-size:12px;color:var(--grey-dk);line-height:1.6;margin-bottom:12px}
-.d2a-matrix{border:1px solid #E0E3E8;border-radius:8px;overflow:hidden;margin-bottom:4px}
-.d2a-district{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;background:#FAFBFC;border-bottom:1px solid #E8EBF0;user-select:none;transition:background .15s}
-.d2a-district:hover{background:#F0F3F6}
-.d2a-district .d2a-chevron{font-size:10px;color:var(--grey);transition:transform .2s;width:14px;text-align:center;flex-shrink:0}
-.d2a-district .d2a-chevron.open{transform:rotate(90deg)}
-.d2a-district .d2a-entity{flex:1;min-width:0}
-.d2a-district .d2a-prov{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);line-height:1}
-.d2a-district .d2a-name{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px;line-height:1.3}
-.d2a-district .d2a-pills{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
-.d2a-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap}
-.d2a-pill.p{background:#E3F2FD;color:var(--blue)}.d2a-pill.ip{background:#FFF3E0;color:var(--orange)}.d2a-pill.c{background:var(--green-lt);color:var(--green-dk)}
-.d2a-school-cnt{font-size:10px;color:var(--grey);font-weight:500;flex-shrink:0;margin-right:4px}
-.d2a-rows{background:#fff;border-bottom:1px solid #E8EBF0}
-.d2a-row{display:grid;grid-template-columns:minmax(90px,.8fr) minmax(100px,1.2fr) minmax(100px,1.2fr) 80px 72px;gap:0;padding:8px 14px 8px 36px;border-top:1px solid #F0F2F5;font-size:11px;align-items:center}
-.d2a-row:first-child{border-top:none}
-.d2a-row-hdr{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);padding:6px 14px 4px 36px;background:#F8F9FB;border-top:1px solid #E8EBF0}
-.d2a-row-hdr>span{display:inline}
-.d2a-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--navy)}
-.d2a-cell.school{font-weight:600;color:var(--grey-dk)}.d2a-cell.decision{color:var(--teal);font-weight:600}.d2a-cell.action{color:var(--navy)}
+.d2a-tbl{border:1px solid #E0E3E8;border-radius:8px;overflow:hidden}
+.d2a-tbl-hdr{display:grid;grid-template-columns:1fr 52px minmax(80px,1fr) 28px 28px 28px;gap:0;padding:6px 12px;background:#F0F2F5;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);align-items:center}
+.d2a-tbl-hdr .d2a-tbl-c4,.d2a-tbl-hdr .d2a-tbl-c5,.d2a-tbl-hdr .d2a-tbl-c6{text-align:center}
+.d2a-tbl-row{display:grid;grid-template-columns:1fr 52px minmax(80px,1fr) 28px 28px 28px;gap:0;padding:9px 12px;border-top:1px solid #ECEFF1;cursor:pointer;transition:background .15s;align-items:center}
+.d2a-tbl-row:hover{background:#F8FAFA}
+.d2a-tbl-open{background:#F0F8F8}
+.d2a-tbl-prov{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--grey);line-height:1}
+.d2a-tbl-name{font-size:12px;font-weight:700;color:var(--navy);margin-top:1px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d2a-tbl-c2{font-size:11px;color:var(--grey-dk);text-align:center;font-weight:600}
+.d2a-tbl-c4,.d2a-tbl-c5,.d2a-tbl-c6{font-size:11px;text-align:center;font-weight:700;color:#ccc}
+.d2a-n-p{color:var(--blue)}.d2a-n-ip{color:var(--orange)}.d2a-n-c{color:var(--green)}
+.d2a-bar-bg{height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden;display:flex}
+.d2a-bar-seg{height:100%;transition:width .4s}
+.d2a-tbl-total{display:grid;grid-template-columns:1fr 52px minmax(80px,1fr) 28px 28px 28px;gap:0;padding:9px 12px;border-top:2px solid #D0D5DD;background:#F8F9FB;align-items:center;font-size:12px;color:var(--navy)}
+.d2a-tbl-total .d2a-tbl-c2{font-size:12px}
+.d2a-exp{background:#fff;border-top:1px solid #E8EBF0;padding:4px 0}
+.d2a-exp-row{display:flex;gap:8px;padding:7px 12px 7px 24px;border-top:1px solid #F5F5F5;align-items:flex-start;font-size:11px}
+.d2a-exp-row:first-child{border-top:none}
+.d2a-exp-school{font-size:10px;font-weight:600;color:var(--grey-dk);min-width:0;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.d2a-exp-mid{flex:1;min-width:0}
+.d2a-exp-dec{font-size:11px;font-weight:600;color:var(--teal);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d2a-exp-act{font-size:10px;color:var(--navy);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d2a-exp-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
+.d2a-exp-date{font-size:9px;color:var(--grey)}
 .d2a-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
 .d2a-badge.Planned{background:#E3F2FD;color:var(--blue)}.d2a-badge.In-Progress{background:#FFF3E0;color:var(--orange)}.d2a-badge.Completed{background:var(--green-lt);color:var(--green-dk)}
-@media(max-width:700px){.d2a-row{grid-template-columns:1fr;gap:2px;padding:8px 14px 8px 28px}.d2a-row-hdr{display:none}.d2a-cell::before{content:attr(data-label);font-size:9px;font-weight:600;color:var(--grey);margin-right:4px}.d2a-district{flex-wrap:wrap}}
+@media(max-width:500px){.d2a-tbl-hdr,.d2a-tbl-row,.d2a-tbl-total{grid-template-columns:1fr 40px minmax(60px,1fr) 24px 24px 24px;padding:8px 8px}.d2a-tbl-name{font-size:11px}.d2a-tbl-c4,.d2a-tbl-c5,.d2a-tbl-c6{font-size:10px}.d2a-exp-row{padding:6px 8px 6px 16px}.d2a-exp-school{max-width:70px}}
 [role="button"]:active{background:#F0F8F8 !important;transform:scale(.99)}
 .dash-subnav{display:flex;flex-wrap:wrap;gap:6px;overflow-x:visible;padding:8px 16px 6px;position:sticky;top:0;z-index:50;background:#fff;margin:0 -16px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-bottom:1px solid #e0e0e0}
 .dash-subnav::-webkit-scrollbar{display:none}
@@ -304,7 +308,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .update-banner-btn.secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
 .fade-in{animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.empty{text-align:center;padding:32px;color:var(--grey);font-size:13px;font-style:italic}
 
 /* File upload */
 .upload-area{border:2px dashed #c8c6c4;border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc}
@@ -352,7 +355,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .review-row:last-child{border:none}
 .review-label{color:var(--grey)}
 .review-value{font-weight:600;color:var(--navy);text-align:right;max-width:60%}
-.source-tag{display:inline-block;font-size:9px;background:var(--teal-lt);color:var(--teal);padding:2px 6px;border-radius:3px;margin-bottom:6px;font-weight:600}
 .checkbox-grp{display:flex;flex-direction:column;gap:5px}
 .checkbox-grp label{display:flex;align-items:flex-start;gap:8px;font-size:13px;padding:7px 10px;border:1px solid #e1dfdd;border-radius:4px;cursor:pointer;font-weight:400;line-height:1.4}
 .checkbox-grp label:hover{background:#f3f2f1}
@@ -1708,6 +1710,7 @@ function renderFormStep2(){
     <div class="field"><label>Grade(s)</label><div class="hint">Tap all that apply</div><div class="tags">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Gr ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><textarea rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea></div>
+    ${(S.f.activity_type==='School support visit'||S.f.activity_type==='Monitoring / follow-up visit')?`<div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:12px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:10px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:10px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E8F5E9':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:11px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\\x27\\x27":"\\x27yes\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\\x27\\x27":"\\x27no\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>`:''}
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=0;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(1,2)">Next &rarr;</button></div>
   </div></div>`;
 }
@@ -1827,7 +1830,6 @@ function renderFormStep4(){
     <div class="field"><label>How Much Support Is Needed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">How much help does this school need?</div><div class="radio-grp"><label><input type="radio" name="supportLvl" value="light" ${S.f.support_level==='light'?'checked':''} onchange="S.f.support_level='light';render()"><span><strong>Light touch</strong> \u2014 school is coping, just needs a check-in now and then</span></label><label><input type="radio" name="supportLvl" value="regular" ${S.f.support_level==='regular'?'checked':''} onchange="S.f.support_level='regular';render()"><span><strong>Regular support</strong> \u2014 needs regular visits, e.g. every two weeks</span></label><label><input type="radio" name="supportLvl" value="intensive" ${S.f.support_level==='intensive'?'checked':''} onchange="S.f.support_level='intensive';render()"><span><strong>Intensive support</strong> \u2014 serious challenges, needs a team effort from multiple people</span></label></div></div>
     <div class="field"><label>School context</label><div class="hint">Tap all that apply across schools visited</div><div style="margin-bottom:8px"><span class="tag-grp-title">Staffing:</span><div class="tags" style="display:inline-flex">${CTX_STAFFING.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_staffing.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_staffing,'${s}',this.checked,'staffing')"><span>${s}</span></label>`).join('')}</div></div><div style="margin-bottom:8px"><span class="tag-grp-title">Resources:</span><div class="tags" style="display:inline-flex">${CTX_RESOURCES.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_resources.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_resources,'${s}',this.checked,'resources')"><span>${s}</span></label>`).join('')}</div></div><div><span class="tag-grp-title">Learners:</span><div class="tags" style="display:inline-flex">${CTX_LEARNERS.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_learners.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_learners,'${s}',this.checked,'learners')"><span>${s}</span></label>`).join('')}</div></div></div>
     <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025..." oninput="S.f.ctx_notes=this.value">${esc(S.f.ctx_notes)}</textarea></div>
-    ${(S.f.activity_type==='School support visit'||S.f.activity_type==='Monitoring / follow-up visit')?`<div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:12px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:10px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:10px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E8F5E9':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:11px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\\x27\\x27":"\\x27yes\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\\x27\\x27":"\\x27no\\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>`:''}
     <div class="field-row"><div class="field"><label>Educators / staff supported</label><div class="hint">Number of educators or officials you worked with</div><input type="number" placeholder="e.g. 8" min="0" value="${S.f.educators_supported}" oninput="S.f.educators_supported=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
     ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><textarea rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation..." oninput="S.f.follow_up_desc=this.value">${esc(S.f.follow_up_desc)}</textarea></div>`:''}
     <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Upload or link any supporting evidence — plans, reports, sign-in registers, SIPs, photos, or detailed notes that add context beyond what this form captures</div>
@@ -3038,7 +3040,6 @@ ${tab==='tracker'?`
 
      <!-- Decision → Action matrix by entity -->
      ${(function(){
-       // Group chains by district
        var entityMap = {};
        decs.forEach(function(d){
          var det = d.details || {};
@@ -3051,52 +3052,48 @@ ${tab==='tracker'?`
          var matchActs = acts.filter(function(a){return a.decision_id === d.id});
          if (matchActs.length) {
            matchActs.forEach(function(a){
-             entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'—'),action:a.action_taken||'—',status:a.status||'In Progress',date:d.date||'',schools:schools.join(', '),responsible:a.responsible||''});
+             entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'\u2014'),action:a.action_taken||'\u2014',status:a.status||'In Progress',date:d.date||'',schools:schools.join(', '),responsible:a.responsible||''});
            });
          } else {
-           entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'—'),action:'(no action logged)',status:'Planned',date:d.date||'',schools:schools.join(', '),responsible:''});
+           entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'\u2014'),action:'(no action logged)',status:'Planned',date:d.date||'',schools:schools.join(', '),responsible:''});
          }
        });
        var entities = Object.entries(entityMap).sort(function(a,b){return b[1].chains.length - a[1].chains.length});
        if (!entities.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No decision chains recorded yet</div>';
-       return '<div style="display:flex;flex-direction:column;gap:6px">' + entities.map(function(entry){
+       var maxChains = entities[0][1].chains.length || 1;
+       var tblHtml = '';
+       tblHtml += '<div class="d2a-tbl-hdr"><span class="d2a-tbl-c1">District</span><span class="d2a-tbl-c2">Schools</span><span class="d2a-tbl-c3">Progress</span><span class="d2a-tbl-c4">P</span><span class="d2a-tbl-c5">IP</span><span class="d2a-tbl-c6">C</span></div>';
+       entities.forEach(function(entry){
          var key = entry[0], e = entry[1];
          var isOpen = S._d2aExpanded[key];
+         var total = e.chains.length;
          var pCnt = e.chains.filter(function(c){return c.status==='Planned'}).length;
          var ipCnt = e.chains.filter(function(c){return c.status==='In Progress'}).length;
          var cCnt = e.chains.filter(function(c){return c.status==='Completed'}).length;
-         var html = '<div class="d2a-matrix">';
-         // District header
-         html += '<div class="d2a-district" onclick="toggleD2a(\''+esc(key.replace(/'/g,"\\'"))+'\')">';
-         html += '<span class="d2a-chevron'+(isOpen?' open':'')+'">▸</span>';
-         html += '<div class="d2a-entity"><div class="d2a-prov">'+esc(e.province)+'</div><div class="d2a-name">'+esc(e.district)+'</div></div>';
-         html += '<span class="d2a-school-cnt">'+e.schoolSet.size+' school'+(e.schoolSet.size!==1?'s':'')+'</span>';
-         html += '<div class="d2a-pills">';
-         if(pCnt) html += '<span class="d2a-pill p">'+pCnt+' Planned</span>';
-         if(ipCnt) html += '<span class="d2a-pill ip">'+ipCnt+' In Progress</span>';
-         if(cCnt) html += '<span class="d2a-pill c">'+cCnt+' Done</span>';
-         html += '</div></div>';
-         // Expanded rows
+         var pPct = Math.round((pCnt/maxChains)*100);
+         var ipPct = Math.round((ipCnt/maxChains)*100);
+         var cPct = Math.round((cCnt/maxChains)*100);
+         var keyEsc = esc(key.replace(/'/g,"\\'"));
+         tblHtml += '<div class="d2a-tbl-row'+(isOpen?' d2a-tbl-open':'')+'" onclick="toggleD2a(\''+keyEsc+'\')">';
+         tblHtml += '<div class="d2a-tbl-c1"><div class="d2a-tbl-prov">'+esc(e.province)+'</div><div class="d2a-tbl-name">'+esc(e.district)+'</div></div>';
+         tblHtml += '<div class="d2a-tbl-c2">'+e.schoolSet.size+'</div>';
+         tblHtml += '<div class="d2a-tbl-c3"><div class="d2a-bar-bg">'+(pCnt?'<div class="d2a-bar-seg" style="width:'+pPct+'%;background:var(--blue)"></div>':'')+(ipCnt?'<div class="d2a-bar-seg" style="width:'+ipPct+'%;background:var(--orange)"></div>':'')+(cCnt?'<div class="d2a-bar-seg" style="width:'+cPct+'%;background:var(--green)"></div>':'')+'</div></div>';
+         tblHtml += '<div class="d2a-tbl-c4'+(pCnt?' d2a-n-p':'')+'">'+pCnt+'</div>';
+         tblHtml += '<div class="d2a-tbl-c5'+(ipCnt?' d2a-n-ip':'')+'">'+ipCnt+'</div>';
+         tblHtml += '<div class="d2a-tbl-c6'+(cCnt?' d2a-n-c':'')+'">'+cCnt+'</div>';
+         tblHtml += '</div>';
          if (isOpen) {
-           html += '<div class="d2a-row-hdr"><span style="display:inline-grid;grid-template-columns:minmax(90px,.8fr) minmax(100px,1.2fr) minmax(100px,1.2fr) 80px 72px;gap:0;width:100%"><span>School(s)</span><span>Decided</span><span>Action</span><span>Status</span><span>Date</span></span></div>';
-           html += '<div class="d2a-rows">';
+           tblHtml += '<div class="d2a-exp">';
            e.chains.forEach(function(c){
              var sCls = c.status.replace(/\s+/g,'-');
-             var sIcon = c.status==='Completed'?'✓':c.status==='Planned'?'○':'●';
-             var shortSchool = c.schools.length > 28 ? c.schools.slice(0,25)+'…' : c.schools;
-             html += '<div class="d2a-row">';
-             html += '<div class="d2a-cell school" data-label="School(s): " title="'+esc(c.schools)+'">'+esc(shortSchool||'—')+'</div>';
-             html += '<div class="d2a-cell decision" data-label="Decided: " title="'+esc(c.decision)+'">'+esc(c.decision)+'</div>';
-             html += '<div class="d2a-cell action" data-label="Action: " title="'+esc(c.action)+'">'+esc(c.action)+'</div>';
-             html += '<div class="d2a-cell" data-label=""><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span></div>';
-             html += '<div class="d2a-cell" data-label="Date: " style="font-size:10px;color:var(--grey)">'+fmtDate(c.date)+'</div>';
-             html += '</div>';
+             var sIcon = c.status==='Completed'?'\u2713':c.status==='Planned'?'\u25CB':'\u25CF';
+             tblHtml += '<div class="d2a-exp-row"><div class="d2a-exp-school">'+esc(c.schools||'\u2014')+'</div><div class="d2a-exp-mid"><div class="d2a-exp-dec">'+esc(c.decision)+'</div><div class="d2a-exp-act">'+esc(c.action)+'</div></div><div class="d2a-exp-right"><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span><span class="d2a-exp-date">'+fmtDate(c.date)+'</span></div></div>';
            });
-           html += '</div>';
+           tblHtml += '</div>';
          }
-         html += '</div>';
-         return html;
-       }).join('') + '</div>';
+       });
+       tblHtml += '<div class="d2a-tbl-total"><span class="d2a-tbl-c1"><strong>Total</strong></span><span class="d2a-tbl-c2"><strong>'+schoolSet.size+'</strong></span><span class="d2a-tbl-c3"><div class="d2a-bar-bg">'+(planned?'<div class="d2a-bar-seg" style="width:'+Math.round((planned/Math.max(maxChains,1))*100)+'%;background:var(--blue)"></div>':'')+(inProgress?'<div class="d2a-bar-seg" style="width:'+Math.round((inProgress/Math.max(maxChains,1))*100)+'%;background:var(--orange)"></div>':'')+(completed?'<div class="d2a-bar-seg" style="width:'+Math.round((completed/Math.max(maxChains,1))*100)+'%;background:var(--green)"></div>':'')+'</div></span><span class="d2a-tbl-c4 d2a-n-p"><strong>'+planned+'</strong></span><span class="d2a-tbl-c5 d2a-n-ip"><strong>'+inProgress+'</strong></span><span class="d2a-tbl-c6 d2a-n-c"><strong>'+completed+'</strong></span></div>';
+       return '<div class="d2a-tbl">' + tblHtml + '</div>';
      })()}
    </div>
  </div>
