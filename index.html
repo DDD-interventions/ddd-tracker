@@ -437,7 +437,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .sup-details{padding:0 14px 10px;font-size:11px;color:var(--grey);line-height:1.5}
 .sup-detail-row{display:flex;gap:6px;margin-bottom:3px}
 .sup-detail-row strong{color:var(--navy);font-weight:600;white-space:nowrap}
-.sup-schools{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .sup-school-tag{font-size:10px;background:#f5f5f5;border:1px solid var(--grey-lt);border-radius:4px;padding:2px 7px;color:var(--navy)}
 .thread-area{border-top:1px solid #f0e8f8;padding:10px 14px 12px;background:#FAFAFE}
 .thread-label{font-size:10px;font-weight:700;color:#7E57C2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
@@ -460,13 +459,23 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .reply-input{flex:1;font-size:11.5px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:8px;padding:8px 10px;resize:none;min-height:36px;max-height:80px;line-height:1.4;outline:none;transition:border-color .15s}
 .reply-input:focus{border-color:#7E57C2}
 .reply-input::placeholder{color:#b0aeac}
-.reply-send{width:34px;height:34px;border-radius:50%;border:none;background:#7E57C2;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;font-family:inherit}
+.reply-send{border-radius:18px;border:none;background:#7E57C2;color:#fff;font-size:11px;font-weight:700;cursor:pointer;padding:8px 14px;transition:background .15s;flex-shrink:0;font-family:inherit;white-space:nowrap}
 .reply-send:hover{background:#6A3FB5}
 .reply-send:disabled{background:#ccc;cursor:default}
 
-/* ─── ACTIVITY TRACKER TIMELINE ─── */
+/* ─── ACTIVITY TRACKER — SOCIAL POST LAYOUT ─── */
+/* Streak bar */
+.streak-bar{background:#fff;border-radius:12px;border:1px solid var(--grey-lt);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+.streak-info{flex:1}
+.streak-title{font-size:13px;font-weight:700;color:var(--navy)}
+.streak-sub{font-size:11px;color:var(--grey);margin-top:2px}
+.streak-dots{display:flex;gap:4px;margin-top:6px}
+.streak-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.streak-dot.sd-done{background:var(--green);color:#fff}
+.streak-dot.sd-now{background:#FFF3E0;color:var(--orange);border:2px solid var(--orange)}
+.streak-dot.sd-future{background:#f0f0f0;color:var(--grey-lt)}
 .act-summary-bar{display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid var(--grey-lt);overflow:hidden;margin-bottom:12px}
-.act-summary-item{flex:1;text-align:center;padding:14px 8px;cursor:pointer;transition:background .15s;position:relative;font-family:inherit;border:none;background:none}
+.act-summary-item{flex:1;text-align:center;padding:12px 6px;cursor:pointer;transition:background .15s;position:relative;font-family:inherit;border:none;background:none}
 .act-summary-item:not(:last-child){border-right:1px solid #f0f0f0}
 .act-summary-item:hover{background:#fafafa}
 .act-summary-item.active{background:#f5f9f9}
@@ -475,47 +484,41 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-summary-item.active.s-progress::after{background:var(--orange)}
 .act-summary-item.active.s-planned::after{background:var(--blue)}
 .act-summary-item.active.s-done::after{background:var(--green)}
-.act-summary-num{font-size:22px;font-weight:800;line-height:1}
+.act-summary-num{font-size:20px;font-weight:800;line-height:1}
 .act-summary-num.c-teal{color:var(--teal)}.act-summary-num.c-orange{color:var(--orange)}.act-summary-num.c-blue{color:var(--blue)}.act-summary-num.c-green{color:var(--green)}
-.act-summary-label{font-size:10px;color:var(--grey);font-weight:600;margin-top:4px}
-.act-stack-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#ECEFF1;margin-bottom:14px}
+.act-summary-label{font-size:9px;color:var(--grey);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+.act-stack-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#ECEFF1;margin-bottom:14px}
 .act-stack-seg{height:100%;transition:width .4s}
 .tl-month-hdr{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;display:flex;align-items:center;gap:8px}
 .tl-month-hdr::after{content:'';flex:1;height:1px;background:#e0e0e0}
-.act-card{background:#fff;border-radius:10px;border:1px solid var(--grey-lt);margin-bottom:8px;overflow:hidden}
-.act-card-top{padding:12px 14px;display:flex;gap:10px;cursor:pointer}
-.act-card-top:hover{background:#fafafa}
-.act-pip{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.act-pip.pip-ip{background:var(--orange)}.act-pip.pip-pl{background:var(--blue)}.act-pip.pip-c{background:var(--green)}
-.act-card-body{flex:1;min-width:0}
-.act-card-action{font-size:13px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:3px}
-.act-card-school{font-size:11px;color:var(--grey);line-height:1.4}
-.act-card-school b{font-weight:600;color:var(--navy)}
-.act-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.act-card-date{font-size:10px;color:var(--grey);white-space:nowrap}
-.act-card-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
-.act-card-badge.b-ip{background:#FFF3E0;color:var(--orange)}.act-card-badge.b-pl{background:#E3F2FD;color:var(--blue)}.act-card-badge.b-c{background:#E8F5E9;color:var(--green)}
-.act-card-arrow{font-size:10px;color:var(--grey-lt);transition:transform .2s;display:inline-block}
-.act-card-arrow.open{transform:rotate(90deg)}
-.act-card-detail{display:none;padding:0 14px 14px;border-top:1px solid #f5f5f5}
-.act-card-detail.show{display:block}
-.act-chain{display:flex;align-items:stretch;gap:0;margin:10px 0 6px;font-size:11px}
-.act-chain-step{flex:1;padding:8px 10px;text-align:center;position:relative;line-height:1.3}
-.act-chain-step:not(:last-child)::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid;z-index:1}
-.act-chain-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.7;margin-bottom:2px}
-.act-chain-txt{font-weight:600;font-size:10px}
-.act-chain-data{background:#E3F2FD;border-radius:8px 0 0 8px;color:var(--blue)}
-.act-chain-data::after{border-left-color:#E3F2FD}
-.act-chain-nodata{background:#f5f5f5;border-radius:8px 0 0 8px;color:var(--grey-lt)}
-.act-chain-nodata::after{border-left-color:#f5f5f5}
-.act-chain-dec{background:#EDE7F6;color:#7E57C2}
-.act-chain-dec::after{border-left-color:#EDE7F6}
-.act-chain-act{background:#E8F5E9;border-radius:0 8px 8px 0;color:var(--green)}
-.act-detail-grid{display:grid;gap:8px;margin-top:10px}
-.act-detail-row{display:flex;gap:8px}
-.act-detail-lbl{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;min-width:70px;flex-shrink:0;padding-top:1px}
-.act-detail-val{font-size:11.5px;color:var(--navy);line-height:1.5}
-.ddd-ref-area{margin-top:10px;padding:8px 10px;background:#f8f9fa;border-radius:8px;border:1px dashed #d0d4da}
+/* Post card */
+.post{background:#fff;border-radius:14px;border:1px solid var(--grey-lt);margin-bottom:12px;overflow:hidden}
+.post.post-done{opacity:.85}
+.post-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px 0}
+.post-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
+.post-who{flex:1;min-width:0}
+.post-name{font-size:12px;font-weight:700;color:var(--navy)}
+.post-role{font-size:10px;color:var(--grey)}
+.post-time{font-size:10px;color:var(--grey-lt);flex-shrink:0}
+.post-body{padding:10px 14px}
+.post-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;margin-bottom:8px}
+.post-status.s-ip{background:#FFF3E0;color:var(--orange)}.post-status.s-pl{background:#E3F2FD;color:var(--blue)}.post-status.s-c{background:var(--green-lt);color:var(--green)}
+.post-status-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.post-action-label{font-size:14px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:6px}
+.post-location{font-size:11.5px;color:var(--grey);line-height:1.4;margin-bottom:8px}
+.post-location b{color:var(--navy);font-weight:600}
+/* Chain */
+.post-chain{display:flex;gap:0;margin-bottom:6px}
+.pc-step{flex:1;padding:6px 8px;text-align:center;line-height:1.2}
+.pc-step:not(:last-child){border-right:2px solid #fff}
+.pc-lbl{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.65;margin-bottom:1px}
+.pc-val{font-size:9px;font-weight:600}
+.pc-data{background:#E3F2FD;color:var(--blue);border-radius:6px 0 0 6px}
+.pc-nodata{background:#f5f5f5;color:var(--grey-lt);border-radius:6px 0 0 6px}
+.pc-dec{background:#EDE7F6;color:#7E57C2}
+.pc-act{background:var(--green-lt);color:var(--green);border-radius:0 6px 6px 0}
+/* DDD tags */
+.ddd-ref-area{margin-top:8px;padding:8px 10px;background:#f8f9fa;border-radius:8px;border:1px dashed #d0d4da}
 .ddd-ref-title{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .ddd-ref-tags{display:flex;flex-wrap:wrap;gap:6px}
 .ddd-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;line-height:1.3;border:1px solid;cursor:pointer;transition:opacity .15s}
@@ -534,11 +537,52 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .ddd-link-quiet{font-size:9px;color:var(--grey-lt);text-decoration:none;padding:2px 6px;border-radius:3px;transition:all .15s}
 .ddd-link-quiet:hover{color:var(--teal);background:var(--teal-lt)}
 .act-no-ddd{margin-top:8px;padding:6px 10px;font-size:10px;color:var(--grey-lt);font-style:italic;background:#fafafa;border-radius:6px}
-.act-btns{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0}
-.act-btn-start{font-family:inherit;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s}
-.act-btn-start:hover{background:var(--orange);color:#fff}
-.act-btn-done{font-family:inherit;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s}
-.act-btn-done:hover{background:var(--green);color:#fff}
+/* Detail rows */
+.post-detail{display:none;font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:6px}
+.post-detail.show{display:block}
+.pd-row{display:flex;gap:6px;margin-bottom:3px}
+.pd-lbl{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.3px;min-width:60px;flex-shrink:0;padding-top:1px}
+.pd-val{font-size:11px;color:var(--navy);line-height:1.4}
+.post-expand-btn{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal);font-weight:600;cursor:pointer;padding:2px 0 4px;background:none;border:none;font-family:inherit;width:100%}
+.post-expand-btn:hover{text-decoration:underline}
+/* Engagement bar */
+.post-engagement{border-top:1px solid #f0f0f0;padding:0 14px}
+.post-stats{display:flex;justify-content:space-between;padding:6px 0;font-size:10px;color:var(--grey)}
+.post-stat-reactions{display:flex;align-items:center;gap:4px}
+.post-stat-comments{cursor:pointer}
+.post-stat-comments:hover{text-decoration:underline;color:var(--navy)}
+.post-actions{display:flex;border-top:1px solid #f0f0f0;padding:0}
+.post-action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;font-size:11px;font-weight:600;color:var(--grey);cursor:pointer;background:none;border:none;font-family:inherit;transition:all .12s}
+.post-action-btn:not(:last-child){border-right:1px solid #f0f0f0}
+.post-action-btn:hover{background:#fafafa;color:var(--navy)}
+.post-action-btn:active{background:#f0f0f0}
+.post-action-btn.reacted{color:var(--teal);font-weight:700}
+/* Thread */
+.post-thread{display:none;border-top:1px solid #f0f0f0;padding:10px 14px;background:#FAFBFC}
+.post-thread.show{display:block}
+.pt-comment{display:flex;gap:8px;margin-bottom:10px}
+.pt-comment:last-of-type{margin-bottom:6px}
+.pt-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;background:var(--teal)}
+.pt-bubble{background:#f0f0f0;border-radius:4px 12px 12px 12px;padding:8px 12px;flex:1;min-width:0}
+.pt-bubble-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:2px}
+.pt-name{font-size:11px;font-weight:700;color:var(--navy)}
+.pt-time{font-size:9px;color:var(--grey-lt)}
+.pt-text{font-size:11.5px;color:var(--navy);line-height:1.5}
+.pt-role{font-size:8px;font-weight:600;color:var(--grey);background:#e0e0e0;padding:1px 5px;border-radius:3px;display:inline-block;margin-top:3px}
+.pt-empty{font-size:11px;color:var(--grey);font-style:italic;text-align:center;padding:4px 0}
+.pt-reply{display:flex;gap:8px;margin-top:6px;align-items:flex-end}
+.pt-input{flex:1;font-size:11.5px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:20px;padding:8px 14px;resize:none;min-height:36px;max-height:80px;line-height:1.4;outline:none;transition:border-color .15s}
+.pt-input:focus{border-color:var(--teal)}
+.pt-input::placeholder{color:#c0c0c0}
+.pt-send{border-radius:18px;border:none;background:var(--teal);color:#fff;font-size:11px;font-weight:700;cursor:pointer;padding:8px 14px;flex-shrink:0;font-family:inherit;white-space:nowrap}
+.pt-send:hover{background:var(--teal-dk)}
+/* Owner action buttons */
+.poa-btns{padding:0 14px 12px;display:flex;gap:8px}
+.poa-btn{font-family:inherit;font-size:11px;font-weight:700;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .15s;flex:1;text-align:center}
+.poa-start{border:1.5px solid var(--orange);background:#fff;color:var(--orange)}
+.poa-start:hover{background:var(--orange);color:#fff}
+.poa-done{border:1.5px solid var(--green);background:#fff;color:var(--green)}
+.poa-done:hover{background:var(--green);color:#fff}
 </style>
 </head>
 <body>
@@ -799,7 +843,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _actExpanded:null, _supResponses:[], _supReplyText:{},
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -1073,9 +1117,37 @@ async function submitSupResponse(need){
   }catch(e){console.warn('Failed to post response:',e);showToast('Could not post response — try again');}
 }
 
-// ─── ACTIVITY TRACKER CARD TOGGLE ───
-function toggleActCard(id){S._actExpanded=S._actExpanded===id?null:id;render();}
+// ─── ACTIVITY TRACKER ───
 function toggleDddTag(el){el.classList.toggle('expanded');}
+function toggleActThread(id){S._actThreadOpen[id]=!S._actThreadOpen[id];render();}
+function setActReply(id,val){S._actReplyText[id]=val;}
+function toggleActNoted(decId){
+  S._actNoted[decId]=!S._actNoted[decId];render();
+  // Fire-and-forget save
+  try{sb.from('activity_responses').upsert({decision_id:decId,official_id:S._officialId,official_name:S.official.full_name||'',official_role:S.official.role||'',response_type:'noted',comment:''},{onConflict:'decision_id,official_id,response_type'}).then(function(){});}catch(e){}
+}
+async function loadActResponses(){
+  try{
+    var {data,error}=await sb.from('activity_responses').select('*').order('created_at',{ascending:true});
+    if(!error&&data){
+      S._actResponses=data;
+      // Rebuild noted map
+      data.forEach(function(r){if(r.response_type==='noted'&&r.official_id===S._officialId)S._actNoted[r.decision_id]=true;});
+    }
+  }catch(e){console.warn('Failed to load activity responses:',e);}
+}
+async function submitActResponse(decId){
+  var txt=(S._actReplyText[decId]||'').trim();
+  if(!txt)return;
+  try{
+    var {error}=await sb.from('activity_responses').insert({decision_id:decId,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',response_type:'comment',comment:txt});
+    if(error)throw error;
+    S._actReplyText[decId]='';
+    await loadActResponses();
+    render();
+    showToast('Comment posted');
+  }catch(e){console.warn('Failed to post comment:',e);showToast('Could not post comment \u2014 try again');}
+}
 
 async function updateActionStatus(actionId, newStatus) {
  try {
@@ -1156,6 +1228,7 @@ async function loadAll() {
  S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
  S.loading = false; S.error = null;
  await loadSupResponses();
+ await loadActResponses();
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
  } catch(e) { S.error = e.message; S.loading = false; }
@@ -2865,11 +2938,8 @@ function renderDashboard() {
    var supByType = {};
    var now30 = new Date(); now30.setDate(now30.getDate()-30);
    supportRequests.forEach(function(sr){
-     if (!supByType[sr.need]) supByType[sr.need] = {schools:new Set(), districts:new Set(), count:0, entries:[], latestDate:null, subjects:{}};
+     if (!supByType[sr.need]) supByType[sr.need] = {count:0, entries:[], latestDate:null, subjects:{}};
      supByType[sr.need].count++;
-     var sArr = sr.schools.split(',').map(function(s){return s.trim()}).filter(Boolean);
-     sArr.forEach(function(s){supByType[sr.need].schools.add(s)});
-     if (sr.district) supByType[sr.need].districts.add(sr.district);
      if (sr.subjects && sr.subjects.length) sr.subjects.forEach(function(sub){supByType[sr.need].subjects[sub]=(supByType[sr.need].subjects[sub]||0)+1;});
      var dd = sr.date ? new Date(sr.date) : null;
      if (dd && (!supByType[sr.need].latestDate || dd > supByType[sr.need].latestDate)) supByType[sr.need].latestDate = dd;
@@ -2892,9 +2962,6 @@ function renderDashboard() {
        var isRecent = data.latestDate && data.latestDate >= now30;
        var isOpen = S._supExpanded[need];
        var needEsc = esc(need).replace(/'/g,"\\x27");
-       var schoolArr = Array.from(data.schools);
-       var distArr = Array.from(data.districts);
-       var schoolPreview = schoolArr.slice(0,4).join(', ')+(schoolArr.length>4?' +' +(schoolArr.length-4)+' more':'');
        var subjectEntries = Object.entries(data.subjects).sort(function(a,b){return b[1]-a[1]});
        var daysAgo = data.latestDate ? Math.floor((new Date()-data.latestDate)/(1000*60*60*24)) : null;
        var recencyLabel = daysAgo===null?'':daysAgo<1?'Last flagged today':daysAgo===1?'Last flagged 1 day ago':'Last flagged '+daysAgo+' days ago';
@@ -2905,10 +2972,26 @@ function renderDashboard() {
        _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'× flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
        _supHTML += '<span class="sup-arrow'+(isOpen?' open':'')+'">&#9654;</span></div>';
 
-       _supHTML += '<div class="sup-expand'+(isOpen?' show':'')+'">';
+       _supHTML += '<div class="sup-expand'+' '+'">';
        _supHTML += '<div class="sup-details">';
-       if (distArr.length) _supHTML += '<div class="sup-detail-row"><strong>'+(distArr.length===1?'District':'Districts')+':</strong> '+esc(distArr.join(', '))+'</div>';
-       if (schoolArr.length) { _supHTML += '<div class="sup-detail-row"><strong>Schools:</strong></div><div class="sup-schools">'+schoolArr.map(function(s){return '<span class="sup-school-tag">'+esc(s)+'</span>'}).join('')+'</div>'; }
+       // Group schools by district
+       var schoolsByDist = {};
+       data.entries.forEach(function(sr){
+         var d2 = sr.district || 'Unknown';
+         if (!schoolsByDist[d2]) schoolsByDist[d2] = new Set();
+         sr.schools.split(',').map(function(s){return s.trim()}).filter(Boolean).forEach(function(s){schoolsByDist[d2].add(s)});
+       });
+       var distKeys = Object.keys(schoolsByDist).sort();
+       distKeys.forEach(function(dk){
+         var dkSchools = Array.from(schoolsByDist[dk]).sort();
+         var dkId = needEsc.replace(/[^a-zA-Z0-9]/g,'')+'_'+dk.replace(/[^a-zA-Z0-9]/g,'');
+         _supHTML += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f5f3fa;border-radius:6px;cursor:pointer" onclick="var el=document.getElementById(\'sd-'+dkId+'\');el.style.display=el.style.display===\'none\'?\'flex\':\'none\'">';
+         _supHTML += '<span style="font-size:11px;font-weight:600;color:var(--navy)">'+esc(dk)+'</span>';
+         _supHTML += '<span style="font-size:10px;color:#7E57C2;font-weight:600">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+'</span>';
+         _supHTML += '</div><div id="sd-'+dkId+'" style="display:none;flex-wrap:wrap;gap:4px;padding:6px 8px 2px">';
+         dkSchools.forEach(function(s){ _supHTML += '<span class="sup-school-tag">'+esc(s)+'</span>'; });
+         _supHTML += '</div></div>';
+       });
        if (subjectEntries.length) _supHTML += '<div class="sup-detail-row" style="margin-top:6px"><strong>Subjects:</strong> '+subjectEntries.map(function(se){return esc(se[0])+(se[1]>1?' ('+se[1]+'×)':'')}).join(', ')+'</div>';
        _supHTML += '</div>';
 
@@ -2923,7 +3006,7 @@ function renderDashboard() {
        } else {
          _supHTML += '<div class="thread-empty">No responses yet \u2014 be the first to respond</div>';
        }
-       _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Add a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needEsc.replace(/[^a-zA-Z0-9]/g,'')+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')" title="Send">&#9654;</button></div>';
+       _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Add a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needEsc.replace(/[^a-zA-Z0-9]/g,'')+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
        _supHTML += '</div>';
        _supHTML += '</div></div>';
      });
@@ -3204,9 +3287,39 @@ ${tab==='tracker'?`
      <span style="font-size:11px;color:var(--grey)">${acts.length} action${acts.length!==1?'s':''} logged</span>
    </div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Each logged activity shows what was decided, what action was taken, and which DDD data informed the decision. Tap any card for full details.</div>
+     <div class="dash-section-desc">Each activity is a post showing who did what, where, and which DDD data informed the decision. Comment on In Progress or Planned activities to coordinate follow-up.</div>
 
-     <!-- Summary bar -->
+     <!-- Streak bar -->
+     ${(function(){
+       /* Compute weekly logging streak */
+       var myDecs = decs.filter(function(d){return d.official_id === S._officialId});
+       if (!myDecs.length) return '';
+       var now = new Date();
+       var weekMs = 7*24*60*60*1000;
+       /* Find start of current week (Monday) */
+       var dow = now.getDay(); var mondayOff = dow === 0 ? 6 : dow - 1;
+       var thisMonday = new Date(now); thisMonday.setHours(0,0,0,0); thisMonday.setDate(thisMonday.getDate()-mondayOff);
+       /* Check which of the last 7 weeks had activity */
+       var weekHits = [];
+       for (var w=6; w>=0; w--) {
+         var wStart = new Date(thisMonday.getTime() - w*weekMs);
+         var wEnd = new Date(wStart.getTime() + weekMs);
+         var hit = myDecs.some(function(d){var dd=new Date(d.date||d.created_at);return dd>=wStart&&dd<wEnd;});
+         var isCurrent = w===0;
+         weekHits.push({num:7-w, hit:hit, current:isCurrent});
+       }
+       var streak = 0;
+       for (var i=weekHits.length-1; i>=0; i--) {
+         if (weekHits[i].hit || weekHits[i].current) streak++; else break;
+       }
+       if (streak < 1) return '';
+       var dots = weekHits.map(function(wh){
+         if (wh.current) return '<div class="streak-dot sd-now">'+wh.num+'</div>';
+         return wh.hit ? '<div class="streak-dot sd-done">'+wh.num+'</div>' : '<div class="streak-dot sd-future">'+wh.num+'</div>';
+       }).join('');
+       return '<div class="streak-bar"><div style="font-size:24px;font-weight:800;color:var(--orange);line-height:1">'+streak+'</div><div class="streak-info"><div class="streak-title">'+streak+'-week logging streak</div><div class="streak-sub">You\u2019ve logged activities '+(streak>=3?'every':'most')+' week'+(streak>1?'s':'')+' this term</div><div class="streak-dots">'+dots+'</div></div></div>';
+     })()}
+
      <div class="act-summary-bar">
        ${[{f:'all',n:acts.length,c:'c-teal',s:'s-all',l:'All'},{f:'in-progress',n:inProgress,c:'c-orange',s:'s-progress',l:'In Progress'},{f:'planned',n:planned,c:'c-blue',s:'s-planned',l:'Planned'},{f:'completed',n:completed,c:'c-green',s:'s-done',l:'Completed'}].map(t => '<button class="act-summary-item'+((S._trackerFilter||'all')===t.f?' active ':' ')+t.s+'" onclick="S._trackerFilter=\''+t.f+'\';render()"><div class="act-summary-num '+t.c+'">'+t.n+'</div><div class="act-summary-label">'+t.l+'</div></button>').join('')}
      </div>
@@ -3214,7 +3327,6 @@ ${tab==='tracker'?`
        ${acts.length?'<div class="act-stack-seg" style="width:'+Math.round(inProgress/acts.length*100)+'%;background:var(--orange)"></div><div class="act-stack-seg" style="width:'+Math.round(planned/acts.length*100)+'%;background:var(--blue)"></div><div class="act-stack-seg" style="width:'+Math.round(completed/acts.length*100)+'%;background:var(--green)"></div>':''}
      </div>
 
-     <!-- Timeline cards -->
      ${(function(){
        var trackerFilter = S._trackerFilter || 'all';
        var allChains = [];
@@ -3247,69 +3359,102 @@ ${tab==='tracker'?`
          var monthKey = dd ? dd.toLocaleString('en-ZA',{month:'long',year:'numeric'}) : 'Unknown';
          if (monthKey !== lastMonth) { html += '<div class="tl-month-hdr">'+esc(monthKey)+'</div>'; lastMonth = monthKey; }
 
-         var cardId = 'ac-'+idx;
-         var isOpen = S._actExpanded === cardId;
-         var sCls = c.status === 'Completed' ? 'c' : c.status === 'Planned' ? 'pl' : 'ip';
+         var postId = 'post-'+idx;
+                  var isCompleted = c.status === 'Completed';
+         var sCls = isCompleted ? 's-c' : c.status === 'Planned' ? 's-pl' : 's-ip';
          var sLabel = c.status;
          var actionLabel = c.act ? (c.act.action_taken || '\u2014') : '(no action logged)';
          var schools = c.det.schools || '';
          var district = c.det.district || '';
          var isMine = c.act ? c.act.official_id === S._officialId : c.dec.official_id === S._officialId;
+         var officialName = c.det.official_name || c.dec.made_by || '';
+         var officialRole = c.det.official_role || '';
+         var initials = officialName.split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+         var avatarBg = officialRole.toLowerCase().indexOf('circuit')>-1?'var(--teal-dk)':officialRole.toLowerCase().indexOf('subject')>-1?'var(--orange)':officialRole.toLowerCase().indexOf('programme')>-1||officialRole.toLowerCase().indexOf('pm')>-1?'var(--purple)':'var(--grey)';
 
-         html += '<div class="act-card"><div class="act-card-top" onclick="toggleActCard(\''+cardId+'\')">';
-         html += '<div class="act-pip pip-'+sCls+'"></div>';
-         html += '<div class="act-card-body"><div class="act-card-action">'+esc(actionLabel)+'</div>';
-         html += '<div class="act-card-school"><b>'+esc(schools.length>60?schools.slice(0,57)+'...':schools||'\u2014')+'</b>'+(district?' \u00B7 '+esc(district):'')+'</div></div>';
-         html += '<div class="act-card-right"><span class="act-card-date">'+fmtDate(c.date)+'</span><span class="act-card-badge b-'+sCls+'">'+sLabel+'</span>';
-         html += '<span class="act-card-arrow'+(isOpen?' open':'')+'">&#9654;</span></div></div>';
+         var rptArr = c.det.ddd_reports || [];
+         var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
+         var rptCount = rptArr.length;
+         var chainDataLabel = usedDDD ? (rptCount === 1 ? '1 report' : rptCount+' reports') : 'No DDD data';
+         var chainDataCls = usedDDD ? 'pc-data' : 'pc-nodata';
+         var decLabel = c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014');
 
-         if (isOpen) {
-           var decLabel = c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014');
-           var rptArr = c.det.ddd_reports || [];
-           var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
-           var rptCount = rptArr.length;
-           var chainDataLabel = usedDDD ? (rptCount === 1 ? '1 DDD report' : rptCount+' DDD reports') : 'No DDD data';
-           var chainDataCls = usedDDD ? 'act-chain-data' : 'act-chain-nodata';
+         // Responses for this decision
+         var decResponses = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='comment'});
+         var notedCount = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='noted'}).length;
+         var isNoted = S._actNoted[c.dec.id];
+         var threadOpen = S._actThreadOpen[postId];
+         var decIdEsc = c.dec.id.replace(/'/g,"\\x27");
 
-           html += '<div class="act-card-detail show">';
-           html += '<div class="act-chain"><div class="act-chain-step '+chainDataCls+'"><div class="act-chain-lbl">Data used</div><div class="act-chain-txt">'+chainDataLabel+'</div></div><div class="act-chain-step act-chain-dec"><div class="act-chain-lbl">Decision</div><div class="act-chain-txt">'+esc(decLabel.length>30?decLabel.slice(0,28)+'\u2026':decLabel)+'</div></div><div class="act-chain-step act-chain-act"><div class="act-chain-lbl">Action</div><div class="act-chain-txt">'+esc(actionLabel.length>30?actionLabel.slice(0,28)+'\u2026':actionLabel)+'</div></div></div>';
+         html += '<div class="post'+(isCompleted?' post-done':'')+'">';
+         // Header
+         html += '<div class="post-hdr"><div class="post-avatar" style="background:'+avatarBg+'">'+initials+'</div><div class="post-who"><div class="post-name">'+esc(officialName)+'</div><div class="post-role">'+esc(officialRole)+(district?' \u00B7 '+esc(district):'')+'</div></div><div class="post-time">'+fmtDate(c.date)+'</div></div>';
 
-           html += '<div class="act-detail-grid">';
-           html += '<div class="act-detail-row"><span class="act-detail-lbl">Logged by</span><span class="act-detail-val">'+esc(c.det.official_name||c.dec.made_by||'')+(c.det.official_role?' \u00B7 '+esc(c.det.official_role):'')+'</span></div>';
-           if (c.det.subjects && c.det.subjects.length) html += '<div class="act-detail-row"><span class="act-detail-lbl">Subjects</span><span class="act-detail-val">'+esc(c.det.subjects.join(', '))+'</span></div>';
-           if (c.det.grades && c.det.grades.length) html += '<div class="act-detail-row"><span class="act-detail-lbl">Grades</span><span class="act-detail-val">'+esc(c.det.grades.join(', '))+'</span></div>';
-           if (c.det.learners_reached) html += '<div class="act-detail-row"><span class="act-detail-lbl">Learners</span><span class="act-detail-val">'+c.det.learners_reached+' learners reached</span></div>';
-           if (c.det.educators_supported) html += '<div class="act-detail-row"><span class="act-detail-lbl">Educators</span><span class="act-detail-val">'+c.det.educators_supported+' educators supported</span></div>';
-           if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="act-detail-row"><span class="act-detail-lbl">Follow-up</span><span class="act-detail-val">'+esc(c.det.follow_up_desc)+'</span></div>';
-           if (c.det.description) html += '<div class="act-detail-row"><span class="act-detail-lbl">Detail</span><span class="act-detail-val">'+esc(c.det.description)+'</span></div>';
-           if (c.act && c.act.responsible) html += '<div class="act-detail-row"><span class="act-detail-lbl">Responsible</span><span class="act-detail-val">'+esc(c.act.responsible)+'</span></div>';
-           html += '</div>';
+         // Body
+         html += '<div class="post-body">';
+         html += '<div class="post-status '+sCls+'"><div class="post-status-dot"></div> '+sLabel+'</div>';
+         html += '<div class="post-action-label">'+esc(actionLabel)+'</div>';
+         html += '<div class="post-location"><b>'+esc(schools.length>70?schools.slice(0,67)+'...':schools||'\u2014')+'</b>'+(district?' \u00B7 '+esc(district):'')+'</div>';
 
-           // DDD report tags
-           if (usedDDD) {
-             html += '<div class="ddd-ref-area"><div class="ddd-ref-title">DDD report'+(rptCount>1?'s':'')+' used</div><div class="ddd-ref-tags">';
-             rptArr.forEach(function(rName){
-               var rObj = TK_REPORTS.find(function(r){return r.name === rName});
-               if (!rObj) { html += '<div class="ddd-tag" style="background:#f5f5f5;border-color:#e0e0e0;color:var(--grey)" onclick="toggleDddTag(this)"><span class="ddd-tag-name">'+esc(rName)+'</span></div>'; return; }
-               html += '<div class="ddd-tag rpt-'+rObj.id+'" onclick="toggleDddTag(this)"><div style="display:flex;align-items:center;gap:5px"><span class="ddd-tag-icon">'+rObj.icon+'</span><span class="ddd-tag-name">'+esc(rObj.name)+'</span></div><div class="ddd-tag-path">Find it: '+esc(rObj.path)+'</div></div>';
-             });
-             html += '</div><div class="ddd-link-row"><a href="'+DDD_DASHBOARD_URL+'" target="_blank" rel="noopener" class="ddd-link-quiet" onclick="event.stopPropagation()">Open DDD Dashboard</a></div></div>';
-           } else {
-             html += '<div class="act-no-ddd">No DDD dashboard data was used for this activity</div>';
-           }
+         // Chain
+         html += '<div class="post-chain"><div class="pc-step '+chainDataCls+'"><div class="pc-lbl">Data</div><div class="pc-val">'+chainDataLabel+'</div></div><div class="pc-step pc-dec"><div class="pc-lbl">Decision</div><div class="pc-val">'+esc(decLabel.length>25?decLabel.slice(0,23)+'\u2026':decLabel)+'</div></div><div class="pc-step pc-act"><div class="pc-lbl">Action</div><div class="pc-val">'+esc(actionLabel.length>25?actionLabel.slice(0,23)+'\u2026':actionLabel)+'</div></div></div>';
 
-           // Action buttons
-           if (isMine && c.act && c.status !== 'Completed') {
-             html += '<div class="act-btns">';
-             if (c.status === 'Planned') html += '<button class="act-btn-start" onclick="updateActionStatus(\''+c.act.id+'\',\'In Progress\')">Start</button>';
-             html += '<button class="act-btn-done" onclick="updateActionStatus(\''+c.act.id+'\',\'Completed\')">&#10003; Mark Complete</button></div>';
-           } else if (!isMine && c.act && c.status !== 'Completed') {
-             html += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:10px">Only '+esc(c.act.responsible || 'the person who logged this')+' can update this action</div>';
-           } else if (c.status === 'Completed') {
-             html += '<div style="font-size:10px;color:var(--grey-lt);font-style:italic;margin-top:10px">Completed'+(c.act&&c.act.updated_at?' on '+fmtDate(c.act.updated_at):'')+'</div>';
-           }
-           html += '</div>';
+         // DDD tags
+         if (usedDDD) {
+           html += '<div class="ddd-ref-area"><div class="ddd-ref-title">DDD report'+(rptCount>1?'s':'')+' used</div><div class="ddd-ref-tags">';
+           rptArr.forEach(function(rName){
+             var rObj = TK_REPORTS.find(function(r){return r.name === rName});
+             if (!rObj) { html += '<div class="ddd-tag" style="background:#f5f5f5;border-color:#e0e0e0;color:var(--grey)" onclick="toggleDddTag(this)"><span class="ddd-tag-name">'+esc(rName)+'</span></div>'; return; }
+             html += '<div class="ddd-tag rpt-'+rObj.id+'" onclick="toggleDddTag(this)"><div style="display:flex;align-items:center;gap:5px"><span class="ddd-tag-icon">'+rObj.icon+'</span><span class="ddd-tag-name">'+esc(rObj.name)+'</span></div><div class="ddd-tag-path">Find it: '+esc(rObj.path)+'</div></div>';
+           });
+           html += '</div><div class="ddd-link-row"><a href="'+DDD_DASHBOARD_URL+'" target="_blank" rel="noopener" class="ddd-link-quiet" onclick="event.stopPropagation()">Open DDD Dashboard</a></div></div>';
+         } else {
+           html += '<div class="act-no-ddd">No DDD dashboard data was used for this activity</div>';
          }
+
+         // Expandable details
+         html += '<div class="post-detail'+' '+'" id="pd-'+postId+'">';
+         if (c.det.subjects && c.det.subjects.length) html += '<div class="pd-row"><span class="pd-lbl">Subjects</span><span class="pd-val">'+esc(c.det.subjects.join(', '))+'</span></div>';
+         if (c.det.grades && c.det.grades.length) html += '<div class="pd-row"><span class="pd-lbl">Grades</span><span class="pd-val">'+esc(c.det.grades.join(', '))+'</span></div>';
+         if (c.det.learners_reached) html += '<div class="pd-row"><span class="pd-lbl">Learners</span><span class="pd-val">'+c.det.learners_reached+' learners reached</span></div>';
+         if (c.det.educators_supported) html += '<div class="pd-row"><span class="pd-lbl">Educators</span><span class="pd-val">'+c.det.educators_supported+' educators supported</span></div>';
+         if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="pd-row"><span class="pd-lbl">Follow-up</span><span class="pd-val">'+esc(c.det.follow_up_desc)+'</span></div>';
+         if (c.det.description) html += '<div class="pd-row"><span class="pd-lbl">Detail</span><span class="pd-val">'+esc(c.det.description)+'</span></div>';
+         if (c.act && c.act.responsible) html += '<div class="pd-row"><span class="pd-lbl">Responsible</span><span class="pd-val">'+esc(c.act.responsible)+'</span></div>';
+         html += '</div>';
+         html += '<button class="post-expand-btn" onclick="var el=document.getElementById(\'pd-'+postId+'\');var o=el.classList.toggle(\'show\');this.textContent=o?\'See less\':\'See more\'">See more</button>';
+         html += '</div>';
+
+         // Engagement + thread — only for non-completed
+         if (!isCompleted) {
+           html += '<div class="post-engagement"><div class="post-stats"><div class="post-stat-reactions">'+(notedCount?notedCount+' noted':'')+'</div><div class="post-stat-comments" onclick="toggleActThread(\''+postId+'\')">'+(decResponses.length?decResponses.length+' comment'+(decResponses.length>1?'s':''):'No comments yet')+'</div></div>';
+           html += '<div class="post-actions"><button class="post-action-btn'+(isNoted?' reacted':'')+'" onclick="toggleActNoted(\''+decIdEsc+'\')">Noted</button><button class="post-action-btn" onclick="toggleActThread(\''+postId+'\')">Comment</button></div></div>';
+
+           // Thread
+           html += '<div class="post-thread'+(threadOpen?' show':'')+'" id="thread-'+postId+'">';
+           if (decResponses.length) {
+             decResponses.forEach(function(r){
+               var rInit = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+               html += '<div class="pt-comment"><div class="pt-avatar" style="background:var(--teal-dk)">'+rInit+'</div><div class="pt-bubble"><div class="pt-bubble-hdr"><span class="pt-name">'+esc(r.official_name||'')+'</span><span class="pt-time">'+supTimeAgo(r.created_at)+'</span></div><div class="pt-text">'+esc(r.comment||'')+'</div>'+(r.official_role?'<div class="pt-role">'+esc(r.official_role)+'</div>':'')+'</div></div>';
+             });
+           } else {
+             html += '<div class="pt-empty">Be the first to comment on this activity</div>';
+           }
+           html += '<div class="pt-reply"><textarea class="pt-input" placeholder="Write a comment\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+           html += '</div>';
+
+           // Owner buttons
+           if (isMine && c.act && c.status !== 'Completed') {
+             html += '<div class="poa-btns">';
+             if (c.status === 'Planned') html += '<button class="poa-btn poa-start" onclick="updateActionStatus(\''+c.act.id+'\',\'In Progress\')">Start</button>';
+             html += '<button class="poa-btn poa-done" onclick="updateActionStatus(\''+c.act.id+'\',\'Completed\')">Mark Complete</button></div>';
+           } else if (!isMine && c.act && c.status !== 'Completed') {
+             html += '<div style="font-size:10px;color:#999;font-style:italic;padding:0 14px 12px">Only '+esc(c.act.responsible || 'the person who logged this')+' can update this action</div>';
+           }
+         } else {
+           html += '<div style="font-size:10px;color:var(--grey-lt);font-style:italic;padding:0 14px 12px">Completed'+(c.act&&c.act.updated_at?' on '+fmtDate(c.act.updated_at):'')+'</div>';
+         }
+
          html += '</div>';
        });
        return html;
@@ -3317,6 +3462,7 @@ ${tab==='tracker'?`
    </div>
  </div>
 `:''}\
+
 
 
 </div>`;
