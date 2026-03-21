@@ -231,32 +231,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-section-hdr h3{font-size:14px;font-weight:700;color:var(--navy)}
 .dash-section-body{padding:14px 16px}
 .dash-section-desc{font-size:12px;color:var(--grey-dk);line-height:1.6;margin-bottom:12px}
-.d2a-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;margin-bottom:4px;border-radius:8px;border:1px solid #E8EBF0;cursor:pointer;transition:background .15s}
-.d2a-row:active{background:#F0F8F8}
-.d2a-row.open{border-radius:8px 8px 0 0;border-bottom:none;margin-bottom:0;background:#F8FAFA}
-.d2a-entity{flex:1;min-width:0}
-.d2a-prov{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--grey);line-height:1}
-.d2a-name{font-size:12px;font-weight:700;color:var(--navy);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.d2a-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;width:130px}
-.d2a-bar{height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden;display:flex;width:100%}
-.d2a-bar-seg{height:100%;transition:width .4s}
-.d2a-counts{display:flex;gap:6px;font-size:9px;font-weight:700;flex-wrap:wrap;justify-content:flex-end}
-.d2a-cnt{display:flex;align-items:center;gap:2px;white-space:nowrap}
-.d2a-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.d2a-cnt.ip{color:var(--orange)}.d2a-cnt.ip .d2a-dot{background:var(--orange)}
-.d2a-cnt.c{color:var(--green)}.d2a-cnt.c .d2a-dot{background:var(--green)}
-.d2a-cnt.pl{color:var(--blue)}.d2a-cnt.pl .d2a-dot{background:var(--blue)}
-.d2a-detail{background:#FAFBFC;border:1px solid #E8EBF0;border-top:none;border-radius:0 0 8px 8px;margin-bottom:4px;padding:4px 0}
-.d2a-chain{padding:10px 14px;border-bottom:1px solid #F0F2F5}
-.d2a-chain:last-child{border-bottom:none}
-.d2a-chain-school{font-size:10px;font-weight:600;color:var(--grey-dk);margin-bottom:4px}
-.d2a-chain-dec{font-size:11px;font-weight:600;color:var(--teal);line-height:1.4}
-.d2a-chain-act{font-size:11px;color:var(--navy);margin-top:2px;line-height:1.4}
-.d2a-chain-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.d2a-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
-.d2a-badge.Planned{background:#E3F2FD;color:var(--blue)}.d2a-badge.In-Progress{background:#FFF3E0;color:var(--orange)}.d2a-badge.Completed{background:var(--green-lt);color:var(--green-dk)}
-.d2a-chain-date{font-size:9px;color:var(--grey)}
-@media(max-width:420px){.d2a-right{width:110px}.d2a-counts{font-size:8px}}
 .dash-subnav{display:flex;flex-wrap:wrap;gap:6px;overflow-x:visible;padding:8px 16px 6px;position:sticky;top:0;z-index:50;background:#fff;margin:0 -16px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-bottom:1px solid #e0e0e0}
 .dash-subnav::-webkit-scrollbar{display:none}
 .dash-subnav button{flex:1 1 auto;min-width:0;font-size:12px;font-weight:700;padding:8px 12px;border-radius:8px;border:2px solid #d0d4db;background:#fff;color:var(--grey-dk);cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;text-align:center}
@@ -439,6 +413,132 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .visit-history-card .vh-zero{color:#b0aeac;font-style:italic}
 .visit-history-card .vh-toggle{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;color:var(--teal-dk);cursor:pointer;background:none;border:none;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .visit-history-card .vh-toggle:hover{color:var(--navy)}
+
+/* ─── SUPPORT CARDS + THREADS ─── */
+.sup-time-tabs{display:flex;gap:0;padding:0 0 10px}
+.sup-time-tab{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;border:1.5px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;transition:all .15s;font-family:inherit}
+.sup-time-tab:hover{border-color:#ccc}
+.sup-time-tab.active{background:#7E57C2;color:#fff;border-color:#7E57C2}
+.sup-card{border-radius:10px;border:1px solid #EDE7F6;overflow:hidden;transition:all .2s;margin-bottom:8px}
+.sup-card.sup-recent{border-color:#CE93D8;background:#FDFAFF}
+.sup-card.sup-older{opacity:.7}
+.sup-header{padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sup-header:hover{background:rgba(126,87,194,.04)}
+.sup-type{font-size:12px;font-weight:700;color:var(--navy);line-height:1.4;flex:1}
+.sup-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.sup-count{font-size:10px;font-weight:700;color:#7E57C2;background:#EDE7F6;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.sup-recency{font-size:9px;font-weight:600;letter-spacing:.3px}
+.sup-recency.fresh{color:var(--green)}
+.sup-recency.stale{color:var(--grey)}
+.sup-arrow{font-size:10px;color:var(--grey-lt);transition:transform .2s;display:inline-block;margin-top:2px}
+.sup-arrow.open{transform:rotate(90deg)}
+.sup-expand{display:none}
+.sup-expand.show{display:block}
+.sup-details{padding:0 14px 10px;font-size:11px;color:var(--grey);line-height:1.5}
+.sup-detail-row{display:flex;gap:6px;margin-bottom:3px}
+.sup-detail-row strong{color:var(--navy);font-weight:600;white-space:nowrap}
+.sup-schools{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.sup-school-tag{font-size:10px;background:#f5f5f5;border:1px solid var(--grey-lt);border-radius:4px;padding:2px 7px;color:var(--navy)}
+.thread-area{border-top:1px solid #f0e8f8;padding:10px 14px 12px;background:#FAFAFE}
+.thread-label{font-size:10px;font-weight:700;color:#7E57C2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.thread-count{font-size:9px;font-weight:700;color:#fff;background:#7E57C2;border-radius:99px;padding:1px 7px;min-width:18px;text-align:center}
+.sup-comment{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0eded}
+.sup-comment:last-of-type{border-bottom:none}
+.sup-comment-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase;background:var(--teal)}
+.sup-comment-body{flex:1;min-width:0}
+.sup-comment-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:2px;flex-wrap:wrap}
+.sup-comment-name{font-size:11px;font-weight:700;color:var(--navy)}
+.sup-comment-role{font-size:9px;color:var(--grey);font-weight:600;background:#f0f0f0;padding:1px 6px;border-radius:99px}
+.sup-comment-time{font-size:9px;color:var(--grey)}
+.sup-comment-text{font-size:11.5px;color:var(--navy);line-height:1.5}
+.sup-comment-status{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;margin-top:4px}
+.sup-comment-status.st-acknowledged{background:#E8F5E9;color:var(--green)}
+.sup-comment-status.st-in-progress{background:#FFF3E0;color:var(--orange)}
+.sup-comment-status.st-scheduled{background:#E3F2FD;color:#1565C0}
+.thread-empty{font-size:11px;color:var(--grey);font-style:italic;padding:4px 0 2px}
+.reply-box{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #f0eded;align-items:flex-end}
+.reply-input{flex:1;font-size:11.5px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:8px;padding:8px 10px;resize:none;min-height:36px;max-height:80px;line-height:1.4;outline:none;transition:border-color .15s}
+.reply-input:focus{border-color:#7E57C2}
+.reply-input::placeholder{color:#b0aeac}
+.reply-send{width:34px;height:34px;border-radius:50%;border:none;background:#7E57C2;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;font-family:inherit}
+.reply-send:hover{background:#6A3FB5}
+.reply-send:disabled{background:#ccc;cursor:default}
+
+/* ─── ACTIVITY TRACKER TIMELINE ─── */
+.act-summary-bar{display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid var(--grey-lt);overflow:hidden;margin-bottom:12px}
+.act-summary-item{flex:1;text-align:center;padding:14px 8px;cursor:pointer;transition:background .15s;position:relative;font-family:inherit;border:none;background:none}
+.act-summary-item:not(:last-child){border-right:1px solid #f0f0f0}
+.act-summary-item:hover{background:#fafafa}
+.act-summary-item.active{background:#f5f9f9}
+.act-summary-item.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:3px;border-radius:3px 3px 0 0}
+.act-summary-item.active.s-all::after{background:var(--teal)}
+.act-summary-item.active.s-progress::after{background:var(--orange)}
+.act-summary-item.active.s-planned::after{background:var(--blue)}
+.act-summary-item.active.s-done::after{background:var(--green)}
+.act-summary-num{font-size:22px;font-weight:800;line-height:1}
+.act-summary-num.c-teal{color:var(--teal)}.act-summary-num.c-orange{color:var(--orange)}.act-summary-num.c-blue{color:var(--blue)}.act-summary-num.c-green{color:var(--green)}
+.act-summary-label{font-size:10px;color:var(--grey);font-weight:600;margin-top:4px}
+.act-stack-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#ECEFF1;margin-bottom:14px}
+.act-stack-seg{height:100%;transition:width .4s}
+.tl-month-hdr{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;display:flex;align-items:center;gap:8px}
+.tl-month-hdr::after{content:'';flex:1;height:1px;background:#e0e0e0}
+.act-card{background:#fff;border-radius:10px;border:1px solid var(--grey-lt);margin-bottom:8px;overflow:hidden}
+.act-card-top{padding:12px 14px;display:flex;gap:10px;cursor:pointer}
+.act-card-top:hover{background:#fafafa}
+.act-pip{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.act-pip.pip-ip{background:var(--orange)}.act-pip.pip-pl{background:var(--blue)}.act-pip.pip-c{background:var(--green)}
+.act-card-body{flex:1;min-width:0}
+.act-card-action{font-size:13px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:3px}
+.act-card-school{font-size:11px;color:var(--grey);line-height:1.4}
+.act-card-school b{font-weight:600;color:var(--navy)}
+.act-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.act-card-date{font-size:10px;color:var(--grey);white-space:nowrap}
+.act-card-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.act-card-badge.b-ip{background:#FFF3E0;color:var(--orange)}.act-card-badge.b-pl{background:#E3F2FD;color:var(--blue)}.act-card-badge.b-c{background:#E8F5E9;color:var(--green)}
+.act-card-arrow{font-size:10px;color:var(--grey-lt);transition:transform .2s;display:inline-block}
+.act-card-arrow.open{transform:rotate(90deg)}
+.act-card-detail{display:none;padding:0 14px 14px;border-top:1px solid #f5f5f5}
+.act-card-detail.show{display:block}
+.act-chain{display:flex;align-items:stretch;gap:0;margin:10px 0 6px;font-size:11px}
+.act-chain-step{flex:1;padding:8px 10px;text-align:center;position:relative;line-height:1.3}
+.act-chain-step:not(:last-child)::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid;z-index:1}
+.act-chain-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.7;margin-bottom:2px}
+.act-chain-txt{font-weight:600;font-size:10px}
+.act-chain-data{background:#E3F2FD;border-radius:8px 0 0 8px;color:var(--blue)}
+.act-chain-data::after{border-left-color:#E3F2FD}
+.act-chain-nodata{background:#f5f5f5;border-radius:8px 0 0 8px;color:var(--grey-lt)}
+.act-chain-nodata::after{border-left-color:#f5f5f5}
+.act-chain-dec{background:#EDE7F6;color:#7E57C2}
+.act-chain-dec::after{border-left-color:#EDE7F6}
+.act-chain-act{background:#E8F5E9;border-radius:0 8px 8px 0;color:var(--green)}
+.act-detail-grid{display:grid;gap:8px;margin-top:10px}
+.act-detail-row{display:flex;gap:8px}
+.act-detail-lbl{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;min-width:70px;flex-shrink:0;padding-top:1px}
+.act-detail-val{font-size:11.5px;color:var(--navy);line-height:1.5}
+.ddd-ref-area{margin-top:10px;padding:8px 10px;background:#f8f9fa;border-radius:8px;border:1px dashed #d0d4da}
+.ddd-ref-title{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ddd-ref-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ddd-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;line-height:1.3;border:1px solid;cursor:pointer;transition:opacity .15s}
+.ddd-tag-icon{font-size:9px;font-weight:800;opacity:.7}
+.ddd-tag-name{white-space:nowrap}
+.ddd-tag-path{display:none;font-size:9px;font-weight:400;color:var(--grey);margin-top:3px;line-height:1.4}
+.ddd-tag.expanded{flex-direction:column;align-items:flex-start;white-space:normal}
+.ddd-tag.expanded .ddd-tag-path{display:block}
+.ddd-tag.rpt-lcr{background:#E0F2F1;border-color:#B2DFDB;color:#0B8E8D}
+.ddd-tag.rpt-fpc{background:#FFF3E0;border-color:#FFE0B2;color:#E8952E}
+.ddd-tag.rpt-t4p{background:#E3F2FD;border-color:#BBDEFB;color:#1565C0}
+.ddd-tag.rpt-g6p{background:#F1F8E9;border-color:#DCEDC8;color:#558B2F}
+.ddd-tag.rpt-sar{background:#E0F2F1;border-color:#B2DFDB;color:#0F7B7D}
+.ddd-tag.rpt-ttd{background:#E0F2F1;border-color:#B2DFDB;color:#074445}
+.ddd-link-row{display:flex;justify-content:flex-end;margin-top:6px}
+.ddd-link-quiet{font-size:9px;color:var(--grey-lt);text-decoration:none;padding:2px 6px;border-radius:3px;transition:all .15s}
+.ddd-link-quiet:hover{color:var(--teal);background:var(--teal-lt)}
+.act-no-ddd{margin-top:8px;padding:6px 10px;font-size:10px;color:var(--grey-lt);font-style:italic;background:#fafafa;border-radius:6px}
+.act-btns{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0}
+.act-btn-start{font-family:inherit;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s}
+.act-btn-start:hover{background:var(--orange);color:#fff}
+.act-btn-done{font-family:inherit;font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s}
+.act-btn-done:hover{background:var(--green);color:#fff}
 </style>
 </head>
 <body>
@@ -699,7 +799,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _d2aExpanded:{}, _challExpanded:null,
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _actExpanded:null, _supResponses:[], _supReplyText:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -940,8 +1040,43 @@ function resetInactivityTimer() {
 );
 
 // STATUS UPDATE & OUTCOME RECORDING
-function toggleD2a(key){S._d2aExpanded[key]=!S._d2aExpanded[key];render();}
 function toggleChall(b){S._challExpanded=S._challExpanded===b?null:b;render();}
+
+// ─── SUPPORT RESPONSE SYSTEM ───
+function toggleSup(need){S._supExpanded[need]=!S._supExpanded[need];render();}
+function filterSupTime(period){S._supTimeFilter=period;render();}
+function setSupReply(need,val){S._supReplyText[need]=val;}
+function supInitials(name){return (name||'?').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
+function supTimeAgo(dateStr){
+  if(!dateStr)return '';
+  var d=new Date(dateStr);var now=new Date();var diff=Math.floor((now-d)/(1000*60*60*24));
+  if(diff<1)return 'Today';if(diff===1)return '1 day ago';if(diff<30)return diff+' days ago';
+  var m=Math.floor(diff/30);return m===1?'1 month ago':m+' months ago';
+}
+async function loadSupResponses(){
+  try{
+    var {data,error}=await sb.from('support_responses').select('*').order('created_at',{ascending:true});
+    if(!error&&data)S._supResponses=data;
+  }catch(e){console.warn('Failed to load support responses:',e);}
+}
+async function submitSupResponse(need){
+  var txt=(S._supReplyText[need]||'').trim();
+  if(!txt)return;
+  try{
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt};
+    var {error}=await sb.from('support_responses').insert(row);
+    if(error)throw error;
+    S._supReplyText[need]='';
+    await loadSupResponses();
+    render();
+    showToast('Response posted');
+  }catch(e){console.warn('Failed to post response:',e);showToast('Could not post response — try again');}
+}
+
+// ─── ACTIVITY TRACKER CARD TOGGLE ───
+function toggleActCard(id){S._actExpanded=S._actExpanded===id?null:id;render();}
+function toggleDddTag(el){el.classList.toggle('expanded');}
+
 async function updateActionStatus(actionId, newStatus) {
  try {
    const act = S.actions.find(a => a.id === actionId);
@@ -1020,6 +1155,7 @@ async function loadAll() {
  ]);
  S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
  S.loading = false; S.error = null;
+ await loadSupResponses();
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
  } catch(e) { S.error = e.message; S.loading = false; }
@@ -2726,35 +2862,73 @@ function renderDashboard() {
  // ── RECOMMENDED SUPPORT ──
  var _supHTML = '';
  if (supportRequests.length) {
-   // Group by support type, collect schools under each
    var supByType = {};
+   var now30 = new Date(); now30.setDate(now30.getDate()-30);
    supportRequests.forEach(function(sr){
-     if (!supByType[sr.need]) supByType[sr.need] = {schools:new Set(), districts:new Set(), count:0, entries:[]};
+     if (!supByType[sr.need]) supByType[sr.need] = {schools:new Set(), districts:new Set(), count:0, entries:[], latestDate:null, subjects:{}};
      supByType[sr.need].count++;
      var sArr = sr.schools.split(',').map(function(s){return s.trim()}).filter(Boolean);
      sArr.forEach(function(s){supByType[sr.need].schools.add(s)});
      if (sr.district) supByType[sr.need].districts.add(sr.district);
+     if (sr.subjects && sr.subjects.length) sr.subjects.forEach(function(sub){supByType[sr.need].subjects[sub]=(supByType[sr.need].subjects[sub]||0)+1;});
+     var dd = sr.date ? new Date(sr.date) : null;
+     if (dd && (!supByType[sr.need].latestDate || dd > supByType[sr.need].latestDate)) supByType[sr.need].latestDate = dd;
      supByType[sr.need].entries.push(sr);
    });
-   var supSorted = Object.entries(supByType).sort(function(a,b){return b[1].count - a[1].count});
+   // Filter by time period
+   var supEntries = Object.entries(supByType);
+   if (S._supTimeFilter === '30d') supEntries = supEntries.filter(function(e){return e[1].latestDate && e[1].latestDate >= now30});
+   supEntries.sort(function(a,b){return (b[1].latestDate||0) - (a[1].latestDate||0)});
+   var activeCount = Object.entries(supByType).filter(function(e){return e[1].latestDate && e[1].latestDate >= now30}).length;
 
-   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+supportRequests.length+' request'+(supportRequests.length!==1?'s':'')+' from '+supSorted.length+' categor'+(supSorted.length!==1?'ies':'y')+'</span></div><div class="dash-section-body">';
-   _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during their visits. These highlight where specialist help, additional resources, or escalation may be required.</div>';
-   _supHTML += '<div style="display:grid;gap:8px">';
-   supSorted.forEach(function(entry){
-     var type = entry[0], data = entry[1];
-     var schoolArr = Array.from(data.schools);
-     var distArr = Array.from(data.districts);
-     var schoolPreview = schoolArr.slice(0,3).join(', ') + (schoolArr.length>3 ? ' +' + (schoolArr.length-3) + ' more' : '');
-     _supHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 14px;border:1px solid #EDE7F6">';
-     _supHTML += '<div style="flex:1;min-width:0">';
-     _supHTML += '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-size:12px;font-weight:700;color:var(--navy);line-height:1.4">'+esc(type)+'</div><span style="font-size:10px;font-weight:700;color:#7E57C2;background:#EDE7F6;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0">'+data.count+'× flagged</span></div>';
-     _supHTML += '<div style="font-size:10px;color:var(--grey);margin-top:3px;line-height:1.5">';
-     if (schoolArr.length) _supHTML += '<span style="font-weight:600">Schools:</span> '+esc(schoolPreview);
-     if (distArr.length) _supHTML += ' &middot; <span style="font-weight:600">'+(distArr.length===1?'District':'Districts')+':</span> '+esc(distArr.join(', '));
-     _supHTML += '</div></div></div>';
-   });
-   _supHTML += '</div></div></div>';
+   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+activeCount+' active</span></div><div class="dash-section-body">';
+   _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during school visits. Tap a request to see details and respond.</div>';
+   _supHTML += '<div class="sup-time-tabs"><button class="sup-time-tab '+(S._supTimeFilter==='30d'?'active':'')+'" onclick="filterSupTime(\'30d\')">Last 30 days</button><button class="sup-time-tab '+(S._supTimeFilter==='term'?'active':'')+'" onclick="filterSupTime(\'term\')">This term</button><button class="sup-time-tab '+(S._supTimeFilter==='all'?'active':'')+'" onclick="filterSupTime(\'all\')">All time</button></div>';
+   if (!supEntries.length) {
+     _supHTML += '<div style="text-align:center;color:var(--grey);padding:16px;font-size:12px">No support requests in this time period</div>';
+   } else {
+     supEntries.forEach(function(entry){
+       var need = entry[0], data = entry[1];
+       var isRecent = data.latestDate && data.latestDate >= now30;
+       var isOpen = S._supExpanded[need];
+       var needEsc = esc(need).replace(/'/g,"\\x27");
+       var schoolArr = Array.from(data.schools);
+       var distArr = Array.from(data.districts);
+       var schoolPreview = schoolArr.slice(0,4).join(', ')+(schoolArr.length>4?' +' +(schoolArr.length-4)+' more':'');
+       var subjectEntries = Object.entries(data.subjects).sort(function(a,b){return b[1]-a[1]});
+       var daysAgo = data.latestDate ? Math.floor((new Date()-data.latestDate)/(1000*60*60*24)) : null;
+       var recencyLabel = daysAgo===null?'':daysAgo<1?'Last flagged today':daysAgo===1?'Last flagged 1 day ago':'Last flagged '+daysAgo+' days ago';
+
+       _supHTML += '<div class="sup-card '+(isRecent?'sup-recent':'sup-older')+'">';
+       _supHTML += '<div class="sup-header" onclick="toggleSup(\''+needEsc+'\')">';
+       _supHTML += '<div><div class="sup-type">'+esc(need)+'</div></div>';
+       _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'× flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
+       _supHTML += '<span class="sup-arrow'+(isOpen?' open':'')+'">&#9654;</span></div>';
+
+       _supHTML += '<div class="sup-expand'+(isOpen?' show':'')+'">';
+       _supHTML += '<div class="sup-details">';
+       if (distArr.length) _supHTML += '<div class="sup-detail-row"><strong>'+(distArr.length===1?'District':'Districts')+':</strong> '+esc(distArr.join(', '))+'</div>';
+       if (schoolArr.length) { _supHTML += '<div class="sup-detail-row"><strong>Schools:</strong></div><div class="sup-schools">'+schoolArr.map(function(s){return '<span class="sup-school-tag">'+esc(s)+'</span>'}).join('')+'</div>'; }
+       if (subjectEntries.length) _supHTML += '<div class="sup-detail-row" style="margin-top:6px"><strong>Subjects:</strong> '+subjectEntries.map(function(se){return esc(se[0])+(se[1]>1?' ('+se[1]+'×)':'')}).join(', ')+'</div>';
+       _supHTML += '</div>';
+
+       // ── THREAD ──
+       var responses = (S._supResponses||[]).filter(function(r){return r.support_need===need});
+       _supHTML += '<div class="thread-area">';
+       _supHTML += '<div class="thread-label">Responses'+(responses.length?' <span class="thread-count">'+responses.length+'</span>':'')+'</div>';
+       if (responses.length) {
+         responses.forEach(function(r){
+           _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div><div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
+         });
+       } else {
+         _supHTML += '<div class="thread-empty">No responses yet \u2014 be the first to respond</div>';
+       }
+       _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Add a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needEsc.replace(/[^a-zA-Z0-9]/g,'')+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')" title="Send">&#9654;</button></div>';
+       _supHTML += '</div>';
+       _supHTML += '</div></div>';
+     });
+   }
+   _supHTML += '</div></div>';
  }
 
 // ── TAB STATE ──
@@ -3024,151 +3198,126 @@ ${tab==='trends'?`
 
 ${tab==='tracker'?`
  <!-- ═══ INTERVENTION ACTIVITY TRACKER ═══ -->
- <div class="dash-section" style="border-left: 4px solid var(--teal)">
+ <div class="dash-section" style="border-left:4px solid var(--teal)">
    <div class="dash-section-hdr">
-     <h3>From Decisions to Action</h3>
+     <h3>Intervention Activity Tracker</h3>
      <span style="font-size:11px;color:var(--grey)">${acts.length} action${acts.length!==1?'s':''} logged</span>
    </div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Tracks the journey from what ${_lYou} planned to what happened on the ground. Each logged activity creates a chain: a decision was made, an action was taken, and a status shows how far it has progressed.</div>
+     <div class="dash-section-desc">Each logged activity shows what was decided, what action was taken, and which DDD data informed the decision. Tap any card for full details.</div>
 
-     <!-- Progress segments -->
-     <div style="display:flex;gap:6px;margin-bottom:18px">
-       ${[
-         {label:'Planned',count:planned,color:'var(--blue)'},
-         {label:'In Progress',count:inProgress,color:'var(--orange)'},
-         {label:'Completed',count:completed,color:'var(--green)'}
-       ].map(s => {
-         const pct = acts.length ? Math.round((s.count/acts.length)*100) : 0;
-         return '<div style="flex:1;text-align:center"><div style="height:6px;border-radius:3px;background:#ECEFF1;overflow:hidden;margin-bottom:6px"><div style="height:100%;border-radius:3px;background:'+s.color+';width:'+pct+'%;transition:width .5s"></div></div><div style="font-size:18px;font-weight:800;color:var(--navy);line-height:1">'+s.count+'</div><div style="font-size:10px;color:var(--grey);font-weight:600">'+s.label+'</div></div>';
-       }).join('')}
+     <!-- Summary bar -->
+     <div class="act-summary-bar">
+       ${[{f:'all',n:acts.length,c:'c-teal',s:'s-all',l:'All'},{f:'in-progress',n:inProgress,c:'c-orange',s:'s-progress',l:'In Progress'},{f:'planned',n:planned,c:'c-blue',s:'s-planned',l:'Planned'},{f:'completed',n:completed,c:'c-green',s:'s-done',l:'Completed'}].map(t => '<button class="act-summary-item'+((S._trackerFilter||'all')===t.f?' active ':' ')+t.s+'" onclick="S._trackerFilter=\''+t.f+'\';render()"><div class="act-summary-num '+t.c+'">'+t.n+'</div><div class="act-summary-label">'+t.l+'</div></button>').join('')}
+     </div>
+     <div class="act-stack-bar">
+       ${acts.length?'<div class="act-stack-seg" style="width:'+Math.round(inProgress/acts.length*100)+'%;background:var(--orange)"></div><div class="act-stack-seg" style="width:'+Math.round(planned/acts.length*100)+'%;background:var(--blue)"></div><div class="act-stack-seg" style="width:'+Math.round(completed/acts.length*100)+'%;background:var(--green)"></div>':''}
      </div>
 
-     <!-- Decision → Action list by entity -->
+     <!-- Timeline cards -->
      ${(function(){
-       var entityMap = {};
+       var trackerFilter = S._trackerFilter || 'all';
+       var allChains = [];
        decs.forEach(function(d){
          var det = d.details || {};
-         var dist = det.district || 'Unknown';
-         var prov = det.province || '';
-         var key = prov + '|' + dist;
-         if (!entityMap[key]) entityMap[key] = {province:prov, district:dist, chains:[], schoolSet:new Set()};
-         var schools = det.schools ? det.schools.split(',').map(function(s){return s.trim()}).filter(Boolean) : [];
-         schools.forEach(function(s){entityMap[key].schoolSet.add(s)});
          var matchActs = acts.filter(function(a){return a.decision_id === d.id});
          if (matchActs.length) {
            matchActs.forEach(function(a){
-             entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'\u2014'),action:a.action_taken||'\u2014',status:a.status||'In Progress',date:d.date||'',schools:schools.join(', '),responsible:a.responsible||''});
+             var statusNorm = (a.status||'In Progress');
+             if (trackerFilter !== 'all') {
+               if (trackerFilter === 'in-progress' && statusNorm !== 'In Progress') return;
+               if (trackerFilter === 'planned' && statusNorm !== 'Planned') return;
+               if (trackerFilter === 'completed' && statusNorm !== 'Completed') return;
+             }
+             allChains.push({dec:d, det:det, act:a, status:statusNorm, date:d.date||''});
            });
          } else {
-           entityMap[key].chains.push({decision:det.decision_type||(det.decision_other?'Other: '+det.decision_other:'\u2014'),action:'(no action logged)',status:'Planned',date:d.date||'',schools:schools.join(', '),responsible:''});
+           if (trackerFilter !== 'all' && trackerFilter !== 'planned') return;
+           allChains.push({dec:d, det:det, act:null, status:'Planned', date:d.date||''});
          }
        });
-       var entities = Object.entries(entityMap).sort(function(a,b){var dA=a[1].district,dB=b[1].district;var natA=(!dA||dA==='All'||dA==='Unknown')?1:0;var natB=(!dB||dB==='All'||dB==='Unknown')?1:0;if(natA!==natB)return natA-natB;return dA.localeCompare(dB)});
-       if (!entities.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No decision chains recorded yet</div>';
-       var mx = Math.max.apply(null,entities.map(function(e){return e[1].chains.length}))||1;
+       allChains.sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
+
+       if (!allChains.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No activities to show'+(trackerFilter!=='all'?' for this filter':'')+'</div>';
+
        var html = '';
-       entities.forEach(function(entry){
-         var key = entry[0], e = entry[1];
-         var isOpen = S._d2aExpanded[key];
-         var pCnt = e.chains.filter(function(c){return c.status==='Planned'}).length;
-         var ipCnt = e.chains.filter(function(c){return c.status==='In Progress'}).length;
-         var cCnt = e.chains.filter(function(c){return c.status==='Completed'}).length;
-         var pPct = Math.round((pCnt/mx)*100);
-         var ipPct = Math.round((ipCnt/mx)*100);
-         var cPct = Math.round((cCnt/mx)*100);
-         var keyEsc = esc(key.replace(/'/g,"\\'"));
-         html += '<div class="d2a-row'+(isOpen?' open':'')+'" onclick="toggleD2a(\''+keyEsc+'\')">';
-         html += '<div class="d2a-entity"><div class="d2a-prov">'+esc(e.province==='National'||!e.province?'National':e.province)+'</div><div class="d2a-name">'+esc(!e.district||e.district==='All'||e.district==='Unknown'?'All Districts':e.district)+'</div></div>';
-         html += '<div class="d2a-right"><div class="d2a-bar">'+(pCnt?'<div class="d2a-bar-seg" style="width:'+pPct+'%;background:var(--blue)"></div>':'')+(ipCnt?'<div class="d2a-bar-seg" style="width:'+ipPct+'%;background:var(--orange)"></div>':'')+(cCnt?'<div class="d2a-bar-seg" style="width:'+cPct+'%;background:var(--green)"></div>':'')+'</div>';
-         html += '<div class="d2a-counts">';
-         if(ipCnt) html += '<span class="d2a-cnt ip"><span class="d2a-dot"></span>'+ipCnt+' In Progress</span>';
-         if(cCnt) html += '<span class="d2a-cnt c"><span class="d2a-dot"></span>'+cCnt+' Done</span>';
-         if(pCnt) html += '<span class="d2a-cnt pl"><span class="d2a-dot"></span>'+pCnt+' Planned</span>';
-         html += '</div></div></div>';
+       var lastMonth = '';
+       allChains.forEach(function(c, idx){
+         var dd = c.date ? new Date(c.date) : null;
+         var monthKey = dd ? dd.toLocaleString('en-ZA',{month:'long',year:'numeric'}) : 'Unknown';
+         if (monthKey !== lastMonth) { html += '<div class="tl-month-hdr">'+esc(monthKey)+'</div>'; lastMonth = monthKey; }
+
+         var cardId = 'ac-'+idx;
+         var isOpen = S._actExpanded === cardId;
+         var sCls = c.status === 'Completed' ? 'c' : c.status === 'Planned' ? 'pl' : 'ip';
+         var sLabel = c.status;
+         var actionLabel = c.act ? (c.act.action_taken || '\u2014') : '(no action logged)';
+         var schools = c.det.schools || '';
+         var district = c.det.district || '';
+         var isMine = c.act ? c.act.official_id === S._officialId : c.dec.official_id === S._officialId;
+
+         html += '<div class="act-card"><div class="act-card-top" onclick="toggleActCard(\''+cardId+'\')">';
+         html += '<div class="act-pip pip-'+sCls+'"></div>';
+         html += '<div class="act-card-body"><div class="act-card-action">'+esc(actionLabel)+'</div>';
+         html += '<div class="act-card-school"><b>'+esc(schools.length>60?schools.slice(0,57)+'...':schools||'\u2014')+'</b>'+(district?' \u00B7 '+esc(district):'')+'</div></div>';
+         html += '<div class="act-card-right"><span class="act-card-date">'+fmtDate(c.date)+'</span><span class="act-card-badge b-'+sCls+'">'+sLabel+'</span>';
+         html += '<span class="act-card-arrow'+(isOpen?' open':'')+'">&#9654;</span></div></div>';
+
          if (isOpen) {
-           html += '<div class="d2a-detail">';
-           e.chains.forEach(function(c){
-             var sCls = c.status.replace(/\s+/g,'-');
-             var sIcon = c.status==='Completed'?'\u2713':c.status==='Planned'?'\u25CB':'\u25CF';
-             var sArr = (c.schools||'').split(',').map(function(x){return x.trim()}).filter(Boolean);
-             var schoolLabel = sArr.length <= 3 ? esc(sArr.join(', ')||'\u2014') : '<strong>'+sArr.length+' schools</strong>';
-             html += '<div class="d2a-chain"><div class="d2a-chain-school">'+schoolLabel+'</div><div class="d2a-chain-dec">Decided: '+esc(c.decision)+'</div><div class="d2a-chain-act">Action: '+esc(c.action)+'</div><div class="d2a-chain-foot"><span class="d2a-badge '+sCls+'">'+sIcon+' '+esc(c.status)+'</span><span class="d2a-chain-date">'+fmtDate(c.date)+'</span></div></div>';
-           });
+           var decLabel = c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014');
+           var rptArr = c.det.ddd_reports || [];
+           var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
+           var rptCount = rptArr.length;
+           var chainDataLabel = usedDDD ? (rptCount === 1 ? '1 DDD report' : rptCount+' DDD reports') : 'No DDD data';
+           var chainDataCls = usedDDD ? 'act-chain-data' : 'act-chain-nodata';
+
+           html += '<div class="act-card-detail show">';
+           html += '<div class="act-chain"><div class="act-chain-step '+chainDataCls+'"><div class="act-chain-lbl">Data used</div><div class="act-chain-txt">'+chainDataLabel+'</div></div><div class="act-chain-step act-chain-dec"><div class="act-chain-lbl">Decision</div><div class="act-chain-txt">'+esc(decLabel.length>30?decLabel.slice(0,28)+'\u2026':decLabel)+'</div></div><div class="act-chain-step act-chain-act"><div class="act-chain-lbl">Action</div><div class="act-chain-txt">'+esc(actionLabel.length>30?actionLabel.slice(0,28)+'\u2026':actionLabel)+'</div></div></div>';
+
+           html += '<div class="act-detail-grid">';
+           html += '<div class="act-detail-row"><span class="act-detail-lbl">Logged by</span><span class="act-detail-val">'+esc(c.det.official_name||c.dec.made_by||'')+(c.det.official_role?' \u00B7 '+esc(c.det.official_role):'')+'</span></div>';
+           if (c.det.subjects && c.det.subjects.length) html += '<div class="act-detail-row"><span class="act-detail-lbl">Subjects</span><span class="act-detail-val">'+esc(c.det.subjects.join(', '))+'</span></div>';
+           if (c.det.grades && c.det.grades.length) html += '<div class="act-detail-row"><span class="act-detail-lbl">Grades</span><span class="act-detail-val">'+esc(c.det.grades.join(', '))+'</span></div>';
+           if (c.det.learners_reached) html += '<div class="act-detail-row"><span class="act-detail-lbl">Learners</span><span class="act-detail-val">'+c.det.learners_reached+' learners reached</span></div>';
+           if (c.det.educators_supported) html += '<div class="act-detail-row"><span class="act-detail-lbl">Educators</span><span class="act-detail-val">'+c.det.educators_supported+' educators supported</span></div>';
+           if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="act-detail-row"><span class="act-detail-lbl">Follow-up</span><span class="act-detail-val">'+esc(c.det.follow_up_desc)+'</span></div>';
+           if (c.det.description) html += '<div class="act-detail-row"><span class="act-detail-lbl">Detail</span><span class="act-detail-val">'+esc(c.det.description)+'</span></div>';
+           if (c.act && c.act.responsible) html += '<div class="act-detail-row"><span class="act-detail-lbl">Responsible</span><span class="act-detail-val">'+esc(c.act.responsible)+'</span></div>';
+           html += '</div>';
+
+           // DDD report tags
+           if (usedDDD) {
+             html += '<div class="ddd-ref-area"><div class="ddd-ref-title">DDD report'+(rptCount>1?'s':'')+' used</div><div class="ddd-ref-tags">';
+             rptArr.forEach(function(rName){
+               var rObj = TK_REPORTS.find(function(r){return r.name === rName});
+               if (!rObj) { html += '<div class="ddd-tag" style="background:#f5f5f5;border-color:#e0e0e0;color:var(--grey)" onclick="toggleDddTag(this)"><span class="ddd-tag-name">'+esc(rName)+'</span></div>'; return; }
+               html += '<div class="ddd-tag rpt-'+rObj.id+'" onclick="toggleDddTag(this)"><div style="display:flex;align-items:center;gap:5px"><span class="ddd-tag-icon">'+rObj.icon+'</span><span class="ddd-tag-name">'+esc(rObj.name)+'</span></div><div class="ddd-tag-path">Find it: '+esc(rObj.path)+'</div></div>';
+             });
+             html += '</div><div class="ddd-link-row"><a href="'+DDD_DASHBOARD_URL+'" target="_blank" rel="noopener" class="ddd-link-quiet" onclick="event.stopPropagation()">Open DDD Dashboard</a></div></div>';
+           } else {
+             html += '<div class="act-no-ddd">No DDD dashboard data was used for this activity</div>';
+           }
+
+           // Action buttons
+           if (isMine && c.act && c.status !== 'Completed') {
+             html += '<div class="act-btns">';
+             if (c.status === 'Planned') html += '<button class="act-btn-start" onclick="updateActionStatus(\''+c.act.id+'\',\'In Progress\')">Start</button>';
+             html += '<button class="act-btn-done" onclick="updateActionStatus(\''+c.act.id+'\',\'Completed\')">&#10003; Mark Complete</button></div>';
+           } else if (!isMine && c.act && c.status !== 'Completed') {
+             html += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:10px">Only '+esc(c.act.responsible || 'the person who logged this')+' can update this action</div>';
+           } else if (c.status === 'Completed') {
+             html += '<div style="font-size:10px;color:var(--grey-lt);font-style:italic;margin-top:10px">Completed'+(c.act&&c.act.updated_at?' on '+fmtDate(c.act.updated_at):'')+'</div>';
+           }
            html += '</div>';
          }
+         html += '</div>';
        });
        return html;
      })()}
    </div>
  </div>
+`:''}\
 
- <!-- ═══ ACTION CARDS ═══ -->
- <div class="dash-section">
-   <div class="dash-section-hdr">
-     <h3>Action Status</h3>
-     <div style="display:flex;gap:4px;flex-wrap:wrap">
-       ${['all','in-progress','planned','completed'].map(f => {
-         var cnt = f==='all'? acts.length : f==='in-progress'? inProgress : f==='planned'? planned : completed;
-         var lbl = f==='all'?'All':f==='in-progress'?'In Progress':f==='planned'?'Planned':'Completed';
-         var sel = (S._trackerFilter||'all') === f;
-         return '<button onclick="S._trackerFilter=\''+f+'\';render()" style="font-family:inherit;font-size:10px;font-weight:'+(sel?'700':'500')+';padding:4px 10px;border-radius:14px;border:'+(sel?'1.5px solid var(--teal)':'1px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'var(--grey-dk)')+';cursor:pointer">'+lbl+' ('+cnt+')</button>';
-       }).join('')}
-     </div>
-   </div>
-   <div class="dash-section-body" style="padding:10px 16px">
-     ${(function(){
-       var trackerFilter = S._trackerFilter || 'all';
-       var filteredActs = acts;
-       if (trackerFilter === 'in-progress') filteredActs = acts.filter(a => a.status === 'In Progress');
-       else if (trackerFilter === 'planned') filteredActs = acts.filter(a => a.status === 'Planned');
-       else if (trackerFilter === 'completed') filteredActs = acts.filter(a => a.status === 'Completed');
-
-       if (!filteredActs.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No actions to show' + (trackerFilter!=='all'?' for this filter':'') + '</div>';
-
-       return filteredActs.map(a => {
-         var parentDec = decs.find(d => d.id === a.decision_id);
-         var det = parentDec ? (parentDec.details || {}) : {};
-         var decLabel = det.decision_type || parentDec?.decision_made || '';
-         var schools = det.schools || '';
-         var district = det.district || '';
-         var isMine = a.official_id === S._officialId;
- 
-         var statusClass = a.status === 'Completed' ? 'completed' : a.status === 'Planned' ? 'planned' : 'in-progress';
-         var statusColor = a.status === 'Completed' ? 'var(--green)' : a.status === 'Planned' ? 'var(--blue)' : 'var(--orange)';
-         var statusBg = a.status === 'Completed' ? 'var(--green-lt)' : a.status === 'Planned' ? '#E3F2FD' : '#FFF3E0';
-         var statusIcon = a.status === 'Completed' ? '✓' : '●';
-         var statusText = a.status || 'In Progress';
-
-         var card = '<div style="background:var(--off);border-radius:8px;padding:12px 14px;margin-bottom:8px;border-left:3px solid '+statusColor+'">';
-         card += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
-         card += '<div style="flex:1;min-width:0">';
-         if (decLabel) card += '<div style="font-size:10px;color:var(--grey);margin-bottom:4px;line-height:1.5">Decided: <b style=\"color:var(--navy);font-weight:600\">' + esc(decLabel) + '</b>' + (district ? ' · ' + esc(district) : '') + '</div>';
-         card += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">' + esc(a.action_taken || '') + '</div>';
-         card += '<div style="font-size:10px;color:var(--grey)">' + (schools ? esc(schools.length > 60 ? schools.slice(0,57)+'...' : schools) + ' · ' : '') + (a.responsible ? esc(a.responsible) : '') + (parentDec && parentDec.date ? ' · ' + fmtDate(parentDec.date) : '') + '</div>';
-         card += '</div>';
-         card += '<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;background:'+statusBg+';color:'+statusColor+'">' + statusIcon + ' ' + statusText + '</span>';
-         card += '</div>';
-
-         // Action buttons — only for owner
-         if (isMine && a.status !== 'Completed') {
-           card += '<div style="display:flex;gap:6px;margin-top:8px">';
-           if (a.status === 'Planned') {
-             card += '<button onclick="updateActionStatus(\''+a.id+'\',\'In Progress\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--orange);background:#fff;color:var(--orange);transition:all .15s">Start</button>';
-           }
-           card += '<button onclick="updateActionStatus(\''+a.id+'\',\'Completed\')" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);transition:all .15s">✓ Mark Complete</button>';
-           card += '</div>';
-         } else if (!isMine && a.status !== 'Completed') {
-           card += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only ' + esc(a.responsible || 'the person who logged this') + ' can update this action</div>';
-         }
-
-         card += '</div>';
-         return card;
-       }).join('');
-     })()}
-   </div>
- </div>
-`:''}
 
 </div>`;
 }
