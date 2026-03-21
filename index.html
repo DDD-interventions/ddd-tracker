@@ -499,7 +499,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .post-who{flex:1;min-width:0}
 .post-name{font-size:12px;font-weight:700;color:var(--navy)}
 .post-role{font-size:10px;color:var(--grey)}
-.post-time{font-size:10px;color:var(--grey-lt);flex-shrink:0}
+.post-time{font-size:10px;color:var(--grey);font-weight:600;flex-shrink:0}
 .post-body{padding:10px 14px}
 .post-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;margin-bottom:8px}
 .post-status.s-ip{background:#FFF3E0;color:var(--orange)}.post-status.s-pl{background:#E3F2FD;color:var(--blue)}.post-status.s-c{background:var(--green-lt);color:var(--green)}
@@ -508,15 +508,15 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .post-location{font-size:11.5px;color:var(--grey);line-height:1.4;margin-bottom:8px}
 .post-location b{color:var(--navy);font-weight:600}
 /* Chain */
-.post-chain{display:flex;gap:0;margin-bottom:6px}
-.pc-step{flex:1;padding:6px 8px;text-align:center;line-height:1.2}
-.pc-step:not(:last-child){border-right:2px solid #fff}
-.pc-lbl{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.65;margin-bottom:1px}
-.pc-val{font-size:9px;font-weight:600}
-.pc-data{background:#E3F2FD;color:var(--blue);border-radius:6px 0 0 6px}
-.pc-nodata{background:#f5f5f5;color:var(--grey-lt);border-radius:6px 0 0 6px}
+.post-chain{display:flex;flex-direction:column;gap:0;margin-bottom:6px;border-radius:8px;overflow:hidden}
+.pc-step{padding:7px 12px;display:flex;align-items:baseline;gap:8px;line-height:1.3}
+.pc-step:not(:last-child){border-bottom:2px solid #fff}
+.pc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.7;min-width:58px;flex-shrink:0}
+.pc-val{font-size:11px;font-weight:600}
+.pc-data{background:#E3F2FD;color:var(--blue)}
+.pc-nodata{background:#f5f5f5;color:var(--grey-lt)}
 .pc-dec{background:#EDE7F6;color:#7E57C2}
-.pc-act{background:var(--green-lt);color:var(--green);border-radius:0 6px 6px 0}
+.pc-act{background:var(--green-lt);color:var(--green)}
 /* DDD tags */
 .ddd-ref-area{margin-top:8px;padding:8px 10px;background:#f8f9fa;border-radius:8px;border:1px dashed #d0d4da}
 .ddd-ref-title{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
@@ -3397,7 +3397,7 @@ ${tab==='tracker'?`
          html += '<div class="post-location"><b>'+esc(schools.length>70?schools.slice(0,67)+'...':schools||'\u2014')+'</b>'+(district?' \u00B7 '+esc(district):'')+'</div>';
 
          // Chain
-         html += '<div class="post-chain"><div class="pc-step '+chainDataCls+'"><div class="pc-lbl">Data</div><div class="pc-val">'+chainDataLabel+'</div></div><div class="pc-step pc-dec"><div class="pc-lbl">Decision</div><div class="pc-val">'+esc(decLabel.length>25?decLabel.slice(0,23)+'\u2026':decLabel)+'</div></div><div class="pc-step pc-act"><div class="pc-lbl">Action</div><div class="pc-val">'+esc(actionLabel.length>25?actionLabel.slice(0,23)+'\u2026':actionLabel)+'</div></div></div>';
+         html += '<div class="post-chain"><div class="pc-step '+chainDataCls+'"><div class="pc-lbl">Data</div><div class="pc-val">'+chainDataLabel+'</div></div><div class="pc-step pc-dec"><div class="pc-lbl">Decision</div><div class="pc-val">'+esc(decLabel)+'</div></div><div class="pc-step pc-act"><div class="pc-lbl">Action</div><div class="pc-val">'+esc(actionLabel)+'</div></div></div>';
 
          // DDD tags
          if (usedDDD) {
