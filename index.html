@@ -462,6 +462,25 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .reply-send{border-radius:18px;border:none;background:#7E57C2;color:#fff;font-size:11px;font-weight:700;cursor:pointer;padding:8px 14px;transition:background .15s;flex-shrink:0;font-family:inherit;white-space:nowrap}
 .reply-send:hover{background:#6A3FB5}
 .reply-send:disabled{background:#ccc;cursor:default}
+/* Scope badges */
+.scope-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:4px}
+.scope-badge.sb-all{background:#EDE7F6;color:#7E57C2}
+.scope-badge.sb-district{background:#E3F2FD;color:#1565C0}
+.scope-badge.sb-school{background:#E8F5E9;color:#43A047}
+/* Scope selector */
+.scope-selector{margin-bottom:6px}
+.scope-lbl{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.scope-opts{display:flex;flex-wrap:wrap;gap:4px}
+.scope-opt{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1.5px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;transition:all .12s;font-family:inherit}
+.scope-opt:hover{border-color:#ccc}
+.scope-opt.active{border-color:#7E57C2;background:#EDE7F6;color:#7E57C2}
+.scope-opt.active.sod{border-color:#1565C0;background:#E3F2FD;color:#1565C0}
+.scope-opt.active.sos{border-color:#43A047;background:#E8F5E9;color:#43A047}
+.scope-schools-dd{display:none;flex-wrap:wrap;gap:4px;margin-top:4px}
+.scope-schools-dd.show{display:flex}
+.scope-school-btn{font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;font-family:inherit}
+.scope-school-btn.active{border-color:#43A047;background:#E8F5E9;color:#43A047}
+.scope-hint{font-size:9px;color:var(--grey);margin-bottom:4px;font-style:italic}
 
 /* ─── ACTIVITY TRACKER — SOCIAL POST LAYOUT ─── */
 /* Streak bar */
@@ -843,7 +862,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -1090,6 +1109,7 @@ function toggleChall(b){S._challExpanded=S._challExpanded===b?null:b;render();}
 function toggleSup(need){S._supExpanded[need]=!S._supExpanded[need];render();}
 function filterSupTime(period){S._supTimeFilter=period;render();}
 function setSupReply(need,val){S._supReplyText[need]=val;}
+function setSupScope(need,type,entity){S._supReplyScope[need]={type:type,entity:entity||''};render();}
 function supInitials(name){return (name||'?').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
 function supTimeAgo(dateStr){
   if(!dateStr)return '';
@@ -1106,11 +1126,13 @@ async function loadSupResponses(){
 async function submitSupResponse(need){
   var txt=(S._supReplyText[need]||'').trim();
   if(!txt)return;
+  var scope=S._supReplyScope[need]||{type:'all',entity:''};
   try{
-    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt};
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:scope.type,scope_entity:scope.entity};
     var {error}=await sb.from('support_responses').insert(row);
     if(error)throw error;
     S._supReplyText[need]='';
+    S._supReplyScope[need]={type:'all',entity:''};
     await loadSupResponses();
     render();
     showToast('Response posted');
@@ -2999,7 +3021,9 @@ function renderDashboard() {
        _supHTML += '<div class="thread-label">Responses'+(responses.length?' <span class="thread-count">'+responses.length+'</span>':'')+'</div>';
        if (responses.length) {
          responses.forEach(function(r){
-           _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div><div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
+           var scopeCls=r.scope_type==='school'?'sb-school':r.scope_type==='district'?'sb-district':'sb-all';
+             var scopeLabel=r.scope_type==='school'?esc(r.scope_entity||''):r.scope_type==='district'?esc(r.scope_entity||''):'All schools';
+             _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
          });
        } else {
          _supHTML += '<div class="thread-empty">No responses yet \u2014 be the first to respond</div>';
@@ -3383,7 +3407,8 @@ ${tab==='tracker'?`
 
          html += '<div class="post'+(isCompleted?' post-done':'')+'">';
          // Header
-         html += '<div class="post-hdr"><div class="post-avatar" style="background:'+avatarBg+'">'+initials+'</div><div class="post-who"><div class="post-name">'+esc(officialName)+'</div><div class="post-role">'+esc(officialRole)+(district?' \u00B7 '+esc(district):'')+'</div></div><div class="post-time">'+fmtDate(c.date)+'</div></div>';
+         var loggedAt = c.dec.created_at ? fmtDateTime(c.dec.created_at) : '';
+         html += '<div class="post-hdr"><div class="post-avatar" style="background:'+avatarBg+'">'+initials+'</div><div class="post-who"><div class="post-name">'+esc(officialName)+'</div><div class="post-role">'+esc(officialRole)+(district?' \u00B7 '+esc(district):'')+'</div></div><div class="post-time"><div>'+fmtDate(c.date)+'</div>'+(loggedAt?'<div style="font-size:9px;color:var(--grey-lt);margin-top:1px">Logged '+loggedAt+'</div>':'')+'</div></div>';
 
          // Body
          html += '<div class="post-body">';
@@ -3835,6 +3860,7 @@ function renderOutcomeModal(){
 // Coverage table row expand/collapse (mobile only)
 
 function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
+function fmtDateTime(d) { if(!d)return''; try{var dt=new Date(d);return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' at '+dt.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Africa/Johannesburg'})}catch(e){return''} }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function markDDDChecked(){S.ddd_last_checked=today();try{localStorage.setItem('ddd_last_checked',S.ddd_last_checked)}catch(e){}render();}
 // ═══════════════════════════════════
