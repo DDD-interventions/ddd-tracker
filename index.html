@@ -430,8 +430,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .sup-recency{font-size:9px;font-weight:600;letter-spacing:.3px}
 .sup-recency.fresh{color:var(--green)}
 .sup-recency.stale{color:var(--grey)}
-.sup-arrow{font-size:10px;color:var(--grey-lt);transition:transform .2s;display:inline-block;margin-top:2px}
+.sup-arrow{font-size:10px;color:var(--purple);transition:transform .2s;display:inline-block;margin-top:2px}
 .sup-arrow.open{transform:rotate(90deg)}
+.sup-tap-hint{font-size:9px;color:var(--purple);font-weight:600;opacity:.5;margin-top:2px}
 .sup-expand{display:none}
 .sup-expand.show{display:block}
 .sup-details{padding:0 14px 10px;font-size:11px;color:var(--grey);line-height:1.5}
@@ -475,6 +476,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .scope-school-btn{font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;font-family:inherit}
 .scope-school-btn.active{border-color:#43A047;background:#E8F5E9;color:#43A047}
 .scope-hint{font-size:9px;color:var(--grey);margin-bottom:4px;font-style:italic}
+.reply-context{font-size:10px;color:var(--navy);font-weight:600;background:#f5f3fa;border-left:3px solid var(--purple);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;line-height:1.4}
+.pt-context{font-size:10px;color:var(--navy);font-weight:600;background:var(--teal-lt);border-left:3px solid var(--teal);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;line-height:1.4}
 
 /* ─── ACTIVITY TRACKER — SOCIAL POST LAYOUT ─── */
 /* Streak bar */
@@ -556,8 +559,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .pd-row{display:flex;gap:6px;margin-bottom:3px}
 .pd-lbl{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.3px;min-width:60px;flex-shrink:0;padding-top:1px}
 .pd-val{font-size:11px;color:var(--navy);line-height:1.4}
-.post-expand-btn{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal);font-weight:600;cursor:pointer;padding:2px 0 4px;background:none;border:none;font-family:inherit;width:100%}
-.post-expand-btn:hover{text-decoration:underline}
+.post-expand-btn{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal);font-weight:700;cursor:pointer;padding:6px 0;background:#f5f9f9;border:1px dashed #d0e4e4;border-radius:6px;font-family:inherit;width:100%;margin-top:4px;transition:background .12s}
+.post-expand-btn:hover{background:#e4f2f2;text-decoration:none}
 /* Engagement bar */
 .post-engagement{border-top:1px solid #f0f0f0;padding:0 14px}
 .post-stats{display:flex;justify-content:space-between;padding:6px 0;font-size:10px;color:var(--grey)}
@@ -856,7 +859,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], expandedChains:{}, outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -1247,6 +1250,7 @@ async function loadAll() {
  await loadActResponses();
  // Restore any saved form draft (from auto-update or page refresh)
  if (!S._draftRestored) { S._draftRestored = true; restoreFormDraft(); }
+ flushSubmitQueue();
  } catch(e) { S.error = e.message; S.loading = false; }
  render();
 }
@@ -1271,7 +1275,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="navToLog()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="navToLog()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -2281,22 +2285,10 @@ async function submitForm() {
  const actId = genId('ACT');
  const meta = { logged_by:S.f.official_name||S.official.full_name||'User', logged_by_email:S.f.official_email||S.official.email||'' };
 
- try {
- // Upload supporting doc if attached
+ // Build payloads
  let docUrl = S.f.doc_url || '';
  let docName = S.f.doc_name || '';
- if (S.f.doc_file) {
-   showToast('Uploading document...');
-   try {
-     const uploaded = await uploadSupportingDoc(S.f.doc_file, actId);
-     if (uploaded.url) { docUrl = uploaded.url; docName = uploaded.name || docName; }
-   } catch (uploadErr) {
-     console.warn('File upload failed, continuing without:', uploadErr.message);
-     showToast('File upload failed — entry will be saved without attachment. You can add it later.');
-   }
- }
 
- // Insert decision
  const dec = {
  id: decId,
  official_id: S._officialId,
@@ -2311,10 +2303,7 @@ async function submitForm() {
  details: details,
  ...meta
  };
- const r1 = await sb.from('decisions').insert(dec);
- if (r1.error) throw r1.error;
 
- // Insert action
  const act = {
  id: actId,
  official_id: S._officialId,
@@ -2329,14 +2318,40 @@ async function submitForm() {
  supporting_doc_name: docName,
  ...meta
  };
+
+ // Save to local queue FIRST — protects against network failure
+ addToSubmitQueue(dec, act);
+
+ try {
+ // Upload supporting doc if attached
+ if (S.f.doc_file) {
+   showToast('Uploading document...');
+   try {
+     const uploaded = await uploadSupportingDoc(S.f.doc_file, actId);
+     if (uploaded.url) { act.supporting_doc_url = uploaded.url; act.supporting_doc_name = uploaded.name || docName; }
+   } catch (uploadErr) {
+     console.warn('File upload failed, continuing without:', uploadErr.message);
+   }
+ }
+
+ const r1 = await sb.from('decisions').insert(dec);
+ if (r1.error) throw r1.error;
  const r2 = await sb.from('actions').insert(act);
  if (r2.error) throw r2.error;
+
+ // Success — remove from queue
+ var q = getSubmitQueue();
+ var qIdx = q.findIndex(function(item){return item.dec.id === decId});
+ if (qIdx > -1) removeFromSubmitQueue(qIdx);
 
  S.submitted = true;
     try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
  await loadAll();
  } catch(e) {
- showToast('Error: ' + e.message);
+ // Network failed — but data is already saved locally
+ S.submitted = true;
+ try{sessionStorage.removeItem('ddd_form_draft')}catch(e2){}
+ showToast('Saved offline — your activity will be submitted when your connection improves');
  }
  S.saving = false; render();
  window.scrollTo({top:0,behavior:'smooth'});
@@ -2982,7 +2997,7 @@ function renderDashboard() {
 
        _supHTML += '<div class="sup-card '+(isRecent?'sup-recent':'sup-older')+'">';
        _supHTML += '<div class="sup-header" onclick="toggleSup(\''+needEsc+'\')">';
-       _supHTML += '<div><div class="sup-type">'+esc(need)+'</div></div>';
+       _supHTML += '<div><div class="sup-type">'+esc(need)+'</div><div class="sup-tap-hint">'+(isOpen?'Tap to collapse':'Tap to expand and respond')+'</div></div>';
        _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'× flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
        _supHTML += '<span class="sup-arrow'+(isOpen?' open':'')+'">&#9654;</span></div>';
 
@@ -2999,9 +3014,9 @@ function renderDashboard() {
        distKeys.forEach(function(dk){
          var dkSchools = Array.from(schoolsByDist[dk]).sort();
          var dkId = needEsc.replace(/[^a-zA-Z0-9]/g,'')+'_'+dk.replace(/[^a-zA-Z0-9]/g,'');
-         _supHTML += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f5f3fa;border-radius:6px;cursor:pointer" onclick="var el=document.getElementById(\'sd-'+dkId+'\');el.style.display=el.style.display===\'none\'?\'flex\':\'none\'">';
+         _supHTML += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f5f3fa;border-radius:6px;cursor:pointer;border:1px dashed #e0d8f0" onclick="var el=document.getElementById(\'sd-'+dkId+'\');el.style.display=el.style.display===\'none\'?\'flex\':\'none\'">';
          _supHTML += '<span style="font-size:11px;font-weight:600;color:var(--navy)">'+esc(dk)+'</span>';
-         _supHTML += '<span style="font-size:10px;color:#7E57C2;font-weight:600">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+'</span>';
+         _supHTML += '<span style="font-size:10px;color:#7E57C2;font-weight:600">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+' \u25BE</span>';
          _supHTML += '</div><div id="sd-'+dkId+'" style="display:none;flex-wrap:wrap;gap:4px;padding:6px 8px 2px">';
          dkSchools.forEach(function(s){ _supHTML += '<span class="sup-school-tag">'+esc(s)+'</span>'; });
          _supHTML += '</div></div>';
@@ -3045,6 +3060,7 @@ function renderDashboard() {
            _supHTML += '</div>';
          }
        }
+       _supHTML += '<div class="reply-context">Responding to: '+esc(need)+'</div>';
        var scopeHint = curScope.type==='school' ? 'Responding about '+esc(curScope.entity) : curScope.type==='district' ? 'Responding about '+esc(curScope.entity)+' \u2014 or tap a school above' : 'Your response will apply to all schools';
        _supHTML += '<div class="scope-hint">'+scopeHint+'</div></div>';
        _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needEsc.replace(/[^a-zA-Z0-9]/g,'')+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
@@ -3461,7 +3477,7 @@ ${tab==='tracker'?`
          if (c.det.description) html += '<div class="pd-row"><span class="pd-lbl">Detail</span><span class="pd-val">'+esc(c.det.description)+'</span></div>';
          if (c.act && c.act.responsible) html += '<div class="pd-row"><span class="pd-lbl">Responsible</span><span class="pd-val">'+esc(c.act.responsible)+'</span></div>';
          html += '</div>';
-         html += '<button class="post-expand-btn" onclick="var el=document.getElementById(\'pd-'+postId+'\');var o=el.classList.toggle(\'show\');this.textContent=o?\'See less\':\'See more\'">See more</button>';
+         html += '<button class="post-expand-btn" onclick="var el=document.getElementById(\'pd-'+postId+'\');var o=el.classList.toggle(\'show\');this.textContent=o?\'Collapse details\':\'See full details\'">See full details</button>';
          html += '</div>';
 
          // Engagement + thread — only for non-completed
@@ -3479,6 +3495,7 @@ ${tab==='tracker'?`
            } else {
              html += '<div class="pt-empty">Be the first to comment on this activity</div>';
            }
+           html += '<div class="pt-context">Commenting on: '+esc(actionLabel)+' at '+esc(schools||'\u2014')+'</div>';
            html += '<div class="pt-reply"><textarea class="pt-input" placeholder="Write a comment\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
            html += '</div>';
 
@@ -3900,6 +3917,55 @@ function isFormDirty() {
 }
 
 // Save form draft to sessionStorage
+// ─── OFFLINE SUBMISSION QUEUE ───
+function getSubmitQueue() {
+  try { return JSON.parse(localStorage.getItem('ddd_submit_queue')||'[]'); } catch(e) { return []; }
+}
+function saveSubmitQueue(queue) {
+  try { localStorage.setItem('ddd_submit_queue', JSON.stringify(queue)); } catch(e) { console.warn('Could not save queue:', e); }
+}
+function addToSubmitQueue(dec, act) {
+  var queue = getSubmitQueue();
+  queue.push({dec:dec, act:act, queued_at:new Date().toISOString()});
+  saveSubmitQueue(queue);
+}
+function removeFromSubmitQueue(idx) {
+  var queue = getSubmitQueue();
+  queue.splice(idx, 1);
+  saveSubmitQueue(queue);
+}
+async function flushSubmitQueue() {
+  var queue = getSubmitQueue();
+  if (!queue.length) return;
+  var flushed = 0;
+  var failed = [];
+  for (var i = 0; i < queue.length; i++) {
+    try {
+      var item = queue[i];
+      var r1 = await sb.from('decisions').insert(item.dec);
+      if (r1.error) throw r1.error;
+      var r2 = await sb.from('actions').insert(item.act);
+      if (r2.error) throw r2.error;
+      flushed++;
+    } catch(e) {
+      // If duplicate key (already submitted), count as flushed
+      if (e.code === '23505' || (e.message && e.message.indexOf('duplicate')>-1)) { flushed++; }
+      else { failed.push(queue[i]); }
+    }
+  }
+  saveSubmitQueue(failed);
+  if (flushed > 0) {
+    showToast(flushed + ' saved activit' + (flushed > 1 ? 'ies' : 'y') + ' submitted successfully');
+    await loadAll();
+  }
+  return {flushed:flushed, remaining:failed.length};
+}
+function renderPendingBanner() {
+  var queue = getSubmitQueue();
+  if (!queue.length) return '';
+  return '<div style="background:#FFF3E0;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:11px;color:#E65100;line-height:1.4"><strong>' + queue.length + ' activit' + (queue.length > 1 ? 'ies' : 'y') + ' saved offline</strong> — waiting to submit when connection improves</div><button onclick="flushSubmitQueue()" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;border:1.5px solid #E65100;background:#fff;color:#E65100;cursor:pointer;white-space:nowrap">Retry now</button></div>';
+}
+
 function saveFormDraft() {
   try {
     const draft = {
@@ -4001,6 +4067,7 @@ function dismissUpdateBanner() {
 }
 
 // INIT 
+window.addEventListener('online', function(){ showToast('Back online \u2014 syncing\u2026'); flushSubmitQueue(); });
 checkAuth();
 // Start version polling after a short delay (don't slow down initial load)
 setTimeout(() => {
