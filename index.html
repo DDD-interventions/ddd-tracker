@@ -478,6 +478,39 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .scope-hint{font-size:9px;color:var(--grey);margin-bottom:4px;font-style:italic}
 .reply-context{font-size:10px;color:var(--navy);font-weight:600;background:#f5f3fa;border-left:3px solid var(--purple);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;line-height:1.4}
 .pt-context{font-size:10px;color:var(--navy);font-weight:600;background:var(--teal-lt);border-left:3px solid var(--teal);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:8px;line-height:1.4}
+/* Resolution UI */
+.sup-resolved-banner{background:#E8F5E9;border:1px solid #C8E6C9;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.sup-resolved-title{font-size:11px;font-weight:700;color:#2E7D32;margin-bottom:4px}
+.sup-resolved-by{font-size:10px;color:#558B2F;line-height:1.5}
+.sup-resolved-comment{font-size:11px;color:var(--navy);line-height:1.5;margin-top:6px;padding:6px 8px;background:#fff;border-radius:6px;border-left:3px solid #43A047}
+.sup-resolve-flow{border-top:1px solid #f0e8f8;padding:10px 14px;background:#FEFCFF}
+.sup-resolve-btn{display:block;width:100%;padding:8px 12px;font-size:11px;font-weight:700;border:1.5px solid #43A047;background:#fff;color:#43A047;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:6px}
+.sup-resolve-btn:hover{background:#E8F5E9}
+.sup-resolve-form{margin-top:8px}
+.sup-resolve-textarea{width:100%;box-sizing:border-box;font-size:11.5px;font-family:inherit;border:1.5px solid #C8E6C9;border-radius:8px;padding:8px 10px;resize:none;min-height:60px;line-height:1.4;outline:none;transition:border-color .15s}
+.sup-resolve-textarea:focus{border-color:#43A047}
+.sup-resolve-textarea.resolve-error{border-color:var(--red)}
+.sup-resolve-actions{display:flex;gap:8px;margin-top:8px}
+.sup-resolve-confirm{flex:1;padding:8px 10px;font-size:11px;font-weight:700;border:none;background:#43A047;color:#fff;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
+.sup-resolve-confirm:hover{background:#2E7D32}
+.sup-resolve-cancel{flex:0;padding:8px 12px;font-size:11px;font-weight:600;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);border-radius:8px;cursor:pointer;font-family:inherit}
+.sup-card.sup-addressed{opacity:.6;border-color:#C8E6C9}
+.sup-card.sup-addressed .sup-header{background:#FAFFF9}
+/* Schools summary line */
+.sup-schools-summary{font-size:11px;color:var(--navy);padding:6px 0;line-height:1.5}
+.sup-schools-summary strong{font-weight:700}
+.sup-schools-toggle{font-size:10px;color:#7E57C2;font-weight:600;cursor:pointer;display:inline;margin-left:6px;text-decoration:underline;text-decoration-style:dashed;text-underline-offset:2px}
+.sup-schools-detail{display:none;margin-top:6px}
+.sup-schools-detail.show{display:block}
+.sup-dist-row{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:#f5f3fa;border-radius:6px;margin-bottom:4px;font-size:10px;font-weight:600;color:var(--navy)}
+.sup-dist-count{color:#7E57C2;font-weight:700}
+/* Scope dropdown */
+.sup-scope-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sup-scope-label{font-size:10px;font-weight:600;color:var(--grey);white-space:nowrap}
+.sup-scope-select{font-size:11px;font-family:inherit;padding:5px 8px;border:1.5px solid var(--grey-lt);border-radius:6px;background:#fff;color:var(--navy);outline:none;flex:1;min-width:0;cursor:pointer}
+.sup-scope-select:focus{border-color:#7E57C2}
+/* Reopen link */
+.sup-reopen-link{font-size:10px;color:#7E57C2;font-weight:600;cursor:pointer;margin-top:6px;display:inline-block;text-decoration:underline;text-decoration-style:dashed}
 
 /* ─── ACTIVITY TRACKER — SOCIAL POST LAYOUT ─── */
 /* Streak bar */
@@ -859,7 +892,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -1134,6 +1167,50 @@ async function submitSupResponse(need){
     render();
     showToast('Response posted');
   }catch(e){console.warn('Failed to post response:',e);showToast('Could not post response — try again');}
+}
+// ─── RESOLUTION SYSTEM ───
+function toggleSupResolve(need){S._supResolving[need]=!S._supResolving[need];render();}
+function setSupResolveComment(need,val){S._supResolveComment[need]=val;}
+async function markSupAddressed(need){
+  var txt=(S._supResolveComment[need]||'').trim();
+  if(!txt){
+    showToast('Please describe what was done to address this');
+    var el=document.getElementById('resolve-ta-'+need.replace(/[^a-zA-Z0-9]/g,''));
+    if(el){el.classList.add('resolve-error');setTimeout(function(){el.classList.remove('resolve-error')},1500);}
+    return;
+  }
+  try{
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:'resolution',scope_entity:''};
+    var {error}=await sb.from('support_responses').insert(row);
+    if(error)throw error;
+    S._supResolving[need]=false;
+    S._supResolveComment[need]='';
+    await loadSupResponses();
+    render();
+    showToast('Marked as addressed');
+  }catch(e){console.warn('Failed to mark as addressed:',e);showToast('Could not save — check your connection and try again');}
+}
+async function reopenSupNeed(need){
+  var txt='Reopened — this still needs attention';
+  try{
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:'reopened',scope_entity:''};
+    var {error}=await sb.from('support_responses').insert(row);
+    if(error)throw error;
+    await loadSupResponses();
+    render();
+    showToast('Reopened — this need is active again');
+  }catch(e){console.warn('Failed to reopen:',e);showToast('Could not reopen — try again');}
+}
+function supScopeFromSelect(need,selectEl){
+  var v=selectEl.value;
+  if(v==='all'){S._supReplyScope[need]={type:'all',entity:''};}
+  else if(v.startsWith('d:')){S._supReplyScope[need]={type:'district',entity:v.slice(2)};}
+  else if(v.startsWith('s:')){S._supReplyScope[need]={type:'school',entity:v.slice(2)};}
+  render();
+}
+function toggleSupSchoolDetail(need){
+  var el=document.getElementById('sup-sd-'+need.replace(/[^a-zA-Z0-9]/g,''));
+  if(el)el.classList.toggle('show');
 }
 
 // ─── ACTIVITY TRACKER ───
@@ -2974,96 +3051,156 @@ function renderDashboard() {
      if (dd && (!supByType[sr.need].latestDate || dd > supByType[sr.need].latestDate)) supByType[sr.need].latestDate = dd;
      supByType[sr.need].entries.push(sr);
    });
+
+   // Determine resolution status for each support need
+   var supResolved = {};
+   (S._supResponses||[]).forEach(function(r){
+     if (r.scope_type === 'resolution' || r.scope_type === 'reopened') {
+       var ts = new Date(r.created_at||0).getTime();
+       if (!supResolved[r.support_need] || ts > supResolved[r.support_need].ts) {
+         supResolved[r.support_need] = {type:r.scope_type, ts:ts, name:r.official_name||'', role:r.official_role||'', comment:r.comment||'', date:r.created_at||''};
+       }
+     }
+   });
+
    // Filter by time period
    var supEntries = Object.entries(supByType);
    if (S._supTimeFilter === '30d') supEntries = supEntries.filter(function(e){return e[1].latestDate && e[1].latestDate >= now30});
    supEntries.sort(function(a,b){return (b[1].latestDate||0) - (a[1].latestDate||0)});
-   var activeCount = Object.entries(supByType).filter(function(e){return e[1].latestDate && e[1].latestDate >= now30}).length;
 
-   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+activeCount+' active</span></div><div class="dash-section-body">';
-   _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during school visits. Tap a request to see details and respond.</div>';
+   // Count active (not resolved)
+   var activeCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return !res || res.type!=='resolution';}).length;
+   var addressedCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return res && res.type==='resolution';}).length;
+
+   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+activeCount+' active'+(addressedCount?' · '+addressedCount+' addressed':'')+'</span></div><div class="dash-section-body">';
+   _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during school visits. Tap to see details, respond, or mark as addressed.</div>';
    _supHTML += '<div class="sup-time-tabs"><button class="sup-time-tab '+(S._supTimeFilter==='30d'?'active':'')+'" onclick="filterSupTime(\'30d\')">Last 30 days</button><button class="sup-time-tab '+(S._supTimeFilter==='term'?'active':'')+'" onclick="filterSupTime(\'term\')">This term</button><button class="sup-time-tab '+(S._supTimeFilter==='all'?'active':'')+'" onclick="filterSupTime(\'all\')">All time</button></div>';
    if (!supEntries.length) {
      _supHTML += '<div style="text-align:center;color:var(--grey);padding:16px;font-size:12px">No support requests in this time period</div>';
    } else {
+     // Show active first, then addressed
+     supEntries.sort(function(a,b){
+       var aRes = supResolved[a[0]] && supResolved[a[0]].type==='resolution' ? 1 : 0;
+       var bRes = supResolved[b[0]] && supResolved[b[0]].type==='resolution' ? 1 : 0;
+       if (aRes !== bRes) return aRes - bRes;
+       return (b[1].latestDate||0) - (a[1].latestDate||0);
+     });
+
      supEntries.forEach(function(entry){
        var need = entry[0], data = entry[1];
        var isRecent = data.latestDate && data.latestDate >= now30;
        var isOpen = S._supExpanded[need];
        var needEsc = esc(need).replace(/'/g,"\\x27");
+       var needId = needEsc.replace(/[^a-zA-Z0-9]/g,'');
        var subjectEntries = Object.entries(data.subjects).sort(function(a,b){return b[1]-a[1]});
        var daysAgo = data.latestDate ? Math.floor((new Date()-data.latestDate)/(1000*60*60*24)) : null;
        var recencyLabel = daysAgo===null?'':daysAgo<1?'Last flagged today':daysAgo===1?'Last flagged 1 day ago':'Last flagged '+daysAgo+' days ago';
 
-       _supHTML += '<div class="sup-card '+(isRecent?'sup-recent':'sup-older')+'">';
+       // Resolution state
+       var resInfo = supResolved[need];
+       var isAddressed = resInfo && resInfo.type === 'resolution';
+
+       _supHTML += '<div class="sup-card '+(isAddressed?'sup-addressed':isRecent?'sup-recent':'sup-older')+'">';
        _supHTML += '<div class="sup-header" onclick="toggleSup(\''+needEsc+'\')">';
-       _supHTML += '<div><div class="sup-type">'+esc(need)+'</div><div class="sup-tap-hint">'+(isOpen?'Tap to collapse':'Tap to expand and respond')+'</div></div>';
-       _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'× flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
+       _supHTML += '<div style="flex:1;min-width:0"><div class="sup-type">'+esc(need)+(isAddressed?' <span style="font-size:9px;font-weight:700;color:#43A047;background:#E8F5E9;padding:1px 6px;border-radius:4px;margin-left:6px">Addressed</span>':'')+'</div><div class="sup-tap-hint">'+(isOpen?'Tap to collapse':'Tap to expand')+'</div></div>';
+       _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'\u00d7 flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
        _supHTML += '<span class="sup-arrow'+(isOpen?' open':'')+'">&#9654;</span></div>';
 
        _supHTML += '<div class="sup-expand'+(isOpen?' show':'')+'">';
+
+       // ── RESOLVED BANNER ──
+       if (isAddressed) {
+         var resDate = resInfo.date ? new Date(resInfo.date) : null;
+         var resDateStr = resDate ? resDate.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
+         _supHTML += '<div style="padding:0 14px 10px"><div class="sup-resolved-banner">';
+         _supHTML += '<div class="sup-resolved-title">Addressed</div>';
+         _supHTML += '<div class="sup-resolved-by">By <strong>'+esc(resInfo.name)+'</strong>'+(resInfo.role?' ('+esc(resInfo.role)+')':'')+(resDateStr?' on '+resDateStr:'')+'</div>';
+         _supHTML += '<div class="sup-resolved-comment">'+esc(resInfo.comment)+'</div>';
+         _supHTML += '</div>';
+         _supHTML += '<span class="sup-reopen-link" onclick="reopenSupNeed(\''+needEsc+'\')">This still needs attention — reopen</span>';
+         _supHTML += '</div>';
+       }
+
+       // ── SCHOOLS SUMMARY (compact) ──
        _supHTML += '<div class="sup-details">';
-       // Group schools by district
        var schoolsByDist = {};
+       var totalSchoolCount = 0;
        data.entries.forEach(function(sr){
          var d2 = sr.district || 'Unknown';
          if (!schoolsByDist[d2]) schoolsByDist[d2] = new Set();
          sr.schools.split(',').map(function(s){return s.trim()}).filter(Boolean).forEach(function(s){schoolsByDist[d2].add(s)});
        });
        var distKeys = Object.keys(schoolsByDist).sort();
+       distKeys.forEach(function(dk){totalSchoolCount += schoolsByDist[dk].size});
+
+       // Summary line
+       _supHTML += '<div class="sup-schools-summary"><strong>'+totalSchoolCount+'</strong> school'+(totalSchoolCount!==1?'s':'')+' across <strong>'+distKeys.length+'</strong> district'+(distKeys.length!==1?'s':'');
+       _supHTML += '<span class="sup-schools-toggle" onclick="toggleSupSchoolDetail(\''+needEsc+'\')">View schools</span></div>';
+
+       // Expandable detail
+       _supHTML += '<div class="sup-schools-detail" id="sup-sd-'+needId+'">';
        distKeys.forEach(function(dk){
          var dkSchools = Array.from(schoolsByDist[dk]).sort();
-         var dkId = needEsc.replace(/[^a-zA-Z0-9]/g,'')+'_'+dk.replace(/[^a-zA-Z0-9]/g,'');
-         _supHTML += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#f5f3fa;border-radius:6px;cursor:pointer;border:1px dashed #e0d8f0" onclick="var el=document.getElementById(\'sd-'+dkId+'\');el.style.display=el.style.display===\'none\'?\'flex\':\'none\'">';
-         _supHTML += '<span style="font-size:11px;font-weight:600;color:var(--navy)">'+esc(dk)+'</span>';
-         _supHTML += '<span style="font-size:10px;color:#7E57C2;font-weight:600">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+' \u25BE</span>';
-         _supHTML += '</div><div id="sd-'+dkId+'" style="display:none;flex-wrap:wrap;gap:4px;padding:6px 8px 2px">';
+         _supHTML += '<div class="sup-dist-row"><span>'+esc(dk)+'</span><span class="sup-dist-count">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+'</span></div>';
+         _supHTML += '<div style="display:flex;flex-wrap:wrap;gap:4px;padding:2px 8px 8px">';
          dkSchools.forEach(function(s){ _supHTML += '<span class="sup-school-tag">'+esc(s)+'</span>'; });
-         _supHTML += '</div></div>';
+         _supHTML += '</div>';
        });
-       if (subjectEntries.length) _supHTML += '<div class="sup-detail-row" style="margin-top:6px"><strong>Subjects:</strong> '+subjectEntries.map(function(se){return esc(se[0])+(se[1]>1?' ('+se[1]+'×)':'')}).join(', ')+'</div>';
        _supHTML += '</div>';
 
-       // ── THREAD ──
-       var responses = (S._supResponses||[]).filter(function(r){return r.support_need===need});
+       if (subjectEntries.length) _supHTML += '<div class="sup-detail-row" style="margin-top:2px"><strong>Subjects:</strong> '+subjectEntries.map(function(se){return esc(se[0])+(se[1]>1?' ('+se[1]+'\u00d7)':'')}).join(', ')+'</div>';
+       _supHTML += '</div>';
+
+       // ── RESPONSES THREAD (directly under details) ──
+       var responses = (S._supResponses||[]).filter(function(r){return r.support_need===need && r.scope_type!=='resolution' && r.scope_type!=='reopened'});
        _supHTML += '<div class="thread-area">';
        _supHTML += '<div class="thread-label">Responses'+(responses.length?' <span class="thread-count">'+responses.length+'</span>':'')+'</div>';
        if (responses.length) {
          responses.forEach(function(r){
            var scopeCls=r.scope_type==='school'?'sb-school':r.scope_type==='district'?'sb-district':'sb-all';
-             var scopeLabel=r.scope_type==='school'?esc(r.scope_entity||''):r.scope_type==='district'?esc(r.scope_entity||''):'All schools';
-             _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
+           var scopeLabel=r.scope_type==='school'?esc(r.scope_entity||''):r.scope_type==='district'?esc(r.scope_entity||''):'All schools';
+           _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
          });
        } else {
-         _supHTML += '<div class="thread-empty">No responses yet \u2014 be the first to respond</div>';
+         _supHTML += '<div class="thread-empty">No responses yet</div>';
        }
-       // Scope selector
-       var curScope = S._supReplyScope[need] || {type:'all',entity:''};
-       _supHTML += '<div class="scope-selector"><div class="scope-lbl">Responding about</div><div class="scope-opts">';
-       _supHTML += '<button class="scope-opt'+(curScope.type==='all'?' active':'')+'" onclick="setSupScope(\''+needEsc+'\',\'all\',\'\')">All schools</button>';
-       distKeys.forEach(function(dk){
-         var dkEsc = esc(dk).replace(/'/g,"\\x27");
-         var isDist = curScope.type==='district' && curScope.entity===dk;
-         var isSchoolInDist = curScope.type==='school' && schoolsByDist[dk] && Array.from(schoolsByDist[dk]).indexOf(curScope.entity)>-1;
-         _supHTML += '<button class="scope-opt sod'+(isDist||isSchoolInDist?' active':'')+'" onclick="setSupScope(\''+needEsc+'\',\'district\',\''+dkEsc+'\')">'+esc(dk)+'</button>';
-       });
-       _supHTML += '</div>';
-       if (curScope.type==='district' || curScope.type==='school') {
-         var selDist = curScope.type==='school' ? distKeys.find(function(dk){return schoolsByDist[dk] && Array.from(schoolsByDist[dk]).indexOf(curScope.entity)>-1}) : curScope.entity;
-         if (selDist && schoolsByDist[selDist]) {
-           var schArr = Array.from(schoolsByDist[selDist]).sort();
-           _supHTML += '<div class="scope-schools-dd show">';
-           schArr.forEach(function(s){
+
+       // ── REPLY BOX (simplified scope as dropdown) ──
+       if (!isAddressed) {
+         var curScope = S._supReplyScope[need] || {type:'all',entity:''};
+         var curScopeVal = curScope.type==='all'?'all':curScope.type==='district'?'d:'+curScope.entity:'s:'+curScope.entity;
+         _supHTML += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0eded">';
+         _supHTML += '<div class="sup-scope-row"><span class="sup-scope-label">Responding about</span>';
+         _supHTML += '<select class="sup-scope-select" onchange="supScopeFromSelect(\''+needEsc+'\',this)">';
+         _supHTML += '<option value="all"'+(curScopeVal==='all'?' selected':'')+'>All schools</option>';
+         distKeys.forEach(function(dk){
+           var dkEsc = esc(dk).replace(/'/g,"\\x27");
+           _supHTML += '<option value="d:'+dkEsc+'"'+(curScopeVal==='d:'+dk?' selected':'')+'>'+esc(dk)+' (district)</option>';
+           Array.from(schoolsByDist[dk]).sort().forEach(function(s){
              var sEsc = esc(s).replace(/'/g,"\\x27");
-             _supHTML += '<button class="scope-school-btn'+(curScope.type==='school'&&curScope.entity===s?' active':'')+'" onclick="setSupScope(\''+needEsc+'\',\'school\',\''+sEsc+'\')">'+esc(s)+'</button>';
+             _supHTML += '<option value="s:'+sEsc+'"'+(curScopeVal==='s:'+s?' selected':'')+'>\u00a0\u00a0\u00a0\u00a0'+esc(s)+'</option>';
            });
-           _supHTML += '</div>';
-         }
+         });
+         _supHTML += '</select></div>';
+         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += '</div>';
        }
-       _supHTML += '<div class="reply-context">Responding to: '+esc(need)+'</div>';
-       var scopeHint = curScope.type==='school' ? 'Responding about '+esc(curScope.entity) : curScope.type==='district' ? 'Responding about '+esc(curScope.entity)+' \u2014 or tap a school above' : 'Your response will apply to all schools';
-       _supHTML += '<div class="scope-hint">'+scopeHint+'</div></div>';
-       _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needEsc.replace(/[^a-zA-Z0-9]/g,'')+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+
+       // ── MARK AS ADDRESSED ──
+       if (!isAddressed) {
+         _supHTML += '<div class="sup-resolve-flow">';
+         if (S._supResolving[need]) {
+           _supHTML += '<div class="sup-resolve-form">';
+           _supHTML += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
+           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+           _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
+           _supHTML += '</div>';
+         } else {
+           _supHTML += '<button class="sup-resolve-btn" onclick="toggleSupResolve(\''+needEsc+'\')">Mark as Addressed</button>';
+         }
+         _supHTML += '</div>';
+       }
+
        _supHTML += '</div>';
        _supHTML += '</div></div>';
      });
