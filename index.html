@@ -15,27 +15,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#32313
 .hdr-sub{font-size:11px;color:#B8DCDC;margin-top:2px}
 .hdr-titles{flex:1}
 nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding:10px 16px 8px}
-.nav-landing{text-align:center}
-.nav-landing-prompt{font-size:13px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:10px}
-.nav-landing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.nav-landing-btn{border:none;border-radius:10px;text-align:center;cursor:pointer;font-family:inherit;padding:14px 8px;transition:all .2s}
+.nav-landing{text-align:center;padding:6px 0}
+.nav-landing-prompt{font-size:14px;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:14px}
+.nav-landing-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:500px;margin:0 auto}
+.nav-landing-btn{border:none;border-radius:12px;text-align:center;cursor:pointer;font-family:inherit;padding:22px 30px;transition:all .2s;min-width:180px;flex:1}
 .nav-landing-btn.primary{background:#7AB648;color:white}
 .nav-landing-btn.primary:active{background:#6a9e3e}
-.nav-landing-btn.secondary{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white}
-.nav-landing-btn.secondary:active{background:rgba(255,255,255,.18)}
-.nav-landing-btn .nav-btn-label{font-size:14px;font-weight:700;margin-bottom:2px}
-.nav-landing-btn .nav-btn-desc{font-size:10px;opacity:.8;line-height:1.3}
-.nav-landing-full{grid-column:1/-1;padding:9px 8px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:rgba(255,255,255,.7)}
-.nav-landing-full:active{background:rgba(255,255,255,.12)}
-.nav-landing-full .nav-btn-label{font-size:12px;font-weight:700;display:inline}
-.nav-landing-full .nav-btn-desc{font-size:10px;color:rgba(255,255,255,.45);margin-left:6px;display:inline}
+.nav-landing-btn.secondary{background:#fff;border:3px solid #7AB648;color:#074445}
+.nav-landing-btn.secondary:active{background:#f0f7f0}
+.nav-landing-btn .nav-btn-label{font-size:17px;font-weight:700;margin-bottom:4px}
+.nav-landing-btn .nav-btn-desc{font-size:11px;opacity:.7;line-height:1.3}
+.nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:12px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#074445;max-width:280px;margin-left:auto;margin-right:auto}
+.nav-landing-full:active{background:#FFF8F0}
+.nav-landing-full .nav-btn-label{font-size:15px;font-weight:700;display:block}
+.nav-landing-full .nav-btn-desc{font-size:11px;color:#607D8B;display:block;margin-top:2px}
 .nav-compact{display:flex;gap:6px;align-items:center}
 .nav-compact-btn{flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);text-align:center;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:rgba(255,255,255,.55);transition:all .2s}
 .nav-compact-btn:active{background:rgba(255,255,255,.15)}
 .nav-compact-btn.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
 .nav-compact-btn.tk{flex:0 0 auto;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
 .nav-compact-btn.tk.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
-@media(max-width:500px){.nav-landing-btn .nav-btn-label{font-size:13px}.nav-landing-btn{padding:12px 6px}.nav-compact-btn{font-size:11px;padding:7px 8px}}
+@media(max-width:420px){.nav-landing-grid{flex-direction:column;gap:10px}.nav-landing-btn{min-width:0;padding:18px 20px}.nav-landing-btn .nav-btn-label{font-size:15px}.nav-landing-full{max-width:none}.nav-landing-full .nav-btn-label{font-size:14px}.nav-compact-btn{font-size:11px;padding:7px 8px}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
@@ -294,11 +294,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .toast.show{opacity:1}
 
 /* Update banner */
-.update-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#074445,#0F7B7D);color:#fff;padding:14px 16px;box-shadow:0 -4px 16px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .4s ease;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#074445;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
 .update-banner.visible{transform:translateY(0)}
-.update-banner-text{font-size:13px;line-height:1.5;text-align:center}
+.update-banner-text{font-size:13px;line-height:1.5;text-align:left}
 .update-banner-text strong{color:var(--green)}
-.update-banner-btn{padding:10px 20px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.update-banner-btns{display:flex;gap:8px}
+.update-banner-btn{flex:1;padding:10px 16px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:center}
 .update-banner-btn.primary{background:var(--green);color:#fff}
 .update-banner-btn.secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
 .fade-in{animation:fadeIn .3s ease}
@@ -868,7 +869,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.02.27.1';
+const APP_VERSION = '2026.03.29.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -4176,8 +4177,10 @@ function showUpdateBanner() {
     <div class="update-banner-text">
       <strong>New version available.</strong> Your form has been saved and will be restored automatically.
     </div>
-    <button class="update-banner-btn primary" onclick="applyUpdate()">Update now</button>
-    <button class="update-banner-btn secondary" onclick="dismissUpdateBanner()">Later</button>
+    <div class="update-banner-btns">
+      <button class="update-banner-btn primary" onclick="applyUpdate()">Update now</button>
+      <button class="update-banner-btn secondary" onclick="dismissUpdateBanner()">Later</button>
+    </div>
   `;
   document.body.appendChild(banner);
   // Slight delay for CSS transition
