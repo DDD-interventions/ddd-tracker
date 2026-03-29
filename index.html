@@ -15,20 +15,37 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#32313
 .hdr-sub{font-size:11px;color:#B8DCDC;margin-top:2px}
 .hdr-titles{flex:1}
 nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding:10px 16px 8px}
-.nav-hint{text-align:center;font-size:10px;color:rgba(255,255,255,.5);margin-bottom:6px;letter-spacing:.5px}
-.nav-hint span{color:var(--green);font-weight:700}
-.nav-row{display:flex;gap:6px;flex-wrap:wrap}
-.nav-btn{flex:1;min-width:0;border:2px solid rgba(255,255,255,.2);color:rgba(255,255,255,.75);font-size:13px;font-weight:700;padding:10px 8px;cursor:pointer;font-family:inherit;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;background:rgba(255,255,255,.08);position:relative;white-space:nowrap}
-@media(max-width:500px){.nav-row{gap:4px}.nav-btn{font-size:10px;padding:8px 5px;border-radius:8px;line-height:1.2}}
-.nav-btn .nav-tip{visibility:hidden;opacity:0;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:11px;font-weight:400;padding:8px 12px;border-radius:8px;white-space:normal;width:200px;text-align:center;line-height:1.5;z-index:101;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .2s,visibility .2s;pointer-events:none}
-.nav-btn .nav-tip::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-bottom-color:var(--navy)}
-.nav-btn:hover .nav-tip,.nav-btn:focus .nav-tip{visibility:visible;opacity:1}
-@media(max-width:500px){.nav-btn .nav-tip{width:160px;font-size:10px;padding:6px 10px}}
-.nav-btn.active{color:white;background:rgba(122,182,72,.25);border-color:var(--green);box-shadow:0 0 12px rgba(122,182,72,.3)}
-.nav-btn:not(.active):hover{color:white;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4);transform:translateY(-1px)}
+.nav-landing{text-align:center}
+.nav-landing-prompt{font-size:13px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:10px}
+.nav-landing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nav-landing-btn{border:none;border-radius:10px;text-align:center;cursor:pointer;font-family:inherit;padding:14px 8px;transition:all .2s}
+.nav-landing-btn.primary{background:#7AB648;color:white}
+.nav-landing-btn.primary:active{background:#6a9e3e}
+.nav-landing-btn.secondary{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white}
+.nav-landing-btn.secondary:active{background:rgba(255,255,255,.18)}
+.nav-landing-btn .nav-btn-label{font-size:14px;font-weight:700;margin-bottom:2px}
+.nav-landing-btn .nav-btn-desc{font-size:10px;opacity:.8;line-height:1.3}
+.nav-landing-full{grid-column:1/-1;padding:9px 8px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:rgba(255,255,255,.7)}
+.nav-landing-full:active{background:rgba(255,255,255,.12)}
+.nav-landing-full .nav-btn-label{font-size:12px;font-weight:700;display:inline}
+.nav-landing-full .nav-btn-desc{font-size:10px;color:rgba(255,255,255,.45);margin-left:6px;display:inline}
+.nav-compact{display:flex;gap:6px;align-items:center}
+.nav-compact-btn{flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);text-align:center;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:rgba(255,255,255,.55);transition:all .2s}
+.nav-compact-btn:active{background:rgba(255,255,255,.15)}
+.nav-compact-btn.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
+.nav-compact-btn.tk{flex:0 0 auto;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.nav-compact-btn.tk.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
+@media(max-width:500px){.nav-landing-btn .nav-btn-label{font-size:13px}.nav-landing-btn{padding:12px 6px}.nav-compact-btn{font-size:11px;padding:7px 8px}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
+.form-group{background:#f7f9fc;border-radius:8px;padding:14px 14px 2px;margin:8px 0 12px}
+.form-group-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.form-progress-msg{text-align:center;font-size:11px;color:var(--grey);margin-top:4px;margin-bottom:-2px;font-style:italic}
+.grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grade-grid label.tag{min-height:44px;display:flex;align-items:center;justify-content:center;padding:10px 8px;font-size:13px;border-radius:8px}
+@media(min-width:500px){.grade-grid{grid-template-columns:repeat(4,1fr)}}
+.school-count-indicator{font-size:12px;font-weight:600;color:var(--teal);margin-top:6px}
 .section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden}
 .sec-hdr{padding:14px 18px 8px;border-left:4px solid var(--teal);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
 .sec-hdr:active{transform:scale(.99);opacity:.9}
@@ -51,10 +68,13 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .field textarea{resize:vertical;min-height:50px}
 
 .school-picker{position:relative}
-.school-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.school-tag{display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal);border-radius:14px;padding:3px 8px 3px 10px;font-size:11px;font-weight:600;line-height:1.3}
-.school-tag button{background:none;border:none;color:var(--teal-dk);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;opacity:.7}
-.school-tag button:hover{opacity:1;color:#c00}
+.school-tags{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.school-tag{display:flex;align-items:center;gap:10px;background:#E8F5E9;color:var(--navy);border:1.5px solid #7AB648;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.3}
+.school-tag .st-info{flex:1;min-width:0}
+.school-tag .st-name{font-size:13px;font-weight:700;color:var(--navy)}
+.school-tag .st-meta{font-size:10px;color:var(--grey);margin-top:2px}
+.school-tag button{background:none;border:1px solid #c8c6c4;color:var(--grey);cursor:pointer;font-size:10px;padding:4px 10px;border-radius:6px;font-family:inherit;font-weight:600;flex-shrink:0}
+.school-tag button:hover{border-color:#c00;color:#c00}
 .school-trigger{width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;background:#fff;color:#323130;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center}
 .school-trigger:hover{border-color:var(--teal)}
 .school-trigger.open{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal);border-radius:4px 4px 0 0}
@@ -62,14 +82,14 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-trigger.open .arrow{transform:rotate(180deg)}
 .school-trigger.disabled{background:#f3f2f1;color:#999;cursor:not-allowed}
 .school-dd{position:absolute;top:100%;left:0;right:0;z-index:50;background:#fff;border:1px solid var(--teal);border-top:none;border-radius:0 0 6px 6px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.school-dd-filter{padding:6px 8px;border-bottom:1px solid #e8e6e4}
-.school-dd-filter input{width:100%;padding:6px 8px;border:1px solid #e8e6e4;border-radius:3px;font-size:12px;font-family:inherit}
+.school-dd-filter{padding:8px 10px;border-bottom:1px solid #e8e6e4}
+.school-dd-filter input{width:100%;padding:10px 12px;border:2px solid var(--teal);border-radius:8px;font-size:14px;font-family:inherit}
 .school-dd-filter input:focus{outline:none;border-color:var(--teal)}
 .school-dd-list{max-height:300px;overflow-y:auto}
-.school-dd-item{padding:6px 10px;font-size:12px;color:#323130;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f8f7f6}
+.school-dd-item{padding:12px 12px;font-size:13px;color:#323130;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f8f7f6;min-height:48px}
 .school-dd-item:hover{background:var(--teal-lt)}
 .school-dd-item.checked{background:#f0faf9;font-weight:600}
-.school-dd-item .tick{width:16px;height:16px;border:1.5px solid #c8c6c4;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;flex-shrink:0}
+.school-dd-item .tick{width:20px;height:20px;border:2px solid #c8c6c4;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0}
 .school-dd-item.checked .tick{background:var(--teal);border-color:var(--teal)}
 .school-dd-hint{padding:8px 10px;font-size:11px;color:#999;font-style:italic;text-align:center}
 .school-dd-foot{padding:6px 10px;border-top:1px solid #e8e6e4;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--grey)}
@@ -540,72 +560,39 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-stack-seg{height:100%;transition:width .4s}
 .tl-month-hdr{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;display:flex;align-items:center;gap:8px}
 .tl-month-hdr::after{content:'';flex:1;height:1px;background:#e0e0e0}
-/* Post card */
-.post{background:#fff;border-radius:14px;border:1px solid var(--grey-lt);margin-bottom:12px;overflow:hidden}
-.post.post-done{opacity:.85}
-.post-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px 0}
-.post-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
-.post-who{flex:1;min-width:0}
-.post-name{font-size:12px;font-weight:700;color:var(--navy)}
-.post-role{font-size:10px;color:var(--grey)}
-.post-time{font-size:10px;color:var(--grey);font-weight:600;flex-shrink:0}
-.post-body{padding:10px 14px}
-.post-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;margin-bottom:8px}
-.post-status.s-ip{background:#FFF3E0;color:var(--orange)}.post-status.s-pl{background:#E3F2FD;color:var(--blue)}.post-status.s-c{background:var(--green-lt);color:var(--green)}
-.post-status-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
-.post-action-label{font-size:14px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:6px}
-.post-location{font-size:11.5px;color:var(--grey);line-height:1.4;margin-bottom:8px}
-.post-location b{color:var(--navy);font-weight:600}
-/* Chain */
-.post-chain{display:flex;flex-direction:column;gap:0;margin-bottom:6px;border-radius:8px;overflow:hidden}
-.pc-step{padding:7px 12px;display:flex;align-items:baseline;gap:8px;line-height:1.3}
-.pc-step:not(:last-child){border-bottom:2px solid #fff}
-.pc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.7;min-width:58px;flex-shrink:0}
-.pc-val{font-size:11px;font-weight:600}
-.pc-data{background:#E3F2FD;color:var(--blue)}
-.pc-nodata{background:#f5f5f5;color:var(--grey-lt)}
-.pc-dec{background:#EDE7F6;color:#7E57C2}
-.pc-act{background:var(--green-lt);color:var(--green)}
-/* DDD tags */
-.ddd-ref-area{margin-top:8px;padding:8px 10px;background:#f8f9fa;border-radius:8px;border:1px dashed #d0d4da}
-.ddd-ref-title{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.ddd-ref-tags{display:flex;flex-wrap:wrap;gap:6px}
-.ddd-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;line-height:1.3;border:1px solid;cursor:pointer;transition:opacity .15s}
-.ddd-tag-icon{font-size:9px;font-weight:800;opacity:.7}
-.ddd-tag-name{white-space:nowrap}
-.ddd-tag-path{display:none;font-size:9px;font-weight:400;color:var(--grey);margin-top:3px;line-height:1.4}
-.ddd-tag.expanded{flex-direction:column;align-items:flex-start;white-space:normal}
-.ddd-tag.expanded .ddd-tag-path{display:block}
-.ddd-tag.rpt-lcr{background:#E0F2F1;border-color:#B2DFDB;color:#0B8E8D}
-.ddd-tag.rpt-fpc{background:#FFF3E0;border-color:#FFE0B2;color:#E8952E}
-.ddd-tag.rpt-t4p{background:#E3F2FD;border-color:#BBDEFB;color:#1565C0}
-.ddd-tag.rpt-g6p{background:#F1F8E9;border-color:#DCEDC8;color:#558B2F}
-.ddd-tag.rpt-sar{background:#E0F2F1;border-color:#B2DFDB;color:#0F7B7D}
-.ddd-tag.rpt-ttd{background:#E0F2F1;border-color:#B2DFDB;color:#074445}
-.ddd-link-row{display:flex;justify-content:flex-end;margin-top:6px}
-.ddd-link-quiet{font-size:9px;color:var(--grey-lt);text-decoration:none;padding:2px 6px;border-radius:3px;transition:all .15s}
-.ddd-link-quiet:hover{color:var(--teal);background:var(--teal-lt)}
-.act-no-ddd{margin-top:8px;padding:6px 10px;font-size:10px;color:var(--grey-lt);font-style:italic;background:#fafafa;border-radius:6px}
-/* Detail rows */
-.post-detail{display:none;font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:6px}
-.post-detail.show{display:block}
-.pd-row{display:flex;gap:6px;margin-bottom:3px}
-.pd-lbl{font-size:9px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.3px;min-width:60px;flex-shrink:0;padding-top:1px}
-.pd-val{font-size:11px;color:var(--navy);line-height:1.4}
-.post-expand-btn{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal);font-weight:700;cursor:pointer;padding:6px 0;background:#f5f9f9;border:1px dashed #d0e4e4;border-radius:6px;font-family:inherit;width:100%;margin-top:4px;transition:background .12s}
-.post-expand-btn:hover{background:#e4f2f2;text-decoration:none}
-/* Engagement bar */
-.post-engagement{border-top:1px solid #f0f0f0;padding:0 14px}
-.post-stats{display:flex;justify-content:space-between;padding:6px 0;font-size:10px;color:var(--grey)}
-.post-stat-reactions{display:flex;align-items:center;gap:4px}
-.post-stat-comments{cursor:pointer}
-.post-stat-comments:hover{text-decoration:underline;color:var(--navy)}
-.post-actions{display:flex;border-top:1px solid #f0f0f0;padding:0}
-.post-action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;font-size:11px;font-weight:600;color:var(--grey);cursor:pointer;background:none;border:none;font-family:inherit;transition:all .12s}
-.post-action-btn:not(:last-child){border-right:1px solid #f0f0f0}
-.post-action-btn:hover{background:#fafafa;color:var(--navy)}
-.post-action-btn:active{background:#f0f0f0}
-.post-action-btn.reacted{color:var(--teal);font-weight:700}
+/* Compact activity cards */
+.act-card{background:#fff;border-radius:10px;border:1px solid #e8e6e4;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.act-card:hover{border-color:var(--teal)}
+.act-card.act-done{opacity:.8}
+.act-card-top{padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.act-card-status{flex-shrink:0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.3px}
+.act-card-status.s-ip{background:#FFF3E0;color:var(--orange)}
+.act-card-status.s-pl{background:#E3F2FD;color:var(--blue)}
+.act-card-status.s-c{background:var(--green-lt);color:var(--green)}
+.act-card-body{flex:1;min-width:0}
+.act-card-date{font-size:10px;color:#999;margin-bottom:2px}
+.act-card-desc{font-size:12px;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:2px}
+.act-card-school{font-size:11px;color:#607D8B}
+.act-card-arrow{flex-shrink:0;font-size:11px;color:#ccc;margin-top:2px;transition:transform .2s}
+.act-card-arrow.open{transform:rotate(90deg);color:var(--teal)}
+.act-card-hint{font-size:9px;color:#bbb;text-align:center;padding:0 14px 8px}
+.act-card-detail{display:none;border-top:1px solid #f0f0f0;padding:12px 14px;background:#FAFBFC}
+.act-card-detail.show{display:block}
+.acd-row{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid #f5f5f5}
+.acd-label{color:#999}
+.acd-value{color:var(--navy);font-weight:600;text-align:right;max-width:60%}
+.acd-chain{margin:10px 0 6px}
+.acd-chain-title{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.acd-chain-step{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.acd-chain-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.acd-chain-dot.cd-d{background:#1565C0}.acd-chain-dot.cd-de{background:var(--orange)}.acd-chain-dot.cd-a{background:var(--green)}
+.acd-chain-lbl{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.3px}
+.acd-chain-text{font-size:11px;color:var(--navy);line-height:1.4}
+.acd-thread-bar{margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.acd-thread-count{font-size:10px;color:#999}
+.acd-thread-btn{font-size:11px;color:var(--teal);font-weight:600;cursor:pointer;background:none;border:1px solid var(--teal);padding:4px 10px;border-radius:6px;font-family:inherit}
+.acd-thread-btn:hover{background:var(--teal-lt)}
+.acd-owner-btns{padding:8px 0 0;display:flex;gap:8px;border-top:1px solid #f0f0f0;margin-top:8px}
 /* Thread */
 .post-thread{display:none;border-top:1px solid #f0f0f0;padding:10px 14px;background:#FAFBFC}
 .post-thread.show{display:block}
@@ -892,7 +879,7 @@ const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
- view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{},
+ view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{}, _actCardOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
@@ -904,7 +891,7 @@ const S = {
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,term:'Term 1 2026',activity_date:today(),
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
- ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,
+ ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
@@ -1214,7 +1201,7 @@ function toggleSupSchoolDetail(need){
 }
 
 // ─── ACTIVITY TRACKER ───
-function toggleDddTag(el){el.classList.toggle('expanded');}
+function toggleActCard(id){S._actCardOpen=S._actCardOpen||{};S._actCardOpen[id]=!S._actCardOpen[id];render();}
 function toggleActThread(id){S._actThreadOpen[id]=!S._actThreadOpen[id];render();}
 function setActReply(id,val){S._actReplyText[id]=val;}
 function toggleActNoted(decId){
@@ -1352,7 +1339,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> <div class="nav-hint">Tap to switch between <span>logging</span> and <span>viewing</span></div> <div class="nav-row"> <button class="nav-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" style="flex:0 1 auto;padding:10px 10px;min-width:0" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Home">Home<span class="nav-tip">Go back to the start screen</span></button> <button class="nav-btn ${S.view==='log'&&(S.f.formStep!==-1||S.submitted)?'active':''}" onclick="navToLog()">Log Activity<span class="nav-tip">Record a school visit, workshop, or any support activity you carried out</span></button> <button class="nav-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My Dashboard<span class="nav-tip">See your activities, follow-ups due, and progress of your interventions</span></button> <button class="nav-btn ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Interventions Toolkit<span class="nav-tip">Explore DDD reports, find proven interventions, and design support plans</span></button> </div> </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -1535,9 +1522,11 @@ function renderForm() {
   const steps = ['Where & When','What Happened','DDD Connection','Context & Follow-up','Review'];
   const stepColors = ['var(--teal)','var(--green)','var(--blue)','var(--orange)','var(--navy)'];
   const allErrs = S._validationErrors || [];
+  const progressMessages = ['Let\'s start with the basics','Describe what you did','Link your work to the data','Nearly there \u2014 just context and follow-up','Check everything before submitting'];
   return `<div class="form-wrap">
     ${renderLiveProgress()}
     <div class="form-progress">${steps.map((s,i)=>{const hasErr=allErrs.some(e=>e.step===i);return`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};render()">${i+1}. ${s}${hasErr?'<span class="step-error-dot"></span>':''}</div>`}).join('')}</div>
+    <div class="form-progress-msg">${progressMessages[step]||''}</div>
     ${step===0?renderFormStep1():step===1?renderFormStep2():step===2?renderFormStep3():step===3?renderFormStep4():renderFormReview()}
   </div>`;
 }
@@ -1691,23 +1680,14 @@ function renderFeedbackSection() {
 
 function renderFormStart(){
   const hasName=S.official.full_name && S.official.full_name!=='Official';
-  const greeting=hasName?'Hi '+esc(S.official.full_name.split(' ')[0])+'! Ready':'Ready';
+  const greeting=hasName?'Welcome, '+esc(S.official.full_name.split(' ')[0])+'!':'Welcome!';
   return `<div class="form-wrap"><div class="section fade-in" style="overflow:visible">
-    <div style="padding:28px 22px;text-align:center">
-      
-      <h2 style="font-size:18px;color:var(--navy);margin-bottom:6px">${greeting} to log an activity?</h2>
-      <p style="font-size:13px;color:var(--grey);line-height:1.7;max-width:420px;margin:0 auto 20px">The best entries start with <strong>your DDD data</strong> — whether you checked the dashboard yourself, received a presentation, or worked from a spreadsheet. Note down the numbers as you go. You can always come back and add detail later.</p>
-      <div style="border:1px dashed #d0d4da;border-radius:8px;padding:10px 14px;margin:0 auto 16px;max-width:360px;background:#f8f9fa">
+    <div style="padding:24px 22px;text-align:center">
+      <h2 style="font-size:18px;color:var(--navy);margin-bottom:6px">${greeting}</h2>
+      <p style="font-size:13px;color:var(--grey);line-height:1.7;max-width:420px;margin:0 auto 16px">The best entries start with <strong>your DDD data</strong> — whether you checked the dashboard yourself, received a presentation, or worked from a spreadsheet. Note down the numbers as you go.</p>
+      <div style="border:1px dashed #d0d4da;border-radius:8px;padding:10px 14px;margin:0 auto 0;max-width:360px;background:#f8f9fa">
         <div style="font-size:11px;color:var(--grey);line-height:1.5;text-align:center">Need to check the data first? <a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:var(--teal);font-size:11px;font-weight:600;text-decoration:none">Open DDD Dashboard</a></div>
         <div style="font-size:9px;color:var(--grey-lt);margin-top:4px;text-align:center">Login: firstname.surname@dbedashboard.co.za</div>
-      </div>
-      <div style="border-top:1px solid #f3f2f1;padding-top:20px">
-        <button class="btn btn-teal" onclick="S.f.formStep=0;render()" style="min-width:200px">Start Logging \u2192</button>
-        <div style="margin-top:10px;font-size:11px;color:var(--teal-md);cursor:pointer" onclick="S.f.formStep=0;render()">or skip straight to the form</div>
-      </div>
-      <div style="margin-top:20px;background:var(--teal-lt);border-radius:8px;padding:12px 14px;text-align:left">
-        <div style="font-size:10px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Quick tip</div>
-        <div style="font-size:11px;color:var(--grey-dk);line-height:1.6">DDD data can reach you in many ways \u2014 through the dashboard, a PowerPoint from your programme team, an Excel extract, or a colleague walking you through it. All of these count. Just note the numbers you see.</div>
       </div>
     </div>
   </div></div>`;
@@ -1882,9 +1862,15 @@ function schoolPickerHTML(){
 
   let tags='';
   if(selected.length){
-    tags='<div class="school-tags">'+selected.map((s,i)=>
-      '<span class="school-tag">'+esc(s)+'<button data-sp-rm="'+i+'">&times;</button></span>'
-    ).join('')+'</div>';
+    const allSch=getAvailableSchools();
+    tags='<div class="school-tags">'+selected.map((s,i)=>{
+      const match=allSch.find(sc=>sc[0]===s);
+      const circuit=S.f.circuit||'';
+      const district=S.f.district||'';
+      const phase=match&&match[1]?PHASE_LABELS[match[1]]||'':'';
+      const meta=[district,circuit,phase].filter(Boolean).join(' \xb7 ');
+      return '<span class="school-tag"><span class="st-info"><span class="st-name">'+esc(s)+'</span>'+(meta?'<span class="st-meta">'+esc(meta)+'</span>':'')+'</span><button data-sp-rm="'+i+'">Remove</button></span>';
+    }).join('')+'</div>';
   }
 
   if(!hasDistrict){
@@ -1915,18 +1901,23 @@ function schoolPickerHTML(){
 
     // Filter input
     if(allSchools.length>20){
-      dd+='<div class="school-dd-filter"><input type="text" placeholder="Filter '+allSchools.length.toLocaleString()+' schools..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
+      dd+='<div class="school-dd-filter"><input type="text" placeholder="Start typing a school name..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
     }
     dd+='<div class="school-dd-list">';
     if(filtered.length===0){
       dd+='<div class="school-dd-hint">No schools match \u201c'+esc(S.f._schoolQ)+'\u201d</div>';
     }else{
       const shown=filtered.slice(0,120);
+      const showCircuit=!S.f.circuit;
+      const circuitLookup={};
+      if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
       for(let i=0;i<shown.length;i++){
         const s=shown[i];
         const isChecked=selected.includes(s[0]);
-        const phaseBadge=s[1]?'<span style="font-size:9px;color:#999;margin-left:auto;flex-shrink:0">'+(PHASE_LABELS[s[1]]||'')+'</span>':'';
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><span style="flex:1;min-width:0">'+esc(s[0])+'</span>'+phaseBadge+'</div>';
+        const phaseLbl=s[1]?PHASE_LABELS[s[1]]||'':'';
+        const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
+        const metaParts=[circLbl,phaseLbl].filter(Boolean).join(' \xb7 ');
+        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div>'+esc(s[0])+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+'</div></div>';
       }
       if(filtered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+filtered.length+' \u2014 filter to see more</div>';
     }
@@ -1958,13 +1949,21 @@ document.addEventListener('click',function(e){
 });
 
 function renderFormStep1(){
+  const _schoolArr = parseSchoolsArr();
+  const _schoolCount = _schoolArr.length;
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
+    <div class="form-group"><div class="form-group-label">Date and term</div>
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
+    </div>
+    <div class="form-group"><div class="form-group-label">School location</div>
     <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
-    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${renderVisitHistoryCard()}</div>
+    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':''}${renderVisitHistoryCard()}</div>
+    </div>
+    <div class="form-group"><div class="form-group-label">Your details</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
     <div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','HoD','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your designation..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please specify your specialisation..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div></div>
+    </div>
     <div style="text-align:right;margin-top:12px"><button class="btn btn-teal" onclick="validateAndNext(0,1)">Next &rarr;</button></div>
   </div></div>`;
 }
@@ -2018,7 +2017,7 @@ function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the activity type..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.activity_type,ACTIVITY_HINTS)}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${(()=>{const t=[...THEMES];if(S.f.district==='Lejweleputswa')t.splice(t.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');return t.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('');})()}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the theme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.intervention_theme,THEME_HINTS)}</div></div>
     <div class="field"><label>Subject(s)</label><div class="hint">Search and select subjects</div>${renderSubjectPicker()}</div>
-    <div class="field"><label>Grade(s)</label><div class="hint">Tap all that apply</div><div class="tags">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Gr ${g}</span></label>`).join('')}</div></div>
+    <div class="field"><label>Grade(s)</label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><textarea rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea></div>
     <div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:12px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:10px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:10px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E8F5E9':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:11px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\x27\x27":"\x27yes\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\x27\x27":"\x27no\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>
@@ -2154,12 +2153,14 @@ function supLbl(v){const m={'light':'Light touch','regular':'Regular support','i
 function renderFormReview(){
   const f=S.f;
   return`<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--navy)"><div><h2>5. Review & Submit</h2><p>Check your entry before submitting</p></div></div><div class="sec-body">
+    <div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:#F57F17;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_type==='Other'&&f.decision_other?'Other: '+f.decision_other:f.decision_type)}${rvRow('Intervention activity',f.action_type==='Other'&&f.action_other?'Other: '+f.action_other:f.action_type)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
-    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving?'disabled':''} style="min-width:160px">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
+    <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
   </div></div>`;
 }
 function handleFileSelect(e){const file=e.target.files[0];if(file)attachFile(file)}
@@ -3486,26 +3487,21 @@ ${tab==='trends'?`
 `:''}
 
 ${tab==='tracker'?`
- <!-- ═══ INTERVENTION ACTIVITY TRACKER ═══ -->
  <div class="dash-section" style="border-left:4px solid var(--teal)">
    <div class="dash-section-hdr">
      <h3>Intervention Activity Tracker</h3>
      <span style="font-size:11px;color:var(--grey)">${acts.length} action${acts.length!==1?'s':''} logged</span>
    </div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Each activity is a post showing who did what, where, and which DDD data informed the decision. Comment on In Progress or Planned activities to coordinate follow-up.</div>
+     <div class="dash-section-desc">Your logged activities. Tap any entry to see the full detail, Data-Decision-Action chain, and responses.</div>
 
-     <!-- Streak bar -->
      ${(function(){
-       /* Compute weekly logging streak */
        var myDecs = decs.filter(function(d){return d.official_id === S._officialId});
        if (!myDecs.length) return '';
        var now = new Date();
        var weekMs = 7*24*60*60*1000;
-       /* Find start of current week (Monday) */
        var dow = now.getDay(); var mondayOff = dow === 0 ? 6 : dow - 1;
        var thisMonday = new Date(now); thisMonday.setHours(0,0,0,0); thisMonday.setDate(thisMonday.getDate()-mondayOff);
-       /* Check which of the last 7 weeks had activity */
        var weekHits = [];
        for (var w=6; w>=0; w--) {
          var wStart = new Date(thisMonday.getTime() - w*weekMs);
@@ -3565,102 +3561,85 @@ ${tab==='tracker'?`
          var monthKey = dd ? dd.toLocaleString('en-ZA',{month:'long',year:'numeric'}) : 'Unknown';
          if (monthKey !== lastMonth) { html += '<div class="tl-month-hdr">'+esc(monthKey)+'</div>'; lastMonth = monthKey; }
 
-         var postId = 'post-'+idx;
-                  var isCompleted = c.status === 'Completed';
+         var cardId = 'acard-'+idx;
+         var isCompleted = c.status === 'Completed';
          var sCls = isCompleted ? 's-c' : c.status === 'Planned' ? 's-pl' : 's-ip';
-         var sLabel = c.status;
          var actionLabel = c.act ? (c.act.action_taken || '\u2014') : '(no action logged)';
          var schools = c.det.schools || '';
          var district = c.det.district || '';
          var isMine = c.act ? c.act.official_id === S._officialId : c.dec.official_id === S._officialId;
          var officialName = c.det.official_name || c.dec.made_by || '';
-         var officialRole = c.det.official_role || '';
-         var initials = officialName.split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
-         var avatarBg = officialRole.toLowerCase().indexOf('circuit')>-1?'var(--teal-dk)':officialRole.toLowerCase().indexOf('subject')>-1?'var(--orange)':officialRole.toLowerCase().indexOf('programme')>-1||officialRole.toLowerCase().indexOf('pm')>-1?'var(--purple)':'var(--grey)';
+         var isOpen = S._actCardOpen && S._actCardOpen[cardId];
 
          var rptArr = c.det.ddd_reports || [];
          var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
-         var rptCount = rptArr.length;
-         var chainDataLabel = usedDDD ? (rptCount === 1 ? '1 report' : rptCount+' reports') : 'No DDD data';
-         var chainDataCls = usedDDD ? 'pc-data' : 'pc-nodata';
+         var chainDataLabel = usedDDD ? rptArr.join(', ') : 'No DDD data used';
          var decLabel = c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014');
 
-         // Responses for this decision
          var decResponses = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='comment'});
          var notedCount = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='noted'}).length;
          var isNoted = S._actNoted[c.dec.id];
-         var threadOpen = S._actThreadOpen[postId];
+         var threadOpen = S._actThreadOpen[cardId];
          var decIdEsc = c.dec.id.replace(/'/g,"\\x27");
 
-         html += '<div class="post'+(isCompleted?' post-done':'')+'">';
-         // Header
-         var loggedAt = c.dec.created_at ? fmtDateTime(c.dec.created_at) : '';
-         html += '<div class="post-hdr"><div class="post-avatar" style="background:'+avatarBg+'">'+initials+'</div><div class="post-who"><div class="post-name">'+esc(officialName)+'</div><div class="post-role">'+esc(officialRole)+(district?' \u00B7 '+esc(district):'')+'</div></div><div class="post-time"><div>'+fmtDate(c.date)+'</div>'+(loggedAt?'<div style="font-size:9px;color:var(--grey-lt);margin-top:1px">Logged '+loggedAt+'</div>':'')+'</div></div>';
+         var descText = c.det.description || actionLabel;
+         var schoolShort = schools.length > 50 ? schools.slice(0,47)+'...' : schools;
 
-         // Body
-         html += '<div class="post-body">';
-         html += '<div class="post-status '+sCls+'"><div class="post-status-dot"></div> '+sLabel+'</div>';
-         html += '<div class="post-action-label">'+esc(actionLabel)+'</div>';
-         html += '<div class="post-location"><b>'+esc(schools.length>70?schools.slice(0,67)+'...':schools||'\u2014')+'</b>'+(district?' \u00B7 '+esc(district):'')+'</div>';
-
-         // Chain
-         html += '<div class="post-chain"><div class="pc-step '+chainDataCls+'"><div class="pc-lbl">Data</div><div class="pc-val">'+chainDataLabel+'</div></div><div class="pc-step pc-dec"><div class="pc-lbl">Decision</div><div class="pc-val">'+esc(decLabel)+'</div></div><div class="pc-step pc-act"><div class="pc-lbl">Action</div><div class="pc-val">'+esc(actionLabel)+'</div></div></div>';
-
-         // DDD tags
-         if (usedDDD) {
-           html += '<div class="ddd-ref-area"><div class="ddd-ref-title">DDD report'+(rptCount>1?'s':'')+' used</div><div class="ddd-ref-tags">';
-           rptArr.forEach(function(rName){
-             var rObj = TK_REPORTS.find(function(r){return r.name === rName});
-             if (!rObj) { html += '<div class="ddd-tag" style="background:#f5f5f5;border-color:#e0e0e0;color:var(--grey)" onclick="toggleDddTag(this)"><span class="ddd-tag-name">'+esc(rName)+'</span></div>'; return; }
-             html += '<div class="ddd-tag rpt-'+rObj.id+'" onclick="toggleDddTag(this)"><div style="display:flex;align-items:center;gap:5px"><span class="ddd-tag-icon">'+rObj.icon+'</span><span class="ddd-tag-name">'+esc(rObj.name)+'</span></div><div class="ddd-tag-path">Find it: '+esc(rObj.path)+'</div></div>';
-           });
-           html += '</div><div class="ddd-link-row"><a href="'+DDD_DASHBOARD_URL+'" target="_blank" rel="noopener" class="ddd-link-quiet" onclick="event.stopPropagation()">Open DDD Dashboard</a></div></div>';
-         } else {
-           html += '<div class="act-no-ddd">No DDD dashboard data was used for this activity</div>';
-         }
-
-         // Expandable details
-         html += '<div class="post-detail'+' '+'" id="pd-'+postId+'">';
-         if (c.det.subjects && c.det.subjects.length) html += '<div class="pd-row"><span class="pd-lbl">Subjects</span><span class="pd-val">'+esc(c.det.subjects.join(', '))+'</span></div>';
-         if (c.det.grades && c.det.grades.length) html += '<div class="pd-row"><span class="pd-lbl">Grades</span><span class="pd-val">'+esc(c.det.grades.join(', '))+'</span></div>';
-         if (c.det.learners_reached) html += '<div class="pd-row"><span class="pd-lbl">Learners</span><span class="pd-val">'+c.det.learners_reached+' learners reached</span></div>';
-         if (c.det.educators_supported) html += '<div class="pd-row"><span class="pd-lbl">Educators</span><span class="pd-val">'+c.det.educators_supported+' educators supported</span></div>';
-         if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="pd-row"><span class="pd-lbl">Follow-up</span><span class="pd-val">'+esc(c.det.follow_up_desc)+'</span></div>';
-         if (c.det.description) html += '<div class="pd-row"><span class="pd-lbl">Detail</span><span class="pd-val">'+esc(c.det.description)+'</span></div>';
-         if (c.act && c.act.responsible) html += '<div class="pd-row"><span class="pd-lbl">Responsible</span><span class="pd-val">'+esc(c.act.responsible)+'</span></div>';
+         html += '<div class="act-card'+(isCompleted?' act-done':'')+'" onclick="toggleActCard(\''+cardId+'\')">';
+         html += '<div class="act-card-top">';
+         html += '<span class="act-card-status '+sCls+'">'+c.status+'</span>';
+         html += '<div class="act-card-body">';
+         html += '<div class="act-card-date">'+fmtDate(c.date)+(officialName&&!isMine?' \u00B7 '+esc(officialName):'')+'</div>';
+         html += '<div class="act-card-desc">'+esc(descText.length>80?descText.slice(0,77)+'...':descText)+'</div>';
+         html += '<div class="act-card-school">'+esc(schoolShort||'\u2014')+(district?' \u00B7 '+esc(district):'')+'</div>';
          html += '</div>';
-         html += '<button class="post-expand-btn" onclick="var el=document.getElementById(\'pd-'+postId+'\');var o=el.classList.toggle(\'show\');this.textContent=o?\'Collapse details\':\'See full details\'">See full details</button>';
+         html += '<span class="act-card-arrow'+(isOpen?' open':'')+'">&#9654;</span>';
          html += '</div>';
+         if (!isOpen) html += '<div class="act-card-hint">Tap for full detail</div>';
 
-         // Engagement + thread — only for non-completed
-         if (!isCompleted) {
-           html += '<div class="post-engagement"><div class="post-stats"><div class="post-stat-reactions">'+(notedCount?notedCount+' noted':'')+'</div><div class="post-stat-comments" onclick="toggleActThread(\''+postId+'\')">'+(decResponses.length?decResponses.length+' comment'+(decResponses.length>1?'s':''):'No comments yet')+'</div></div>';
-           html += '<div class="post-actions"><button class="post-action-btn'+(isNoted?' reacted':'')+'" onclick="toggleActNoted(\''+decIdEsc+'\')">Noted</button><button class="post-action-btn" onclick="toggleActThread(\''+postId+'\')">Comment</button></div></div>';
+         if (isOpen) {
+           html += '<div class="act-card-detail show" onclick="event.stopPropagation()">';
+           html += '<div class="acd-row"><span class="acd-label">Activity type</span><span class="acd-value">'+esc(c.det.activity_type||'\u2014')+'</span></div>';
+           if (c.det.intervention_theme) html += '<div class="acd-row"><span class="acd-label">Theme</span><span class="acd-value">'+esc(c.det.intervention_theme)+'</span></div>';
+           if (c.det.subjects && c.det.subjects.length) html += '<div class="acd-row"><span class="acd-label">Subjects</span><span class="acd-value">'+esc(c.det.subjects.join(', '))+'</span></div>';
+           if (c.det.grades && c.det.grades.length) html += '<div class="acd-row"><span class="acd-label">Grades</span><span class="acd-value">'+esc(c.det.grades.join(', '))+'</span></div>';
+           if (c.det.educators_supported) html += '<div class="acd-row"><span class="acd-label">Educators</span><span class="acd-value">'+c.det.educators_supported+' supported</span></div>';
+           if (c.det.description) html += '<div class="acd-row"><span class="acd-label">Description</span><span class="acd-value">'+esc(c.det.description)+'</span></div>';
 
-           // Thread
-           html += '<div class="post-thread'+(threadOpen?' show':'')+'" id="thread-'+postId+'">';
-           if (decResponses.length) {
-             decResponses.forEach(function(r){
-               var rInit = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
-               html += '<div class="pt-comment"><div class="pt-avatar" style="background:var(--teal-dk)">'+rInit+'</div><div class="pt-bubble"><div class="pt-bubble-hdr"><span class="pt-name">'+esc(r.official_name||'')+'</span><span class="pt-time">'+supTimeAgo(r.created_at)+'</span></div><div class="pt-text">'+esc(r.comment||'')+'</div>'+(r.official_role?'<div class="pt-role">'+esc(r.official_role)+'</div>':'')+'</div></div>';
-             });
-           } else {
-             html += '<div class="pt-empty">Be the first to comment on this activity</div>';
-           }
-           html += '<div class="pt-context">Commenting on: '+esc(actionLabel)+' at '+esc(schools||'\u2014')+'</div>';
-           html += '<div class="pt-reply"><textarea class="pt-input" placeholder="Write a comment\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+           html += '<div class="acd-chain"><div class="acd-chain-title">Data to decision to action</div>';
+           html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-d">D</span><div><div class="acd-chain-lbl">Data</div><div class="acd-chain-text">'+esc(chainDataLabel)+'</div></div></div>';
+           html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-de">D</span><div><div class="acd-chain-lbl">Decision</div><div class="acd-chain-text">'+esc(decLabel)+'</div></div></div>';
+           html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-a">A</span><div><div class="acd-chain-lbl">Action</div><div class="acd-chain-text">'+esc(actionLabel)+'</div></div></div>';
            html += '</div>';
 
-           // Owner buttons
+           if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="acd-row"><span class="acd-label">Follow-up</span><span class="acd-value" style="color:var(--orange)">'+esc(c.det.follow_up_desc)+'</span></div>';
+
+           var respCount = decResponses.length + (notedCount > 0 ? 1 : 0);
+           html += '<div class="acd-thread-bar"><span class="acd-thread-count">'+(respCount?respCount+' response'+(respCount>1?'s':''):'No responses yet')+'</span><button class="acd-thread-btn" onclick="toggleActThread(\''+cardId+'\')">'+( threadOpen?'Hide thread':'View thread')+'</button></div>';
+
+           if (threadOpen) {
+             html += '<div class="post-thread show" style="border-top:none;padding:10px 0 0;background:transparent">';
+             if (decResponses.length) {
+               decResponses.forEach(function(r){
+                 var rInit = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+                 html += '<div class="pt-comment"><div class="pt-avatar" style="background:var(--teal-dk)">'+rInit+'</div><div class="pt-bubble"><div class="pt-bubble-hdr"><span class="pt-name">'+esc(r.official_name||'')+'</span><span class="pt-time">'+supTimeAgo(r.created_at)+'</span></div><div class="pt-text">'+esc(r.comment||'')+'</div>'+(r.official_role?'<div class="pt-role">'+esc(r.official_role)+'</div>':'')+'</div></div>';
+               });
+             } else {
+               html += '<div class="pt-empty">Be the first to comment on this activity</div>';
+             }
+             html += '<div class="pt-reply"><textarea class="pt-input" placeholder="Write a comment\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+             html += '</div>';
+           }
+
            if (isMine && c.act && c.status !== 'Completed') {
-             html += '<div class="poa-btns">';
+             html += '<div class="acd-owner-btns">';
              if (c.status === 'Planned') html += '<button class="poa-btn poa-start" onclick="updateActionStatus(\''+c.act.id+'\',\'In Progress\')">Start</button>';
              html += '<button class="poa-btn poa-done" onclick="updateActionStatus(\''+c.act.id+'\',\'Completed\')">Mark Complete</button></div>';
-           } else if (!isMine && c.act && c.status !== 'Completed') {
-             html += '<div style="font-size:10px;color:#999;font-style:italic;padding:0 14px 12px">Only '+esc(c.act.responsible || 'the person who logged this')+' can update this action</div>';
+           } else if (isCompleted) {
+             html += '<div style="font-size:10px;color:var(--grey-lt);font-style:italic;margin-top:8px">Completed'+(c.act&&c.act.updated_at?' on '+fmtDate(c.act.updated_at):'')+'</div>';
            }
-         } else {
-           html += '<div style="font-size:10px;color:var(--grey-lt);font-style:italic;padding:0 14px 12px">Completed'+(c.act&&c.act.updated_at?' on '+fmtDate(c.act.updated_at):'')+'</div>';
+
+           html += '</div>';
          }
 
          html += '</div>';
