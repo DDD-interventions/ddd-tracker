@@ -4155,14 +4155,8 @@ async function checkForUpdates() {
 
 function handleUpdateAvailable() {
   if (_updateBannerShown) return;
-  // If user is NOT mid-form → auto-refresh silently
-  if (!isFormDirty()) {
-    _intentionalReload = true;
-    window.location.reload();
-    return;
-  }
-  // User IS mid-form → save draft, show banner
-  saveFormDraft();
+  // Always ask the user before refreshing
+  if (isFormDirty()) saveFormDraft();
   showUpdateBanner();
 }
 
@@ -4170,20 +4164,12 @@ function showUpdateBanner() {
   _updateBannerShown = true;
   let banner = document.getElementById('update-banner');
   if (banner) { banner.classList.add('visible'); return; }
+  var hasDraft = isFormDirty();
   banner = document.createElement('div');
   banner.id = 'update-banner';
   banner.className = 'update-banner';
-  banner.innerHTML = `
-    <div class="update-banner-text">
-      <strong>New version available.</strong> Your form has been saved and will be restored automatically.
-    </div>
-    <div class="update-banner-btns">
-      <button class="update-banner-btn primary" onclick="applyUpdate()">Update now</button>
-      <button class="update-banner-btn secondary" onclick="dismissUpdateBanner()">Later</button>
-    </div>
-  `;
+  banner.innerHTML = '<div class="update-banner-text"><strong>New version available.</strong> '+(hasDraft?'Your form has been saved and will be restored after updating.':'Tap Update now to get the latest version.')+'</div><div class="update-banner-btns"><button class="update-banner-btn primary" onclick="applyUpdate()">Update now</button><button class="update-banner-btn secondary" onclick="dismissUpdateBanner()">Later</button></div>';
   document.body.appendChild(banner);
-  // Slight delay for CSS transition
   requestAnimationFrame(() => requestAnimationFrame(() => banner.classList.add('visible')));
 }
 
