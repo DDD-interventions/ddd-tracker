@@ -869,7 +869,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.03.29.1';
+const APP_VERSION = '2026.03.30.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3325,15 +3325,6 @@ ${tab==='overview'?`
    </div>
  </div>
 
- <!-- ═══ INTERVENTION THEME ═══ -->
- <div class="dash-section">
-   <div class="dash-section-hdr"><h3>Which Programme Streams Are Active?</h3></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">The intervention themes officials selected when logging their activities — shows which programme streams are receiving the most on-the-ground support</div>
-     ${_ovThemeChart}
-   </div>
- </div>
-
  <!-- ═══ SMART NARRATIVES ═══ -->
  ${_narrHTML}
 
@@ -3342,6 +3333,15 @@ ${tab==='overview'?`
 
  <!-- ═══ RECOMMENDED SUPPORT ═══ -->
  ${_supHTML}
+
+ <!-- ═══ INTERVENTION THEME ═══ -->
+ <div class="dash-section">
+   <div class="dash-section-hdr"><h3>Which Programme Streams Are Active?</h3></div>
+   <div class="dash-section-body">
+     <div class="dash-section-desc">The intervention themes officials selected when logging their activities — shows which programme streams are receiving the most on-the-ground support</div>
+     ${_ovThemeChart}
+   </div>
+ </div>
 
  <!-- ═══ DDD DASHBOARD REFERENCE ═══ -->
  <div style="border:1px dashed #d0d4da;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8f9fa">
