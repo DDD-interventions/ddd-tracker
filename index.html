@@ -251,6 +251,21 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-section-hdr h3{font-size:14px;font-weight:700;color:var(--navy)}
 .dash-section-body{padding:14px 16px}
 .dash-section-desc{font-size:12px;color:var(--grey-dk);line-height:1.6;margin-bottom:12px}
+.dash-explore-divider{position:relative;border-top:1px dashed #ccc;margin:20px 0 12px;text-align:center}
+.dash-explore-divider span{position:relative;top:-9px;background:#fff;padding:0 12px;font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+details.dash-collapse{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:8px;overflow:hidden}
+details.dash-collapse summary{padding:14px 16px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none;-webkit-appearance:none;user-select:none}
+details.dash-collapse summary::-webkit-details-marker{display:none}
+details.dash-collapse summary::marker{display:none}
+details.dash-collapse summary .dc-border{width:4px;height:18px;border-radius:2px;flex-shrink:0}
+details.dash-collapse summary .dc-hint{margin-left:auto;font-size:10px;color:#bbb;font-weight:400}
+details.dash-collapse summary .dc-arrow{font-size:10px;color:#bbb;transition:transform .2s;flex-shrink:0}
+details.dash-collapse[open] summary .dc-arrow{transform:rotate(90deg);color:var(--teal)}
+details.dash-collapse[open] summary .dc-hint{display:none}
+details.dash-collapse[open] summary{border-bottom:1px solid var(--grey-lt)}
+details.dash-collapse .dc-body{padding:14px 16px}
+.fu-show-all{text-align:center;padding:6px;font-size:11px;color:var(--teal);font-weight:600;cursor:pointer}
+.fu-show-all:hover{text-decoration:underline}
 .dash-subnav{display:flex;flex-wrap:wrap;gap:6px;overflow-x:visible;padding:8px 16px 6px;position:sticky;top:0;z-index:50;background:#fff;margin:0 -16px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-bottom:1px solid #e0e0e0}
 .dash-subnav::-webkit-scrollbar{display:none}
 .dash-subnav button{flex:1 1 auto;min-width:0;font-size:12px;font-weight:700;padding:8px 12px;border-radius:8px;border:2px solid #d0d4db;background:#fff;color:var(--grey-dk);cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;text-align:center}
@@ -869,7 +884,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.03.29.1';
+const APP_VERSION = '2026.03.30.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -884,7 +899,7 @@ const S = {
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
- dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
+ dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all', _fuShowAll:false,
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
@@ -1122,6 +1137,7 @@ function resetInactivityTimer() {
 
 // STATUS UPDATE & OUTCOME RECORDING
 function toggleChall(b){S._challExpanded=S._challExpanded===b?null:b;render();}
+function toggleFuShowAll(){S._fuShowAll=!S._fuShowAll;render();}
 
 // ─── SUPPORT RESPONSE SYSTEM ───
 function toggleSup(need){S._supExpanded[need]=!S._supExpanded[need];render();}
@@ -3016,7 +3032,8 @@ function renderDashboard() {
    _fuHTML = '<div class="dash-section" style="border-left:4px solid var(--orange)"><div class="dash-section-hdr"><h3>Needs Attention</h3><span style="font-size:11px;color:var(--grey)">'+(followUpsWithAge.length+silentDistricts.length)+' item'+((followUpsWithAge.length+silentDistricts.length)!==1?'s':'')+'</span></div><div class="dash-section-body">';
    if (followUpsWithAge.length) {
      _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Follow-ups Due</div><div style="display:grid;gap:6px;margin-bottom:'+(silentDistricts.length?'14':'0')+'px">';
-     for (var _fi=0; _fi<Math.min(followUpsWithAge.length,5); _fi++) {
+     var _fuLimit = S._fuShowAll ? followUpsWithAge.length : Math.min(followUpsWithAge.length, 3);
+     for (var _fi=0; _fi<_fuLimit; _fi++) {
        var _f=followUpsWithAge[_fi];
        var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
        var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
@@ -3029,7 +3046,8 @@ function renderDashboard() {
        }
        _fuHTML += '</div>';
      }
-     if (followUpsWithAge.length>5) _fuHTML += '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ '+(followUpsWithAge.length-5)+' more</div>';
+     if (followUpsWithAge.length>3 && !S._fuShowAll) _fuHTML += '<div class="fu-show-all" onclick="toggleFuShowAll()">Show all '+followUpsWithAge.length+' follow-ups</div>';
+     if (followUpsWithAge.length>3 && S._fuShowAll) _fuHTML += '<div class="fu-show-all" onclick="toggleFuShowAll()">Show fewer</div>';
      _fuHTML += '</div>';
    }
    if (silentDistricts.length) {
@@ -3243,6 +3261,12 @@ function renderDashboard() {
  </div>
 
 ${tab==='overview'?`
+ <!-- ═══ TIER 1: ACTION ZONE ═══ -->
+ ${_narrHTML}
+ ${_fuHTML}
+ ${_supHTML}
+
+ <!-- ═══ TIER 2: KEY NUMBERS ═══ -->
  <!-- ═══ STAT CARDS ═══ -->
  <div class="stats-row">
    <div class="stat-card">
@@ -3259,25 +3283,27 @@ ${tab==='overview'?`
    </div>
    <div class="stat-card orange">
      <div class="st-title">Educators Supported</div>
-     <div class="st-desc">The estimated number of learners who benefited from ${_lYour} intervention activities, based on what was reported</div>
+     <div class="st-desc">The estimated number of educators who benefited from ${_lYour} intervention activities, based on what was reported</div>
      <div class="st-num">${totalEducators.toLocaleString()}</div>
-     ${schoolSet.size?'<div class="st-foot">Average of ~'+Math.round(totalEducators/(schoolSet.size||1))+' educators per school</div>':''}
+     ${totalEducators&&schoolSet.size&&Math.round(totalEducators/schoolSet.size)>=1?'<div class="st-foot">Average of ~'+Math.round(totalEducators/schoolSet.size)+' educators per school</div>':''}
    </div>
  </div>
 
- <!-- ═══ CHART PANELS ═══ -->
- <div class="dash-panels">
-   <div class="dash-section" style="margin-bottom:0">
-     <div class="dash-section-hdr"><h3>Overview of Interventions</h3></div>
-     <div class="dash-section-body">
-       <div class="dash-section-desc">The types of support activities ${_lYou} have logged</div>
-       ${_ovActChart}
-     </div>
+ <!-- ═══ TIER 3: EXPLORE FURTHER ═══ -->
+ <div class="dash-explore-divider"><span>Explore further</span></div>
+
+ <details class="dash-collapse">
+   <summary><span class="dc-border" style="background:var(--teal)"></span>Overview of interventions<span class="dc-hint">Tap to expand</span><span class="dc-arrow">&#9654;</span></summary>
+   <div class="dc-body">
+     <div class="dash-section-desc">The types of support activities ${_lYou} have logged</div>
+     ${_ovActChart}
    </div>
-   <div class="dash-section" style="margin-bottom:0">
-     <div class="dash-section-hdr"><h3>Data-Informed Practice</h3></div>
-     <div class="dash-section-body">
-       <div class="dash-section-desc">How often ${_lYou} use DDD data — from any source — before taking action</div>
+ </details>
+
+ <details class="dash-collapse">
+   <summary><span class="dc-border" style="background:#1565C0"></span>Data-informed practice<span class="dc-hint">Tap to expand</span><span class="dc-arrow">&#9654;</span></summary>
+   <div class="dc-body">
+     <div class="dash-section-desc">How often ${_lYou} use DDD data — from any source — before taking action</div>
        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
          <div style="position:relative;width:90px;height:90px;flex-shrink:0">
            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
@@ -3321,29 +3347,17 @@ ${tab==='overview'?`
        </div>
        ` : ''}
        <div style="font-size:10px;color:var(--grey);line-height:1.5;padding:8px 10px;background:#F8F9FA;border-radius:6px">${_dddTip}</div>
-     </div>
    </div>
- </div>
+ </details>
 
- <!-- ═══ INTERVENTION THEME ═══ -->
- <div class="dash-section">
-   <div class="dash-section-hdr"><h3>Which Programme Streams Are Active?</h3></div>
-   <div class="dash-section-body">
+ <details class="dash-collapse">
+   <summary><span class="dc-border" style="background:#7E57C2"></span>Which programme streams are active?<span class="dc-hint">Tap to expand</span><span class="dc-arrow">&#9654;</span></summary>
+   <div class="dc-body">
      <div class="dash-section-desc">The intervention themes officials selected when logging their activities — shows which programme streams are receiving the most on-the-ground support</div>
      ${_ovThemeChart}
    </div>
- </div>
+ </details>
 
- <!-- ═══ SMART NARRATIVES ═══ -->
- ${_narrHTML}
-
- <!-- ═══ NEEDS YOUR ATTENTION ═══ -->
- ${_fuHTML}
-
- <!-- ═══ RECOMMENDED SUPPORT ═══ -->
- ${_supHTML}
-
- <!-- ═══ DDD DASHBOARD REFERENCE ═══ -->
  <div style="border:1px dashed #d0d4da;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8f9fa">
    <div style="font-size:11px;color:var(--grey);line-height:1.5">Want stronger entries? Check your DDD data before logging.</div>
    <a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" onclick="markDDDChecked()" style="font-size:10px;color:var(--teal);text-decoration:none;font-weight:600;white-space:nowrap">Open Dashboard</a>
