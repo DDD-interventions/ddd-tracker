@@ -831,6 +831,16 @@ const SUBJECT_GROUPS = [
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
 const SIP_FOCUS_AREAS = ["Reading and literacy","Maths and numeracy","Improving specific subjects","Learner attendance and keeping learners in school","Covering the curriculum on time","Tests, exams and marking","Educator training and mentoring","School leadership and management","Working with parents and the community"];
 const SUPPORT_NEEDED = ["More visits from subject advisors","A specialist to help with a specific subject","Help for progressed learners","Mentoring for the principal or HoDs","Staffing problem \u2014 needs to go to HR/PED","Learning materials and resources","Learner welfare or psychosocial support","Building or infrastructure problem","On track \u2014 keep doing what we're doing"];
+const ROLE_SUPPORT_MAP = {
+  'More visits from subject advisors':['Subject Advisor'],
+  'A specialist to help with a specific subject':['Subject Advisor','Senior Education Specialist','Chief Education Specialist'],
+  'Help for progressed learners':['Subject Advisor','Senior Education Specialist'],
+  'Mentoring for the principal or HoDs':['Circuit Manager','District Director','Senior Education Specialist'],
+  'Staffing problem \u2014 needs to go to HR/PED':['District Director','Director','Chief Director'],
+  'Learning materials and resources':['Circuit Manager','Subject Advisor'],
+  'Learner welfare or psychosocial support':['Circuit Manager'],
+  'Building or infrastructure problem':['District Director','Director']
+};
 
 // Geographic hierarchy: Province -> District -> [Circuits] from DDD Master List Sept 2025
 const GEO_HIER = {"Eastern Cape":{"Alfred Nzo East":["Ane Circuit 1","Ane Circuit 2","Ane Circuit 3","Ane Circuit 4","Ane Circuit 5","Ane Circuit 6","Ane Circuit 7","Ane Circuit 8"],"Alfred Nzo West":["Anw Blorweni","Anw Fort Donald","Anw Kuali Nzo","Anw Ladykok","Anw Lesedi","Anw Letsema","Anw Magudlaphi","Anw Mkemane","Anw Mnceba 01","Anw Mnceba 02","Anw Moshesh","Anw Mt Currie","Anw N2","Anw Nolangeni","Anw Ntabankulu Central","Anw Ntabatye","Anw Ntenetyana","Anw Ntsizwa","Anw Nunge Range","Anw Shinta","Anw Simaka-Maka","Anw Simanyene","Anw Zimthuma","Anw Zinyosini"],"Amathole East":["Ae Beleni Circuit","Ae Bhadi Circuit","Ae Blue Sky Circuit","Ae Blythswood Circuit","Ae Buru Circuit","Ae Cunningham Circuit","Ae Elliotdale Village Circuit","Ae Ilingelethu Circuit","Ae J.S. Skenjana Circuit","Ae Jongulwandle Circuit","Ae Kamvalihle Circuit","Ae King Zwelidumile Circuit","Ae Kwantshunqe Circuit","Ae L.M.Malgas Circuit","Ae Lengeni Circuit","Ae Lower Gwadu Circuit","Ae Mandende Circuit","Ae Manyano Circuit","Ae Mbhashe Circuit","Ae Msobomvu Circuit","Ae Njingini Circuit","Ae Nomkqubela Circuit","Ae Nompumelelo Circuit","Ae Notinara Circuit","Ae Patricia Noah Circuit","Ae Ukhozi Circuit","Ae Upper Ngculu Circuit","Ae Willowvale Circuit"],"Amathole West":["Aw Circuit 1","Aw Circuit 10","Aw Circuit 11","Aw Circuit 12","Aw Circuit 13","Aw Circuit 14","Aw Circuit 2","Aw Circuit 3","Aw Circuit 4","Aw Circuit 5","Aw Circuit 6","Aw Circuit 7","Aw Circuit 8","Aw Circuit 9"],"Buffalo City":["Bc Amagasela-Quzini","Bc City Centre","Bc City Eastern Side","Bc Dimbaza","Bc Elotheni","Bc Fort Pato","Bc Gompo","Bc Great Kei","Bc Ingqanga Nentsiba Zayo","Bc King Williamstown","Bc Litha-Ndevana","Bc Nahoon River","Bc Ntabozuko","Bc Oceanside","Bc Sophumelela","Bc Zwelitsha"],"Chris Hani East":["Che All Saints","Che Bojane","Che Cala","Che Clarkebury","Che Elliot","Che Ikwezi","Che Iliso","Che Laphumilanga","Che Mabelentombi","Che Manzana","Che Mtawelanga","Che Mzantsi","Che Nciba","Che Nkondlo","Che Seplan","Che Sisonke","Che Zabasa"],"Chris Hani West":["Chw Cacadu","Chw Cradock","Chw Ezibeleni","Chw Isibane","Chw Lukhanji","Chw Macubeni","Chw Mid","Chw Middelburg","Chw Nciba","Chw Ndonga","Chw Nonesi","Chw Ntabethemba","Chw Qoqodala","Chw Sada","Chw Sikumtwa","Chw Tarka-Hofmeyer","Chw Vaalzwa"],"Joe Gqabi":["Jg Central","Jg Eastern","Jg Ekhephini","Jg Fairview","Jg Gariep","Jg Hd Ndzeleni","Jg Highlands","Jg Lahlangubo","Jg Maclear","Jg Maletswai","Jg Ngxaza","Jg Orange","Jg Solomzi","Jg Ugie","Jg Ukhahlamba","Jg Western"],"Nelson Mandela":["Nm Algoa-1","Nm Algoa-2","Nm Algoa-3","Nm Algoa-4","Nm Algoa-5","Nm Central-1","Nm Central-2","Nm Central-3","Nm Central-4","Nm Central-5","Nm Tinara-1","Nm Tinara-2","Nm Tinara-3","Nm Tinara-4","Nm Tinara-5","Nm-Independent","Nm-Lsen"],"O R Tambo Coastal":["Ortc Circuit 1","Ortc Circuit 10","Ortc Circuit 11","Ortc Circuit 12","Ortc Circuit 13","Ortc Circuit 14","Ortc Circuit 15","Ortc Circuit 16","Ortc Circuit 17","Ortc Circuit 2","Ortc Circuit 3","Ortc Circuit 4","Ortc Circuit 5","Ortc Circuit 6","Ortc Circuit 7","Ortc Circuit 8","Ortc Circuit 9","Ortc Hlwahlwazi","Ortc Khanyisa","Ortc Lusikisiki Central","Ortc Malangeni","Ortc Mfundisweni","Ortc Mtontsasa","Ortc Palmtop","Ortc Qaukeni","Ortc Sigcau"],"O R Tambo Inland":["Orti Circuit 1","Orti Circuit 10","Orti Circuit 11","Orti Circuit 12","Orti Circuit 13","Orti Circuit 14","Orti Circuit 15","Orti Circuit 16","Orti Circuit 17","Orti Circuit 18","Orti Circuit 19","Orti Circuit 2","Orti Circuit 20","Orti Circuit 21","Orti Circuit 22","Orti Circuit 23","Orti Circuit 24","Orti Circuit 25","Orti Circuit 3","Orti Circuit 4","Orti Circuit 5","Orti Circuit 6","Orti Circuit 7","Orti Circuit 8","Orti Circuit 9"],"Sarah Baartman":["Sb Baviaans","Sb Blue Crane","Sb Camdeboo","Sb Kou-Kamma","Sb Kouga Coastal","Sb Kouga Inland","Sb Makana 1","Sb Makana 2","Sb Ndlambe","Sb Sundays River Valley"]},"Free State":{"Fezile Dabi":["Fd Circuit 01","Fd Circuit 02","Fd Circuit 03","Fd Circuit 04","Fd Circuit 05","Fd Circuit 06","Fd Circuit 07"],"Lejweleputswa":["Lejwe Circuit 01","Lejwe Circuit 02","Lejwe Circuit 03","Lejwe Circuit 04","Lejwe Circuit 05","Lejwe Circuit 06","Lejwe Circuit 07","Lejwe Circuit 08","Lejwe Circuit 09","Lejwe Circuit 10"],"Mangaung Metro":["M Circuit 01","M Circuit 02","M Circuit 03","M Circuit 04","M Circuit 05","M Circuit 06","M Circuit 07","M Circuit 08","M Circuit 09","M Circuit 10","M Circuit 12","M Circuit S1"],"Thabo Mofutsanyana":["Tmed Circuit 01","Tmed Circuit 02","Tmed Circuit 03","Tmed Circuit 04","Tmed Circuit 05","Tmed Circuit 06","Tmed Circuit 07","Tmed Circuit 08","Tmed Circuit 09","Tmed Circuit 10","Tmed Circuit 11","Tmed Circuit 12","Tmed Circuit 13"],"Xhariep":["X Circuit 01","X Circuit 02","X Circuit 03","X Circuit 04"]},"Gauteng":{"Ekurhuleni North":["En Circuit 01","En Circuit 02","En Circuit 03","En Circuit 04"],"Ekurhuleni South":["Es Circuit 01","Es Circuit 02","Es Circuit 03","Es Circuit 04","Es Circuit 05"],"Gauteng East":["Ge Circuit 01","Ge Circuit 02","Ge Circuit 03","Ge Circuit 04","Ge Circuit 05"],"Gauteng North":["Gn Circuit 01","Gn Circuit 02","Gn Circuit 03"],"Gauteng West":["Gw Circuit 01","Gw Circuit 02","Gw Circuit 03","Gw Circuit 04","Gw Circuit 05"],"Johannesburg Central":["Jc Circuit 01","Jc Circuit 02","Jc Circuit 03","Jc Circuit 04","Jc Circuit 05","Jc Circuit 06"],"Johannesburg East":["Je Circuit 01","Je Circuit 02","Je Circuit 03"],"Johannesburg North":["Jn Circuit 01","Jn Circuit 02","Jn Circuit 03","Jn Circuit 04"],"Johannesburg South":["Js Circuit 01","Js Circuit 02","Js Circuit 03"],"Johannesburg West":["Jw Circuit 01","Jw Circuit 02","Jw Circuit 03","Jw Circuit 04"],"Sedibeng East":["Se Circuit 01","Se Circuit 02","Se Circuit 03"],"Sedibeng West":["Sw Circuit 01","Sw Circuit 02","Sw Circuit 03","Sw Circuit 04"],"Tshwane North":["Tn Circuit 01","Tn Circuit 02","Tn Circuit 03","Tn Circuit 04"],"Tshwane South":["Ts Circuit 01","Ts Circuit 02","Ts Circuit 03","Ts Circuit 04","Ts Circuit 05"],"Tshwane West":["Tw Circuit 01","Tw Circuit 02","Tw Circuit 03","Tw Circuit 04"]},"KwaZulu-Natal":{"Amajuba":["Dannhauser","Newcastle"],"Harry Gwala":["Ixopo","Pholela","Umzimkhulu"],"Ilembe":["Maphumulo","Ndwedwe","Stanger"],"King Cetshwayo":["Imfolozi","Mthonjaneni","Nkandla","Umhlathuze","Umlalazi"],"Pinetown":["Durban Northwest","Mafukuzela Ghandi","Umhlathuzana"],"Ugu":["Emzumbe","Sayidi","Scottburgh"],"Umgungundlovu":["Umngeni","Umsunduzi","Vulindlela"],"Umkhanyakude":["Hlabisa","Ingwavuma","Ubombo","Umhlabuyalingana"],"Umlazi":["Durban Central","Phumelela","Umbumbulu"],"Umzinyathi":["Endumeni/Nquthu","Msinga","Umvoti"],"Uthukela":["Bergville","Estcourt","Mnambithi"],"Zululand":["Bhekuzulu","Mahlabathini","Nongoma","Paulpietersburg","Pongola"]},"Limpopo":{"Capricorn North":["Bahananwa North","Bahananwa South","Bahlaloga","Bakone-Vlakfontein","Bochum East","Bochum West","Koloti","Maleboho Central","Maleboho East","Maleboho West","Maune","Mogoshi","Moletjie","Moloto","Sekgosese Central","Sekgosese West"],"Capricorn South":["Dimamo","Kgakotlou","Lebopo","Lebowakgomo","Lepelle(Capricorn South)","Magatle","Mamabolo","Mankweng","Maraba","Mogodumo","Moletlane","Mphahlele","Nokotlou","Pietersburg","Sepitsi","Seshego"],"Mogalakwena":["Bakenberg North","Bakenberg South","Baltimore","Mahwelereng","Mapela","Matlalane","Mogalakwena","Mokopane","Potgietersrus"],"Mopani East":["Groot Letaba","Klein Letaba","Lulekani","Mamaila","Manombe","Modjadji","Molototsi","Namakgale","Nsami","Rakwadu 1","Sekgosese East 1","Sekgosese East 2","Shamavunga"],"Mopani West":["Khujwana","Lepelle(Mopani West)","Mafarana","Makhutswe","Mawa","Motupa","Nkowankowa","Nwanedzi","Rakwadu 2","Shiluvane","Thabina","Tzaneen","Xihoko"],"Sekhukhune East":["Bogwasha","Dilokong","Drakensberg","Driekop","Leolo","Lepellane","Mabulane","Malegale","Malokela","Mmashadi","Mohlaletse","Moroke","Ngwaabe","Schoonoord","Seotlong","Tubatse"],"Sekhukhune South":["Eensaam","Glen Cowie","Groblersdal","Hlogotlou","Lepelle(Sekhukhune South)","Lobethal","Manthole","Masemola","Motetema","Moutse Central","Moutse East","Moutse West","Ngwaritsi","Phokoane","Rakgwadi","Tsimanyane"],"Vhembe East":["Dzindi","Luvuvhu","Malamulele Central","Malamulele East","Malamulele North East","Malamulele South","Malamulele West","Mudaswali","Mutshindudi","Mvudi","Niani East","Niani West","Sambandou","Sibasa","Tshilamba","Tshinane","Vhumbedzi","Vhuronga 1"],"Vhembe West":["Dzondo","Elim","Hlanganani Central","Hlanganani North","Hlanganani South","Lwamondo","Nzhelele Central","Nzhelele East","Nzhelele West","Sekgosese North","Soutpansberg East","Soutpansberg North","Soutpansberg West","Vhuronga 2"],"Waterberg":["Dwaalboom","Ellisras","Naboomspruit","Nylstroom","Palala North","Palala South","Thabazimbi","Vaalwater","Warmbad"]},"Mpumalanga":{"Bohlabela":["Cottondale","Greenvalley","Lehukwe","Maboke","Mafemani","Manyeleti","Maripe","Marite","Mashishing","Matsavana","Mkhuhlu","Ngwaritsane","Sabie","Shatale","Thulamahashe","Ximhungwe"],"Ehlanzeni":["Insikazi","Khulangwane","Lubombo","Malelane","Mbombela","Mgwenya","Nkomazi Central","Nkomazi East","Nkomazi West","Nkululeko","Sikhulile","Umjindi","White Hazy 1","White Hazy 2","White River"],"Gert Sibande":["Bethal","Breyten","Carolina","Dipaliseng","Dundonald","Highveld Ridge East","Highveld Ridge West","Kwathandeka","Lekwa East","Lekwa West","Manzana","Mashishila","Mkhondo East","Mkhondo West","Mpuluzi","Msukaligwa 1","Msukaligwa 2","Volksrust","Wakkerstroom"],"Nkangala":["Buhlebesizwe","Emakhazeni","Emalahleni 1","Emalahleni 2","Emalahleni 3","Emthambothini","Kwaggafontein East","Kwaggafontein West","Kwamhlanga Ne","Kwamhlanga Sw","Libangeni","Marapyane","Mmametlhake","Nokaneng","Phumula","Siyabuswa 1","Siyabuswa 2","Steve Tshwete 1","Steve Tshwete 2","Steve Tshwete 3","Victor Khanye"]},"North West":{"Ditsobotla":["Bodibe","Coligny","Itsoseng","Lichtenburg"],"Greater Taung":["Ba Ga Mothibi","Manthe","Mokgareng","Pudumong","Reivilo","Taung Central"],"Jb Marks":["Retlakgona-Jb Marks","Super A","Tshing"],"Kagisano Molopo":["Ganyesa","Morokweng 1","Morokweng 2","Tlaakgameng"],"Madibeng":["Ditlou","Kopano-Madibeng","Kwena","Morula","Retlakgona-Madibeng","Toloane"],"Mahikeng":["Botshabelo","Central","Kopano-Mahikeng","Mmabatho","Montshioa Stadt","Tshwaranang"],"Maquassi Hills":["Naledi"],"Matlosana":["Jc Motaung","Meepong","Naledi-Matlosana","Refentse","Tswelelopele"],"Moretele":["Makapanstad Central","Makapanstad North","Makapanstad West","Rekopantswe","Tswaing"],"Moses Kotane":["Dinaledi","Kopano-Moses Kotane","Madikwe","Mankwe","Mogale","Retladirela-Moses Kotane"],"Naledi":["Lekwa-Teemane","Mamusa","Naledi"],"Ramotshere Moiloa":["Lerato","Motswedi","Nietverdiendt","Zeerust"],"Ratlou":["Kraaima","Madibogo","Makgobistadt"],"Rustenburg":["Areaganeng","Boinelo","Boitshoko","Bokamoso","Bonesang","Bosaneng","Kgetleng","Retladirela-Rustenburg"],"Tswaing":["Delareyville","Ganapan","Mahunwana"]},"Northern Cape":{"Frances Baard":["F1","F2","F3","F4","F5","F6","F7","F8"],"John Taolo Gaetsewe":["K1","K2","K3","K4","K5","K6","K7","K8"],"Namakwa":["N1","N2","N3","N4"],"Pixley-Ka-Seme":["P1","P2","P3","P4","P5"],"Zf Mgcawu":["S1","S2","S3","S4","S5"]},"Western Cape":{"Cape Winelands":["Cp Circuit 1","Cp Circuit 10","Cp Circuit 2","Cp Circuit 3","Cp Circuit 4","Cp Circuit 5","Cp Circuit 6","Cp Circuit 7","Cp Circuit 8","Cp Circuit 9"],"Eden And Central Karoo":["Eck Circuit 1","Eck Circuit 2","Eck Circuit 3","Eck Circuit 4","Eck Circuit 5","Eck Circuit 6","Eck Circuit 7","Eck Circuit 8"],"Metro Central":["Mc Circuit 1","Mc Circuit 10","Mc Circuit 2","Mc Circuit 3","Mc Circuit 4","Mc Circuit 5","Mc Circuit 6","Mc Circuit 7","Mc Circuit 8","Mc Circuit 9"],"Metro East":["Me Circuit 1","Me Circuit 2","Me Circuit 3","Me Circuit 4","Me Circuit 5","Me Circuit 6","Me Circuit 7","Me Circuit 8","Me Circuit 9"],"Metro North":["Mn Circuit 1","Mn Circuit 10","Mn Circuit 2","Mn Circuit 3","Mn Circuit 4","Mn Circuit 5","Mn Circuit 6","Mn Circuit 7","Mn Circuit 8","Mn Circuit 9"],"Metro South":["Ms Circuit 1","Ms Circuit 2","Ms Circuit 3","Ms Circuit 4","Ms Circuit 5","Ms Circuit 6","Ms Circuit 7","Ms Circuit 8","Ms Circuit 9"],"Overberg":["Ob Circuit 1","Ob Circuit 2","Ob Circuit 3"],"Partnership Schools":["Acorn Education","Common Good","Education Ally"],"West Coast":["Wc Circuit 1","Wc Circuit 2","Wc Circuit 3","Wc Circuit 4","Wc Circuit 5"]}};
@@ -887,17 +897,20 @@ const S = {
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
+ _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false,
+ _supTagged:{}, _supTagSearch:{}, _supTagResults:{}, _supTagLoading:{},
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
- province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,term:'Term 1 2026',activity_date:today(),
+ province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:'Term 1 2026',activity_date:today(),
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
- ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
+ ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
  doc_url:'',doc_name:'',
     sip_focus_areas:[],support_needed:[],support_level:'',doc_file:null,doc_file_name:'',
+    tagged_officials:{},_offSearchQ:{},_offSearchResults:{},_offSearchLoading:{},
     formStep:-1,intervention_trigger:'',intervention_trigger_other:'',official_name:'',official_role:'',official_specialisation:'',official_email:'',
     insight_type:'',insight_pass_rate:'',insight_learners_affected:'',insight_threshold:'',insight_detail:'',insight_educator_absent:'',insight_attendance_days:'',insight_sba_exam_gap:'',insight_curriculum_pct:''
   }
@@ -931,6 +944,179 @@ async function notifyLogin(official) {
  } catch(e) { console.warn('Login notification failed:', e); }
 }
 
+// Change 8: Notification for tagged officials
+async function notifyTagged(ctx) {
+ try {
+   if (!ctx.toEmail) return;
+   // Check opt-out
+   var {data:row} = await sb.from('officials').select('details').eq('email',ctx.toEmail).maybeSingle();
+   if (row && row.details && row.details.notify_tagged_disabled) return;
+   var momentLabels = {
+     requested:'You have been requested to provide support',
+     looped_in:'You have been looped in on a support recommendation',
+     addressed:'A support request you were involved in has been marked as addressed'
+   };
+   var subjectLine = '[DDD Tracker] ' + (momentLabels[ctx.moment]||'Support notification') + ' \u2014 ' + (Array.isArray(ctx.schools)?ctx.schools.join(', '):ctx.schools||'');
+   var subjList = (ctx.subjects&&ctx.subjects.length)?ctx.subjects.join(', '):'Not specified';
+   var bodyHTML = '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
+     '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0"><div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div><div style="font-size:13px;color:#B8DCDC;margin-top:4px">' + (momentLabels[ctx.moment]||'Notification') + '</div></div>' +
+     '<div style="background:#fff;padding:20px 24px;border:1px solid #e8e6e4;border-top:none">' +
+     '<table style="border-collapse:collapse;width:100%;font-size:13px">' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">School</td><td style="padding:8px 0">' + (Array.isArray(ctx.schools)?ctx.schools.join(', '):ctx.schools||'') + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Support needed</td><td style="padding:8px 0">' + (ctx.supportNeed||'') + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Subject(s)</td><td style="padding:8px 0">' + subjList + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Logged by</td><td style="padding:8px 0">' + (ctx.fromName||'') + (ctx.fromRole?' (' + ctx.fromRole + ')':'') + '</td></tr>' +
+     '</table>' +
+     '<div style="text-align:center;margin:20px 0 8px"><a href="' + window.location.href + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Tracker</a></div>' +
+     '</div></div>';
+   await fetch(NOTIFY_URL, {
+     method:'POST', headers:{'Content-Type':'application/json'},
+     body: JSON.stringify({ from:'DDD Tracker <onboarding@resend.dev>', to:[ctx.toEmail], subject:subjectLine, html:bodyHTML })
+   });
+ } catch(e) { console.warn('notifyTagged failed:', e); }
+}
+
+// Change 8: Opt-out toggle
+async function toggleNotifyOptOut() {
+  var updated = !S.official.notify_tagged_disabled;
+  try {
+    var {data:row} = await sb.from('officials').select('details').eq('id',S._officialId).single();
+    var details = Object.assign({}, row && row.details || {}, { notify_tagged_disabled: updated });
+    await sb.from('officials').update({ details: details }).eq('id', S._officialId);
+    S.official.notify_tagged_disabled = updated;
+    render();
+  } catch(e) { console.warn('Opt-out toggle failed:', e); }
+}
+
+// Change 6: Search officials for tagging (form)
+var _offSearchTimer = null;
+async function searchOfficialsForNeed(need, query) {
+  if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; render(); return; }
+  S.f._offSearchLoading[need] = true; render();
+  try {
+    var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
+      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
+      .eq('district', S.f.district || S.official.district)
+      .limit(20);
+    // Deduplicate by email
+    var seen = {}; var results = [];
+    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
+    S.f._offSearchResults[need] = results;
+  } catch(e) { S.f._offSearchResults[need] = []; console.warn('Official search failed:', e); }
+  S.f._offSearchLoading[need] = false; render();
+}
+function tagOfficial(need, official) {
+  if (!S.f.tagged_officials[need]) S.f.tagged_officials[need] = [];
+  if (S.f.tagged_officials[need].some(function(o){return o.id === official.id;})) return;
+  S.f.tagged_officials[need].push(official);
+  S.f._offSearchQ[need] = ''; S.f._offSearchResults[need] = [];
+  render();
+}
+function untagOfficial(need, officialId) {
+  if (!S.f.tagged_officials[need]) return;
+  S.f.tagged_officials[need] = S.f.tagged_officials[need].filter(function(o){return o.id !== officialId;});
+  render();
+}
+function renderOfficialSearch(need) {
+  var q = S.f._offSearchQ[need] || '';
+  var results = S.f._offSearchResults[need] || [];
+  var loading = S.f._offSearchLoading[need] || false;
+  var tagged = S.f.tagged_officials[need] || [];
+  var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+  var html = '';
+  // Tagged pills
+  if (tagged.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">';
+    tagged.forEach(function(o) {
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc(o.name) + ' <span style="font-weight:400;color:var(--grey)">(' + esc(o.role) + ')</span><button onclick="untagOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
+    });
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--teal);margin-bottom:4px">\u2713 Tagged by unique ID \u2014 name changes or spelling variations won\'t affect who gets notified.</div>';
+  }
+  // Search input
+  html += '<div style="margin-top:4px"><input type="text" placeholder="Search for an official to tag (name or email)..." value="' + esc(q) + '" oninput="S.f._offSearchQ[\'' + needKey + '\']=this.value;clearTimeout(_offSearchTimer);_offSearchTimer=setTimeout(function(){searchOfficialsForNeed(\'' + needKey + '\',S.f._offSearchQ[\'' + needKey + '\'])},300)" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit"></div>';
+  if (loading) { html += '<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching...</div>'; }
+  else if (q.length >= 2 && results.length === 0) {
+    html += '<div style="font-size:11px;color:var(--grey);padding:6px 0;line-height:1.5">No official found matching \u201c' + esc(q) + '\u201d. They may not be registered on the tracker yet, or try searching by email address instead. <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="S.f._offSearchQ[\'' + needKey + '\']=\'\';S.f._offSearchResults[\'' + needKey + '\']=[];render()">Clear search</span></div>';
+  } else if (results.length > 0) {
+    var names = {}; results.forEach(function(o){names[o.name]=(names[o.name]||0)+1;});
+    var hasDupes = Object.values(names).some(function(c){return c > 1;});
+    if (hasDupes) html += '<div style="font-size:10px;color:var(--orange);padding:4px 0;font-weight:600">More than one person shares this name \u2014 check the circuit and email.</div>';
+    html += '<div style="max-height:180px;overflow-y:auto;border:1px solid #e8e6e4;border-radius:4px;margin-top:4px">';
+    results.forEach(function(o) {
+      var alreadyTagged = tagged.some(function(t){return t.id === o.id;});
+      html += '<div onclick="' + (alreadyTagged ? '' : 'tagOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')') + '" style="padding:10px;border-bottom:1px solid #f3f2f1;cursor:' + (alreadyTagged ? 'default' : 'pointer') + ';min-height:44px;display:flex;align-items:center;gap:8px' + (alreadyTagged ? ';opacity:.5' : '') + '">';
+      html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12px;color:var(--navy)">' + esc(o.name) + '</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"><span style="font-size:10px;padding:1px 6px;border-radius:8px;background:#7B1FA222;color:#7B1FA2;font-weight:600">' + esc(o.role) + '</span>';
+      if (o.circuit) html += '<span style="font-size:10px;color:var(--grey)">' + esc(o.circuit) + '</span>';
+      html += '</div><div style="font-size:10px;color:var(--teal);font-family:monospace;margin-top:1px">' + esc(o.email) + '</div></div>';
+      if (alreadyTagged) html += '<span style="font-size:10px;color:var(--teal);font-weight:600">Tagged</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+// Change 7: Dashboard tagging helpers (respond/resolve flows)
+var _supTagTimer = null;
+async function searchSupTagOfficial(need, query) {
+  if (!query || query.length < 2) { S._supTagResults[need] = []; S._supTagLoading[need] = false; render(); return; }
+  S._supTagLoading[need] = true; render();
+  try {
+    var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
+      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
+      .eq('district', S.official.district)
+      .limit(20);
+    var seen = {}; var results = [];
+    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
+    S._supTagResults[need] = results;
+  } catch(e) { S._supTagResults[need] = []; }
+  S._supTagLoading[need] = false; render();
+}
+function tagSupOfficial(need, official) {
+  if (!S._supTagged[need]) S._supTagged[need] = [];
+  if (S._supTagged[need].some(function(o){return o.id === official.id;})) return;
+  S._supTagged[need].push(official);
+  S._supTagSearch[need] = ''; S._supTagResults[need] = [];
+  render();
+}
+function untagSupOfficial(need, officialId) {
+  if (!S._supTagged[need]) return;
+  S._supTagged[need] = S._supTagged[need].filter(function(o){return o.id !== officialId;});
+  render();
+}
+function renderSupTagSearch(need, purpose) {
+  var q = S._supTagSearch[need] || '';
+  var results = S._supTagResults[need] || [];
+  var loading = S._supTagLoading[need] || false;
+  var tagged = S._supTagged[need] || [];
+  var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+  var label = purpose === 'resolve' ? 'Who carried out this support? (optional)' : 'Tag a colleague to loop in (optional)';
+  var html = '<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:var(--grey-dk);margin-bottom:4px">' + label + '</div>';
+  if (tagged.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">';
+    tagged.forEach(function(o) {
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:3px 8px;font-size:11px;font-weight:600">' + esc(o.name) + '<button onclick="untagSupOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 3px;line-height:1">&times;</button></span>';
+    });
+    html += '</div>';
+  }
+  html += '<input type="text" placeholder="Search by name or email..." value="' + esc(q) + '" oninput="S._supTagSearch[\'' + needKey + '\']=this.value;clearTimeout(_supTagTimer);_supTagTimer=setTimeout(function(){searchSupTagOfficial(\'' + needKey + '\',S._supTagSearch[\'' + needKey + '\'])},300)" style="width:100%;padding:7px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit">';
+  if (loading) html += '<div style="font-size:10px;color:var(--grey);padding:4px 0">Searching...</div>';
+  else if (q.length >= 2 && results.length === 0) {
+    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0">No official found. <span style="color:var(--teal);cursor:pointer" onclick="S._supTagSearch[\'' + needKey + '\']=\'\';S._supTagResults[\'' + needKey + '\']=[];render()">Clear</span></div>';
+  } else if (results.length > 0) {
+    html += '<div style="max-height:140px;overflow-y:auto;border:1px solid #e8e6e4;border-radius:4px;margin-top:4px">';
+    results.forEach(function(o) {
+      var already = tagged.some(function(t){return t.id === o.id;});
+      html += '<div onclick="' + (already ? '' : 'tagSupOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')') + '" style="padding:8px;border-bottom:1px solid #f3f2f1;cursor:' + (already?'default':'pointer') + ';min-height:44px' + (already?';opacity:.5':'') + '"><div style="font-weight:700;font-size:11px">' + esc(o.name) + '</div><div style="font-size:10px;color:#7B1FA2">' + esc(o.role) + '</div><div style="font-size:10px;color:var(--teal);font-family:monospace">' + esc(o.email) + '</div></div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 async function checkAuth() {
  S.authState = 'checking';
  S.loading = true;
@@ -940,13 +1126,13 @@ async function checkAuth() {
    const { data: { session } } = await sb.auth.getSession();
    if (session) {
      const { data, error } = await sb.from('officials')
-       .select('id,full_name,role,province,district,email,is_active')
+       .select('id,full_name,role,province,district,email,is_active,details')
        .limit(1);
 
      if (!error && data && data.length > 0) {
        const official = data[0];
        S._officialId = official.id;
-       S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', email: official.email || '' };
+       S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', email: official.email || '', notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled) };
        S.f.official_name = official.full_name || '';
        S.f.official_role = official.role || '';
        S.f.official_email = official.email || '';
@@ -1021,7 +1207,7 @@ async function handleOtpSubmit() {
 
    // Session is now set - JWT attached to all future requests
    const { data: officials } = await sb.from('officials')
-     .select('id,full_name,role,province,district,email')
+     .select('id,full_name,role,province,district,email,details')
      .limit(1);
 
    const official = officials?.[0];
@@ -1037,7 +1223,8 @@ async function handleOtpSubmit() {
      role: official.role || '',
      province: official.province || '',
      district: official.district || '',
-     email: S._otpEmail
+     email: S._otpEmail,
+     notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled)
    };
    S.f.official_name = official.full_name || '';
    S.f.official_role = official.role || '';
@@ -1145,12 +1332,16 @@ async function submitSupResponse(need){
   var txt=(S._supReplyText[need]||'').trim();
   if(!txt)return;
   var scope=S._supReplyScope[need]||{type:'all',entity:''};
+  var tagged=S._supTagged[need]||[];
   try{
-    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:scope.type,scope_entity:scope.entity};
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:scope.type,scope_entity:scope.entity,details:{tagged_officials:tagged}};
     var {error}=await sb.from('support_responses').insert(row);
     if(error)throw error;
     S._supReplyText[need]='';
     S._supReplyScope[need]={type:'all',entity:''};
+    // Notify tagged officials (fire-and-forget)
+    try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:'',supportNeed:need,subjects:[],moment:'looped_in'});});}catch(e){console.warn('notifyTagged failed:',e);}
+    S._supTagged[need]=[];S._supTagSearch[need]='';S._supTagResults[need]=[];
     await loadSupResponses();
     render();
     showToast('Response posted');
@@ -1167,12 +1358,25 @@ async function markSupAddressed(need){
     if(el){el.classList.add('resolve-error');setTimeout(function(){el.classList.remove('resolve-error')},1500);}
     return;
   }
+  var tagged=S._supTagged[need]||[];
   try{
-    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:'resolution',scope_entity:''};
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:'resolution',scope_entity:'',details:{tagged_officials:tagged}};
     var {error}=await sb.from('support_responses').insert(row);
     if(error)throw error;
     S._supResolving[need]=false;
     S._supResolveComment[need]='';
+    // Notify tagged officials
+    try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:'',supportNeed:need,subjects:[],moment:'addressed'});});}catch(e){console.warn('notifyTagged failed:',e);}
+    // Notify original logger
+    try{
+      var origDec=S.decisions.find(function(d){var det=d.details||{};return(det.support_needed||[]).includes(need);});
+      if(origDec){
+        var origEmail=(origDec.details&&origDec.details.official_email)||(origDec.logged_by_email)||'';
+        var origName=origDec.made_by||(origDec.details&&origDec.details.official_name)||'';
+        if(origEmail&&origEmail!==S.official.email){notifyTagged({toEmail:origEmail,toName:origName,fromName:S.official.full_name,fromRole:S.official.role,schools:(origDec.details&&origDec.details.schools)||'',supportNeed:need,subjects:(origDec.details&&origDec.details.subjects)||[],moment:'addressed'});}
+      }
+    }catch(e){console.warn('Notify original logger failed:',e);}
+    S._supTagged[need]=[];S._supTagSearch[need]='';S._supTagResults[need]=[];
     await loadSupResponses();
     render();
     showToast('Marked as addressed');
@@ -1342,7 +1546,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="toggleNotifyOptOut()" title="Toggle email notifications when tagged"><span style="font-size:9px;color:rgba(255,255,255,.6);white-space:nowrap">${S.official.notify_tagged_disabled?'Notifications off':'Notifications on'}</span><div style="width:28px;height:16px;border-radius:8px;background:${S.official.notify_tagged_disabled?'rgba(255,255,255,.2)':'#7AB648'};position:relative;transition:.2s"><div style="width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:2px;${S.official.notify_tagged_disabled?'left:2px':'left:14px'};transition:.2s"></div></div></div><button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button></div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -1474,8 +1678,8 @@ function getFormProgress() {
    [f.sip_focus_areas.length > 0, 1],
    // Step 3: DDD Connection
    [!!f.ddd_used, 3],
-   [!!f.action_type && (f.action_type !== 'Other' || !!f.action_other.trim()), 3],
-   [!!f.decision_type, 2],
+   [f.action_types.length > 0 && (!f.action_types.includes('Other') || !!f.action_other.trim()), 3],
+   [f.decision_types.length > 0, 2],
    [!!f.intervention_trigger, 1],
    // Step 4: Context & Follow-up
    [f.support_needed.length > 0, 1],
@@ -1812,11 +2016,9 @@ let _spItems=[];
 let _spFilterTimer=null;
 function schoolFilterInput(val){
   S.f._schoolQ=val;
-  // Debounce: update the dropdown list only, not the full page
   if(_spFilterTimer)clearTimeout(_spFilterTimer);
   _spFilterTimer=setTimeout(function(){
     _spFilterTimer=null;
-    // Get the dropdown list container and update only its content
     const listEl=document.querySelector('.school-dd-list');
     const footEl=document.querySelector('.school-dd-foot');
     if(!listEl)return;
@@ -1824,25 +2026,33 @@ function schoolFilterInput(val){
     const selected=parseSchoolsArr();
     const q=(S.f._schoolQ||'').toLowerCase();
     const filtered=q?allSchools.filter(function(s){return s[0].toLowerCase().includes(q)}):allSchools;
-    _spItems=filtered;
+    var phaseFilter=S.f._schoolPhaseFilter||'ALL';
+    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+    var phaseFiltered=filtered;
+    if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
+    _spItems=phaseFiltered;
+    var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+    var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
+    var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
     let html='';
-    if(filtered.length===0){
-      html='<div class="school-dd-hint">No schools match \u201c'+esc(S.f._schoolQ)+'\u201d</div>';
+    if(phaseFiltered.length===0){
+      html='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
     }else{
-      const shown=filtered.slice(0,120);
+      const showCircuit=!S.f.circuit;const circuitLookup={};
+      if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
+      const shown=phaseFiltered.slice(0,120);
       for(let i=0;i<shown.length;i++){
-        const s=shown[i];
-        const isChecked=selected.includes(s[0]);
-        const phaseBadge=s[1]?'<span style="font-size:9px;color:#999;margin-left:auto;flex-shrink:0">'+(PHASE_LABELS[s[1]]||'')+'</span>':'';
-        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'\u2713':'')+'</span><span style="flex:1;min-width:0">'+esc(s[0])+'</span>'+phaseBadge+'</div>';
+        const s=shown[i];const isChecked=selected.includes(s[0]);
+        const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
+        var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
+        var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
+        var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
+        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+'</div></div>';
       }
-      if(filtered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+filtered.length+' \u2014 filter to see more</div>';
+      if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
     listEl.innerHTML=html;
-    if(footEl){
-      const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
-      footEl.innerHTML='<span>'+scope+' \xb7 '+allSchools.length+' schools</span><span>'+selected.length+' selected</span>';
-    }
+    if(footEl){const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);footEl.innerHTML='<span>'+scope+' \xb7 '+phaseFiltered.length+' schools'+(phaseFilter!=='ALL'?' (filtered)':'')+'</span><span>'+selected.length+' selected</span>';}
   },120);
 }
 function schoolPickerHTML(){
@@ -1896,23 +2106,48 @@ function schoolPickerHTML(){
     if(allSchools.length>20){
       dd+='<div class="school-dd-filter"><input type="text" placeholder="Start typing a school name..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
     }
+
+    // Phase filter tabs
+    var phaseFilter=S.f._schoolPhaseFilter||'ALL';
+    var phaseTabs=[['ALL','All'],['FET','FET Phase (Gr 10\u201312)'],['SENIOR','Senior Phase (Gr 7\u20139)'],['INTERMEDIATE','Intermediate (Gr 4\u20136)'],['FOUNDATION','Foundation (Gr R\u20133)']];
+    dd+='<div style="padding:6px 8px;border-bottom:1px solid #e8e6e4;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none">';
+    for(var pt=0;pt<phaseTabs.length;pt++){
+      var ptCode=phaseTabs[pt][0],ptLabel=phaseTabs[pt][1];
+      var ptActive=phaseFilter===ptCode;
+      dd+='<button onclick="S.f._schoolPhaseFilter=\''+ptCode+'\';render();setTimeout(function(){var el=document.getElementById(\'spFilter\');if(el)el.focus();},50)" style="display:inline-block;font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ptActive?'var(--teal)':'#c8c6c4')+';background:'+(ptActive?'var(--teal-lt)':'#fff')+';color:'+(ptActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ptActive?'700':'500')+';font-family:inherit;margin-right:6px;min-height:32px;white-space:nowrap">'+ptLabel+'</button>';
+    }
+    dd+='</div>';
+
+    // Apply phase filter
+    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+    var phaseFiltered=filtered;
+    if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){
+      var allowedTypes=phaseTypeMap[phaseFilter];
+      phaseFiltered=filtered.filter(function(s){return s[1]&&allowedTypes.includes(s[1]);});
+    }
+    _spItems=phaseFiltered;
+
     dd+='<div class="school-dd-list">';
-    if(filtered.length===0){
-      dd+='<div class="school-dd-hint">No schools match \u201c'+esc(S.f._schoolQ)+'\u201d</div>';
+    if(phaseFiltered.length===0){
+      dd+='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
     }else{
-      const shown=filtered.slice(0,120);
+      var typeBadgeColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+      var typeBadgeLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
+      var phaseLabelsForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
+      const shown=phaseFiltered.slice(0,120);
       const showCircuit=!S.f.circuit;
       const circuitLookup={};
       if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
       for(let i=0;i<shown.length;i++){
         const s=shown[i];
         const isChecked=selected.includes(s[0]);
-        const phaseLbl=s[1]?PHASE_LABELS[s[1]]||'':'';
         const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
-        const metaParts=[circLbl,phaseLbl].filter(Boolean).join(' \xb7 ');
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div>'+esc(s[0])+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+'</div></div>';
+        var tBadge=s[1]&&typeBadgeLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+typeBadgeColors[s[1]]+'22;color:'+typeBadgeColors[s[1]]+';margin-left:6px;flex-shrink:0">'+typeBadgeLabels[s[1]]+'</span>':'';
+        var phaseSub=s[1]&&phaseLabelsForType[s[1]]?phaseLabelsForType[s[1]]:'';
+        var metaParts=[circLbl,phaseSub].filter(Boolean).join(' \xb7 ');
+        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+'</div></div>';
       }
-      if(filtered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+filtered.length+' \u2014 filter to see more</div>';
+      if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
     dd+='</div>';
     const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
@@ -1939,6 +2174,9 @@ document.addEventListener('click',function(e){
   if(rmBtn){const idx=parseInt(rmBtn.dataset.spRm);const arr=parseSchoolsArr();if(arr[idx])removeSchool(arr[idx]);e.stopPropagation();return;}
   if(S.f._schoolDDOpen&&!e.target.closest('.school-picker')){S.f._schoolDDOpen=false;S.f._schoolQ='';render();}
   if(S.f._subjectDDOpen&&!e.target.closest('.school-picker')){S.f._subjectDDOpen=false;S.f._subjectQ='';render();}
+  if(S.f._decDDOpen&&!e.target.closest('.chip-picker')){S.f._decDDOpen=false;render();}
+  if(S.f._actDDOpen&&!e.target.closest('.chip-picker')){S.f._actDDOpen=false;render();}
+  if(S._dashSubjDDOpen&&!e.target.closest('.chip-picker')){S._dashSubjDDOpen=false;render();}
 });
 
 function renderFormStep1(){
@@ -2010,7 +2248,7 @@ function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the activity type..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.activity_type,ACTIVITY_HINTS)}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${(()=>{const t=[...THEMES];if(S.f.district==='Lejweleputswa')t.splice(t.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');return t.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('');})()}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the theme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.intervention_theme,THEME_HINTS)}</div></div>
     <div class="field"><label>Subject(s)</label><div class="hint">Search and select subjects</div>${renderSubjectPicker()}</div>
-    <div class="field"><label>Grade(s)</label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
+    <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><textarea rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea></div>
     <div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:12px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:10px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:10px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E8F5E9':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:11px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\x27\x27":"\x27yes\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\x27\x27":"\x27no\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>
@@ -2063,6 +2301,32 @@ function buildInsightStatement(){
   if(t==='other-issue'&&f.insight_detail)parts.push(f.insight_detail);
   return parts.join(' ');
 }
+function toggleDecision(name){S.f.decision_types.includes(name)?S.f.decision_types=S.f.decision_types.filter(s=>s!==name):S.f.decision_types.push(name);S.f.decision_type=S.f.decision_types[0]||'';if(!S.f.decision_types.includes('Other'))S.f.decision_other='';render();}
+function removeDecision(name){S.f.decision_types=S.f.decision_types.filter(s=>s!==name);S.f.decision_type=S.f.decision_types[0]||'';if(!S.f.decision_types.includes('Other'))S.f.decision_other='';render();}
+function toggleAction(name){S.f.action_types.includes(name)?S.f.action_types=S.f.action_types.filter(s=>s!==name):S.f.action_types.push(name);S.f.action_type=S.f.action_types[0]||'';if(!S.f.action_types.includes('Other'))S.f.action_other='';render();}
+function removeAction(name){S.f.action_types=S.f.action_types.filter(s=>s!==name);S.f.action_type=S.f.action_types[0]||'';if(!S.f.action_types.includes('Other'))S.f.action_other='';render();}
+function renderChipPicker(sel,items,openFlag,toggleFn,removeFn,openExpr,closeExpr,placeholder,hintMap){
+  const open=openFlag;
+  const chips=sel.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${sel.map(s=>`<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:12px;font-weight:600">${esc(s)}<button onclick="event.stopPropagation();${removeFn}('${s.replace(/'/g,"\\\\'")}')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:14px;padding:0 0 0 4px;line-height:1">&times;</button></span>`).join('')}</div>`:'';
+  const trigger=`<button class="school-trigger ${open?'open':''}" onclick="${openExpr}" style="text-align:left">${sel.length?sel.length+' selected':placeholder}<span class="arrow">\u25BC</span></button>`;
+  let dd='';
+  if(open){
+    let ddItems=items.map(s=>{
+      const checked=sel.includes(s);
+      const se=s.replace(/'/g,"\\\\'");
+      return`<div class="school-dd-item ${checked?'checked':''}" onclick="${toggleFn}('${se}')"><div class="tick">${checked?'\u2713':''}</div>${esc(s)}</div>`;
+    }).join('');
+    dd=`<div class="school-dd"><div class="school-dd-list" style="max-height:250px">${ddItems}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();${closeExpr}">Done</span></div></div>`;
+  }
+  const hint=sel.length===1&&hintMap?getSelHint(sel[0],hintMap):'';
+  return`<div class="chip-picker" style="position:relative">${trigger}${dd}${chips}${hint}</div>`;
+}
+function renderDecisionPicker(){
+  return renderChipPicker(S.f.decision_types,DECISIONS,S.f._decDDOpen,'toggleDecision','removeDecision',"S.f._decDDOpen=!S.f._decDDOpen;S.f._actDDOpen=false;render()","S.f._decDDOpen=false;render()",'Select planned interventions...',DECISION_HINTS);
+}
+function renderActionPicker(){
+  return renderChipPicker(S.f.action_types,ACTIONS,S.f._actDDOpen,'toggleAction','removeAction',"S.f._actDDOpen=!S.f._actDDOpen;S.f._decDDOpen=false;render()","S.f._actDDOpen=false;render()",'Select actions taken...',ACTION_HINTS);
+}
 function renderFormStep3(){
   const phase=getPhaseForGrades();
   const usedDDD=S.f.ddd_used && S.f.ddd_used!=='no';
@@ -2114,15 +2378,17 @@ function renderFormStep3(){
     ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs DDD data. But next time, try starting from the data. You can log into the dashboard yourself, or ask your Programme Manager or Subject Advisor for a data pack, presentation, or spreadsheet extract.</div></div>`:''}
 
     <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data that made you step in?</div><select onchange="S.f.intervention_trigger=this.value;if(this.value!=='Other')S.f.intervention_trigger_other='';render()"><option value="">Select...</option>${INTERVENTION_TRIGGERS.map(t=>'<option '+(S.f.intervention_trigger===t?'selected':'')+'>'+t+'</option>').join('')}</select>${S.f.intervention_trigger==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe what made you act..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}</div>
-    <div class="field-row"><div class="field"><label>Planned intervention</label><div class="hint">What did you decide to do based on what the data showed you? This is the plan you made.</div><select onchange="S.f.decision_type=this.value;if(this.value!=='Other')S.f.decision_other='';render()"><option value="">Select...</option>${DECISIONS.map(d=>'<option '+(S.f.decision_type===d?'selected':'')+'>'+d+'</option>').join('')}</select>${S.f.decision_type==='Other'?'<div style="margin-top:6px"><input type="text" placeholder="Please describe the planned intervention..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.decision_type,DECISION_HINTS)}</div><div class="field" id="fld-action"><label>Action taken<span class="req">*</span></label><div class="hint">What did you actually do on the ground to carry out that decision?</div><select onchange="S.f.action_type=this.value;render()"><option value="">Select...</option>${ACTIONS.map(a=>'<option '+(S.f.action_type===a?'selected':'')+'>'+a+'</option>').join('')}</select>${getSelHint(S.f.action_type,ACTION_HINTS)}</div></div>
-    ${S.f.action_type==='Other'?`<div class="field"><label>Describe action</label><textarea rows="2" placeholder="Describe..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
+    <div class="field"><label>Planned intervention(s)</label><div class="hint">What did you decide to do based on what the data showed you? Select all that apply.</div>${renderDecisionPicker()}</div>
+    ${S.f.decision_types.includes('Other')?'<div class="field"><label>Describe planned intervention</label><input type="text" placeholder="Please describe the planned intervention..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}
+    <div class="field" id="fld-action"><label>Action(s) taken<span class="req">*</span></label><div class="hint">What did you actually do on the ground? Select all that apply.</div>${renderActionPicker()}</div>
+    ${S.f.action_types.includes('Other')?`<div class="field"><label>Describe action</label><textarea rows="2" placeholder="Describe..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
     
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(2,3)">Next &rarr;</button></div>
   </div></div>`;
 }
 function renderFormStep4(){
   return `<div class="section fade-in"><div class="sec-hdr orange" style="border-color:var(--orange)"><div><h2>4. Context & Follow-up</h2><p>School context, support needs, and next steps</p></div></div><div class="sec-body">
-    <div class="field"><label>What Support Do These Schools Need?</label><div class="hint">Select all that apply \u2014 helps district officials prioritise and allocate resources</div><div class="checkbox-grp">${SUPPORT_NEEDED.map(s=>{const se=s.replace(/'/g,"\\\'").replace(/\u2014/g,'\u2014');return`<label><input type="checkbox" ${S.f.support_needed.includes(s)?'checked':''} onchange="togCtx(S.f.support_needed,'${se}',this.checked,'support')"><span>${s}</span></label>`}).join('')}</div></div>
+    <div class="field"><label>What Support Do These Schools Need?</label><div class="hint">Select all that apply \u2014 helps district officials prioritise and allocate resources</div><div class="checkbox-grp">${SUPPORT_NEEDED.map(s=>{const se=s.replace(/'/g,"\\\'").replace(/\u2014/g,'\u2014');const isChecked=S.f.support_needed.includes(s);const hasRoles=!!ROLE_SUPPORT_MAP[s];return`<label><input type="checkbox" ${isChecked?'checked':''} onchange="togCtx(S.f.support_needed,'${se}',this.checked,'support')"><span>${s}</span></label>${isChecked&&hasRoles?'<div style="margin:-4px 0 8px 28px;padding:8px 10px;background:#f8f9fc;border-radius:6px;border-left:2px solid var(--teal-md)"><div style="font-size:10px;color:var(--grey);margin-bottom:4px">Tag a specific official to notify (optional \u2014 leave blank to alert all matching-role officials)</div>'+renderOfficialSearch(s)+'</div>':''}`}).join('')}</div></div>
     <div class="field"><label>How Much Support Is Needed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">How much help does this school need?</div><div class="radio-grp"><label><input type="radio" name="supportLvl" value="light" ${S.f.support_level==='light'?'checked':''} onchange="S.f.support_level='light';render()"><span><strong>Light touch</strong> \u2014 school is coping, just needs a check-in now and then</span></label><label><input type="radio" name="supportLvl" value="regular" ${S.f.support_level==='regular'?'checked':''} onchange="S.f.support_level='regular';render()"><span><strong>Regular support</strong> \u2014 needs regular visits, e.g. every two weeks</span></label><label><input type="radio" name="supportLvl" value="intensive" ${S.f.support_level==='intensive'?'checked':''} onchange="S.f.support_level='intensive';render()"><span><strong>Intensive support</strong> \u2014 serious challenges, needs a team effort from multiple people</span></label></div></div>
     <div class="field"><label>School context</label><div class="hint">Tap all that apply across schools visited</div><div style="margin-bottom:8px"><span class="tag-grp-title">Staffing:</span><div class="tags" style="display:inline-flex">${CTX_STAFFING.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_staffing.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_staffing,'${s}',this.checked,'staffing')"><span>${s}</span></label>`).join('')}</div></div><div style="margin-bottom:8px"><span class="tag-grp-title">Resources:</span><div class="tags" style="display:inline-flex">${CTX_RESOURCES.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_resources.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_resources,'${s}',this.checked,'resources')"><span>${s}</span></label>`).join('')}</div></div><div><span class="tag-grp-title">Learners:</span><div class="tags" style="display:inline-flex">${CTX_LEARNERS.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_learners.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_learners,'${s}',this.checked,'learners')"><span>${s}</span></label>`).join('')}</div></div></div>
     <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025..." oninput="S.f.ctx_notes=this.value">${esc(S.f.ctx_notes)}</textarea></div>
@@ -2150,7 +2416,7 @@ function renderFormReview(){
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_type==='Other'&&f.decision_other?'Other: '+f.decision_other:f.decision_type)}${rvRow('Intervention activity',f.action_type==='Other'&&f.action_other?'Other: '+f.action_other:f.action_type)}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',{'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger)}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
@@ -2158,7 +2424,7 @@ function renderFormReview(){
 }
 function handleFileSelect(e){const file=e.target.files[0];if(file)attachFile(file)}
 function handleFileDrop(e){const file=e.dataTransfer.files[0];if(file)attachFile(file)}
-function attachFile(file){if(file.size>6*1024*1024){alert('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;render()}
+function attachFile(file){if(file.size>6*1024*1024){alert('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;if(!S.f.doc_name)S.f.doc_name=file.name.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');render()}
 
 async function uploadSupportingDoc(file, actionId) {
  if (!file) return { url: null, name: null };
@@ -2230,7 +2496,7 @@ function renderSuccess() {
    <div style="font-size:12px;color:var(--navy);line-height:1.6">Try starting from the DDD data — whether you log into the dashboard yourself, use a presentation from your programme team, or work from a spreadsheet extract. Note the numbers you see \u2014 pass rates, how many learners, which subjects. Entries with real numbers help us show the difference your work is making.</div>
  </div>`}
  <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:12px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> at <strong>${esc(S.f.schools)}</strong><br> ${S.f.district}, ${S.f.province} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
- ${S.f.action_type ? 'Intervention activity: ' + esc(S.f.action_type) : ''}
+ ${S.f.action_types.length ? 'Intervention activity: ' + esc(S.f.action_types.join('; ')) : ''}
  ${S.f.educators_supported ? ' \u00b7 ~' + S.f.educators_supported + ' educators' : ''}
  </div> </div> ${renderFeedbackSection()}
  <div style="display:flex;gap:10px;justify-content:center;margin-top:20px"> <button class="btn btn-teal" onclick="resetForm()">Log Another</button> <button class="btn btn-outline" onclick="S.view='dashboard';render()">View Dashboard</button> </div> </div></div></div>`;
@@ -2254,10 +2520,11 @@ function getValidationErrors() {
  // Step 2: What Happened
  if (!f.activity_type) errs.push({step:1,field:'activity_type',label:'Activity type',fieldId:'fld-activity'});
  if (f.activity_type==='Other'&&!f.activity_type_other.trim()) errs.push({step:1,field:'activity_type_other',label:'Activity type (please describe)',fieldId:'fld-activity'});
+ if (!f.grades.length) errs.push({step:1,field:'grades',label:'Grades supported',fieldId:'fld-grades'});
  // Step 3: DDD Connection
  if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was DDD data used?',fieldId:'fld-ddd-used'});
- if (!f.action_type) errs.push({step:2,field:'action_type',label:'Intervention activity (action taken)',fieldId:'fld-action'});
- if (f.action_type==='Other'&&!f.action_other.trim()) errs.push({step:2,field:'action_other',label:'Intervention activity (please describe)',fieldId:'fld-action'});
+ if (!f.action_types.length) errs.push({step:2,field:'action_types',label:'Intervention activity (action taken)',fieldId:'fld-action'});
+ if (f.action_types.includes('Other')&&!f.action_other.trim()) errs.push({step:2,field:'action_other',label:'Intervention activity (please describe)',fieldId:'fld-action'});
  return errs;
 }
 
@@ -2333,12 +2600,15 @@ async function submitForm() {
  insight_statement:buildInsightStatement(),
  insight_pass_rate:S.f.insight_pass_rate?parseFloat(S.f.insight_pass_rate):null,
  insight_learners_affected:S.f.insight_learners_affected?parseInt(S.f.insight_learners_affected):null,
- decision_type:S.f.decision_type==='Other'&&S.f.decision_other?'Other: '+S.f.decision_other:S.f.decision_type,
+ decision_type:S.f.decision_types[0]||'',
+ decision_types:S.f.decision_types,
+ action_types:S.f.action_types,
  ctx_staffing:S.f.ctx_staffing, ctx_resources:S.f.ctx_resources, ctx_learners:S.f.ctx_learners, ctx_notes:S.f.ctx_notes,
  obs:Object.assign({},S.f.obs),
  educators_supported:S.f.educators_supported ? parseInt(S.f.educators_supported) : null,
  follow_up:S.f.follow_up, follow_up_desc:S.f.follow_up_desc,
       sip_focus_areas:S.f.sip_focus_areas, support_needed:S.f.support_needed, support_level:S.f.support_level,
+      tagged_officials:S.f.tagged_officials,
       intervention_trigger:S.f.intervention_trigger,
       official_name:S.f.official_name, official_email:S.f.official_email,
       official_role:S.f.official_role==='Other'&&S.f.official_role_other?'Other: '+S.f.official_role_other:S.f.official_role,
@@ -2360,7 +2630,7 @@ async function submitForm() {
  ddd_tool: S.f.ddd_reports.join(', '),
  data_viewed: (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type) + ' — ' + S.f.schools,
  insight: buildInsightStatement() || S.f.insight_detail || S.f.description,
- decision_made: (S.f.decision_type==='Other'&&S.f.decision_other?'Other: '+S.f.decision_other:S.f.decision_type) || (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type),
+ decision_made: (S.f.decision_types.length?(S.f.decision_types.includes('Other')&&S.f.decision_other?S.f.decision_types.filter(d=>d!=='Other').concat(['Other: '+S.f.decision_other]).join('; '):S.f.decision_types.join('; ')):'') || (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type),
  contextual_factors: [...S.f.ctx_staffing,...S.f.ctx_resources,...S.f.ctx_learners].join(', ') + (S.f.ctx_notes ? ' | ' + S.f.ctx_notes : ''),
  made_by: S.f.official_name || S.official.full_name || 'User',
  date: S.f.activity_date,
@@ -2373,7 +2643,7 @@ async function submitForm() {
  official_id: S._officialId,
  decision_id: decId,
  intervention_id: dec.intervention_id,
- action_taken: S.f.action_type === 'Other' ? S.f.action_other : S.f.action_type,
+ action_taken: S.f.action_types.includes('Other')&&S.f.action_other ? S.f.action_types.filter(a=>a!=='Other').concat(['Other: '+S.f.action_other]).join('; ') : S.f.action_types.join('; '),
  responsible: S.f.official_name || S.official.full_name || 'User',
  status: 'In Progress',
  target_date: null,
@@ -2410,6 +2680,17 @@ async function submitForm() {
 
  S.submitted = true;
     try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
+
+ // Fire-and-forget: notify tagged officials
+ try {
+   var _taggedAll = S.f.tagged_officials || {};
+   Object.keys(_taggedAll).forEach(function(need) {
+     (_taggedAll[need]||[]).forEach(function(o) {
+       notifyTagged({ toEmail:o.email, toName:o.name, fromName:S.f.official_name||S.official.full_name, fromRole:S.f.official_role||S.official.role, schools:S.f.schools, supportNeed:need, subjects:S.f.subjects, moment:'requested' });
+     });
+   });
+ } catch(e) { console.warn('notifyTagged batch failed:', e); }
+
  await loadAll();
  } catch(e) {
  // Network failed — but data is already saved locally
@@ -2426,14 +2707,15 @@ function resetForm() {
  S._validationErrors = null;
  try{sessionStorage.removeItem('ddd_form_draft')}catch(e){}
  S.f = {
- province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, term:S.f.term, activity_date:today(),
+ province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
- ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', decision_type:'', decision_other:'', action_type:'', action_other:'',
+ ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'',
     sip_focus_areas:[], support_needed:[], support_level:'', doc_file:null, doc_file_name:'',
+    tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
     formStep:-1, intervention_trigger:'', intervention_trigger_other:'',  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, official_specialisation_other:S.f.official_specialisation_other,
     insight_type:'', insight_pass_rate:'', insight_learners_affected:'', insight_threshold:'', insight_detail:'', insight_educator_absent:'', insight_attendance_days:'', insight_sba_exam_gap:'', insight_curriculum_pct:''
   };
@@ -2456,6 +2738,10 @@ function initDashFilters() {
     circuit: 'All',
     school: 'All'
   };
+  S._dashRoleFilter = 'ALL';
+  S._dashSubjFilter = [];
+  S._dashSubjQ = '';
+  S._dashSubjDDOpen = false;
 }
 
 function getClientScope() {
@@ -2661,7 +2947,7 @@ function buildExportRow(d, det, a, o) {
    det.ddd_access_date || '',
    det.ddd_dashboard_confirmed || '',
    det.insight_statement || det.insight_detail || d.insight || '',
-   det.decision_type || d.decision_made || '',
+   (det.decision_types&&det.decision_types.length?det.decision_types.join('; '):det.decision_type||d.decision_made||''),
    det.educators_supported != null ? det.educators_supported : '',
    det.insight_type || '',
    det.insight_pass_rate != null ? det.insight_pass_rate : '',
@@ -3181,6 +3467,7 @@ function renderDashboard() {
          });
          _supHTML += '</select></div>';
          _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += renderSupTagSearch(need, 'respond');
          _supHTML += '</div>';
        }
 
@@ -3191,6 +3478,7 @@ function renderDashboard() {
            _supHTML += '<div class="sup-resolve-form">';
            _supHTML += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
            _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+           _supHTML += renderSupTagSearch(need, 'resolve');
            _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
            _supHTML += '</div>';
          } else {
@@ -3235,6 +3523,7 @@ function renderDashboard() {
  </div>
 
 ${tab==='overview'?`
+ ${renderPendingForYou(decs, S._supResponses)}
  <!-- ═══ STAT CARDS ═══ -->
  <div class="stats-row">
    <div class="stat-card">
@@ -3489,6 +3778,50 @@ ${tab==='tracker'?`
      <div class="dash-section-desc">Your logged activities. Tap any entry to see the full detail, Data-Decision-Action chain, and responses.</div>
 
      ${(function(){
+       // Build designation filter chips
+       var roleSet={};
+       decs.forEach(function(d){var det=d.details||{};var r=det.official_role||'';if(r)roleSet[r]=(roleSet[r]||0)+1;else roleSet['Unknown']=(roleSet['Unknown']||0)+1;});
+       var roles=Object.keys(roleSet).sort();
+       var roleFilter=S._dashRoleFilter||'ALL';
+       var roleChips='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding:8px 0;scrollbar-width:none;-ms-overflow-style:none">';
+       roleChips+='<button onclick="S._dashRoleFilter=\'ALL\';render()" style="display:inline-block;font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(roleFilter==='ALL'?'var(--teal)':'#c8c6c4')+';background:'+(roleFilter==='ALL'?'var(--teal-lt)':'#fff')+';color:'+(roleFilter==='ALL'?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(roleFilter==='ALL'?'700':'500')+';font-family:inherit;margin-right:6px;min-height:36px">All ('+decs.length+')</button>';
+       roles.forEach(function(r){
+         var active=roleFilter===r;
+         roleChips+='<button onclick="S._dashRoleFilter=\''+r.replace(/'/g,"\\x27")+'\';render()" style="display:inline-block;font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(active?'var(--teal)':'#c8c6c4')+';background:'+(active?'var(--teal-lt)':'#fff')+';color:'+(active?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(active?'700':'500')+';font-family:inherit;margin-right:6px;min-height:36px;white-space:nowrap">'+esc(r)+' ('+roleSet[r]+')</button>';
+       });
+       roleChips+='</div>';
+
+       // Build subject filter dropdown
+       var subjFilter=S._dashSubjFilter||[];
+       var subjOpen=S._dashSubjDDOpen;
+       var subjQ=(S._dashSubjQ||'').toLowerCase();
+       var subjTriggerLabel=subjFilter.length?subjFilter.length+' subject'+(subjFilter.length>1?'s':'')+' selected':'All subjects';
+       var subjHTML='<div class="chip-picker" style="position:relative;display:inline-block;width:100%">';
+       subjHTML+='<button class="school-trigger '+(subjOpen?'open':'')+'" onclick="S._dashSubjDDOpen=!S._dashSubjDDOpen;S._dashSubjQ=\'\';render()" style="text-align:left;font-size:12px;padding:8px 10px">'+subjTriggerLabel+'<span class="arrow">\u25BC</span></button>';
+       if(subjOpen){
+         var sItems='';
+         SUBJECT_GROUPS.forEach(function(g){
+           var filt=g.items.filter(function(s){return !subjQ||s.toLowerCase().includes(subjQ);});
+           if(!filt.length)return;
+           sItems+='<div style="padding:5px 10px;font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">'+g.label+'</div>';
+           filt.forEach(function(s){
+             var chk=subjFilter.includes(s);
+             var se=s.replace(/'/g,"\\x27");
+             sItems+='<div class="school-dd-item '+(chk?'checked':'')+'" onclick="var i=S._dashSubjFilter.indexOf(\''+se+'\');if(i>-1)S._dashSubjFilter.splice(i,1);else S._dashSubjFilter.push(\''+se+'\');render()"><div class="tick">'+(chk?'\u2713':'')+'</div>'+esc(s)+'</div>';
+           });
+         });
+         if(!sItems)sItems='<div class="school-dd-hint">No subjects match your search</div>';
+         subjHTML+='<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Search subjects..." value="'+esc(S._dashSubjQ||'')+'" oninput="S._dashSubjQ=this.value;render()" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:220px">'+sItems+'</div><div class="school-dd-foot"><span>'+subjFilter.length+' selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S._dashSubjDDOpen=false;render()">Done</span></div></div>';
+       }
+       subjHTML+='</div>';
+       if(subjFilter.length){
+         subjHTML+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+subjFilter.map(function(s){return'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:3px 8px;font-size:11px;font-weight:600">'+esc(s)+'<button onclick="event.stopPropagation();S._dashSubjFilter=S._dashSubjFilter.filter(function(x){return x!==\''+s.replace(/'/g,"\\x27")+'\'});render()" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 3px;line-height:1">&times;</button></span>';}).join('')+'</div>';
+       }
+
+       return '<div style="margin:10px 0 6px"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Filter by designation</div>'+roleChips+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by subject</div>'+subjHTML+'</div>';
+     })()}
+
+     ${(function(){
        var myDecs = decs.filter(function(d){return d.official_id === S._officialId});
        if (!myDecs.length) return '';
        var now = new Date();
@@ -3524,9 +3857,23 @@ ${tab==='tracker'?`
 
      ${(function(){
        var trackerFilter = S._trackerFilter || 'all';
+       var roleFilter = S._dashRoleFilter || 'ALL';
+       var subjFilter = S._dashSubjFilter || [];
        var allChains = [];
        decs.forEach(function(d){
          var det = d.details || {};
+         // Apply designation filter
+         if (roleFilter !== 'ALL') {
+           var dRole = det.official_role || '';
+           if (!dRole && roleFilter !== 'Unknown') return;
+           if (dRole && dRole !== roleFilter) return;
+           if (!dRole && roleFilter === 'Unknown') { /* match */ }
+         }
+         // Apply subject filter
+         if (subjFilter.length > 0) {
+           var dSubjects = det.subjects || [];
+           if (!dSubjects.some(function(s){return subjFilter.includes(s);})) return;
+         }
          var matchActs = acts.filter(function(a){return a.decision_id === d.id});
          if (matchActs.length) {
            matchActs.forEach(function(a){
@@ -3567,7 +3914,7 @@ ${tab==='tracker'?`
          var rptArr = c.det.ddd_reports || [];
          var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
          var chainDataLabel = usedDDD ? rptArr.join(', ') : 'No DDD data used';
-         var decLabel = c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014');
+         var decLabel = (c.det.decision_types&&c.det.decision_types.length)?c.det.decision_types.join('; '):(c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014'));
 
          var decResponses = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='comment'});
          var notedCount = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='noted'}).length;
@@ -4033,7 +4380,7 @@ function isFormDirty() {
   if (S.view !== 'log' || f.formStep < 0 || S.submitted) return false;
   // Check if user has entered meaningful data beyond defaults (including Step 1 fields)
   return !!(f.intervention_theme || f.term || f.activity_type || f.description
-    || f.action_type || f.decision_type || f.ddd_used
+    || f.action_types.length || f.decision_types.length || f.action_type || f.decision_type || f.ddd_used
     || f.schools || f.insight_detail || f.insight_pass_rate
     || (f.subjects && f.subjects.length) || (f.grades && f.grades.length)
     || (f.ddd_reports && f.ddd_reports.length) || f.educators_supported
@@ -4088,6 +4435,63 @@ function renderPendingBanner() {
   var queue = getSubmitQueue();
   if (!queue.length) return '';
   return '<div style="background:#FFF3E0;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:11px;color:#E65100;line-height:1.4"><strong>' + queue.length + ' activit' + (queue.length > 1 ? 'ies' : 'y') + ' saved offline</strong> — waiting to submit when connection improves</div><button onclick="flushSubmitQueue()" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;border:1.5px solid #E65100;background:#fff;color:#E65100;cursor:pointer;white-space:nowrap">Retry now</button></div>';
+}
+
+// Change 9: Pending for you panel
+function renderPendingForYou(decs, supResponses) {
+  if (!S._officialId || !decs || !decs.length) return '';
+  var myRole = S.official.role || '';
+  var myDistrict = S.official.district || '';
+  var resolved = {};
+  (supResponses || []).forEach(function(r) {
+    if (r.scope_type === 'resolution') resolved[r.support_need] = true;
+    if (r.scope_type === 'reopened') delete resolved[r.support_need];
+  });
+  var items = [];
+  decs.forEach(function(d) {
+    var det = d.details || {};
+    var needs = det.support_needed || [];
+    var taggedAll = det.tagged_officials || {};
+    needs.forEach(function(need) {
+      if (resolved[need]) return;
+      if (!ROLE_SUPPORT_MAP[need]) return;
+      var taggedForNeed = taggedAll[need] || [];
+      var isUUIDMatch = taggedForNeed.some(function(o) { return o.id === S._officialId; });
+      var isRoleMatch = taggedForNeed.length === 0 && ROLE_SUPPORT_MAP[need].includes(myRole) && (det.district || '') === myDistrict;
+      if (!isUUIDMatch && !isRoleMatch) return;
+      // Don't show your own logged items
+      if (d.official_id === S._officialId) return;
+      items.push({
+        school: det.schools || '', need: need, subjects: det.subjects || [], grades: det.grades || [],
+        flaggedBy: d.made_by || det.official_name || '', date: d.date || d.created_at || '',
+        isRequested: isUUIDMatch, decId: d.id
+      });
+    });
+  });
+  if (!items.length) return '';
+  var now = new Date();
+  var html = '<div style="background:#FFF8E1;border:2px solid #F57F17;border-radius:10px;padding:14px 16px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F57F17;animation:pulse 2s infinite"></span><span style="font-size:15px;font-weight:700;color:#E65100">Pending for you \u2014 ' + items.length + ' item' + (items.length > 1 ? 's' : '') + '</span></div>';
+  items.forEach(function(it) {
+    var ago = '';
+    if (it.date) {
+      var d = new Date(it.date); var diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+      ago = diff === 0 ? 'Today' : diff === 1 ? '1 day ago' : diff + ' days ago';
+    }
+    html += '<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #F57F17">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--navy)">' + esc(it.school) + '</div>';
+    html += '<div style="font-size:12px;color:var(--grey-dk);margin-top:2px">' + esc(it.need);
+    if (it.subjects.length) html += ' \xb7 ' + esc(it.subjects.join(', '));
+    if (it.grades.length) html += ' \xb7 Gr ' + esc(it.grades.join(', '));
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--grey);margin-top:4px">Flagged by ' + esc(it.flaggedBy) + (ago ? ' \xb7 ' + ago : '') + '</div>';
+    if (it.isRequested) html += '<div style="font-size:10px;font-weight:700;color:#E65100;margin-top:4px">You were specifically requested</div>';
+    var schoolEsc = (it.school || '').replace(/'/g, "\\x27");
+    html += '<button onclick="S.view=\'log\';S.f.formStep=0;S.f.schools=\'' + schoolEsc + '\';render();window.scrollTo({top:0,behavior:\'smooth\'})" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:700;border:1.5px solid #F57F17;background:#FFF8E1;color:#E65100;border-radius:8px;cursor:pointer;font-family:inherit;min-height:44px">Log a support visit</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
 }
 
 function saveFormDraft() {
