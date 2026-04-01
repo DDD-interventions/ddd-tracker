@@ -879,7 +879,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.03.31.1';
+const APP_VERSION = '2026.04.01.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1546,7 +1546,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="toggleNotifyOptOut()" title="Toggle email notifications when tagged"><span style="font-size:9px;color:rgba(255,255,255,.6);white-space:nowrap">${S.official.notify_tagged_disabled?'Notifications off':'Notifications on'}</span><div style="width:28px;height:16px;border-radius:8px;background:${S.official.notify_tagged_disabled?'rgba(255,255,255,.2)':'#7AB648'};position:relative;transition:.2s"><div style="width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:2px;${S.official.notify_tagged_disabled?'left:2px':'left:14px'};transition:.2s"></div></div></div><button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button></div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -1757,6 +1757,13 @@ function navToLog() {
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function renderNotifyToggle() {
+  var isOn = !S.official.notify_tagged_disabled;
+  return '<div onclick="toggleNotifyOptOut()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f7f9fc;border-radius:8px;cursor:pointer;min-height:44px;border:1px solid #e8e6e4">' +
+    '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">Email me when someone tags me for support</div><div style="font-size:11px;color:var(--grey);margin-top:2px">' + (isOn ? 'You will receive an email when a colleague requests your help' : 'Email notifications are turned off') + '</div></div>' +
+    '<div style="width:40px;height:22px;border-radius:11px;background:' + (isOn ? '#7AB648' : '#c8c6c4') + ';position:relative;transition:.2s;flex-shrink:0"><div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;' + (isOn ? 'left:20px' : 'left:2px') + ';transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)"></div></div>' +
+  '</div>';
+}
 function renderWelcome() {
   var firstName = 'there';
   if (S.official.full_name && S.official.full_name !== 'Official') {
@@ -1791,6 +1798,7 @@ function renderWelcome() {
       '<div class="pn-icon">🧪</div>' +
       '<div class="pn-text"><strong>Pilot until 10 April 2026.</strong> Please log your Term 1 2026 school support activities — go back as far as you can. Your entries will help us test the tracker and decide on next steps.</div>' +
     '</div>' +
+    '<div style="padding:0 18px 10px;animation:fadeUp .4s ease .7s both">' + renderNotifyToggle() + '</div>' +
     '<div class="welcome-cta">' +
       '<button class="btn-go" onclick="dismissWelcome()">Let\u2019s Go →</button>' +
     '</div>' +
@@ -3523,7 +3531,7 @@ function renderDashboard() {
  </div>
 
 ${tab==='overview'?`
- ${renderPendingForYou(decs, S._supResponses)}
+ ${renderPendingForYou(allDecs, S._supResponses)}
  <!-- ═══ STAT CARDS ═══ -->
  <div class="stats-row">
    <div class="stat-card">
@@ -3991,6 +3999,11 @@ ${tab==='tracker'?`
 `:''}\
 
 
+
+<div style="max-width:640px;margin:20px auto 0;padding:0 16px">
+  <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
+  ${renderNotifyToggle()}
+</div>
 
 </div>`;
 }
