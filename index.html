@@ -915,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.10';
+const APP_VERSION = '2026.04.02.11';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -967,7 +967,7 @@ async function notifyLogin(official) {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({
-       from: 'DDD Tracker <onboarding@resend.dev>',
+       from: 'DDD Interventions Tracker <tracker@ddd-interventions-tracker.com>',
        to: [ADMIN_EMAIL],
        subject: 'DDD Tracker Login: ' + (official.full_name || 'Unknown'),
        html: '<h3>Login Notification</h3><p><strong>' + (official.full_name || 'Unknown') + '</strong> logged into the DDD Learner Improvement Interventions Tracker.</p>' +
@@ -1010,7 +1010,7 @@ async function notifyTagged(ctx) {
      '</div></div>';
    await fetch(NOTIFY_URL, {
      method:'POST', headers:{'Content-Type':'application/json'},
-     body: JSON.stringify({ from:'DDD Tracker <onboarding@resend.dev>', to:[ctx.toEmail], subject:subjectLine, html:bodyHTML })
+     body: JSON.stringify({ from:'DDD Interventions Tracker <tracker@ddd-interventions-tracker.com>', to:[ctx.toEmail], subject:subjectLine, html:bodyHTML })
    });
  } catch(e) { console.warn('notifyTagged failed:', e); }
 }
