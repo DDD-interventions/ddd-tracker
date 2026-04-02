@@ -243,6 +243,20 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .sup-type{font-size:14px}
   .reply-input{font-size:16px}
   .reply-send{padding:12px 24px;font-size:13px}
+  /* Activity tracker mobile — more breathing room */
+  .act-card{margin-bottom:12px}
+  .act-post-hdr{padding:14px 14px 6px;gap:10px}
+  .act-avatar{width:36px;height:36px;font-size:13px}
+  .act-author-name{font-size:14px}
+  .act-author-role{font-size:12px}
+  .act-post-body{padding:8px 14px 12px}
+  .act-post-desc{font-size:14px;line-height:1.6}
+  .act-meta-tag{font-size:12px;padding:4px 10px}
+  .act-action-bar{margin:0 10px}
+  .act-action-btn{font-size:13px;padding:12px 6px;min-height:48px}
+  .act-status-tag{font-size:11px;padding:4px 12px}
+  .act-card-detail{padding:14px}
+  .acd-row{padding:6px 0;font-size:12px}
   /* School picker phase filter - stack on very small screens */
   .school-dd [style*="flex-wrap:wrap"]{gap:4px}
   /* Scope selector mobile */
@@ -901,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.9';
+const APP_VERSION = '2026.04.02.10';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -913,7 +927,7 @@ const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{}, _actCardOpen:{},
- saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false,
+ saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false, _pendReply:null, _pendReplyData:{},
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
@@ -1605,6 +1619,31 @@ function filterSupTime(period){S._supTimeFilter=period;render();}
 function setSupReply(need,val){S._supReplyText[need]=val;}
 function setSupScope(need,type,entity){S._supReplyScope[need]={type:type,entity:entity||''};render();}
 function supInitials(name){return (name||'?').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
+
+// ─── PENDING RESPONSE SYSTEM ───
+function togglePendReply(key){S._pendReply=S._pendReply===key?null:key;render();}
+function setPendStatus(key,val){if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};S._pendReplyData[key].status=val;render();}
+function setPendComment(key,val){if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};S._pendReplyData[key].comment=val;}
+async function submitPendResponse(key,school,need){
+  if(!S._pendReplyData||!S._pendReplyData[key])return;
+  var pd=S._pendReplyData[key];
+  var comment=pd.comment||'';
+  var status=pd.status||'In Progress';
+  comment = getCommentTextWithAttach('pend:'+key, comment);
+  var fullComment = 'Status: '+status+(comment?'\n'+comment:'');
+  var scopeType = status==='Completed'?'resolution':'pending_response';
+  try{
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:fullComment,scope_type:scopeType,scope_entity:school||'',details:{status:status,school:school}};
+    var {error}=await sb.from('support_responses').insert(row);
+    if(error)throw error;
+    delete S._pendReplyData[key];
+    delete S._commentAttach['pend:'+key];
+    S._pendReply=null;
+    await loadSupResponses();
+    render();
+    showToast(status==='Completed'?'Marked as completed':'Response logged — '+status);
+  }catch(e){console.warn('Failed to submit pending response:',e);showToast('Could not save — check your connection and try again');}
+}
 function supTimeAgo(dateStr){
   if(!dateStr)return '';
   var d=new Date(dateStr);var now=new Date();var diff=Math.floor((now-d)/(1000*60*60*24));
@@ -3610,6 +3649,13 @@ function renderDashboard() {
  });
  // Exclude items where user already visited since the flag
  var _pendingActive = _pendingItems.filter(function(it){ return !it.visitedSince; });
+ // Check for completed pending responses and separate them
+ var _pendCompleted = [];
+ _pendingActive = _pendingActive.filter(function(it){
+   var pendResponses = (S._supResponses||[]).filter(function(r){return r.support_need===it.need && r.scope_type==='pending_response' && r.details && r.details.school===it.school && r.details.status==='Completed';});
+   if (pendResponses.length) { _pendCompleted.push(it); return false; }
+   return true;
+ });
 
  // ── RECOMMENDED SUPPORT ──
  var _supHTML = '';
@@ -3660,16 +3706,78 @@ function renderDashboard() {
      function _renderPendCard(it) {
        var ago = '';
        if (it.date) { var d = new Date(it.date); var diff = Math.floor((_pendNow - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
-       var c = '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid '+(it.isRequested?'#E65100':'#F57F17')+';box-shadow:0 1px 3px rgba(0,0,0,.06)">';
-       c += '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + esc(it.school) + '</div>';
-       c += '<div style="font-size:12px;color:var(--grey-dk);margin-top:3px;line-height:1.5">' + esc(it.need);
-       if (it.subjects.length) c += ' \xb7 ' + esc(it.subjects.join(', '));
-       if (it.grades.length) c += ' \xb7 Grade ' + esc(it.grades.join(', '));
-       c += '</div>';
-       c += '<div style="font-size:11px;color:#E65100;margin-top:4px">Flagged ' + (ago||'') + ' \xb7 No visit logged since</div>';
-       if (it.isRequested) c += '<div style="font-size:11px;font-weight:700;color:#E65100;margin-top:4px;background:#FFF8E1;display:inline-block;padding:2px 8px;border-radius:4px">You were specifically requested</div>';
+       var pendKey = (it.school||'')+'::'+(it.need||'');
+       var pendKeyEsc = pendKey.replace(/'/g,"\\x27");
+       var isReplying = S._pendReply === pendKey;
+       var pd = (S._pendReplyData && S._pendReplyData[pendKey]) || {status:'In Progress',comment:''};
+       var needEsc = (it.need||'').replace(/'/g,"\\x27");
        var schoolEsc = (it.school||'').replace(/'/g,"\\x27");
-       c += '<button onclick="S.view=\'log\';S.f.formStep=0;S.f.schools=\'' + schoolEsc + '\';render();window.scrollTo({top:0,behavior:\'smooth\'})" style="display:block;width:100%;margin-top:10px;padding:12px;font-size:13px;font-weight:700;border:none;background:#F57F17;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;min-height:44px">Log a support visit</button>';
+
+       // Check for existing responses from this user on this pending item
+       var existingResponses = (S._supResponses||[]).filter(function(r){return r.support_need===it.need && r.scope_type==='pending_response' && r.details && r.details.school===it.school;});
+       var latestResponse = existingResponses.length ? existingResponses[existingResponses.length-1] : null;
+       var currentStatus = latestResponse && latestResponse.details ? latestResponse.details.status : null;
+
+       var authorInitials = (it.flaggedBy||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+       var c = '<div class="act-card" style="border-left:4px solid '+(it.isRequested?'#E65100':'var(--orange)')+'">';
+
+       // ── POST HEADER ──
+       c += '<div class="act-post-hdr">';
+       c += '<div class="act-avatar" style="background:'+(it.isRequested?'#E65100':'var(--orange)')+'">'+authorInitials+'</div>';
+       c += '<div class="act-author"><div class="act-author-name">'+esc(it.flaggedBy||'Official')+'</div><div class="act-author-role">'+esc(it.need)+' \xb7 Flagged '+(ago||'')+'</div></div>';
+       if (currentStatus) c += '<span class="act-status-tag '+(currentStatus==='Completed'?'st-c':currentStatus==='Ongoing'?'st-ip':'st-pl')+'">'+esc(currentStatus)+'</span>';
+       c += '</div>';
+
+       // ── POST BODY ──
+       c += '<div class="act-post-body">';
+       c += '<div class="act-post-desc" style="font-size:14px;font-weight:700;color:var(--navy)">'+esc(it.school)+'</div>';
+       c += '<div class="act-post-meta">';
+       if (it.subjects.length) it.subjects.forEach(function(s){ c += '<span class="act-meta-tag" style="background:#E8F5E9;color:#2E7D32">'+esc(s)+'</span>'; });
+       if (it.grades.length) c += '<span class="act-meta-tag">Grade '+esc(it.grades.join(', '))+'</span>';
+       c += '<span class="act-meta-tag" style="background:#FFF8E1;color:#F57F17;border:1px solid #FFE082">No visit logged since</span>';
+       if (it.isRequested) c += '<span class="act-meta-tag" style="background:#FFF3E0;color:#E65100;font-weight:700;border:1px solid #FFCC80">You were specifically requested</span>';
+       c += '</div></div>';
+
+       // Show existing responses
+       if (existingResponses.length) {
+         c += '<div style="padding:6px 14px;border-top:1px solid #f0f0f0;background:#FAFBFC">';
+         existingResponses.forEach(function(r){
+           var rInitials = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+           c += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal)">'+rInitials+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div><div class="sup-comment-text">'+renderCommentBody(r.comment||'')+'</div></div></div>';
+         });
+         c += '</div>';
+       }
+
+       // ── ACTION BAR ──
+       c += '<div class="act-action-bar">';
+       c += '<button class="act-action-btn'+(isReplying?' active':'')+'" onclick="event.stopPropagation();togglePendReply(\''+pendKeyEsc+'\')" style="flex:2">Log a response</button>';
+       c += '</div>';
+
+       // ── INLINE RESPONSE FORM ──
+       if (isReplying) {
+         c += '<div style="padding:12px 14px;border-top:1px solid #f0f0f0;background:#FAFBFC">';
+         c += '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">Log a response to this support request</div>';
+         // Status selector
+         c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">Update status</div>';
+         c += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
+         ['In Progress','Ongoing','Completed'].forEach(function(st){
+           var isSel = pd.status === st;
+           var stCol = st==='Completed'?'var(--green)':st==='Ongoing'?'var(--orange)':'var(--blue)';
+           c += '<button onclick="setPendStatus(\''+pendKeyEsc+'\',\''+st+'\')" style="flex:1;min-width:80px;padding:10px 12px;border-radius:8px;border:2px solid '+(isSel?stCol:'#d0d4db')+';background:'+(isSel?stCol:'#fff')+';color:'+(isSel?'#fff':'var(--grey-dk)')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;transition:all .15s">'+st+'</button>';
+         });
+         c += '</div></div>';
+         // Comment
+         c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">What did you do? <span style="font-weight:400">(optional for In Progress)</span></div>';
+         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. Visited the school, conducted lesson observation..." oninput="setPendComment(\''+pendKeyEsc+'\',this.value)">'+esc(pd.comment||'')+'</textarea></div>';
+         // Attach
+         c += '<div style="margin-bottom:10px">'+renderAttachButton('pend:'+pendKey)+'<button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'pend:'+pendKeyEsc+'\')" title="Attach evidence" style="border-radius:8px;font-size:13px;padding:8px 14px">\uD83D\uDCCE Attach evidence</button></div>';
+         // Actions
+         c += '<div style="display:flex;gap:8px">';
+         c += '<button onclick="togglePendReply(\''+pendKeyEsc+'\')" style="flex:0;padding:10px 16px;border-radius:8px;border:1px solid #d0d4db;background:#fff;color:var(--grey);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px">Cancel</button>';
+         c += '<button onclick="submitPendResponse(\''+pendKeyEsc+'\',\''+schoolEsc+'\',\''+needEsc+'\')" style="flex:1;padding:10px 16px;border-radius:8px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px">Submit response</button>';
+         c += '</div></div>';
+       }
+
        c += '</div>';
        return c;
      }
@@ -3684,7 +3792,18 @@ function renderDashboard() {
      _supHTML += '</div>';
    }
 
-   // Only show time tabs and support need cards when there are actual support requests
+   // ── COMPLETED PENDING REQUESTS ──
+   if (_pendCompleted.length) {
+     _supHTML += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px">\u2713 Completed support requests ('+_pendCompleted.length+')</div>';
+     _pendCompleted.forEach(function(it){
+       var ago = '';
+       if (it.date) { var d=new Date(it.date); var diff=Math.floor((new Date()-d)/(1000*60*60*24)); ago=diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
+       _supHTML += '<div style="background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid #C8E6C9;opacity:.7">';
+       _supHTML += '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">\u2705</span><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">'+esc(it.school)+'</div><div style="font-size:11px;color:var(--grey)">'+esc(it.need)+(it.subjects.length?' \xb7 '+esc(it.subjects.join(', ')):'')+'</div></div><span class="act-status-tag st-c">Completed</span></div>';
+       _supHTML += '</div>';
+     });
+     _supHTML += '</div>';
+   }
    if (supportRequests.length) {
    _supHTML += '<div class="sup-time-tabs"><button class="sup-time-tab '+(S._supTimeFilter==='30d'?'active':'')+'" onclick="filterSupTime(\'30d\')">Last 30 days</button><button class="sup-time-tab '+(S._supTimeFilter==='term'?'active':'')+'" onclick="filterSupTime(\'term\')">This term</button><button class="sup-time-tab '+(S._supTimeFilter==='all'?'active':'')+'" onclick="filterSupTime(\'all\')">All time</button></div>';
    if (!supEntries.length) {
@@ -3701,7 +3820,6 @@ function renderDashboard() {
      supEntries.forEach(function(entry){
        var need = entry[0], data = entry[1];
        var isRecent = data.latestDate && data.latestDate >= now30;
-       var isOpen = S._supExpanded[need];
        var needEsc = esc(need).replace(/'/g,"\\x27");
        var needId = needEsc.replace(/[^a-zA-Z0-9]/g,'');
        var subjectEntries = Object.entries(data.subjects).sort(function(a,b){return b[1]-a[1]});
@@ -3712,29 +3830,26 @@ function renderDashboard() {
        var resInfo = supResolved[need];
        var isAddressed = resInfo && resInfo.type === 'resolution';
 
-       _supHTML += '<div class="sup-card '+(isAddressed?'sup-addressed':isRecent?'sup-recent':'sup-older')+'">';
-       _supHTML += '<div class="sup-header" onclick="toggleSup(\''+needEsc+'\')">';
-       _supHTML += '<div style="flex:1;min-width:0"><div class="sup-type">'+esc(need)+(isAddressed?' <span style="font-size:9px;font-weight:700;color:#43A047;background:#E8F5E9;padding:1px 6px;border-radius:4px;margin-left:6px">Addressed</span>':'')+'</div><div class="sup-tap-hint">'+(isOpen?'Tap to collapse':'Tap to expand')+'</div></div>';
-       _supHTML += '<div class="sup-meta"><span class="sup-count">'+data.count+'\u00d7 flagged</span>'+(recencyLabel?'<span class="sup-recency '+(isRecent?'fresh':'stale')+'">'+recencyLabel+'</span>':'')+'</div>';
-       _supHTML += '<span class="sup-arrow'+(isOpen?' open':'')+'">&#9654;</span></div>';
+       // Find the latest entry to get author info for the card header
+       var latestEntry = data.entries.sort(function(a,b){return (b.date||'').localeCompare(a.date||'')})[0] || {};
+       var authorName = latestEntry.loggedBy || 'Official';
+       var authorRole = latestEntry.role || '';
+       var authorInitials = (authorName||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
 
-       _supHTML += '<div class="sup-expand'+(isOpen?' show':'')+'">';
+       _supHTML += '<div class="act-card'+(isAddressed?' act-done':'')+'" style="'+(isAddressed?'opacity:.6;border-color:#C8E6C9':'')+'">'; 
 
-       // ── RESOLVED BANNER ──
-       if (isAddressed) {
-         var resDate = resInfo.date ? new Date(resInfo.date) : null;
-         var resDateStr = resDate ? resDate.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
-         _supHTML += '<div style="padding:0 14px 10px"><div class="sup-resolved-banner">';
-         _supHTML += '<div class="sup-resolved-title">Addressed</div>';
-         _supHTML += '<div class="sup-resolved-by">By <strong>'+esc(resInfo.name)+'</strong>'+(resInfo.role?' ('+esc(resInfo.role)+')':'')+(resDateStr?' on '+resDateStr:'')+'</div>';
-         _supHTML += '<div class="sup-resolved-comment">'+esc(resInfo.comment)+'</div>';
-         _supHTML += '</div>';
-         _supHTML += '<span class="sup-reopen-link" onclick="reopenSupNeed(\''+needEsc+'\')">This still needs attention — reopen</span>';
-         _supHTML += '</div>';
-       }
+       // ── POST HEADER (Activity Tracker style) ──
+       _supHTML += '<div class="act-post-hdr">';
+       _supHTML += '<div class="act-avatar" style="background:'+avatarColor(authorName)+'">'+authorInitials+'</div>';
+       _supHTML += '<div class="act-author"><div class="act-author-name">'+esc(authorName)+'</div><div class="act-author-role">'+esc(authorRole)+' \xb7 '+(recencyLabel||'')+'</div></div>';
+       _supHTML += '<span class="act-status-tag" style="background:'+(isAddressed?'var(--green-lt)':'#FFF3E0')+';color:'+(isAddressed?'var(--green)':'var(--orange)')+'">'+data.count+'\u00d7 flagged</span>';
+       _supHTML += '</div>';
 
-       // ── SCHOOLS SUMMARY (compact) ──
-       _supHTML += '<div class="sup-details">';
+       // ── POST BODY: need description + school/subject tags ──
+       _supHTML += '<div class="act-post-body">';
+       _supHTML += '<div class="act-post-desc" style="font-weight:600">'+esc(need)+(isAddressed?' <span style="font-size:10px;font-weight:700;color:#43A047;background:#E8F5E9;padding:2px 8px;border-radius:4px;margin-left:6px">Addressed</span>':'')+'</div>';
+       _supHTML += '<div class="act-post-meta">';
+       // Schools summary inline
        var schoolsByDist = {};
        var totalSchoolCount = 0;
        data.entries.forEach(function(sr){
@@ -3744,13 +3859,22 @@ function renderDashboard() {
        });
        var distKeys = Object.keys(schoolsByDist).sort();
        distKeys.forEach(function(dk){totalSchoolCount += schoolsByDist[dk].size});
+       _supHTML += '<span class="act-meta-tag">'+totalSchoolCount+' school'+(totalSchoolCount!==1?'s':'')+'</span>';
+       distKeys.forEach(function(dk){ _supHTML += '<span class="act-meta-tag">'+esc(dk)+'</span>'; });
+       if (subjectEntries.length) subjectEntries.slice(0,3).forEach(function(se){ _supHTML += '<span class="act-meta-tag" style="background:#E8F5E9;color:#2E7D32">'+esc(se[0])+(se[1]>1?' ('+se[1]+'\u00d7)':'')+'</span>'; });
+       _supHTML += '</div></div>';
 
-       // Summary line
-       _supHTML += '<div class="sup-schools-summary"><strong>'+totalSchoolCount+'</strong> school'+(totalSchoolCount!==1?'s':'')+' across <strong>'+distKeys.length+'</strong> district'+(distKeys.length!==1?'s':'');
-       _supHTML += '<span class="sup-schools-toggle" onclick="toggleSupSchoolDetail(\''+needEsc+'\')">View schools</span></div>';
+       // ── ACTION BAR (Noted/Comments/See Schools) ──
+       var responses = (S._supResponses||[]).filter(function(r){return r.support_need===need && r.scope_type!=='resolution' && r.scope_type!=='reopened'});
+       var isOpen = S._supExpanded[need];
+       _supHTML += '<div class="act-action-bar">';
+       _supHTML += '<button class="act-action-btn" onclick="event.stopPropagation();toggleSupSchoolDetail(\''+needEsc+'\')">\uD83C\uDFEB View schools</button>';
+       _supHTML += '<button class="act-action-btn" onclick="event.stopPropagation();toggleSup(\''+needEsc+'\')">'+(responses.length?responses.length+' ':'')+'Response'+(responses.length!==1?'s':'')+'</button>';
+       if (!isAddressed) _supHTML += '<button class="act-action-btn" onclick="event.stopPropagation();toggleSupResolve(\''+needEsc+'\')">Mark addressed</button>';
+       _supHTML += '</div>';
 
-       // Expandable detail
-       _supHTML += '<div class="sup-schools-detail" id="sup-sd-'+needId+'">';
+       // ── SCHOOLS DETAIL (expandable) ──
+       _supHTML += '<div class="sup-schools-detail" id="sup-sd-'+needId+'" style="padding:0 14px">';
        distKeys.forEach(function(dk){
          var dkSchools = Array.from(schoolsByDist[dk]).sort();
          _supHTML += '<div class="sup-dist-row"><span>'+esc(dk)+'</span><span class="sup-dist-count">'+dkSchools.length+' school'+(dkSchools.length!==1?'s':'')+'</span></div>';
@@ -3760,12 +3884,22 @@ function renderDashboard() {
        });
        _supHTML += '</div>';
 
-       if (subjectEntries.length) _supHTML += '<div class="sup-detail-row" style="margin-top:2px"><strong>Subjects:</strong> '+subjectEntries.map(function(se){return esc(se[0])+(se[1]>1?' ('+se[1]+'\u00d7)':'')}).join(', ')+'</div>';
-       _supHTML += '</div>';
+       // ── RESOLVED BANNER ──
+       if (isAddressed) {
+         _supHTML += '<div style="padding:8px 14px"><div class="sup-resolved-banner">';
+         _supHTML += '<div class="sup-resolved-title">Addressed</div>';
+         var resDate = resInfo.date ? new Date(resInfo.date) : null;
+         var resDateStr = resDate ? resDate.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
+         _supHTML += '<div class="sup-resolved-by">By <strong>'+esc(resInfo.name)+'</strong>'+(resInfo.role?' ('+esc(resInfo.role)+')':'')+(resDateStr?' on '+resDateStr:'')+'</div>';
+         _supHTML += '<div class="sup-resolved-comment">'+renderCommentBody(resInfo.comment||'')+'</div>';
+         _supHTML += '</div>';
+         _supHTML += '<span class="sup-reopen-link" onclick="reopenSupNeed(\''+needEsc+'\')">This still needs attention — reopen</span>';
+         _supHTML += '</div>';
+       }
 
-       // ── RESPONSES THREAD (directly under details) ──
-       var responses = (S._supResponses||[]).filter(function(r){return r.support_need===need && r.scope_type!=='resolution' && r.scope_type!=='reopened'});
-       _supHTML += '<div class="thread-area">';
+       // ── RESPONSES THREAD (shown when expanded via action bar) ──
+       if (isOpen) {
+       _supHTML += '<div class="thread-area" style="display:block">';
        _supHTML += '<div class="thread-label">Responses'+(responses.length?' <span class="thread-count">'+responses.length+'</span>':'')+'</div>';
        if (responses.length) {
          responses.forEach(function(r){
@@ -3774,10 +3908,10 @@ function renderDashboard() {
            _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+renderCommentBody(r.comment||'')+'</div></div></div>';
          });
        } else {
-         _supHTML += '<div class="thread-empty">No responses yet</div>';
+         _supHTML += '<div class="thread-empty">No responses yet \u2014 be the first to respond</div>';
        }
 
-       // ── REPLY BOX (simplified scope as dropdown) ──
+       // ── REPLY BOX ──
        if (!isAddressed) {
          var curScope = S._supReplyScope[need] || {type:'all',entity:''};
          var curScopeVal = curScope.type==='all'?'all':curScope.type==='district'?'d:'+curScope.entity:'s:'+curScope.entity;
@@ -3794,32 +3928,29 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">Tap the clip icon to attach supporting evidence →</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
+         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">Tap \uD83D\uDCCE to attach evidence \u2192</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
          _supHTML += renderAttachButton(need);
          _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
        }
+       _supHTML += '</div>';
+       }
 
-       // ── MARK AS ADDRESSED ──
-       if (!isAddressed) {
+       // ── MARK AS ADDRESSED (inline form) ──
+       if (!isAddressed && S._supResolving[need]) {
          _supHTML += '<div class="sup-resolve-flow">';
-         if (S._supResolving[need]) {
-           _supHTML += '<div class="sup-resolve-form">';
-           _supHTML += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
-           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery\u2026 Type @ to tag" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
-           _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:6px 0"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
-           _supHTML += renderAttachButton('resolve:'+need);
-           _supHTML += renderMentionDropdown(need);
-           _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
-           _supHTML += '</div>';
-         } else {
-           _supHTML += '<button class="sup-resolve-btn" onclick="toggleSupResolve(\''+needEsc+'\')">Mark as Addressed</button>';
-         }
+         _supHTML += '<div class="sup-resolve-form">';
+         _supHTML += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
+         _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery\u2026 Type @ to tag" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+         _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:6px 0"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
+         _supHTML += renderAttachButton('resolve:'+need);
+         _supHTML += renderMentionDropdown(need);
+         _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm \u2014 Mark as Addressed</button></div>';
+         _supHTML += '</div>';
          _supHTML += '</div>';
        }
 
        _supHTML += '</div>';
-       _supHTML += '</div></div>';
      });
    }
    } // end if (supportRequests.length)
