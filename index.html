@@ -554,6 +554,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-summary-item.active.s-progress::after{background:var(--orange)}
 .act-summary-item.active.s-planned::after{background:var(--blue)}
 .act-summary-item.active.s-done::after{background:var(--green)}
+.act-summary-item.active.s-followup::after{background:#F57F17}
 .act-summary-num{font-size:20px;font-weight:800;line-height:1}
 .act-summary-num.c-teal{color:var(--teal)}.act-summary-num.c-orange{color:var(--orange)}.act-summary-num.c-blue{color:var(--blue)}.act-summary-num.c-green{color:var(--green)}
 .act-summary-label{font-size:9px;color:var(--grey);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
@@ -899,6 +900,8 @@ const S = {
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
  _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false,
  _supTagged:{}, _supTagSearch:{}, _supTagResults:{}, _supTagLoading:{},
+ _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
+ _actTagged:{},
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
@@ -1113,6 +1116,161 @@ function renderSupTagSearch(need, purpose) {
     });
     html += '</div>';
   }
+  html += '</div>';
+  return html;
+}
+
+// ── @MENTION SYSTEM (Facebook-style) ──
+var _mentionTimer = null;
+function getRecentTagged() {
+  try { var raw = localStorage.getItem('ddd_recent_tagged'); return raw ? JSON.parse(raw) : []; } catch(e) { return []; }
+}
+function addRecentTagged(official) {
+  try {
+    var recents = getRecentTagged().filter(function(o){return o.id !== official.id;});
+    recents.unshift({id:official.id, name:official.name, role:official.role, email:official.email, ts:Date.now()});
+    if (recents.length > 10) recents = recents.slice(0, 10);
+    localStorage.setItem('ddd_recent_tagged', JSON.stringify(recents));
+  } catch(e) {}
+}
+
+function handleMentionInput(key, text, el) {
+  var pos = el.selectionStart || text.length;
+  var before = text.slice(0, pos);
+  var atIdx = before.lastIndexOf('@');
+  if (atIdx === -1 || (atIdx > 0 && before[atIdx-1] !== ' ' && before[atIdx-1] !== '\n')) {
+    if (S._mention.active && S._mention.key === key) { S._mention.active = false; S._mention.results = []; }
+    return;
+  }
+  var query = before.slice(atIdx + 1);
+  if (query.includes(' ') && query.split(' ').length > 3) {
+    if (S._mention.active) { S._mention.active = false; S._mention.results = []; }
+    return;
+  }
+  S._mention.active = true;
+  S._mention.key = key;
+  S._mention.elId = el.id;
+  S._mention.query = query;
+
+  if (query.length < 2) {
+    // Show recents immediately
+    S._mention.results = [];
+    S._mention.recents = getRecentTagged();
+    S._mention.loading = false;
+    render();
+    setTimeout(function(){ var ta = document.getElementById(el.id); if(ta){ta.focus();ta.setSelectionRange(pos,pos);} }, 30);
+    return;
+  }
+  S._mention.loading = true;
+  S._mention.recents = [];
+  clearTimeout(_mentionTimer);
+  _mentionTimer = setTimeout(async function() {
+    try {
+      var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
+        .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
+        .eq('district', S.official.district)
+        .limit(8);
+      var seen = {}; var results = [];
+      (data || []).forEach(function(o) {
+        if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '' }); }
+      });
+      S._mention.results = results;
+      S._mention.loading = false;
+    } catch(e) { S._mention.results = []; S._mention.loading = false; }
+    render();
+    setTimeout(function(){ var ta = document.getElementById(el.id); if(ta){ta.focus();ta.setSelectionRange(pos,pos);} }, 30);
+  }, 250);
+}
+
+function insertMention(key, official) {
+  var el = document.getElementById(S._mention.elId);
+  if (!el) return;
+
+  var text = el.value || '';
+  var pos = el.selectionStart || text.length;
+  var before = text.slice(0, pos);
+  var atIdx = before.lastIndexOf('@');
+  if (atIdx === -1) return;
+
+  var replacement = '@' + official.name + ' ';
+  var newText = text.slice(0, atIdx) + replacement + text.slice(pos);
+  var elId = el.id;
+
+  // Write back to the correct state based on element ID
+  if (elId.startsWith('reply-')) {
+    S._supReplyText[key] = newText;
+  } else if (elId.startsWith('resolve-ta-')) {
+    S._supResolveComment[key] = newText;
+  } else if (elId.startsWith('act-reply-')) {
+    S._actReplyText[key] = newText;
+  }
+
+  // Track tagged official in the right bucket
+  if (elId.startsWith('act-reply-')) {
+    if (!S._actTagged) S._actTagged = {};
+    if (!S._actTagged[key]) S._actTagged[key] = [];
+    if (!S._actTagged[key].some(function(o){return o.id === official.id;})) S._actTagged[key].push(official);
+  } else {
+    if (!S._supTagged[key]) S._supTagged[key] = [];
+    if (!S._supTagged[key].some(function(o){return o.id === official.id;})) S._supTagged[key].push(official);
+  }
+
+  addRecentTagged(official);
+  S._mention = {active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false};
+  render();
+
+  setTimeout(function() {
+    var ta = document.getElementById(elId);
+    if (ta) { var np = atIdx + replacement.length; ta.focus(); ta.setSelectionRange(np, np); }
+  }, 30);
+}
+
+function renderMentionDropdown(key) {
+  if (!S._mention.active || S._mention.key !== key) return '';
+  var results = S._mention.results || [];
+  var recents = S._mention.recents || [];
+  var query = S._mention.query || '';
+  var loading = S._mention.loading;
+  var keyEsc = key.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+
+  var html = '';
+  var items = [];
+
+  if (query.length < 2 && !loading) {
+    // Show recents + prompt
+    if (recents.length) {
+      html += '<div style="border:1px solid #e8e6e4;border-radius:8px;overflow:hidden;margin-top:4px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.1)">';
+      html += '<div style="padding:6px 12px;font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">Recently tagged</div>';
+      recents.forEach(function(o) {
+        var oJson = JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;');
+        var initials = (o.name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+        html += '<div onclick="insertMention(\'' + keyEsc + '\',' + oJson + ')" style="padding:10px 12px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:10px">';
+        html += '<div style="width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">' + initials + '</div>';
+        html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + esc(o.name) + '</div>';
+        html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + '</div></div></div>';
+      });
+      html += '</div>';
+    }
+    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0;font-style:italic">' + (recents.length ? 'Or keep typing to search...' : 'Type a name or email after @ to find a colleague') + '</div>';
+    return html;
+  }
+  if (loading && !results.length) {
+    return '<div style="font-size:10px;color:var(--grey);padding:4px 0">Searching...</div>';
+  }
+  if (!results.length && query.length >= 2) {
+    return '<div style="font-size:10px;color:var(--grey);padding:6px 0">No one found matching \u201c' + esc(query) + '\u201d \u2014 try their email address</div>';
+  }
+  if (!results.length) return '';
+
+  html += '<div style="border:1px solid #e8e6e4;border-radius:8px;overflow:hidden;margin-top:4px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.1)">';
+  results.forEach(function(o) {
+    var oJson = JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;');
+    var initials = (o.name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+    html += '<div onclick="insertMention(\'' + keyEsc + '\',' + oJson + ')" style="padding:10px 12px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:10px">';
+    html += '<div style="width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">' + initials + '</div>';
+    html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + esc(o.name) + '</div>';
+    html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + ' \xb7 ' + esc(o.email) + '</div></div></div>';
+  });
   html += '</div>';
   return html;
 }
@@ -1430,7 +1588,15 @@ async function submitActResponse(decId){
   try{
     var {error}=await sb.from('activity_responses').insert({decision_id:decId,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',response_type:'comment',comment:txt});
     if(error)throw error;
+    // Notify @mentioned officials (fire-and-forget)
+    var tagged = (S._actTagged && S._actTagged[decId]) || [];
+    if (tagged.length) {
+      var dec = S.decisions.find(function(d){return d.id === decId;});
+      var det = dec ? (dec.details || {}) : {};
+      try { tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:det.schools||'',supportNeed:'Activity comment',subjects:det.subjects||[],moment:'looped_in'});}); } catch(e){console.warn('notifyTagged failed:',e);}
+    }
     S._actReplyText[decId]='';
+    if (S._actTagged) S._actTagged[decId] = [];
     await loadActResponses();
     render();
     showToast('Comment posted');
@@ -2185,6 +2351,7 @@ document.addEventListener('click',function(e){
   if(S.f._decDDOpen&&!e.target.closest('.chip-picker')){S.f._decDDOpen=false;render();}
   if(S.f._actDDOpen&&!e.target.closest('.chip-picker')){S.f._actDDOpen=false;render();}
   if(S._dashSubjDDOpen&&!e.target.closest('.chip-picker')){S._dashSubjDDOpen=false;render();}
+  if(S._mention.active&&!e.target.closest('.reply-box')&&!e.target.closest('.sup-resolve-form')&&!e.target.closest('.pt-reply')&&!e.target.closest('.post-thread')){S._mention={active:false,key:'',elId:'',query:'',results:[],recents:[],loading:false};render();}
 });
 
 function renderFormStep1(){
@@ -3152,6 +3319,9 @@ function renderDashboard() {
  const planned = acts.filter(a=>a.status==='Planned').length;
  const inProgress = acts.filter(a=>a.status==='In Progress').length;
  const completed = acts.filter(a=>a.status==='Completed').length;
+ const followUpDecIds = new Set();
+ decs.forEach(function(d){ var dt=d.details||{}; if(dt.follow_up && dt.follow_up_desc && !dt.follow_up_completed) followUpDecIds.add(d.id); });
+ const followUpCount = followUpDecIds.size;
 
  // ── FOLLOW-UPS ──
  const followUpsWithAge = followUps.map(f => {
@@ -3187,10 +3357,6 @@ function renderDashboard() {
    const daysSince = d.lastDate ? Math.floor((now - new Date(d.lastDate))/(1000*60*60*24)) : 999;
    return daysSince > 30;
  });
- if (silentDistricts.length > 0 && districts.length > 1) {
-   narratives.push({color:'var(--red)',text:`<strong>${silentDistricts.length}</strong> district${silentDistricts.length!==1?'s have':' has'} had no activity in 30+ days: ${silentDistricts.slice(0,3).map(d=>d.district||d.province).join(', ')}${silentDistricts.length>3?' and '+(silentDistricts.length-3)+' more':''}.`,action:'Consider scheduling support visits to these districts.'});
- }
-
  // Follow-up insight
  if (followUps.length > 0) {
    narratives.push({color:'var(--orange)',text:`There are <strong>${followUps.length}</strong> recommended follow-up${followUps.length!==1?'s':''} pending. Staying in touch with schools shows commitment and strengthens support relationships.`,action:''});
@@ -3295,39 +3461,6 @@ function renderDashboard() {
      _narrHTML += '<div style="background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid '+_n.color+'"><div><div style="font-size:12px;color:var(--navy);line-height:1.6">'+_n.text+'</div>'+(_n.action?'<div style="font-size:11px;color:'+_n.color+';font-weight:600;margin-top:4px">'+_n.action+'</div>':'')+'</div></div>';
    }
    _narrHTML += '</div>';
- }
-
- var _fuHTML = '';
- if (followUpsWithAge.length || silentDistricts.length) {
-   _fuHTML = '<div class="dash-section" style="border-left:4px solid var(--orange)"><div class="dash-section-hdr"><h3>Needs Attention</h3><span style="font-size:11px;color:var(--grey)">'+(followUpsWithAge.length+silentDistricts.length)+' item'+((followUpsWithAge.length+silentDistricts.length)!==1?'s':'')+'</span></div><div class="dash-section-body">';
-   if (followUpsWithAge.length) {
-     _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Follow-ups Due</div><div style="display:grid;gap:6px;margin-bottom:'+(silentDistricts.length?'14':'0')+'px">';
-     for (var _fi=0; _fi<Math.min(followUpsWithAge.length,5); _fi++) {
-       var _f=followUpsWithAge[_fi];
-       var _urg = _f.daysSince>30?'var(--red)':_f.daysSince>14?'var(--orange)':'var(--blue)';
-       var _sa = (_f.schools||'').split(',').map(function(s){return s.trim()}).filter(Boolean);
-       var _isOwner = !_f.officialId || _f.officialId === S._officialId;
-       _fuHTML += '<div style="background:#FAFBFC;border-radius:8px;padding:10px 12px;border-left:3px solid '+_urg+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(_f.desc)+'</div><div style="font-size:10px;color:var(--grey);margin-top:3px">'+(_sa.length?_sa.slice(0,2).join(', ')+(_sa.length>2?' +'+(_sa.length-2)+' more':''):'')+(_f.district?' &middot; '+esc(_f.district):'')+(_f.loggedBy?' &middot; '+esc(_f.loggedBy):'')+'</div></div><span style="font-size:10px;font-weight:700;color:'+_urg+';white-space:nowrap">'+_f.daysSince+'d ago</span></div>';
-       if (_isOwner) {
-         _fuHTML += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="markFollowUpDone(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit">✓ Done</button><button onclick="logFollowUpVisit(\''+_f.id+'\')" style="flex:1;padding:6px 8px;font-size:10px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit">Log Follow-up</button></div>';
-       } else {
-         _fuHTML += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only '+esc(_f.loggedBy||'the person who logged this')+' can complete this follow-up</div>';
-       }
-       _fuHTML += '</div>';
-     }
-     if (followUpsWithAge.length>5) _fuHTML += '<div style="font-size:11px;color:var(--grey);text-align:center;padding:4px">+ '+(followUpsWithAge.length-5)+' more</div>';
-     _fuHTML += '</div>';
-   }
-   if (silentDistricts.length) {
-     _fuHTML += '<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Districts With No Recent Activity (30+ days)</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
-     for (var _si=0; _si<silentDistricts.length; _si++) {
-       _fuHTML += '<span style="font-size:11px;padding:4px 10px;border-radius:6px;background:var(--red-lt);color:var(--red);font-weight:600;border:1px solid rgba(229,57,53,.15)">'+esc(silentDistricts[_si].district||silentDistricts[_si].province)+'</span>';
-     }
-     _fuHTML += '</div>';
-   }
-   _fuHTML += '</div></div>';
- } else if (totalActivities > 0) {
-   _fuHTML = '<div style="background:#fff;border-radius:8px;padding:14px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--green);text-align:center"><div style="font-size:13px;color:var(--green-dk);font-weight:600">All clear \u2014 no follow-ups due and all districts active</div></div>';
  }
 
  // ── RECOMMENDED SUPPORT ──
@@ -3474,8 +3607,8 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
-         _supHTML += renderSupTagSearch(need, 'respond');
+         _supHTML += '<div class="reply-box" style="position:relative"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
        }
 
@@ -3485,8 +3618,8 @@ function renderDashboard() {
          if (S._supResolving[need]) {
            _supHTML += '<div class="sup-resolve-form">';
            _supHTML += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
-           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
-           _supHTML += renderSupTagSearch(need, 'resolve');
+           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026 Type @ to tag a colleague" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+           _supHTML += renderMentionDropdown(need);
            _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
            _supHTML += '</div>';
          } else {
@@ -3617,20 +3750,8 @@ ${tab==='overview'?`
  <!-- ═══ SMART NARRATIVES ═══ -->
  ${_narrHTML}
 
- <!-- ═══ NEEDS YOUR ATTENTION ═══ -->
- ${_fuHTML}
-
  <!-- ═══ RECOMMENDED SUPPORT ═══ -->
  ${_supHTML}
-
- <!-- ═══ INTERVENTION THEME ═══ -->
- <div class="dash-section">
-   <div class="dash-section-hdr"><h3>Which Programme Streams Are Active?</h3></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">The intervention themes officials selected when logging their activities — shows which programme streams are receiving the most on-the-ground support</div>
-     ${_ovThemeChart}
-   </div>
- </div>
 
  <!-- ═══ DDD DASHBOARD REFERENCE ═══ -->
  <div style="border:1px dashed #d0d4da;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f8f9fa">
@@ -3857,7 +3978,7 @@ ${tab==='tracker'?`
      })()}
 
      <div class="act-summary-bar">
-       ${[{f:'all',n:acts.length,c:'c-teal',s:'s-all',l:'All'},{f:'in-progress',n:inProgress,c:'c-orange',s:'s-progress',l:'In Progress'},{f:'planned',n:planned,c:'c-blue',s:'s-planned',l:'Planned'},{f:'completed',n:completed,c:'c-green',s:'s-done',l:'Completed'}].map(t => '<button class="act-summary-item'+((S._trackerFilter||'all')===t.f?' active ':' ')+t.s+'" onclick="S._trackerFilter=\''+t.f+'\';render()"><div class="act-summary-num '+t.c+'">'+t.n+'</div><div class="act-summary-label">'+t.l+'</div></button>').join('')}
+       ${[{f:'all',n:acts.length,c:'c-teal',s:'s-all',l:'All'},{f:'in-progress',n:inProgress,c:'c-orange',s:'s-progress',l:'In Progress'},{f:'planned',n:planned,c:'c-blue',s:'s-planned',l:'Planned'},{f:'completed',n:completed,c:'c-green',s:'s-done',l:'Completed'},{f:'follow-up',n:followUpCount,c:'c-orange',s:'s-followup',l:'Follow-ups'}].filter(t=>t.f!=='follow-up'||t.n>0).map(t => '<button class="act-summary-item'+((S._trackerFilter||'all')===t.f?' active ':' ')+t.s+'" onclick="S._trackerFilter=\''+t.f+'\';render()"><div class="act-summary-num '+t.c+'">'+t.n+'</div><div class="act-summary-label">'+t.l+'</div></button>').join('')}
      </div>
      <div class="act-stack-bar">
        ${acts.length?'<div class="act-stack-seg" style="width:'+Math.round(inProgress/acts.length*100)+'%;background:var(--orange)"></div><div class="act-stack-seg" style="width:'+Math.round(planned/acts.length*100)+'%;background:var(--blue)"></div><div class="act-stack-seg" style="width:'+Math.round(completed/acts.length*100)+'%;background:var(--green)"></div>':''}
@@ -3891,13 +4012,17 @@ ${tab==='tracker'?`
                if (trackerFilter === 'planned' && statusNorm !== 'Planned') return;
                if (trackerFilter === 'completed' && statusNorm !== 'Completed') return;
              }
-             allChains.push({dec:d, det:det, act:a, status:statusNorm, date:d.date||''});
+             allChains.push({dec:d, det:det, act:a, status:statusNorm, date:d.date||'', hasFollowUp:followUpDecIds.has(d.id)});
            });
          } else {
-           if (trackerFilter !== 'all' && trackerFilter !== 'planned') return;
-           allChains.push({dec:d, det:det, act:null, status:'Planned', date:d.date||''});
+           if (trackerFilter !== 'all' && trackerFilter !== 'planned' && trackerFilter !== 'follow-up') return;
+           allChains.push({dec:d, det:det, act:null, status:'Planned', date:d.date||'', hasFollowUp:followUpDecIds.has(d.id)});
          }
        });
+       // Apply follow-up filter after building chains
+       if (trackerFilter === 'follow-up') {
+         allChains = allChains.filter(function(c){return c.hasFollowUp;});
+       }
        allChains.sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
 
        if (!allChains.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No activities to show'+(trackerFilter!=='all'?' for this filter':'')+'</div>';
@@ -3936,6 +4061,7 @@ ${tab==='tracker'?`
          html += '<div class="act-card'+(isCompleted?' act-done':'')+'" onclick="toggleActCard(\''+cardId+'\')">';
          html += '<div class="act-card-top">';
          html += '<span class="act-card-status '+sCls+'">'+c.status+'</span>';
+         if (c.hasFollowUp) html += '<span style="display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;margin-left:4px;white-space:nowrap">Follow-up due</span>';
          html += '<div class="act-card-body">';
          html += '<div class="act-card-date">'+fmtDate(c.date)+(officialName&&!isMine?' \u00B7 '+esc(officialName):'')+'</div>';
          html += '<div class="act-card-desc">'+esc(descText.length>80?descText.slice(0,77)+'...':descText)+'</div>';
@@ -3960,7 +4086,39 @@ ${tab==='tracker'?`
            html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-a">A</span><div><div class="acd-chain-lbl">Action</div><div class="acd-chain-text">'+esc(actionLabel)+'</div></div></div>';
            html += '</div>';
 
-           if (c.det.follow_up && c.det.follow_up_desc) html += '<div class="acd-row"><span class="acd-label">Follow-up</span><span class="acd-value" style="color:var(--orange)">'+esc(c.det.follow_up_desc)+'</span></div>';
+           if (c.det.follow_up && c.det.follow_up_desc) {
+             html += '<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 12px;margin:8px 0">';
+             html += '<div style="font-size:11px;font-weight:700;color:#F57F17;margin-bottom:4px">Follow-up due</div>';
+             html += '<div style="font-size:12px;color:var(--navy);line-height:1.5">'+esc(c.det.follow_up_desc)+'</div>';
+             if (c.det.follow_up_completed) {
+               html += '<div style="font-size:10px;color:var(--green);font-weight:600;margin-top:6px">Completed'+(c.det.follow_up_completed_date?' on '+c.det.follow_up_completed_date:'')+'</div>';
+             } else if (isMine) {
+               html += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="event.stopPropagation();markFollowUpDone(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Done</button><button onclick="event.stopPropagation();logFollowUpVisit(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Log Follow-up Visit</button></div>';
+             } else {
+               html += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only '+esc(c.det.official_name||c.dec.made_by||'the person who logged this')+' can complete this follow-up</div>';
+             }
+             html += '</div>';
+           }
+
+           // ── EVIDENCE / SUPPORTING DOCUMENTS ──
+           var evFiles = c.det.evidence_files || [];
+           var existingDoc = c.act && c.act.supporting_doc_url;
+           html += '<div style="margin:8px 0;padding:8px 10px;background:#f7f9fc;border-radius:6px;border:1px solid #e8e6e4">';
+           html += '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Supporting evidence</div>';
+           if (existingDoc) {
+             var docName = (c.act.supporting_doc_name || 'Document').length > 40 ? (c.act.supporting_doc_name||'Document').slice(0,37)+'...' : (c.act.supporting_doc_name||'Document');
+             html += '<div style="margin-bottom:4px"><a href="'+esc(c.act.supporting_doc_url)+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--teal);font-weight:600;text-decoration:none" onclick="event.stopPropagation()">'+esc(docName)+'</a> <span style="font-size:10px;color:var(--grey)">(uploaded with activity)</span></div>';
+           }
+           if (evFiles.length) {
+             evFiles.forEach(function(ef) {
+               var efName = (ef.name||'File').length > 40 ? (ef.name||'File').slice(0,37)+'...' : (ef.name||'File');
+               html += '<div style="margin-bottom:4px"><a href="'+esc(ef.url)+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--teal);font-weight:600;text-decoration:none" onclick="event.stopPropagation()">'+esc(efName)+'</a> <span style="font-size:10px;color:var(--grey)">'+supTimeAgo(ef.uploaded_at)+(ef.uploaded_by?' by '+esc(ef.uploaded_by):'')+'</span></div>';
+             });
+           }
+           if (!existingDoc && !evFiles.length) { html += '<div style="font-size:11px;color:var(--grey);font-style:italic">No evidence attached yet</div>'; }
+           html += '<input type="file" id="ev-file-'+decIdEsc.replace(/\'/g,'')+'" style="display:none" onchange="event.stopPropagation();uploadEvidence(\''+decIdEsc+'\',this.files[0])" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">';
+           html += '<button onclick="event.stopPropagation();triggerEvidenceUpload(\''+decIdEsc+'\')" style="margin-top:6px;padding:8px 14px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;width:100%">Upload supporting evidence</button>';
+           html += '</div>';
 
            var respCount = decResponses.length + (notedCount > 0 ? 1 : 0);
            html += '<div class="acd-thread-bar"><span class="acd-thread-count">'+(respCount?respCount+' response'+(respCount>1?'s':''):'No responses yet')+'</span><button class="acd-thread-btn" onclick="toggleActThread(\''+cardId+'\')">'+( threadOpen?'Hide thread':'View thread')+'</button></div>';
@@ -3975,7 +4133,8 @@ ${tab==='tracker'?`
              } else {
                html += '<div class="pt-empty">Be the first to comment on this activity</div>';
              }
-             html += '<div class="pt-reply"><textarea class="pt-input" placeholder="Write a comment\u2026" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+             html += '<div class="pt-reply" style="position:relative"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+             html += renderMentionDropdown(c.dec.id);
              html += '</div>';
            }
 
@@ -4301,6 +4460,36 @@ function logFollowUpVisit(decId) {
   showToast('Form pre-filled from original activity — review and complete');
   render();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── EVIDENCE UPLOAD ON TRACKER CARDS ──
+function triggerEvidenceUpload(decId) {
+  var inp = document.getElementById('ev-file-' + decId.replace(/[^a-zA-Z0-9]/g,''));
+  if (inp) inp.click();
+}
+async function uploadEvidence(decId, file) {
+  if (!file) return;
+  if (file.size > 6*1024*1024) { showToast('File too large — maximum 6MB'); return; }
+  showToast('Uploading...');
+  try {
+    var safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
+    var path = S._officialId + '/evidence/' + decId.replace(/[^a-zA-Z0-9]/g,'') + '/' + Date.now() + '_' + safe;
+    var {data, error} = await sb.storage.from('Supporting-Documents').upload(path, file, { cacheControl:'3600', upsert:false, contentType:file.type||'application/octet-stream' });
+    if (error) throw error;
+    var {data:urlData} = sb.storage.from('Supporting-Documents').getPublicUrl(path);
+    var url = urlData && urlData.publicUrl || '';
+    // Store in decision details
+    var dec = S.decisions.find(function(d){return d.id===decId;});
+    if (dec) {
+      var det = Object.assign({}, dec.details || {});
+      if (!det.evidence_files) det.evidence_files = [];
+      det.evidence_files.push({url:url, name:file.name, uploaded_at:new Date().toISOString(), uploaded_by:S.official.full_name});
+      await sb.from('decisions').update({details:det}).eq('id',decId);
+      dec.details = det;
+    }
+    showToast('Evidence uploaded');
+    render();
+  } catch(e) { console.warn('Evidence upload failed:', e); showToast('Upload failed — try again'); }
 }
 
 // POLICY MODAL 
