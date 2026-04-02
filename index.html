@@ -473,11 +473,14 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .sup-comment-time{font-size:9px;color:var(--grey)}
 .sup-comment-text{font-size:11.5px;color:var(--navy);line-height:1.5}
 .thread-empty{font-size:11px;color:var(--grey);font-style:italic;padding:4px 0 2px}
-.reply-box{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #f0eded;align-items:flex-end}
-.reply-input{flex:1;font-size:11.5px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:8px;padding:8px 10px;resize:none;min-height:36px;max-height:80px;line-height:1.4;outline:none;transition:border-color .15s}
+.reply-box{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #f0eded;position:relative}
+.reply-input{width:100%;box-sizing:border-box;font-size:13px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:20px;padding:10px 14px;resize:none;min-height:44px;max-height:100px;line-height:1.4;outline:none;transition:border-color .15s}
 .reply-input:focus{border-color:#7E57C2}
-.reply-input::placeholder{color:#b0aeac}
-.reply-send{border-radius:18px;border:none;background:#7E57C2;color:#fff;font-size:11px;font-weight:700;cursor:pointer;padding:8px 14px;transition:background .15s;flex-shrink:0;font-family:inherit;white-space:nowrap}
+.reply-input::placeholder{color:#b0aeac;font-size:12px}
+.reply-actions{display:flex;justify-content:flex-end;align-items:center;gap:4px}
+.reply-attach{background:none;border:1px solid var(--grey-lt);border-radius:20px;font-size:15px;cursor:pointer;padding:6px 10px;color:var(--grey);min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.reply-attach:hover{border-color:#7E57C2}
+.reply-send{border-radius:20px;border:none;background:#7E57C2;color:#fff;font-size:12px;font-weight:700;cursor:pointer;padding:10px 20px;min-height:44px;transition:background .15s;flex-shrink:0;font-family:inherit;white-space:nowrap}
 .reply-send:hover{background:#6A3FB5}
 /* Scope badges */
 .scope-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:4px}
@@ -505,16 +508,16 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .sup-resolved-by{font-size:10px;color:#558B2F;line-height:1.5}
 .sup-resolved-comment{font-size:11px;color:var(--navy);line-height:1.5;margin-top:6px;padding:6px 8px;background:#fff;border-radius:6px;border-left:3px solid #43A047}
 .sup-resolve-flow{border-top:1px solid #f0e8f8;padding:10px 14px;background:#FEFCFF}
-.sup-resolve-btn{display:block;width:100%;padding:8px 12px;font-size:11px;font-weight:700;border:1.5px solid #43A047;background:#fff;color:#43A047;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:6px}
+.sup-resolve-btn{display:block;width:100%;padding:12px 12px;font-size:12px;font-weight:700;border:1.5px solid #43A047;background:#fff;color:#43A047;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:6px;min-height:44px}
 .sup-resolve-btn:hover{background:#E8F5E9}
 .sup-resolve-form{margin-top:8px}
-.sup-resolve-textarea{width:100%;box-sizing:border-box;font-size:11.5px;font-family:inherit;border:1.5px solid #C8E6C9;border-radius:8px;padding:8px 10px;resize:none;min-height:60px;line-height:1.4;outline:none;transition:border-color .15s}
+.sup-resolve-textarea{width:100%;box-sizing:border-box;font-size:13px;font-family:inherit;border:1.5px solid #C8E6C9;border-radius:12px;padding:10px 14px;resize:none;min-height:60px;line-height:1.4;outline:none;transition:border-color .15s}
 .sup-resolve-textarea:focus{border-color:#43A047}
 .sup-resolve-textarea.resolve-error{border-color:var(--red)}
-.sup-resolve-actions{display:flex;gap:8px;margin-top:8px}
-.sup-resolve-confirm{flex:1;padding:8px 10px;font-size:11px;font-weight:700;border:none;background:#43A047;color:#fff;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
+.sup-resolve-actions{display:flex;gap:8px;margin-top:10px}
+.sup-resolve-confirm{flex:1;padding:10px 12px;font-size:12px;font-weight:700;border:none;background:#43A047;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s;min-height:44px}
 .sup-resolve-confirm:hover{background:#2E7D32}
-.sup-resolve-cancel{flex:0;padding:8px 12px;font-size:11px;font-weight:600;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);border-radius:8px;cursor:pointer;font-family:inherit}
+.sup-resolve-cancel{flex:0;padding:10px 14px;font-size:12px;font-weight:600;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);border-radius:10px;cursor:pointer;font-family:inherit;min-height:44px}
 .sup-card.sup-addressed{opacity:.6;border-color:#C8E6C9}
 .sup-card.sup-addressed .sup-header{background:#FAFFF9}
 /* Schools summary line */
@@ -526,9 +529,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .sup-dist-row{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:#f5f3fa;border-radius:6px;margin-bottom:4px;font-size:10px;font-weight:600;color:var(--navy)}
 .sup-dist-count{color:#7E57C2;font-weight:700}
 /* Scope dropdown */
-.sup-scope-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.sup-scope-label{font-size:10px;font-weight:600;color:var(--grey);white-space:nowrap}
-.sup-scope-select{font-size:11px;font-family:inherit;padding:5px 8px;border:1.5px solid var(--grey-lt);border-radius:6px;background:#fff;color:var(--navy);outline:none;flex:1;min-width:0;cursor:pointer}
+.sup-scope-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.sup-scope-label{font-size:11px;font-weight:600;color:var(--grey);white-space:nowrap}
+.sup-scope-select{font-size:12px;font-family:inherit;padding:8px 10px;border:1.5px solid var(--grey-lt);border-radius:8px;background:#fff;color:var(--navy);outline:none;flex:1;min-width:0;min-height:44px;cursor:pointer}
 .sup-scope-select:focus{border-color:#7E57C2}
 /* Reopen link */
 .sup-reopen-link{font-size:10px;color:#7E57C2;font-weight:600;cursor:pointer;margin-top:6px;display:inline-block;text-decoration:underline;text-decoration-style:dashed}
@@ -608,11 +611,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .pt-text{font-size:11.5px;color:var(--navy);line-height:1.5}
 .pt-role{font-size:8px;font-weight:600;color:var(--grey);background:#e0e0e0;padding:1px 5px;border-radius:3px;display:inline-block;margin-top:3px}
 .pt-empty{font-size:11px;color:var(--grey);font-style:italic;text-align:center;padding:4px 0}
-.pt-reply{display:flex;gap:8px;margin-top:6px;align-items:flex-end}
-.pt-input{flex:1;font-size:11.5px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:20px;padding:8px 14px;resize:none;min-height:36px;max-height:80px;line-height:1.4;outline:none;transition:border-color .15s}
+.pt-reply{display:flex;flex-direction:column;gap:6px;margin-top:6px;position:relative}
+.pt-input{width:100%;box-sizing:border-box;font-size:13px;font-family:inherit;border:1.5px solid var(--grey-lt);border-radius:20px;padding:10px 14px;resize:none;min-height:44px;max-height:100px;line-height:1.4;outline:none;transition:border-color .15s}
 .pt-input:focus{border-color:var(--teal)}
-.pt-input::placeholder{color:#c0c0c0}
-.pt-send{border-radius:18px;border:none;background:var(--teal);color:#fff;font-size:11px;font-weight:700;cursor:pointer;padding:8px 14px;flex-shrink:0;font-family:inherit;white-space:nowrap}
+.pt-input::placeholder{color:#c0c0c0;font-size:12px}
+.pt-actions{display:flex;justify-content:flex-end;align-items:center;gap:4px}
+.pt-send{border-radius:20px;border:none;background:var(--teal);color:#fff;font-size:12px;font-weight:700;cursor:pointer;padding:10px 20px;min-height:44px;flex-shrink:0;font-family:inherit;white-space:nowrap}
 .pt-send:hover{background:var(--teal-dk)}
 /* Owner action buttons */
 .poa-btns{padding:0 14px 12px;display:flex;gap:8px}
@@ -880,7 +884,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.01.2';
+const APP_VERSION = '2026.04.02.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3672,7 +3676,7 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box" style="position:relative"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" style="background:none;border:none;font-size:18px;cursor:pointer;padding:6px;color:var(--grey);min-width:36px;min-height:36px" title="Attach a file">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach a file">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
          _supHTML += renderAttachButton(need);
          _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
@@ -3683,9 +3687,9 @@ function renderDashboard() {
          _supHTML += '<div class="sup-resolve-flow">';
          if (S._supResolving[need]) {
            _supHTML += '<div class="sup-resolve-form">';
-           _supHTML += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
-           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026 Type @ to tag a colleague" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
-           _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><button onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" style="background:none;border:1px solid #e8e6e4;border-radius:6px;font-size:14px;cursor:pointer;padding:6px 10px;color:var(--grey);min-height:36px" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
+           _supHTML += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
+           _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery\u2026 Type @ to tag" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+           _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:6px 0"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
            _supHTML += renderAttachButton('resolve:'+need);
            _supHTML += renderMentionDropdown(need);
            _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
@@ -4204,7 +4208,7 @@ ${tab==='tracker'?`
            }
 
            // Reply input always visible
-           html += '<div class="pt-reply" style="position:relative;display:flex;align-items:flex-end;gap:4px"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)" style="flex:1">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" style="background:none;border:none;font-size:18px;cursor:pointer;padding:6px;color:var(--grey);min-width:36px;min-height:36px" title="Attach a file">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+           html += '<div class="pt-reply"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><div class="pt-actions"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" title="Attach a file">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div></div>';
            html += renderAttachButton(c.dec.id);
            html += renderMentionDropdown(c.dec.id);
            html += '</div>';
