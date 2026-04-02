@@ -893,7 +893,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.3';
+const APP_VERSION = '2026.04.02.4';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3658,9 +3658,66 @@ function renderDashboard() {
    _narrHTML += '</div>';
  }
 
+ // ── PENDING FOR YOU (computed from ALL decisions, not geo-filtered) ──
+ var _pendingItems = [];
+ if (S._officialId && allDecs && allDecs.length) {
+   var _myRole = S.official.role || '';
+   var _myDistrict = S.official.district || '';
+   var _pendResolved = {};
+   (S._supResponses || []).forEach(function(r) {
+     if (r.scope_type === 'resolution') _pendResolved[r.support_need] = true;
+     if (r.scope_type === 'reopened') delete _pendResolved[r.support_need];
+   });
+   // Build a set of schools the current user has visited (for "No visit logged since")
+   var _myVisitedSchools = {};
+   allDecs.forEach(function(d) {
+     if (d.official_id !== S._officialId) return;
+     var det = d.details || {};
+     var visitDate = d.date || d.created_at || '';
+     (det.schools || '').split(',').map(function(s){return s.trim()}).filter(Boolean).forEach(function(s) {
+       if (!_myVisitedSchools[s] || visitDate > _myVisitedSchools[s]) _myVisitedSchools[s] = visitDate;
+     });
+   });
+   allDecs.forEach(function(d) {
+     var det = d.details || {};
+     var needs = det.support_needed || [];
+     var taggedAll = det.tagged_officials || {};
+     needs.forEach(function(need) {
+       if (_pendResolved[need]) return;
+       if (!ROLE_SUPPORT_MAP[need]) return;
+       var taggedForNeed = taggedAll[need] || [];
+       var isUUIDMatch = taggedForNeed.some(function(o) { return o.id === S._officialId; });
+       // Role match works independently — even when specific officials are tagged
+       var isRoleMatch = ROLE_SUPPORT_MAP[need].includes(_myRole) && (det.district || '') === _myDistrict;
+       if (!isUUIDMatch && !isRoleMatch) return;
+       if (d.official_id === S._officialId) return;
+       var school = det.schools || '';
+       var flagDate = d.date || d.created_at || '';
+       var lastVisit = _myVisitedSchools[school.split(',')[0].trim()] || '';
+       var visitedSince = lastVisit && flagDate && lastVisit > flagDate;
+       _pendingItems.push({
+         school: school, need: need, subjects: det.subjects || [], grades: det.grades || [],
+         flaggedBy: d.made_by || det.official_name || '', date: flagDate,
+         isRequested: isUUIDMatch, decId: d.id, visitedSince: visitedSince
+       });
+     });
+   });
+ }
+ // Deduplicate: same school + same need = keep only the most recent flag
+ var _pendSeen = {};
+ _pendingItems = _pendingItems.filter(function(it) {
+   var key = (it.school||'')+'||'+it.need;
+   if (_pendSeen[key]) return false;
+   _pendSeen[key] = true;
+   return true;
+ });
+ // Exclude items where user already visited since the flag
+ var _pendingActive = _pendingItems.filter(function(it){ return !it.visitedSince; });
+
  // ── RECOMMENDED SUPPORT ──
  var _supHTML = '';
- if (supportRequests.length) {
+ var _hasPending = _pendingActive.length > 0;
+ if (supportRequests.length || _hasPending) {
    var supByType = {};
    var now30 = new Date(); now30.setDate(now30.getDate()-30);
    supportRequests.forEach(function(sr){
@@ -3692,8 +3749,46 @@ function renderDashboard() {
    var activeCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return !res || res.type!=='resolution';}).length;
    var addressedCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return res && res.type==='resolution';}).length;
 
-   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+activeCount+' active'+(addressedCount?' · '+addressedCount+' addressed':'')+'</span></div><div class="dash-section-body">';
+   _supHTML = '<div class="dash-section" style="border-left:4px solid #7E57C2;margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:11px;color:var(--grey)">'+activeCount+' active'+(addressedCount?' \xb7 '+addressedCount+' addressed':'')+(_hasPending?' \xb7 '+_pendingActive.length+' pending for you':'')+'</span></div><div class="dash-section-body">';
    _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during school visits. Tap to see details, respond, or mark as addressed.</div>';
+
+   // ── PENDING FOR YOU PANEL (merged inside Recommended Support) ──
+   if (_hasPending) {
+     var _pendRequested = _pendingActive.filter(function(it){return it.isRequested});
+     var _pendRoleMatch = _pendingActive.filter(function(it){return !it.isRequested});
+     var _pendNow = new Date();
+     _supHTML += '<div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:12px;padding:14px 14px 10px;margin-bottom:14px">';
+     _supHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F57F17;animation:pulse 2s infinite;flex-shrink:0"></span><div style="font-size:15px;font-weight:700;color:#E65100">Pending for you \u2014 '+_pendingActive.length+' item'+(_pendingActive.length!==1?'s':'')+' need'+(_pendingActive.length===1?'s':'')+' your attention</div></div>';
+     _supHTML += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:12px">These schools have been flagged as needing support from '+(_myRole?'a '+_myRole.toLowerCase():'someone in your role')+'. Based on your district and role, these are waiting on you.</div>';
+     function _renderPendCard(it) {
+       var ago = '';
+       if (it.date) { var d = new Date(it.date); var diff = Math.floor((_pendNow - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
+       var c = '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid '+(it.isRequested?'#E65100':'#F57F17')+';box-shadow:0 1px 3px rgba(0,0,0,.06)">';
+       c += '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + esc(it.school) + '</div>';
+       c += '<div style="font-size:12px;color:var(--grey-dk);margin-top:3px;line-height:1.5">' + esc(it.need);
+       if (it.subjects.length) c += ' \xb7 ' + esc(it.subjects.join(', '));
+       if (it.grades.length) c += ' \xb7 Grade ' + esc(it.grades.join(', '));
+       c += '</div>';
+       c += '<div style="font-size:11px;color:#E65100;margin-top:4px">Flagged ' + (ago||'') + ' \xb7 No visit logged since</div>';
+       if (it.isRequested) c += '<div style="font-size:11px;font-weight:700;color:#E65100;margin-top:4px;background:#FFF8E1;display:inline-block;padding:2px 8px;border-radius:4px">You were specifically requested</div>';
+       var schoolEsc = (it.school||'').replace(/'/g,"\\x27");
+       c += '<button onclick="S.view=\'log\';S.f.formStep=0;S.f.schools=\'' + schoolEsc + '\';render();window.scrollTo({top:0,behavior:\'smooth\'})" style="display:block;width:100%;margin-top:10px;padding:12px;font-size:13px;font-weight:700;border:none;background:#F57F17;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;min-height:44px">Log a support visit</button>';
+       c += '</div>';
+       return c;
+     }
+     if (_pendRequested.length) {
+       _supHTML += '<div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Specifically requested from you (' + _pendRequested.length + ')</div>';
+       _pendRequested.forEach(function(it){ _supHTML += _renderPendCard(it); });
+     }
+     if (_pendRoleMatch.length) {
+       _supHTML += '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:' + (_pendRequested.length?'12px':'0') + ' 0 6px">Based on your role (' + _pendRoleMatch.length + ')</div>';
+       _pendRoleMatch.forEach(function(it){ _supHTML += _renderPendCard(it); });
+     }
+     _supHTML += '</div>';
+   }
+
+   // Only show time tabs and support need cards when there are actual support requests
+   if (supportRequests.length) {
    _supHTML += '<div class="sup-time-tabs"><button class="sup-time-tab '+(S._supTimeFilter==='30d'?'active':'')+'" onclick="filterSupTime(\'30d\')">Last 30 days</button><button class="sup-time-tab '+(S._supTimeFilter==='term'?'active':'')+'" onclick="filterSupTime(\'term\')">This term</button><button class="sup-time-tab '+(S._supTimeFilter==='all'?'active':'')+'" onclick="filterSupTime(\'all\')">All time</button></div>';
    if (!supEntries.length) {
      _supHTML += '<div style="text-align:center;color:var(--grey);padding:16px;font-size:12px">No support requests in this time period</div>';
@@ -3830,6 +3925,7 @@ function renderDashboard() {
        _supHTML += '</div></div>';
      });
    }
+   } // end if (supportRequests.length)
    _supHTML += '</div></div>';
  }
 
@@ -3944,8 +4040,7 @@ ${tab==='overview'?`
    </div>
  </div>
 
- <!-- ═══ SUPPORT: NEEDING YOUR ATTENTION + ALL RECOMMENDED ═══ -->
- ${renderPendingForYou(allDecs, S._supResponses)}
+ <!-- ═══ SUPPORT: RECOMMENDED (with pending items merged inside) ═══ -->
  ${_supHTML}
 
  <!-- ═══ DDD DASHBOARD REFERENCE ═══ -->
@@ -4837,70 +4932,6 @@ function renderPendingBanner() {
   return '<div style="background:#FFF3E0;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="font-size:11px;color:#E65100;line-height:1.4"><strong>' + queue.length + ' activit' + (queue.length > 1 ? 'ies' : 'y') + ' saved offline</strong> — waiting to submit when connection improves</div><button onclick="flushSubmitQueue()" style="font-family:inherit;font-size:10px;font-weight:700;padding:6px 12px;border-radius:6px;border:1.5px solid #E65100;background:#fff;color:#E65100;cursor:pointer;white-space:nowrap">Retry now</button></div>';
 }
 
-// Change 9: Pending for you panel
-function renderPendingForYou(decs, supResponses) {
-  if (!S._officialId || !decs || !decs.length) return '';
-  var myRole = S.official.role || '';
-  var myDistrict = S.official.district || '';
-  var resolved = {};
-  (supResponses || []).forEach(function(r) {
-    if (r.scope_type === 'resolution') resolved[r.support_need] = true;
-    if (r.scope_type === 'reopened') delete resolved[r.support_need];
-  });
-  var items = [];
-  decs.forEach(function(d) {
-    var det = d.details || {};
-    var needs = det.support_needed || [];
-    var taggedAll = det.tagged_officials || {};
-    needs.forEach(function(need) {
-      if (resolved[need]) return;
-      if (!ROLE_SUPPORT_MAP[need]) return;
-      var taggedForNeed = taggedAll[need] || [];
-      var isUUIDMatch = taggedForNeed.some(function(o) { return o.id === S._officialId; });
-      var isRoleMatch = taggedForNeed.length === 0 && ROLE_SUPPORT_MAP[need].includes(myRole) && (det.district || '') === myDistrict;
-      if (!isUUIDMatch && !isRoleMatch) return;
-      if (d.official_id === S._officialId) return;
-      items.push({
-        school: det.schools || '', need: need, subjects: det.subjects || [], grades: det.grades || [],
-        flaggedBy: d.made_by || det.official_name || '', date: d.date || d.created_at || '',
-        isRequested: isUUIDMatch, decId: d.id
-      });
-    });
-  });
-  if (!items.length) return '';
-  var now = new Date();
-  var requested = items.filter(function(it){return it.isRequested});
-  var roleMatch = items.filter(function(it){return !it.isRequested});
-  var html = '<div style="margin-bottom:16px">';
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F57F17;animation:pulse 2s infinite;flex-shrink:0"></span><div style="font-size:15px;font-weight:700;color:#E65100">Needing your attention</div></div>';
-  html += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:12px">These schools have been flagged as needing support from someone in your role. Based on your district and role, these are waiting on you.</div>';
-  function renderPendingCard(it) {
-    var ago = '';
-    if (it.date) { var d = new Date(it.date); var diff = Math.floor((now - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
-    var c = '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid '+(it.isRequested?'#E65100':'#F57F17')+';box-shadow:0 1px 3px rgba(0,0,0,.06)">';
-    c += '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + esc(it.school) + '</div>';
-    c += '<div style="font-size:12px;color:var(--grey-dk);margin-top:3px;line-height:1.5">' + esc(it.need);
-    if (it.subjects.length) c += ' \xb7 ' + esc(it.subjects.join(', '));
-    if (it.grades.length) c += ' \xb7 Grade ' + esc(it.grades.join(', '));
-    c += '</div>';
-    c += '<div style="font-size:11px;color:var(--grey);margin-top:4px">Flagged ' + (ago||'') + ' by ' + esc(it.flaggedBy) + '</div>';
-    if (it.isRequested) c += '<div style="font-size:11px;font-weight:700;color:#E65100;margin-top:4px;background:#FFF8E1;display:inline-block;padding:2px 8px;border-radius:4px">You were specifically requested</div>';
-    var schoolEsc = (it.school||'').replace(/'/g,"\\x27");
-    c += '<button onclick="S.view=\'log\';S.f.formStep=0;S.f.schools=\'' + schoolEsc + '\';render();window.scrollTo({top:0,behavior:\'smooth\'})" style="display:block;width:100%;margin-top:10px;padding:12px;font-size:13px;font-weight:700;border:2px solid #F57F17;background:#FFF8E1;color:#E65100;border-radius:10px;cursor:pointer;font-family:inherit;min-height:44px">Log a support visit</button>';
-    c += '</div>';
-    return c;
-  }
-  if (requested.length) {
-    html += '<div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Specifically requested from you (' + requested.length + ')</div>';
-    requested.forEach(function(it){ html += renderPendingCard(it); });
-  }
-  if (roleMatch.length) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:' + (requested.length?'12px':'0') + ' 0 6px">Based on your role (' + roleMatch.length + ')</div>';
-    roleMatch.forEach(function(it){ html += renderPendingCard(it); });
-  }
-  html += '</div>';
-  return html;
-}
 
 function saveFormDraft() {
   try {
