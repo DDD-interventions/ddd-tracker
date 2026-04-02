@@ -998,14 +998,10 @@ async function searchOfficialsForNeed(need, query) {
   if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; render(); return; }
   S.f._offSearchLoading[need] = true; render();
   try {
-    var q = sb.from('officials').select('id,full_name,role,email,district,details')
-      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
-    var dist = S.f.district || S.official.district;
-    if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
-    var {data} = await q.limit(20);
-    // Deduplicate by email
+    var dist = S.f.district || S.official.district || null;
+    var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
     var seen = {}; var results = [];
-    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
+    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
     S.f._offSearchResults[need] = results;
   } catch(e) { S.f._offSearchResults[need] = []; console.warn('Official search failed:', e); }
   S.f._offSearchLoading[need] = false; render();
@@ -1069,13 +1065,10 @@ async function searchSupTagOfficial(need, query) {
   if (!query || query.length < 2) { S._supTagResults[need] = []; S._supTagLoading[need] = false; render(); return; }
   S._supTagLoading[need] = true; render();
   try {
-    var q = sb.from('officials').select('id,full_name,role,email,district,details')
-      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
-    var dist = S.official.district;
-    if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
-    var {data} = await q.limit(20);
+    var dist = S.official.district || null;
+    var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
     var seen = {}; var results = [];
-    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
+    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
     S._supTagResults[need] = results;
   } catch(e) { S._supTagResults[need] = []; }
   S._supTagLoading[need] = false; render();
@@ -1169,11 +1162,8 @@ function handleMentionInput(key, text, el) {
   clearTimeout(_mentionTimer);
   _mentionTimer = setTimeout(async function() {
     try {
-      var q = sb.from('officials').select('id,full_name,role,email,district,details')
-        .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
-      var dist = S.official.district;
-      if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
-      var {data} = await q.limit(8);
+      var dist = S.official.district || null;
+      var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
       var seen = {}; var results = [];
       (data || []).forEach(function(o) {
         if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '' }); }
