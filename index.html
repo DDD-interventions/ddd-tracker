@@ -487,6 +487,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .voice-wrap{position:relative;display:flex;flex-direction:column;gap:4px}
 .voice-row{display:flex;align-items:flex-end;gap:6px}
 .voice-row textarea,.voice-row input[type="text"]{flex:1;min-width:0}
+.voice-hint{position:absolute;bottom:calc(100% + 6px);right:0;width:240px;background:#1A2332;color:#fff;font-size:12px;line-height:1.5;padding:10px 14px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:100;animation:fadeIn .2s}
+.voice-hint::after{content:'';position:absolute;top:100%;right:16px;border:6px solid transparent;border-top-color:#1A2332}
 .reply-send{border-radius:20px;border:none;background:#7E57C2;color:#fff;font-size:12px;font-weight:700;cursor:pointer;padding:10px 20px;min-height:44px;transition:background .15s;flex-shrink:0;font-family:inherit;white-space:nowrap}
 .reply-send:hover{background:#6A3FB5}
 /* Scope badges */
@@ -891,7 +893,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.2';
+const APP_VERSION = '2026.04.02.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1297,11 +1299,28 @@ var _voiceRec = null;
 var _voiceTarget = null;
 var _voiceField = null;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+var _voiceUsedBefore = (function(){try{return localStorage.getItem('ddd_voice_used')==='1'}catch(e){return false}})();
+
+function showVoiceHint(btnId) {
+  var btn = document.getElementById(btnId);
+  if (!btn) return;
+  var hint = document.createElement('div');
+  hint.className = 'voice-hint';
+  hint.innerHTML = 'Your phone may ask for microphone access. <strong>Tap Allow</strong> to continue. Speak clearly and tap the button again when done.';
+  btn.parentNode.style.position = 'relative';
+  btn.parentNode.appendChild(hint);
+  setTimeout(function(){ if(hint.parentNode) hint.parentNode.removeChild(hint); }, 6000);
+}
 
 function toggleVoice(fieldPath, textareaId) {
   if (!_speechSupported) { alert('Voice input is not available on this browser. Try using Chrome on your phone.'); return; }
   if (_voiceRec && _voiceField === fieldPath) { _voiceRec.stop(); return; }
   if (_voiceRec) { _voiceRec.stop(); _voiceRec = null; }
+  if (!_voiceUsedBefore) {
+    _voiceUsedBefore = true;
+    try{localStorage.setItem('ddd_voice_used','1')}catch(e){}
+    showVoiceHint('mic-' + textareaId);
+  }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   _voiceRec = new SR();
   _voiceRec.lang = 'en-ZA';
@@ -1321,13 +1340,17 @@ function toggleVoice(fieldPath, textareaId) {
       var existing = el ? el.value : '';
       var newVal = existing ? existing.trimEnd() + ' ' + transcript.trim() : transcript.trim();
       if (el) { el.value = newVal; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
-      // Write back to state
       var parts = fieldPath.split('.');
       if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
       else if (parts.length === 1) S.f[parts[0]] = newVal;
     }
   };
-  _voiceRec.onerror = function() { stopVoice(); };
+  _voiceRec.onerror = function(e) {
+    if (e.error === 'not-allowed') {
+      alert('Microphone access was not allowed. To use voice input, go to your phone Settings and allow microphone access for this browser.');
+    }
+    stopVoice();
+  };
   _voiceRec.onend = function() { stopVoice(); };
   _voiceRec.start();
 }
@@ -1339,7 +1362,8 @@ function stopVoice() {
 function micBtn(fieldPath, taId) {
   if (!_speechSupported) return '';
   var isRec = _voiceField === fieldPath;
-  return '<button type="button" class="voice-btn' + (isRec ? ' recording' : '') + '" id="mic-' + taId + '" onclick="event.preventDefault();toggleVoice(\'' + fieldPath + '\',\'' + taId + '\')" title="' + (isRec ? 'Stop recording' : 'Tap to speak') + '">' + (isRec ? '&#9632;' : '&#127908;') + '</button>';
+  var label = _voiceUsedBefore ? '' : '<div style="font-size:9px;color:var(--grey);text-align:center;margin-top:2px">Speak</div>';
+  return '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><button type="button" class="voice-btn' + (isRec ? ' recording' : '') + '" id="mic-' + taId + '" onclick="event.preventDefault();toggleVoice(\'' + fieldPath + '\',\'' + taId + '\')" title="' + (isRec ? 'Tap to stop recording' : 'Tap to speak instead of typing') + '">' + (isRec ? '&#9632;' : '&#127908;') + '</button>' + label + '</div>';
 }
 
 // ── COMMENT ATTACHMENTS ──
