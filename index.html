@@ -893,7 +893,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.4';
+const APP_VERSION = '2026.04.02.6';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1008,8 +1008,8 @@ async function toggleNotifyOptOut() {
 // Change 6: Search officials for tagging (form)
 var _offSearchTimer = null;
 async function searchOfficialsForNeed(need, query) {
-  if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; render(); return; }
-  S.f._offSearchLoading[need] = true; render();
+  if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; updateOffSearchUI(need); return; }
+  S.f._offSearchLoading[need] = true; updateOffSearchUI(need);
   try {
     var dist = S.f.district || S.official.district || null;
     var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
@@ -1017,7 +1017,7 @@ async function searchOfficialsForNeed(need, query) {
     (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
     S.f._offSearchResults[need] = results;
   } catch(e) { S.f._offSearchResults[need] = []; console.warn('Official search failed:', e); }
-  S.f._offSearchLoading[need] = false; render();
+  S.f._offSearchLoading[need] = false; updateOffSearchUI(need);
 }
 function tagOfficial(need, official) {
   if (!S.f.tagged_officials[need]) S.f.tagged_officials[need] = [];
@@ -1031,27 +1031,17 @@ function untagOfficial(need, officialId) {
   S.f.tagged_officials[need] = S.f.tagged_officials[need].filter(function(o){return o.id !== officialId;});
   render();
 }
-function renderOfficialSearch(need) {
+function offSearchContainerId(need) { return 'off-sr-' + need.replace(/[^a-zA-Z0-9]/g, ''); }
+function renderOffSearchResultsInner(need) {
   var q = S.f._offSearchQ[need] || '';
   var results = S.f._offSearchResults[need] || [];
   var loading = S.f._offSearchLoading[need] || false;
   var tagged = S.f.tagged_officials[need] || [];
   var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
   var html = '';
-  // Tagged pills
-  if (tagged.length) {
-    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">';
-    tagged.forEach(function(o) {
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc(o.name) + ' <span style="font-weight:400;color:var(--grey)">(' + esc(o.role) + ')</span><button onclick="untagOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
-    });
-    html += '</div>';
-    html += '<div style="font-size:10px;color:var(--teal);margin-bottom:4px">\u2713 Tagged by unique ID \u2014 name changes or spelling variations won\'t affect who gets notified.</div>';
-  }
-  // Search input
-  html += '<div style="margin-top:4px"><input type="text" placeholder="Search for an official to tag (name or email)..." value="' + esc(q) + '" oninput="S.f._offSearchQ[\'' + needKey + '\']=this.value;clearTimeout(_offSearchTimer);_offSearchTimer=setTimeout(function(){searchOfficialsForNeed(\'' + needKey + '\',S.f._offSearchQ[\'' + needKey + '\'])},300)" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit"></div>';
   if (loading) { html += '<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching...</div>'; }
   else if (q.length >= 2 && results.length === 0) {
-    html += '<div style="font-size:11px;color:var(--grey);padding:6px 0;line-height:1.5">No official found matching \u201c' + esc(q) + '\u201d. They may not be registered on the tracker yet, or try searching by email address instead. <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="S.f._offSearchQ[\'' + needKey + '\']=\'\';S.f._offSearchResults[\'' + needKey + '\']=[];render()">Clear search</span></div>';
+    html += '<div style="font-size:11px;color:var(--grey);padding:6px 0;line-height:1.5">No official found matching \u201c' + esc(q) + '\u201d. They may not be registered on the tracker yet, or try searching by email address instead. <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="S.f._offSearchQ[\'' + needKey + '\']=\'\';S.f._offSearchResults[\'' + needKey + '\']=[];updateOffSearchUI(\'' + needKey + '\')">Clear search</span></div>';
   } else if (results.length > 0) {
     var names = {}; results.forEach(function(o){names[o.name]=(names[o.name]||0)+1;});
     var hasDupes = Object.values(names).some(function(c){return c > 1;});
@@ -1069,6 +1059,30 @@ function renderOfficialSearch(need) {
     });
     html += '</div>';
   }
+  return html;
+}
+function updateOffSearchUI(need) {
+  var el = document.getElementById(offSearchContainerId(need));
+  if (el) el.innerHTML = renderOffSearchResultsInner(need);
+}
+function renderOfficialSearch(need) {
+  var q = S.f._offSearchQ[need] || '';
+  var tagged = S.f.tagged_officials[need] || [];
+  var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+  var html = '';
+  // Tagged pills
+  if (tagged.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">';
+    tagged.forEach(function(o) {
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc(o.name) + ' <span style="font-weight:400;color:var(--grey)">(' + esc(o.role) + ')</span><button onclick="untagOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
+    });
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--teal);margin-bottom:4px">\u2713 Tagged by unique ID \u2014 name changes or spelling variations won\'t affect who gets notified.</div>';
+  }
+  // Search input — oninput updates state + debounces search, does NOT call render()
+  html += '<div style="margin-top:4px"><input type="text" placeholder="Search for an official to tag (name or email)..." value="' + esc(q) + '" oninput="S.f._offSearchQ[\'' + needKey + '\']=this.value;clearTimeout(_offSearchTimer);_offSearchTimer=setTimeout(function(){searchOfficialsForNeed(\'' + needKey + '\',S.f._offSearchQ[\'' + needKey + '\'])},300)" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit"></div>';
+  // Results container — updated via targeted DOM update, not render()
+  html += '<div id="' + offSearchContainerId(need) + '">' + renderOffSearchResultsInner(need) + '</div>';
   return html;
 }
 
@@ -2680,7 +2694,7 @@ function renderChipPicker(sel,items,openFlag,toggleFn,removeFn,openExpr,closeExp
       const se=s.replace(/'/g,"\\\\'");
       return`<div class="school-dd-item ${checked?'checked':''}" onclick="${toggleFn}('${se}')"><div class="tick">${checked?'\u2713':''}</div>${esc(s)}</div>`;
     }).join('');
-    dd=`<div class="school-dd"><div class="school-dd-list" style="max-height:320px">${ddItems}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();${closeExpr}">Done</span></div></div>`;
+    dd=`<div class="school-dd" style="position:relative;top:0;border:1px solid var(--teal);border-top:none;border-radius:0 0 6px 6px"><div class="school-dd-list" style="max-height:320px">${ddItems}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();${closeExpr}">Done</span></div></div>`;
   }
   const hint=sel.length===1&&hintMap?getSelHint(sel[0],hintMap):'';
   return`<div class="chip-picker" style="position:relative">${trigger}${dd}${chips}${hint}</div>`;
@@ -2707,37 +2721,6 @@ function renderFormStep3(){
         <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">What did you see in the data?</div>
         <div style="font-size:11px;color:var(--grey);margin-bottom:10px;line-height:1.5">Select all types of issues you observed</div>
         <div style="margin-bottom:10px">${renderInsightPicker()}</div>
-        ${S.f.insight_types.includes('learner-attendance')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--orange)"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px">Learner attendance</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 45" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Absent how many days?</label><input type="number" min="0" placeholder="e.g. 10" value="${S.f.insight_attendance_days}" oninput="S.f.insight_attendance_days=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"><div style="font-size:10px;color:var(--grey);margin-top:2px">Days absent or more</div></div>
-        </div></div>`:''}
-        ${S.f.insight_types.includes('educator-attendance')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #E53935"><div style="font-size:11px;font-weight:600;color:#E53935;margin-bottom:6px">Educator attendance</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Educators affected</label><input type="number" min="0" placeholder="e.g. 5" value="${S.f.insight_educator_absent}" oninput="S.f.insight_educator_absent=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Absent how many days?</label><input type="number" min="0" placeholder="e.g. 4" value="${S.f.insight_attendance_days}" oninput="S.f.insight_attendance_days=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"><div style="font-size:10px;color:var(--grey);margin-top:2px">Days absent or more</div></div>
-        </div></div>`:''}
-        ${S.f.insight_types.includes('sba-exam-gap')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--purple)"><div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:6px">SBA-Exam gap</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Gap size</label><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" max="100" placeholder="e.g. 22" value="${S.f.insight_sba_exam_gap}" oninput="S.f.insight_sba_exam_gap=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center"><span style="font-size:13px;color:var(--grey);font-weight:600">%</span></div></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 8" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-        </div></div>`:''}
-        ${S.f.insight_types.includes('curriculum-coverage')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--blue)"><div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px">Curriculum coverage</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Curriculum covered</label><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" max="100" placeholder="e.g. 60" value="${S.f.insight_curriculum_pct}" oninput="S.f.insight_curriculum_pct=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center"><span style="font-size:13px;color:var(--grey);font-weight:600">%</span></div><div style="font-size:10px;color:var(--grey);margin-top:2px">Of expected pace</div></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 200" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-        </div></div>`:''}
-        ${S.f.insight_types.includes('promotion-criteria')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--green)"><div style="font-size:11px;font-weight:600;color:var(--green-dk);margin-bottom:6px">Promotion / at-risk learners</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners at risk</label><input type="number" min="0" placeholder="e.g. 35" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Criteria missing</label><select onchange="S.f.insight_threshold=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"><option value="">Select...</option><option ${S.f.insight_threshold==='missed-one-criteria'?'selected':''} value="missed-one-criteria">Missing one criteria</option><option ${S.f.insight_threshold==='missed-multiple'?'selected':''} value="missed-multiple">Missing several criteria</option><option ${S.f.insight_threshold==='below-30'?'selected':''} value="below-30">Below 30%</option><option ${S.f.insight_threshold==='at-30-39'?'selected':''} value="at-30-39">At 30-39%</option><option ${S.f.insight_threshold==='progressed'?'selected':''} value="progressed">Progressed learners</option></select></div>
-        </div>
-        <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Pass / promotion rate <span style="font-weight:400;color:var(--grey)">(if known)</span></label><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" max="100" placeholder="e.g. 41" value="${S.f.insight_pass_rate}" oninput="S.f.insight_pass_rate=this.value" style="width:120px;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center"><span style="font-size:13px;color:var(--grey);font-weight:600">%</span></div></div></div>`:''}
-        ${S.f.insight_types.includes('subject-performance')?`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--teal)"><div style="font-size:11px;font-weight:600;color:var(--teal);margin-bottom:6px">Subject / pass rate</div><div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Pass rate seen</label><div style="display:flex;align-items:center;gap:4px"><input type="number" min="0" max="100" placeholder="e.g. 41" value="${S.f.insight_pass_rate}" oninput="S.f.insight_pass_rate=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;text-align:center"><span style="font-size:13px;color:var(--grey);font-weight:600">%</span></div></div>
-          <div><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Learners affected</label><input type="number" min="0" placeholder="e.g. 35" value="${S.f.insight_learners_affected}" oninput="S.f.insight_learners_affected=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
-        </div></div>`:''}
         ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
         ${S.f.insight_types.length&&!(S.f.insight_types.length===1&&S.f.insight_types[0]==='other-issue'&&!S.f.insight_detail)?(buildInsightStatement()?`<div style="margin-top:10px;background:var(--green-lt);border-radius:8px;padding:10px 12px;border-left:3px solid var(--green)"><div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.6">${buildInsightStatement()}</div></div>`:''):''}      </div>
     ` : ''}
