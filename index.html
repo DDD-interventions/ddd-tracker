@@ -478,9 +478,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .reply-input:focus{border-color:#7E57C2}
 .reply-input::placeholder{color:#b0aeac;font-size:12px}
 .reply-actions{display:flex;justify-content:flex-end;align-items:center;gap:4px}
-.reply-attach{background:none;border:1px solid var(--grey-lt);border-radius:20px;font-size:15px;cursor:pointer;padding:6px 10px;color:var(--grey);min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
-.reply-attach:hover{border-color:#7E57C2}
-.attach-hint{font-size:11px;color:var(--grey);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-attach{background:none;border:1px solid var(--grey-lt);border-radius:20px;font-size:20px;cursor:pointer;padding:8px 12px;color:var(--grey);min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s}
+.reply-attach:hover{border-color:#7E57C2;background:#f5f0ff}
+.attach-hint{font-size:11px;color:var(--teal);font-weight:600;flex:1;min-width:0;line-height:1.3}
 .voice-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;transition:all .2s;flex-shrink:0;font-size:18px;padding:0}
 .voice-btn:hover{border-color:var(--teal);color:var(--teal)}
 .voice-btn.recording{border-color:#E53935;background:#FFEBEE;color:#E53935;animation:pulse 1.5s infinite}
@@ -574,22 +574,26 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-stack-seg{height:100%;transition:width .4s}
 .tl-month-hdr{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;padding:10px 0 6px;display:flex;align-items:center;gap:8px}
 .tl-month-hdr::after{content:'';flex:1;height:1px;background:#e0e0e0}
-/* Compact activity cards */
-.act-card{background:#fff;border-radius:10px;border:1px solid #e8e6e4;margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s}
-.act-card:hover{border-color:var(--teal)}
-.act-card.act-done{opacity:.8}
-.act-card-top{padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
-.act-card-status{flex-shrink:0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.3px}
-.act-card-status.s-ip{background:#FFF3E0;color:var(--orange)}
-.act-card-status.s-pl{background:#E3F2FD;color:var(--blue)}
-.act-card-status.s-c{background:var(--green-lt);color:var(--green)}
-.act-card-body{flex:1;min-width:0}
-.act-card-date{font-size:10px;color:#999;margin-bottom:2px}
-.act-card-desc{font-size:12px;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:2px}
-.act-card-school{font-size:11px;color:#607D8B}
-.act-card-arrow{flex-shrink:0;font-size:11px;color:#ccc;margin-top:2px;transition:transform .2s}
-.act-card-arrow.open{transform:rotate(90deg);color:var(--teal)}
-.act-card-hint{font-size:9px;color:#bbb;text-align:center;padding:0 14px 8px}
+/* Facebook-style activity cards */
+.act-card{background:#fff;border-radius:12px;border:1px solid #e8e6e4;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.act-card.act-done{opacity:.75}
+.act-post-hdr{display:flex;gap:10px;align-items:flex-start;padding:14px 14px 0}
+.act-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.act-author{flex:1;min-width:0}
+.act-author-name{font-size:13px;font-weight:700;color:var(--navy);line-height:1.3}
+.act-author-role{font-size:11px;color:var(--grey)}
+.act-post-body{padding:10px 14px}
+.act-post-desc{font-size:13px;color:var(--navy);line-height:1.5;margin-bottom:8px}
+.act-post-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.act-meta-tag{font-size:11px;padding:3px 8px;border-radius:12px;background:#f0f2f5;color:#606770}
+.act-status-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;letter-spacing:.3px}
+.act-status-tag.st-ip{background:#FFF3E0;color:var(--orange)}
+.act-status-tag.st-pl{background:#E3F2FD;color:var(--blue)}
+.act-status-tag.st-c{background:var(--green-lt);color:var(--green)}
+.act-action-bar{display:flex;border-top:1px solid #f0f0f0;margin:0 14px}
+.act-action-btn{flex:1;text-align:center;padding:10px 6px;font-size:12px;font-weight:600;color:#65676b;cursor:pointer;background:none;border:none;font-family:inherit;min-height:44px;transition:background .15s}
+.act-action-btn:hover{background:#f0f2f5;border-radius:6px}
+.act-action-btn.active{color:var(--teal)}
 .act-card-detail{display:none;border-top:1px solid #f0f0f0;padding:12px 14px;background:#FAFBFC}
 .act-card-detail.show{display:block}
 .acd-row{display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-bottom:1px solid #f5f5f5}
@@ -893,7 +897,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.6';
+const APP_VERSION = '2026.04.02.8';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -912,7 +916,7 @@ const S = {
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
  _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false,
- _supTagged:{}, _supTagSearch:{}, _supTagResults:{}, _supTagLoading:{},
+ _supTagged:{},
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
  _actTagged:{},
  _commentAttach:{},
@@ -1011,8 +1015,7 @@ async function searchOfficialsForNeed(need, query) {
   if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; updateOffSearchUI(need); return; }
   S.f._offSearchLoading[need] = true; updateOffSearchUI(need);
   try {
-    var dist = S.f.district || S.official.district || null;
-    var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
+    var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: null });
     var seen = {}; var results = [];
     (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
     S.f._offSearchResults[need] = results;
@@ -1087,61 +1090,6 @@ function renderOfficialSearch(need) {
 }
 
 // Change 7: Dashboard tagging helpers (respond/resolve flows)
-var _supTagTimer = null;
-async function searchSupTagOfficial(need, query) {
-  if (!query || query.length < 2) { S._supTagResults[need] = []; S._supTagLoading[need] = false; render(); return; }
-  S._supTagLoading[need] = true; render();
-  try {
-    var dist = S.official.district || null;
-    var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
-    var seen = {}; var results = [];
-    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
-    S._supTagResults[need] = results;
-  } catch(e) { S._supTagResults[need] = []; }
-  S._supTagLoading[need] = false; render();
-}
-function tagSupOfficial(need, official) {
-  if (!S._supTagged[need]) S._supTagged[need] = [];
-  if (S._supTagged[need].some(function(o){return o.id === official.id;})) return;
-  S._supTagged[need].push(official);
-  S._supTagSearch[need] = ''; S._supTagResults[need] = [];
-  render();
-}
-function untagSupOfficial(need, officialId) {
-  if (!S._supTagged[need]) return;
-  S._supTagged[need] = S._supTagged[need].filter(function(o){return o.id !== officialId;});
-  render();
-}
-function renderSupTagSearch(need, purpose) {
-  var q = S._supTagSearch[need] || '';
-  var results = S._supTagResults[need] || [];
-  var loading = S._supTagLoading[need] || false;
-  var tagged = S._supTagged[need] || [];
-  var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
-  var label = purpose === 'resolve' ? 'Who carried out this support? (optional)' : 'Tag a colleague to loop in (optional)';
-  var html = '<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:var(--grey-dk);margin-bottom:4px">' + label + '</div>';
-  if (tagged.length) {
-    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">';
-    tagged.forEach(function(o) {
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:3px 8px;font-size:11px;font-weight:600">' + esc(o.name) + '<button onclick="untagSupOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 3px;line-height:1">&times;</button></span>';
-    });
-    html += '</div>';
-  }
-  html += '<input type="text" placeholder="Search by name or email..." value="' + esc(q) + '" oninput="S._supTagSearch[\'' + needKey + '\']=this.value;clearTimeout(_supTagTimer);_supTagTimer=setTimeout(function(){searchSupTagOfficial(\'' + needKey + '\',S._supTagSearch[\'' + needKey + '\'])},300)" style="width:100%;padding:7px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit">';
-  if (loading) html += '<div style="font-size:10px;color:var(--grey);padding:4px 0">Searching...</div>';
-  else if (q.length >= 2 && results.length === 0) {
-    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0">No official found. <span style="color:var(--teal);cursor:pointer" onclick="S._supTagSearch[\'' + needKey + '\']=\'\';S._supTagResults[\'' + needKey + '\']=[];render()">Clear</span></div>';
-  } else if (results.length > 0) {
-    html += '<div style="max-height:140px;overflow-y:auto;border:1px solid #e8e6e4;border-radius:4px;margin-top:4px">';
-    results.forEach(function(o) {
-      var already = tagged.some(function(t){return t.id === o.id;});
-      html += '<div onclick="' + (already ? '' : 'tagSupOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')') + '" style="padding:8px;border-bottom:1px solid #f3f2f1;cursor:' + (already?'default':'pointer') + ';min-height:44px' + (already?';opacity:.5':'') + '"><div style="font-weight:700;font-size:11px">' + esc(o.name) + '</div><div style="font-size:10px;color:#7B1FA2">' + esc(o.role) + '</div><div style="font-size:10px;color:var(--teal);font-family:monospace">' + esc(o.email) + '</div></div>';
-    });
-    html += '</div>';
-  }
-  html += '</div>';
-  return html;
-}
 
 // ── @MENTION SYSTEM (Facebook-style) ──
 var _mentionTimer = null;
@@ -1350,9 +1298,12 @@ function toggleVoice(fieldPath, textareaId) {
       if (e.results[i].isFinal) transcript += e.results[i][0].transcript;
     }
     if (transcript) {
+      var trimmed = transcript.trim();
+      var ok = confirm('Is this what you said?\n\n"' + trimmed + '"\n\nTap OK to use this text, or Cancel to discard and try again.');
+      if (!ok) return;
       var el = document.getElementById(textareaId);
       var existing = el ? el.value : '';
-      var newVal = existing ? existing.trimEnd() + ' ' + transcript.trim() : transcript.trim();
+      var newVal = existing ? existing.trimEnd() + ' ' + trimmed : trimmed;
       if (el) { el.value = newVal; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
       var parts = fieldPath.split('.');
       if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
@@ -1376,7 +1327,7 @@ function stopVoice() {
 function micBtn(fieldPath, taId) {
   if (!_speechSupported) return '';
   var isRec = _voiceField === fieldPath;
-  var label = _voiceUsedBefore ? '' : '<div style="font-size:9px;color:var(--grey);text-align:center;margin-top:2px">Speak</div>';
+  var label = '<div style="font-size:9px;color:var(--grey);text-align:center;margin-top:2px;line-height:1.3;max-width:48px">Record voice note</div>';
   return '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><button type="button" class="voice-btn' + (isRec ? ' recording' : '') + '" id="mic-' + taId + '" onclick="event.preventDefault();toggleVoice(\'' + fieldPath + '\',\'' + taId + '\')" title="' + (isRec ? 'Tap to stop recording' : 'Tap to speak instead of typing') + '">' + (isRec ? '&#9632;' : '&#127908;') + '</button>' + label + '</div>';
 }
 
@@ -1670,7 +1621,7 @@ async function submitSupResponse(need){
     delete S._commentAttach[need];
     // Notify tagged officials (fire-and-forget)
     try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:'',supportNeed:need,subjects:[],moment:'looped_in'});});}catch(e){console.warn('notifyTagged failed:',e);}
-    S._supTagged[need]=[];S._supTagSearch[need]='';S._supTagResults[need]=[];
+    S._supTagged[need]=[];
     await loadSupResponses();
     render();
     showToast('Response posted');
@@ -1707,7 +1658,7 @@ async function markSupAddressed(need){
         if(origEmail&&origEmail!==S.official.email){notifyTagged({toEmail:origEmail,toName:origName,fromName:S.official.full_name,fromRole:S.official.role,schools:(origDec.details&&origDec.details.schools)||'',supportNeed:need,subjects:(origDec.details&&origDec.details.subjects)||[],moment:'addressed'});}
       }
     }catch(e){console.warn('Notify original logger failed:',e);}
-    S._supTagged[need]=[];S._supTagSearch[need]='';S._supTagResults[need]=[];
+    S._supTagged[need]=[];
     await loadSupResponses();
     render();
     showToast('Marked as addressed');
@@ -3520,66 +3471,7 @@ function renderDashboard() {
  const months = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
  const maxMonthly = months.length ? Math.max(...months.map(m=>m[1])) : 1;
 
- // ── SMART NARRATIVES ──
  const activeProvinces = Object.keys(provinceCounts);
- const narratives = [];
-
- // Pipeline insight — balanced: celebrate effort, gently note gaps
- if (chainsTotal >= 2) {
-   if (chainsTotal >= 5) narratives.push({color:'var(--green)',text:`${_lYouCap} have logged <strong>${chainsTotal} interventions</strong> across <strong>${schoolSet.size} school${schoolSet.size!==1?'s':''}</strong>${activeProvinces.length>1?' in '+activeProvinces.length+' provinces':''}. That level of activity makes a real difference.`,action:''});
-   else narratives.push({color:'var(--blue)',text:`${_lYouCap} have logged <strong>${chainsTotal}</strong> intervention${chainsTotal!==1?'s':''} so far${schoolSet.size?' reaching '+schoolSet.size+' school'+(schoolSet.size!==1?'s':''):''}. Each one builds your evidence portfolio.`,action:''});
- }
-
- // Geographic insight
- const silentDistricts = districts.filter(d => {
-   const daysSince = d.lastDate ? Math.floor((now - new Date(d.lastDate))/(1000*60*60*24)) : 999;
-   return daysSince > 30;
- });
- // Follow-up insight
- if (followUps.length > 0) {
-   narratives.push({color:'var(--orange)',text:`There are <strong>${followUps.length}</strong> recommended follow-up${followUps.length!==1?'s':''} pending. Staying in touch with schools shows commitment and strengthens support relationships.`,action:''});
- }
-
- // Subject insight
- if (topSubjects.length >= 2) {
-   const topSub = topSubjects[0];
-   const subWithBarriers = {};
-   decs.forEach(d => {
-     const det = d.details || {};
-     const hasBarriers = [...(det.ctx_staffing||[]),...(det.ctx_resources||[]),...(det.ctx_learners||[])].some(b=>b!=='All posts filled'&&b!=='Adequate'&&b!=='No major concerns');
-     if (hasBarriers) (det.subjects||[]).forEach(s => { subWithBarriers[s] = (subWithBarriers[s]||0)+1; });
-   });
-   const mostBarrierSub = Object.entries(subWithBarriers).sort((a,b)=>b[1]-a[1])[0];
-   if (mostBarrierSub && mostBarrierSub[0] !== topSub[0]) {
-     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is the most targeted subject (${topSub[1]} activities), but <strong>${mostBarrierSub[0]}</strong> has the most barrier reports (${mostBarrierSub[1]}). It may need more focused support.`,action:''});
-   } else {
-     narratives.push({color:'var(--teal)',text:`<strong>${topSub[0]}</strong> is the most targeted subject with <strong>${topSub[1]}</strong> activities${topSubjects.length>1?', followed by '+topSubjects[1][0]+' ('+topSubjects[1][1]+')':''}.`,action:''});
-   }
- }
-
- // DDD usage insight — balanced, acknowledges multiple access channels
- if (totalActivities >= 3) {
-   var _indirectCount = dddSourceCounts.presentation + dddSourceCounts.spreadsheet + dddSourceCounts.shared;
-   var _directCount = dddSourceCounts.dashboard;
-   if (dddPct < 50) {
-     narratives.push({color:'var(--orange)',text:`<strong>${dddPct}%</strong> of ${_lYour} activities used DDD data. Starting from the data — whether through the dashboard, a presentation, or a spreadsheet — helps target the right schools and subjects.`,action:''});
-   } else if (dddPct >= 75) {
-     var _srcNote = '';
-     if (_indirectCount > 0 && _directCount > 0) _srcNote = ' Data reaches '+_lYou+' through multiple channels — '+_directCount+' via the dashboard and '+_indirectCount+' via presentations, spreadsheets, or colleagues.';
-     else if (_indirectCount > 0) _srcNote = ' Most of '+_lYour+' data comes through presentations, spreadsheets, or colleagues — that counts just as much.';
-     narratives.push({color:'var(--green)',text:`Excellent — <strong>${dddPct}%</strong> of ${_lYour} activities are data-informed.${_srcNote} ${dataQualityPct>=60?'And '+dataQualityPct+'% include specific numbers — that\'s strong evidence.':'Including specific numbers (pass rates, learner counts) strengthens entries further.'}`,action:''});
-   }
- }
-
- // Barriers pattern
- if (barriers.length >= 2) {
-   const topBarrier = barriers[0];
-   const distinctDistricts = new Set();
-   decs.forEach(d=>{const det=d.details||{};const allB=[...(det.ctx_staffing||[]),...(det.ctx_resources||[]),...(det.ctx_learners||[])];if(allB.includes(topBarrier[0])&&det.district)distinctDistricts.add(det.district)});
-   if (distinctDistricts.size > 1) {
-     narratives.push({color:'#E53935',text:`<strong>"${topBarrier[0]}"</strong> is the most reported barrier (${topBarrier[1]} times across ${distinctDistricts.size} districts). This is a widespread problem worth raising to higher levels.`,action:''});
-   }
- }
 
  // ── HELPER: month label ──
  function monthLabel(ym) {
@@ -3631,15 +3523,6 @@ function renderDashboard() {
  var _dddCol = dddPct>=60?'var(--teal)':dddPct>=40?'var(--orange)':'var(--red)';
  var _dddTip = dddPct>=60?'Most activities are data-informed — whether from the dashboard, presentations, or spreadsheets. This strengthens evidence for quarterly reports.':dddPct>=40?'A data-informed habit is building. DDD data can reach you through the dashboard, a PowerPoint, an Excel extract, or a colleague — all count.':'Tip: Start from DDD data before taking action. Ask your Programme Manager for a data pack if you cannot access the dashboard directly.';
 
- var _narrHTML = '';
- if (narratives.length) {
-   _narrHTML = '<div style="margin-bottom:16px">';
-   for (var _ni=0; _ni<Math.min(narratives.length,4); _ni++) {
-     var _n=narratives[_ni];
-     _narrHTML += '<div style="background:#fff;border-radius:8px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid '+_n.color+'"><div><div style="font-size:12px;color:var(--navy);line-height:1.6">'+_n.text+'</div>'+(_n.action?'<div style="font-size:11px;color:'+_n.color+';font-weight:600;margin-top:4px">'+_n.action+'</div>':'')+'</div></div>';
-   }
-   _narrHTML += '</div>';
- }
 
  // ── PENDING FOR YOU (computed from ALL decisions, not geo-filtered) ──
  var _pendingItems = [];
@@ -3880,7 +3763,7 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">You can attach supporting evidence</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
+         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">Tap the clip icon to attach supporting evidence →</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
          _supHTML += renderAttachButton(need);
          _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
@@ -4180,18 +4063,15 @@ ${tab==='tracker'?`
      <div class="dash-section-desc">Your logged activities. Tap any entry to see the full detail, Data-Decision-Action chain, and responses.</div>
 
      ${(function(){
-       // Build designation filter chips
+       // Build designation filter dropdown (mobile-friendly)
        var roleSet={};
        decs.forEach(function(d){var det=d.details||{};var r=det.official_role||'';if(r)roleSet[r]=(roleSet[r]||0)+1;else roleSet['Unknown']=(roleSet['Unknown']||0)+1;});
        var roles=Object.keys(roleSet).sort();
        var roleFilter=S._dashRoleFilter||'ALL';
-       var roleChips='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding:8px 0;scrollbar-width:none;-ms-overflow-style:none">';
-       roleChips+='<button onclick="S._dashRoleFilter=\'ALL\';render()" style="display:inline-block;font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(roleFilter==='ALL'?'var(--teal)':'#c8c6c4')+';background:'+(roleFilter==='ALL'?'var(--teal-lt)':'#fff')+';color:'+(roleFilter==='ALL'?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(roleFilter==='ALL'?'700':'500')+';font-family:inherit;margin-right:6px;min-height:36px">All ('+decs.length+')</button>';
-       roles.forEach(function(r){
-         var active=roleFilter===r;
-         roleChips+='<button onclick="S._dashRoleFilter=\''+r.replace(/'/g,"\\x27")+'\';render()" style="display:inline-block;font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(active?'var(--teal)':'#c8c6c4')+';background:'+(active?'var(--teal-lt)':'#fff')+';color:'+(active?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(active?'700':'500')+';font-family:inherit;margin-right:6px;min-height:36px;white-space:nowrap">'+esc(r)+' ('+roleSet[r]+')</button>';
-       });
-       roleChips+='</div>';
+       var roleDD='<select onchange="S._dashRoleFilter=this.value;render()" style="width:100%;padding:10px 12px;font-size:13px;font-family:inherit;border:1.5px solid #c8c6c4;border-radius:8px;background:#fff;color:var(--navy);min-height:44px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url(\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22><path d=%22M0 0l6 8 6-8z%22 fill=%22%23999%22/></svg>\');background-repeat:no-repeat;background-position:right 12px center">';
+       roleDD+='<option value="ALL"'+(roleFilter==='ALL'?' selected':'')+'>All designations ('+decs.length+')</option>';
+       roles.forEach(function(r){ roleDD+='<option value="'+esc(r)+'"'+(roleFilter===r?' selected':'')+'>'+esc(r)+' ('+roleSet[r]+')</option>'; });
+       roleDD+='</select>';
 
        // Build subject filter dropdown
        var subjFilter=S._dashSubjFilter||[];
@@ -4220,7 +4100,7 @@ ${tab==='tracker'?`
          subjHTML+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+subjFilter.map(function(s){return'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:3px 8px;font-size:11px;font-weight:600">'+esc(s)+'<button onclick="event.stopPropagation();S._dashSubjFilter=S._dashSubjFilter.filter(function(x){return x!==\''+s.replace(/'/g,"\\x27")+'\'});render()" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 3px;line-height:1">&times;</button></span>';}).join('')+'</div>';
        }
 
-       return '<div style="margin:10px 0 6px"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Filter by designation</div>'+roleChips+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by subject</div>'+subjHTML+'</div>';
+       return '<div style="margin:10px 0 6px"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Filter by designation</div>'+roleDD+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by subject</div>'+subjHTML+'</div>';
      })()}
 
      ${(function(){
@@ -4329,21 +4209,37 @@ ${tab==='tracker'?`
          var decIdEsc = c.dec.id.replace(/'/g,"\\x27");
 
          var descText = c.det.description || actionLabel;
-         var schoolShort = schools.length > 50 ? schools.slice(0,47)+'...' : schools;
+         var initials = (officialName||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+         var stCls = isCompleted ? 'st-c' : c.status === 'Planned' ? 'st-pl' : 'st-ip';
 
-         html += '<div class="act-card'+(isCompleted?' act-done':'')+'" onclick="toggleActCard(\''+cardId+'\')">';
-         html += '<div class="act-card-top">';
-         html += '<span class="act-card-status '+sCls+'">'+c.status+'</span>';
-         if (c.hasFollowUp) html += '<span style="display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:#FFF8E1;color:#F57F17;border:1px solid #FFE082;margin-left:4px;white-space:nowrap">Follow-up due</span>';
-         html += '<div class="act-card-body">';
-         html += '<div class="act-card-date">'+fmtDate(c.date)+(officialName&&!isMine?' \u00B7 '+esc(officialName):'')+'</div>';
-         html += '<div class="act-card-desc">'+esc(descText.length>80?descText.slice(0,77)+'...':descText)+'</div>';
-         html += '<div class="act-card-school">'+esc(schoolShort||'\u2014')+(district?' \u00B7 '+esc(district):'')+'</div>';
-         html += '</div>';
-         html += '<span class="act-card-arrow'+(isOpen?' open':'')+'">&#9654;</span>';
-         html += '</div>';
-         if (!isOpen) html += '<div class="act-card-hint">Tap for full detail</div>';
+         html += '<div class="act-card'+(isCompleted?' act-done':'')+'">';
 
+         // ── POST HEADER: avatar + name/role + time + status ──
+         html += '<div class="act-post-hdr">';
+         html += '<div class="act-avatar" style="background:'+avatarColor(officialName)+'">'+initials+'</div>';
+         html += '<div class="act-author"><div class="act-author-name">'+esc(officialName||'Official')+(isMine?' (you)':'')+'</div><div class="act-author-role">'+esc(c.det.official_role||c.det.activity_type||'')+' \xb7 '+relTimeAgo(c.date)+'</div></div>';
+         html += '<span class="act-status-tag '+stCls+'">'+c.status+'</span>';
+         html += '</div>';
+
+         // ── POST BODY: description + school/subjects ──
+         html += '<div class="act-post-body">';
+         html += '<div class="act-post-desc">'+esc(descText)+'</div>';
+         html += '<div class="act-post-meta">';
+         if (schools) html += '<span class="act-meta-tag">'+esc(schools.length>60?schools.slice(0,57)+'...':schools)+'</span>';
+         if (district) html += '<span class="act-meta-tag">'+esc(district)+'</span>';
+         if (c.det.subjects && c.det.subjects.length) c.det.subjects.slice(0,3).forEach(function(s){ html += '<span class="act-meta-tag" style="background:#E8F5E9;color:#2E7D32">'+esc(s)+'</span>'; });
+         if (c.hasFollowUp) html += '<span class="act-meta-tag" style="background:#FFF8E1;color:#F57F17;font-weight:700;border:1px solid #FFE082">Follow-up due</span>';
+         if (usedDDD) html += '<span class="act-meta-tag" style="background:#E3F2FD;color:#1565C0">Data-informed</span>';
+         html += '</div></div>';
+
+         // ── ACTION BAR (Facebook-style) ──
+         html += '<div class="act-action-bar">';
+         html += '<button class="act-action-btn'+(isNoted?' active':'')+'" onclick="event.stopPropagation();noteDecision(\''+decIdEsc+'\')">'+(isNoted?'\u2713 ':'')+' Noted'+(notedCount?' ('+notedCount+')':'')+'</button>';
+         html += '<button class="act-action-btn" onclick="event.stopPropagation();var el=document.getElementById(\'act-reply-'+decIdEsc.replace(/'/g,'')+'\');if(el){el.focus();el.scrollIntoView({behavior:\'smooth\',block:\'center\'})}">'+(decResponses.length?decResponses.length+' ':'')+'Comment'+(decResponses.length!==1?'s':'')+'</button>';
+         html += '<button class="act-action-btn" onclick="event.stopPropagation();toggleActCard(\''+cardId+'\')">'+(isOpen?'Hide detail':'See detail')+'</button>';
+         html += '</div>';
+
+         // ── EXPANDABLE DETAIL (D-D-A chain, evidence, follow-up) ──
          if (isOpen) {
            html += '<div class="act-card-detail show" onclick="event.stopPropagation()">';
            html += '<div class="acd-row"><span class="acd-label">Activity type</span><span class="acd-value">'+esc(c.det.activity_type||'\u2014')+'</span></div>';
@@ -4351,7 +4247,6 @@ ${tab==='tracker'?`
            if (c.det.subjects && c.det.subjects.length) html += '<div class="acd-row"><span class="acd-label">Subjects</span><span class="acd-value">'+esc(c.det.subjects.join(', '))+'</span></div>';
            if (c.det.grades && c.det.grades.length) html += '<div class="acd-row"><span class="acd-label">Grades</span><span class="acd-value">'+esc(c.det.grades.join(', '))+'</span></div>';
            if (c.det.educators_supported) html += '<div class="acd-row"><span class="acd-label">Educators</span><span class="acd-value">'+c.det.educators_supported+' supported</span></div>';
-           if (c.det.description) html += '<div class="acd-row"><span class="acd-label">Description</span><span class="acd-value">'+esc(c.det.description)+'</span></div>';
 
            html += '<div class="acd-chain"><div class="acd-chain-title">Data to decision to action</div>';
            html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-d">D</span><div><div class="acd-chain-lbl">Data</div><div class="acd-chain-text">'+esc(chainDataLabel)+'</div></div></div>';
@@ -4367,13 +4262,10 @@ ${tab==='tracker'?`
                html += '<div style="font-size:10px;color:var(--green);font-weight:600;margin-top:6px">Completed'+(c.det.follow_up_completed_date?' on '+c.det.follow_up_completed_date:'')+'</div>';
              } else if (isMine) {
                html += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="event.stopPropagation();markFollowUpDone(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Done</button><button onclick="event.stopPropagation();logFollowUpVisit(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Log Follow-up Visit</button></div>';
-             } else {
-               html += '<div style="font-size:10px;color:#999;font-style:italic;margin-top:6px">Only '+esc(c.det.official_name||c.dec.made_by||'the person who logged this')+' can complete this follow-up</div>';
              }
              html += '</div>';
            }
 
-           // ── EXISTING DOCS (compact) ──
            var evFiles = c.det.evidence_files || [];
            var existingDoc = c.act && c.act.supporting_doc_url;
            if (existingDoc || evFiles.length) {
@@ -4388,8 +4280,11 @@ ${tab==='tracker'?`
              });
              html += '</div>';
            }
+           html += '</div>';
+         }
 
-           // ── FACEBOOK-STYLE COMMENTS ──
+         // ── COMMENTS (always visible — Facebook-style) ──
+         html += '<div class="act-post-comments">';
            var showAll = S._actThreadOpen && S._actThreadOpen[cardId];
            var visibleComments = showAll ? decResponses : decResponses.slice(-2);
            var hiddenCount = decResponses.length - visibleComments.length;
@@ -4409,7 +4304,7 @@ ${tab==='tracker'?`
            }
 
            // Reply input always visible
-           html += '<div class="pt-reply"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><div class="pt-actions"><span class="attach-hint">You can attach supporting evidence</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div></div>';
+           html += '<div class="pt-reply"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><div class="pt-actions"><span class="attach-hint">Tap the clip icon to attach supporting evidence →</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div></div>';
            html += renderAttachButton(c.dec.id);
            html += renderMentionDropdown(c.dec.id);
            html += '</div>';
@@ -4423,7 +4318,6 @@ ${tab==='tracker'?`
            }
 
            html += '</div>';
-         }
 
          html += '</div>';
        });
@@ -4846,6 +4740,8 @@ function renderOutcomeModal(){
 
 function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
 function fmtDateTime(d) { if(!d)return''; try{var dt=new Date(d);return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' at '+dt.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Africa/Johannesburg'})}catch(e){return''} }
+function relTimeAgo(d){if(!d)return'';try{var ms=Date.now()-new Date(d).getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
+function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 function markDDDChecked(){S.ddd_last_checked=today();try{localStorage.setItem('ddd_last_checked',S.ddd_last_checked)}catch(e){}render();}
 // ═══════════════════════════════════
