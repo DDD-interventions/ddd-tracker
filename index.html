@@ -902,6 +902,7 @@ const S = {
  _supTagged:{}, _supTagSearch:{}, _supTagResults:{}, _supTagLoading:{},
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
  _actTagged:{},
+ _commentAttach:{},
  ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
@@ -997,10 +998,11 @@ async function searchOfficialsForNeed(need, query) {
   if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; render(); return; }
   S.f._offSearchLoading[need] = true; render();
   try {
-    var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
-      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
-      .eq('district', S.f.district || S.official.district)
-      .limit(20);
+    var q = sb.from('officials').select('id,full_name,role,email,district,details')
+      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
+    var dist = S.f.district || S.official.district;
+    if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
+    var {data} = await q.limit(20);
     // Deduplicate by email
     var seen = {}; var results = [];
     (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
@@ -1067,10 +1069,11 @@ async function searchSupTagOfficial(need, query) {
   if (!query || query.length < 2) { S._supTagResults[need] = []; S._supTagLoading[need] = false; render(); return; }
   S._supTagLoading[need] = true; render();
   try {
-    var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
-      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
-      .eq('district', S.official.district)
-      .limit(20);
+    var q = sb.from('officials').select('id,full_name,role,email,district,details')
+      .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
+    var dist = S.official.district;
+    if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
+    var {data} = await q.limit(20);
     var seen = {}; var results = [];
     (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; var d = o.details || {}; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: d.circuit || '' }); } });
     S._supTagResults[need] = results;
@@ -1166,10 +1169,11 @@ function handleMentionInput(key, text, el) {
   clearTimeout(_mentionTimer);
   _mentionTimer = setTimeout(async function() {
     try {
-      var {data} = await sb.from('officials').select('id,full_name,role,email,district,details')
-        .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%')
-        .eq('district', S.official.district)
-        .limit(8);
+      var q = sb.from('officials').select('id,full_name,role,email,district,details')
+        .or('full_name.ilike.%' + query + '%,email.ilike.%' + query + '%');
+      var dist = S.official.district;
+      if (dist && dist !== 'All' && dist !== 'National') q = q.eq('district', dist);
+      var {data} = await q.limit(8);
       var seen = {}; var results = [];
       (data || []).forEach(function(o) {
         if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '' }); }
@@ -1272,6 +1276,69 @@ function renderMentionDropdown(key) {
     html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + ' \xb7 ' + esc(o.email) + '</div></div></div>';
   });
   html += '</div>';
+  return html;
+}
+
+// ── COMMENT ATTACHMENTS ──
+function triggerCommentAttach(key) {
+  var inp = document.getElementById('ca-file-' + key.replace(/[^a-zA-Z0-9]/g,''));
+  if (inp) inp.click();
+}
+async function handleCommentFileSelect(key, file) {
+  if (!file) return;
+  if (file.size > 6*1024*1024) { showToast('File too large — maximum 6MB'); return; }
+  S._commentAttach[key] = { name: file.name, url: '', uploading: true };
+  render();
+  try {
+    var safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
+    var path = S._officialId + '/comments/' + Date.now() + '_' + safe;
+    var {data, error} = await sb.storage.from('Supporting-Documents').upload(path, file, { cacheControl:'3600', upsert:false, contentType:file.type||'application/octet-stream' });
+    if (error) throw error;
+    var {data:urlData} = sb.storage.from('Supporting-Documents').getPublicUrl(path);
+    S._commentAttach[key] = { name: file.name, url: urlData && urlData.publicUrl || '', uploading: false };
+  } catch(e) {
+    console.warn('Comment attachment upload failed:', e);
+    delete S._commentAttach[key];
+    showToast('Upload failed — try again');
+  }
+  render();
+}
+function removeCommentAttach(key) { delete S._commentAttach[key]; render(); }
+function getCommentTextWithAttach(key, text) {
+  var attach = S._commentAttach[key];
+  if (attach && attach.url) return text + '\n[ATTACH:' + attach.url + ':' + attach.name + ']';
+  return text;
+}
+function renderCommentBody(text) {
+  if (!text) return '';
+  var parts = text.split(/\[ATTACH:([^:]+):([^\]]+)\]/g);
+  var html = '';
+  for (var i = 0; i < parts.length; i++) {
+    if (i % 3 === 0) {
+      // Text part — also highlight @mentions
+      var t = esc(parts[i]).replace(/@(\S+(?:\s\S+)?)/g, '<span style="color:var(--teal);font-weight:600">@$1</span>');
+      html += t;
+    } else if (i % 3 === 1) {
+      // URL
+      var url = parts[i];
+      var fname = parts[i+1] || 'File';
+      var fnameShort = fname.length > 35 ? fname.slice(0,32)+'...' : fname;
+      html += '<div style="margin-top:4px"><a href="' + esc(url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#f0f7f7;border:1px solid var(--teal-md);border-radius:6px;font-size:11px;color:var(--teal);font-weight:600;text-decoration:none">\uD83D\uDCCE ' + esc(fnameShort) + '</a></div>';
+      i++; // skip the filename part
+    }
+  }
+  return html;
+}
+function renderAttachButton(key) {
+  var attach = S._commentAttach[key];
+  var keyClean = key.replace(/[^a-zA-Z0-9]/g,'');
+  var keyEsc = key.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+  var html = '<input type="file" id="ca-file-' + keyClean + '" style="display:none" onchange="event.stopPropagation();handleCommentFileSelect(\'' + keyEsc + '\',this.files[0])" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">';
+  if (attach && attach.uploading) {
+    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0">Uploading ' + esc(attach.name) + '...</div>';
+  } else if (attach && attach.url) {
+    html += '<div style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--teal-lt);border:1px solid var(--teal-md);border-radius:12px;font-size:10px;color:var(--teal-dk);font-weight:600;margin-top:4px">\uD83D\uDCCE ' + esc(attach.name.length > 25 ? attach.name.slice(0,22) + '...' : attach.name) + '<button onclick="event.stopPropagation();removeCommentAttach(\'' + keyEsc + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:12px;padding:0 0 0 4px;line-height:1">&times;</button></div>';
+  }
   return html;
 }
 
@@ -1488,7 +1555,9 @@ async function loadSupResponses(){
 }
 async function submitSupResponse(need){
   var txt=(S._supReplyText[need]||'').trim();
-  if(!txt)return;
+  if(!txt&&!S._commentAttach[need])return;
+  if(!txt)txt='';
+  txt = getCommentTextWithAttach(need, txt);
   var scope=S._supReplyScope[need]||{type:'all',entity:''};
   var tagged=S._supTagged[need]||[];
   try{
@@ -1497,6 +1566,7 @@ async function submitSupResponse(need){
     if(error)throw error;
     S._supReplyText[need]='';
     S._supReplyScope[need]={type:'all',entity:''};
+    delete S._commentAttach[need];
     // Notify tagged officials (fire-and-forget)
     try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:'',supportNeed:need,subjects:[],moment:'looped_in'});});}catch(e){console.warn('notifyTagged failed:',e);}
     S._supTagged[need]=[];S._supTagSearch[need]='';S._supTagResults[need]=[];
@@ -1517,12 +1587,14 @@ async function markSupAddressed(need){
     return;
   }
   var tagged=S._supTagged[need]||[];
+  txt = getCommentTextWithAttach('resolve:'+need, txt);
   try{
     var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:txt,scope_type:'resolution',scope_entity:'',details:{tagged_officials:tagged}};
     var {error}=await sb.from('support_responses').insert(row);
     if(error)throw error;
     S._supResolving[need]=false;
     S._supResolveComment[need]='';
+    delete S._commentAttach['resolve:'+need];
     // Notify tagged officials
     try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:'',supportNeed:need,subjects:[],moment:'addressed'});});}catch(e){console.warn('notifyTagged failed:',e);}
     // Notify original logger
@@ -1584,7 +1656,9 @@ async function loadActResponses(){
 }
 async function submitActResponse(decId){
   var txt=(S._actReplyText[decId]||'').trim();
-  if(!txt)return;
+  if(!txt&&!S._commentAttach[decId])return;
+  if(!txt)txt='';
+  txt = getCommentTextWithAttach(decId, txt);
   try{
     var {error}=await sb.from('activity_responses').insert({decision_id:decId,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',response_type:'comment',comment:txt});
     if(error)throw error;
@@ -1596,6 +1670,7 @@ async function submitActResponse(decId){
       try { tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:det.schools||'',supportNeed:'Activity comment',subjects:det.subjects||[],moment:'looped_in'});}); } catch(e){console.warn('notifyTagged failed:',e);}
     }
     S._actReplyText[decId]='';
+    delete S._commentAttach[decId];
     if (S._actTagged) S._actTagged[decId] = [];
     await loadActResponses();
     render();
@@ -3584,7 +3659,7 @@ function renderDashboard() {
          responses.forEach(function(r){
            var scopeCls=r.scope_type==='school'?'sb-school':r.scope_type==='district'?'sb-district':'sb-all';
            var scopeLabel=r.scope_type==='school'?esc(r.scope_entity||''):r.scope_type==='district'?esc(r.scope_entity||''):'All schools';
-           _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+esc(r.comment||'')+'</div></div></div>';
+           _supHTML += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal-dk)">'+supInitials(r.official_name)+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span> <span class="sup-comment-role">'+esc(r.official_role||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div>'+(scopeLabel?'<div class="scope-badge '+scopeCls+'">'+scopeLabel+'</div>':'')+'<div class="sup-comment-text">'+renderCommentBody(r.comment||'')+'</div></div></div>';
          });
        } else {
          _supHTML += '<div class="thread-empty">No responses yet</div>';
@@ -3607,7 +3682,8 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box" style="position:relative"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += '<div class="reply-box" style="position:relative"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><button onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" style="background:none;border:none;font-size:18px;cursor:pointer;padding:6px;color:var(--grey);min-width:36px;min-height:36px" title="Attach a file">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div>';
+         _supHTML += renderAttachButton(need);
          _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
        }
@@ -3619,6 +3695,8 @@ function renderDashboard() {
            _supHTML += '<div class="sup-resolve-form">';
            _supHTML += '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
            _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery to affected schools on 15 March\u2026 Type @ to tag a colleague" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+           _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><button onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" style="background:none;border:1px solid #e8e6e4;border-radius:6px;font-size:14px;cursor:pointer;padding:6px 10px;color:var(--grey);min-height:36px" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
+           _supHTML += renderAttachButton('resolve:'+need);
            _supHTML += renderMentionDropdown(need);
            _supHTML += '<div class="sup-resolve-actions"><button class="sup-resolve-cancel" onclick="toggleSupResolve(\''+needEsc+'\')">Cancel</button><button class="sup-resolve-confirm" onclick="markSupAddressed(\''+needEsc+'\')">Confirm — Mark as Addressed</button></div>';
            _supHTML += '</div>';
@@ -4100,43 +4178,46 @@ ${tab==='tracker'?`
              html += '</div>';
            }
 
-           // ── EVIDENCE / SUPPORTING DOCUMENTS ──
+           // ── EXISTING DOCS (compact) ──
            var evFiles = c.det.evidence_files || [];
            var existingDoc = c.act && c.act.supporting_doc_url;
-           html += '<div style="margin:8px 0;padding:8px 10px;background:#f7f9fc;border-radius:6px;border:1px solid #e8e6e4">';
-           html += '<div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Supporting evidence</div>';
-           if (existingDoc) {
-             var docName = (c.act.supporting_doc_name || 'Document').length > 40 ? (c.act.supporting_doc_name||'Document').slice(0,37)+'...' : (c.act.supporting_doc_name||'Document');
-             html += '<div style="margin-bottom:4px"><a href="'+esc(c.act.supporting_doc_url)+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--teal);font-weight:600;text-decoration:none" onclick="event.stopPropagation()">'+esc(docName)+'</a> <span style="font-size:10px;color:var(--grey)">(uploaded with activity)</span></div>';
-           }
-           if (evFiles.length) {
-             evFiles.forEach(function(ef) {
-               var efName = (ef.name||'File').length > 40 ? (ef.name||'File').slice(0,37)+'...' : (ef.name||'File');
-               html += '<div style="margin-bottom:4px"><a href="'+esc(ef.url)+'" target="_blank" rel="noopener" style="font-size:11px;color:var(--teal);font-weight:600;text-decoration:none" onclick="event.stopPropagation()">'+esc(efName)+'</a> <span style="font-size:10px;color:var(--grey)">'+supTimeAgo(ef.uploaded_at)+(ef.uploaded_by?' by '+esc(ef.uploaded_by):'')+'</span></div>';
-             });
-           }
-           if (!existingDoc && !evFiles.length) { html += '<div style="font-size:11px;color:var(--grey);font-style:italic">No evidence attached yet</div>'; }
-           html += '<input type="file" id="ev-file-'+decIdEsc.replace(/\'/g,'')+'" style="display:none" onchange="event.stopPropagation();uploadEvidence(\''+decIdEsc+'\',this.files[0])" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">';
-           html += '<button onclick="event.stopPropagation();triggerEvidenceUpload(\''+decIdEsc+'\')" style="margin-top:6px;padding:8px 14px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px;width:100%">Upload supporting evidence</button>';
-           html += '</div>';
-
-           var respCount = decResponses.length + (notedCount > 0 ? 1 : 0);
-           html += '<div class="acd-thread-bar"><span class="acd-thread-count">'+(respCount?respCount+' response'+(respCount>1?'s':''):'No responses yet')+'</span><button class="acd-thread-btn" onclick="toggleActThread(\''+cardId+'\')">'+( threadOpen?'Hide thread':'View thread')+'</button></div>';
-
-           if (threadOpen) {
-             html += '<div class="post-thread show" style="border-top:none;padding:10px 0 0;background:transparent">';
-             if (decResponses.length) {
-               decResponses.forEach(function(r){
-                 var rInit = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
-                 html += '<div class="pt-comment"><div class="pt-avatar" style="background:var(--teal-dk)">'+rInit+'</div><div class="pt-bubble"><div class="pt-bubble-hdr"><span class="pt-name">'+esc(r.official_name||'')+'</span><span class="pt-time">'+supTimeAgo(r.created_at)+'</span></div><div class="pt-text">'+esc(r.comment||'')+'</div>'+(r.official_role?'<div class="pt-role">'+esc(r.official_role)+'</div>':'')+'</div></div>';
-               });
-             } else {
-               html += '<div class="pt-empty">Be the first to comment on this activity</div>';
+           if (existingDoc || evFiles.length) {
+             html += '<div style="margin:6px 0;padding:6px 10px;background:#f7f9fc;border-radius:6px;border:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.3px">Evidence:</span>';
+             if (existingDoc) {
+               var docName = (c.act.supporting_doc_name || 'Document').length > 30 ? (c.act.supporting_doc_name||'Document').slice(0,27)+'...' : (c.act.supporting_doc_name||'Document');
+               html += '<a href="'+esc(c.act.supporting_doc_url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#f0f7f7;border:1px solid var(--teal-md);border-radius:6px;font-size:11px;color:var(--teal);font-weight:600;text-decoration:none">\uD83D\uDCCE '+esc(docName)+'</a>';
              }
-             html += '<div class="pt-reply" style="position:relative"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
-             html += renderMentionDropdown(c.dec.id);
+             evFiles.forEach(function(ef) {
+               var efName = (ef.name||'File').length > 30 ? (ef.name||'File').slice(0,27)+'...' : (ef.name||'File');
+               html += '<a href="'+esc(ef.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#f0f7f7;border:1px solid var(--teal-md);border-radius:6px;font-size:11px;color:var(--teal);font-weight:600;text-decoration:none">\uD83D\uDCCE '+esc(efName)+'</a>';
+             });
              html += '</div>';
            }
+
+           // ── FACEBOOK-STYLE COMMENTS ──
+           var showAll = S._actThreadOpen && S._actThreadOpen[cardId];
+           var visibleComments = showAll ? decResponses : decResponses.slice(-2);
+           var hiddenCount = decResponses.length - visibleComments.length;
+
+           html += '<div style="margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px">';
+           if (decResponses.length > 0) {
+             html += '<div style="font-size:10px;color:var(--grey);margin-bottom:6px">' + decResponses.length + ' comment' + (decResponses.length!==1?'s':'') + '</div>';
+           }
+           if (hiddenCount > 0) {
+             html += '<div onclick="S._actThreadOpen[\''+cardId+'\']=true;render()" style="font-size:11px;color:var(--teal);font-weight:600;cursor:pointer;padding:6px 0;text-align:center">View ' + hiddenCount + ' earlier comment' + (hiddenCount!==1?'s':'') + '</div>';
+           }
+           if (visibleComments.length) {
+             visibleComments.forEach(function(r){
+               var rInit = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
+               html += '<div class="pt-comment"><div class="pt-avatar" style="background:var(--teal-dk)">'+rInit+'</div><div class="pt-bubble"><div class="pt-bubble-hdr"><span class="pt-name">'+esc(r.official_name||'')+'</span><span class="pt-time">'+supTimeAgo(r.created_at)+'</span></div><div class="pt-text">'+renderCommentBody(r.comment||'')+'</div>'+(r.official_role?'<div class="pt-role">'+esc(r.official_role)+'</div>':'')+'</div></div>';
+             });
+           }
+
+           // Reply input always visible
+           html += '<div class="pt-reply" style="position:relative;display:flex;align-items:flex-end;gap:4px"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag a colleague" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,80)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)" style="flex:1">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><button onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" style="background:none;border:none;font-size:18px;cursor:pointer;padding:6px;color:var(--grey);min-width:36px;min-height:36px" title="Attach a file">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div>';
+           html += renderAttachButton(c.dec.id);
+           html += renderMentionDropdown(c.dec.id);
+           html += '</div>';
 
            if (isMine && c.act && c.status !== 'Completed') {
              html += '<div class="acd-owner-btns">';
