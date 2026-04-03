@@ -915,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.1';
+const APP_VERSION = '2026.04.03.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -963,6 +963,7 @@ const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
 async function notifyLogin(official) {
  try {
    const loginTime = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+   const n = esc(official.full_name || 'Unknown');
    await fetch(NOTIFY_URL, {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
@@ -970,13 +971,13 @@ async function notifyLogin(official) {
        from: 'DDD Interventions Tracker <tracker@ddd-interventions-tracker.com>',
        to: [ADMIN_EMAIL],
        subject: 'DDD Tracker Login: ' + (official.full_name || 'Unknown'),
-       html: '<h3>Login Notification</h3><p><strong>' + (official.full_name || 'Unknown') + '</strong> logged into the DDD Learner Improvement Interventions Tracker.</p>' +
+       html: '<h3>Login Notification</h3><p><strong>' + n + '</strong> logged into the DDD Learner Improvement Interventions Tracker.</p>' +
          '<table style="border-collapse:collapse;">' +
-         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Email</td><td>' + (official.email || '') + '</td></tr>' +
-         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Role</td><td>' + (official.role || '—') + '</td></tr>' +
-         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Province</td><td>' + (official.province || '—') + '</td></tr>' +
-         '<tr><td style="padding:4px 12px 4px 0;color:#666;">District</td><td>' + (official.district || '—') + '</td></tr>' +
-         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Time (SAST)</td><td>' + loginTime + '</td></tr>' +
+         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Email</td><td>' + esc(official.email || '') + '</td></tr>' +
+         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Role</td><td>' + esc(official.role || '—') + '</td></tr>' +
+         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Province</td><td>' + esc(official.province || '—') + '</td></tr>' +
+         '<tr><td style="padding:4px 12px 4px 0;color:#666;">District</td><td>' + esc(official.district || '—') + '</td></tr>' +
+         '<tr><td style="padding:4px 12px 4px 0;color:#666;">Time (SAST)</td><td>' + esc(loginTime) + '</td></tr>' +
          '</table>'
      })
    });
@@ -995,18 +996,20 @@ async function notifyTagged(ctx) {
      looped_in:'You have been looped in on a support recommendation',
      addressed:'A support request you were involved in has been marked as addressed'
    };
+   var schoolsStr = esc(Array.isArray(ctx.schools)?ctx.schools.join(', '):ctx.schools||'');
    var subjectLine = '[DDD Tracker] ' + (momentLabels[ctx.moment]||'Support notification') + ' \u2014 ' + (Array.isArray(ctx.schools)?ctx.schools.join(', '):ctx.schools||'');
-   var subjList = (ctx.subjects&&ctx.subjects.length)?ctx.subjects.join(', '):'Not specified';
+   var subjList = esc((ctx.subjects&&ctx.subjects.length)?ctx.subjects.join(', '):'Not specified');
+   var safeHref = esc(window.location.href);
    var bodyHTML = '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
-     '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0"><div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div><div style="font-size:13px;color:#B8DCDC;margin-top:4px">' + (momentLabels[ctx.moment]||'Notification') + '</div></div>' +
+     '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0"><div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div><div style="font-size:13px;color:#B8DCDC;margin-top:4px">' + esc(momentLabels[ctx.moment]||'Notification') + '</div></div>' +
      '<div style="background:#fff;padding:20px 24px;border:1px solid #e8e6e4;border-top:none">' +
      '<table style="border-collapse:collapse;width:100%;font-size:13px">' +
-     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">School</td><td style="padding:8px 0">' + (Array.isArray(ctx.schools)?ctx.schools.join(', '):ctx.schools||'') + '</td></tr>' +
-     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Support needed</td><td style="padding:8px 0">' + (ctx.supportNeed||'') + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">School</td><td style="padding:8px 0">' + schoolsStr + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Support needed</td><td style="padding:8px 0">' + esc(ctx.supportNeed||'') + '</td></tr>' +
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Subject(s)</td><td style="padding:8px 0">' + subjList + '</td></tr>' +
-     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Logged by</td><td style="padding:8px 0">' + (ctx.fromName||'') + (ctx.fromRole?' (' + ctx.fromRole + ')':'') + '</td></tr>' +
+     '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Logged by</td><td style="padding:8px 0">' + esc(ctx.fromName||'') + (ctx.fromRole?' (' + esc(ctx.fromRole) + ')':'') + '</td></tr>' +
      '</table>' +
-     '<div style="text-align:center;margin:20px 0 8px"><a href="' + window.location.href + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Tracker</a></div>' +
+     '<div style="text-align:center;margin:20px 0 8px"><a href="' + safeHref + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Tracker</a></div>' +
      '</div></div>';
    await fetch(NOTIFY_URL, {
      method:'POST', headers:{'Content-Type':'application/json'},
@@ -1307,7 +1310,7 @@ function showVoiceHint(btnId) {
 }
 
 function toggleVoice(fieldPath, textareaId) {
-  if (!_speechSupported) { alert('Voice input is not available on this browser. Try using Chrome on your phone.'); return; }
+  if (!_speechSupported) { showToast('Voice input is not available on this browser — try using Chrome on your phone'); return; }
   if (_voiceRec && _voiceField === fieldPath) { _voiceRec.stop(); return; }
   if (_voiceRec) { _voiceRec.stop(); _voiceRec = null; }
   if (!_voiceUsedBefore) {
@@ -1344,7 +1347,7 @@ function toggleVoice(fieldPath, textareaId) {
   };
   _voiceRec.onerror = function(e) {
     if (e.error === 'not-allowed') {
-      alert('Microphone access was not allowed. To use voice input, go to your phone Settings and allow microphone access for this browser.');
+      showToast('Microphone access was not allowed — check your phone Settings to allow microphone for this browser');
     }
     stopVoice();
   };
@@ -1623,7 +1626,6 @@ function toggleChall(b){S._challExpanded=S._challExpanded===b?null:b;render();}
 function toggleSup(need){S._supExpanded[need]=!S._supExpanded[need];render();}
 function filterSupTime(period){S._supTimeFilter=period;render();}
 function setSupReply(need,val){S._supReplyText[need]=val;}
-function setSupScope(need,type,entity){S._supReplyScope[need]={type:type,entity:entity||''};render();}
 function supInitials(name){return (name||'?').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
 
 // ─── PENDING RESPONSE SYSTEM ───
@@ -1638,7 +1640,7 @@ async function submitPendResponse(key,school,need){
   var tagged=pd.tagged||[];
   comment = getCommentTextWithAttach('pend:'+key, comment);
   var fullComment = 'Status: '+status+(comment?'\n'+comment:'');
-  var scopeType = status==='Completed'?'resolution':'pending_response';
+  var scopeType = 'pending_response';
   try{
     var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:fullComment,scope_type:scopeType,scope_entity:school||'',details:{status:status,school:school,tagged_officials:tagged}};
     var {error}=await sb.from('support_responses').insert(row);
@@ -1749,13 +1751,7 @@ function toggleSupSchoolDetail(need){
 
 // ─── ACTIVITY TRACKER ───
 function toggleActCard(id){S._actCardOpen=S._actCardOpen||{};S._actCardOpen[id]=!S._actCardOpen[id];render();}
-function toggleActThread(id){S._actThreadOpen[id]=!S._actThreadOpen[id];render();}
 function setActReply(id,val){S._actReplyText[id]=val;}
-function toggleActNoted(decId){
-  S._actNoted[decId]=!S._actNoted[decId];render();
-  // Fire-and-forget save
-  try{sb.from('activity_responses').upsert({decision_id:decId,official_id:S._officialId,official_name:S.official.full_name||'',official_role:S.official.role||'',response_type:'noted',comment:''},{onConflict:'decision_id,official_id,response_type'}).then(function(){});}catch(e){}
-}
 async function loadActResponses(){
   try{
     var {data,error}=await sb.from('activity_responses').select('*').order('created_at',{ascending:true});
@@ -1860,15 +1856,19 @@ async function saveOutcome() {
 
 async function loadAll() {
  try {
- const [d,a,o,iv,ps] = await Promise.all([
+ const results = await Promise.allSettled([
  sb.from('decisions').select('*').order('created_at',{ascending:false}),
  sb.from('actions').select('*').order('created_at',{ascending:false}),
  sb.from('outcomes').select('*').order('created_at',{ascending:false}),
  sb.from('interventions').select('*').order('entity_name'),
  sb.rpc('get_programme_stats')
  ]);
- S.decisions = d.data||[]; S.actions = a.data||[]; S.outcomes = o.data||[]; S.interventions = iv.data||[];
- S._programmeStats = ps.data || null;
+ const val = function(r) { return r.status==='fulfilled' && r.value && !r.value.error ? r.value.data : null; };
+ S.decisions = val(results[0]) || S.decisions || [];
+ S.actions = val(results[1]) || S.actions || [];
+ S.outcomes = val(results[2]) || S.outcomes || [];
+ S.interventions = val(results[3]) || S.interventions || [];
+ S._programmeStats = val(results[4]) || S._programmeStats || null;
  S.loading = false; S.error = null;
  await loadSupResponses();
  await loadActResponses();
@@ -2804,7 +2804,7 @@ function renderFormReview(){
 }
 function handleFileSelect(e){const file=e.target.files[0];if(file)attachFile(file)}
 function handleFileDrop(e){const file=e.dataTransfer.files[0];if(file)attachFile(file)}
-function attachFile(file){if(file.size>6*1024*1024){alert('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;if(!S.f.doc_name)S.f.doc_name=file.name.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');render()}
+function attachFile(file){if(file.size>6*1024*1024){showToast('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;if(!S.f.doc_name)S.f.doc_name=file.name.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');render()}
 
 async function uploadSupportingDoc(file, actionId) {
  if (!file) return { url: null, name: null };
@@ -4802,36 +4802,6 @@ function logFollowUpVisit(decId) {
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── EVIDENCE UPLOAD ON TRACKER CARDS ──
-function triggerEvidenceUpload(decId) {
-  var inp = document.getElementById('ev-file-' + decId.replace(/[^a-zA-Z0-9]/g,''));
-  if (inp) inp.click();
-}
-async function uploadEvidence(decId, file) {
-  if (!file) return;
-  if (file.size > 6*1024*1024) { showToast('File too large — maximum 6MB'); return; }
-  showToast('Uploading...');
-  try {
-    var safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
-    var path = S._officialId + '/evidence/' + decId.replace(/[^a-zA-Z0-9]/g,'') + '/' + Date.now() + '_' + safe;
-    var {data, error} = await sb.storage.from('Supporting-Documents').upload(path, file, { cacheControl:'3600', upsert:false, contentType:file.type||'application/octet-stream' });
-    if (error) throw error;
-    var {data:urlData} = sb.storage.from('Supporting-Documents').getPublicUrl(path);
-    var url = urlData && urlData.publicUrl || '';
-    // Store in decision details
-    var dec = S.decisions.find(function(d){return d.id===decId;});
-    if (dec) {
-      var det = Object.assign({}, dec.details || {});
-      if (!det.evidence_files) det.evidence_files = [];
-      det.evidence_files.push({url:url, name:file.name, uploaded_at:new Date().toISOString(), uploaded_by:S.official.full_name});
-      await sb.from('decisions').update({details:det}).eq('id',decId);
-      dec.details = det;
-    }
-    showToast('Evidence uploaded');
-    render();
-  } catch(e) { console.warn('Evidence upload failed:', e); showToast('Upload failed — try again'); }
-}
-
 // POLICY MODAL 
 function closePolicyModal(){
  S.showPolicy=null;
@@ -4909,11 +4879,9 @@ function renderOutcomeModal(){
 // Coverage table row expand/collapse (mobile only)
 
 function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
-function fmtDateTime(d) { if(!d)return''; try{var dt=new Date(d);return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' at '+dt.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Africa/Johannesburg'})}catch(e){return''} }
 function relTimeAgo(d){if(!d)return'';try{var ms=Date.now()-new Date(d).getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
 function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-function markDDDChecked(){S.ddd_last_checked=today();try{localStorage.setItem('ddd_last_checked',S.ddd_last_checked)}catch(e){}render();}
 // ═══════════════════════════════════
 // AUTO-UPDATE SYSTEM
 // ═══════════════════════════════════
@@ -4957,15 +4925,36 @@ async function flushSubmitQueue() {
   for (var i = 0; i < queue.length; i++) {
     try {
       var item = queue[i];
-      var r1 = await sb.from('decisions').insert(item.dec);
-      if (r1.error) throw r1.error;
-      var r2 = await sb.from('actions').insert(item.act);
-      if (r2.error) throw r2.error;
-      flushed++;
+      var decOk = item.decInserted || false;
+      var actOk = item.actInserted || false;
+
+      // Insert decision if not already done
+      if (!decOk) {
+        var r1 = await sb.from('decisions').insert(item.dec);
+        if (r1.error) {
+          if (r1.error.code === '23505' || (r1.error.message && r1.error.message.indexOf('duplicate')>-1)) { decOk = true; }
+          else { throw r1.error; }
+        } else { decOk = true; }
+      }
+
+      // Insert action if not already done
+      if (!actOk) {
+        var r2 = await sb.from('actions').insert(item.act);
+        if (r2.error) {
+          if (r2.error.code === '23505' || (r2.error.message && r2.error.message.indexOf('duplicate')>-1)) { actOk = true; }
+          else {
+            // Decision succeeded but action failed — save partial state
+            item.decInserted = true;
+            failed.push(item);
+            continue;
+          }
+        } else { actOk = true; }
+      }
+
+      if (decOk && actOk) { flushed++; }
+      else { failed.push(item); }
     } catch(e) {
-      // If duplicate key (already submitted), count as flushed
-      if (e.code === '23505' || (e.message && e.message.indexOf('duplicate')>-1)) { flushed++; }
-      else { failed.push(queue[i]); }
+      failed.push(queue[i]);
     }
   }
   saveSubmitQueue(failed);
