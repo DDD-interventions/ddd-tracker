@@ -915,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.02.11';
+const APP_VERSION = '2026.04.03.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1182,7 +1182,9 @@ function insertMention(key, official) {
   var elId = el.id;
 
   // Write back to the correct state based on element ID
-  if (elId.startsWith('reply-')) {
+  if (elId.startsWith('pend-reply-')) {
+    if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};S._pendReplyData[key].comment=newText;
+  } else if (elId.startsWith('reply-')) {
     S._supReplyText[key] = newText;
   } else if (elId.startsWith('resolve-ta-')) {
     S._supResolveComment[key] = newText;
@@ -1195,7 +1197,11 @@ function insertMention(key, official) {
   }
 
   // Track tagged official in the right bucket
-  if (elId.startsWith('act-reply-')) {
+  if (elId.startsWith('pend-reply-')) {
+    if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};
+    if(!S._pendReplyData[key].tagged)S._pendReplyData[key].tagged=[];
+    if(!S._pendReplyData[key].tagged.some(function(o){return o.id === official.id;}))S._pendReplyData[key].tagged.push(official);
+  } else if (elId.startsWith('act-reply-')) {
     if (!S._actTagged) S._actTagged = {};
     if (!S._actTagged[key]) S._actTagged[key] = [];
     if (!S._actTagged[key].some(function(o){return o.id === official.id;})) S._actTagged[key].push(official);
@@ -1629,20 +1635,23 @@ async function submitPendResponse(key,school,need){
   var pd=S._pendReplyData[key];
   var comment=pd.comment||'';
   var status=pd.status||'In Progress';
+  var tagged=pd.tagged||[];
   comment = getCommentTextWithAttach('pend:'+key, comment);
   var fullComment = 'Status: '+status+(comment?'\n'+comment:'');
   var scopeType = status==='Completed'?'resolution':'pending_response';
   try{
-    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:fullComment,scope_type:scopeType,scope_entity:school||'',details:{status:status,school:school}};
+    var row={support_need:need,official_id:S._officialId,official_name:S.official.full_name||'Official',official_role:S.official.role||'',comment:fullComment,scope_type:scopeType,scope_entity:school||'',details:{status:status,school:school,tagged_officials:tagged}};
     var {error}=await sb.from('support_responses').insert(row);
     if(error)throw error;
+    // Notify tagged officials (fire-and-forget)
+    try{tagged.forEach(function(o){notifyTagged({toEmail:o.email,toName:o.name,fromName:S.official.full_name,fromRole:S.official.role,schools:school||'',supportNeed:need,subjects:[],moment:'looped_in'});});}catch(e){console.warn('notifyTagged failed:',e);}
     delete S._pendReplyData[key];
     delete S._commentAttach['pend:'+key];
     S._pendReply=null;
     await loadSupResponses();
     render();
-    showToast(status==='Completed'?'Marked as completed':'Response logged — '+status);
-  }catch(e){console.warn('Failed to submit pending response:',e);showToast('Could not save — check your connection and try again');}
+    showToast(status==='Completed'?'Marked as completed':'Response logged \u2014 '+status);
+  }catch(e){console.warn('Failed to submit pending response:',e);showToast('Could not save \u2014 check your connection and try again');}
 }
 function supTimeAgo(dateStr){
   if(!dateStr)return '';
@@ -3708,6 +3717,7 @@ function renderDashboard() {
        if (it.date) { var d = new Date(it.date); var diff = Math.floor((_pendNow - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
        var pendKey = (it.school||'')+'::'+(it.need||'');
        var pendKeyEsc = pendKey.replace(/'/g,"\\x27");
+       var pendId = pendKey.replace(/[^a-zA-Z0-9]/g,'');
        var isReplying = S._pendReply === pendKey;
        var pd = (S._pendReplyData && S._pendReplyData[pendKey]) || {status:'In Progress',comment:''};
        var needEsc = (it.need||'').replace(/'/g,"\\x27");
@@ -3768,7 +3778,9 @@ function renderDashboard() {
          c += '</div></div>';
          // Comment
          c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">What did you do? <span style="font-weight:400">(optional for In Progress)</span></div>';
-         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. Visited the school, conducted lesson observation..." oninput="setPendComment(\''+pendKeyEsc+'\',this.value)">'+esc(pd.comment||'')+'</textarea></div>';
+         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. Visited the school, conducted lesson observation\u2026 Type @ to tag" id="pend-reply-'+pendId+'" oninput="setPendComment(\''+pendKeyEsc+'\',this.value);handleMentionInput(\''+pendKeyEsc+'\',this.value,this)">'+esc(pd.comment||'')+'</textarea>';
+         c += renderMentionDropdown(pendKey);
+         c += '</div>';
          // Attach
          c += '<div style="margin-bottom:10px">'+renderAttachButton('pend:'+pendKey)+'<button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'pend:'+pendKeyEsc+'\')" title="Attach evidence" style="border-radius:8px;font-size:13px;padding:8px 14px">\uD83D\uDCCE Attach evidence</button></div>';
          // Actions
