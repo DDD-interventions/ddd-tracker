@@ -915,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.3';
+const APP_VERSION = '2026.04.03.6';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -927,7 +927,7 @@ const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{}, _actCardOpen:{},
- saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false, _pendReply:null, _pendReplyData:{},
+ saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false, _pendReply:null, _pendReplyData:{}, _pendReassign:null, _pendReassignData:{},
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
  filterCat:'All',
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
@@ -938,7 +938,6 @@ const S = {
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
  _actTagged:{},
  _commentAttach:{},
- ddd_last_checked:(()=>{try{return localStorage.getItem('ddd_last_checked')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:'Term 1 2026',activity_date:today(),
@@ -984,7 +983,7 @@ async function notifyLogin(official) {
  } catch(e) { console.warn('Login notification failed:', e); }
 }
 
-// Change 8: Notification for tagged officials
+// Email notification for tagged officials
 async function notifyTagged(ctx) {
  try {
    if (!ctx.toEmail) return;
@@ -1018,7 +1017,7 @@ async function notifyTagged(ctx) {
  } catch(e) { console.warn('notifyTagged failed:', e); }
 }
 
-// Change 8: Opt-out toggle
+// Notification opt-out toggle
 async function toggleNotifyOptOut() {
   var updated = !S.official.notify_tagged_disabled;
   try {
@@ -1030,7 +1029,7 @@ async function toggleNotifyOptOut() {
   } catch(e) { console.warn('Opt-out toggle failed:', e); }
 }
 
-// Change 6: Search officials for tagging (form)
+// Search officials for tagging (form)
 var _offSearchTimer = null;
 async function searchOfficialsForNeed(need, query) {
   if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; updateOffSearchUI(need); return; }
@@ -1038,7 +1037,7 @@ async function searchOfficialsForNeed(need, query) {
   try {
     var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: null });
     var seen = {}; var results = [];
-    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '' }); } });
+    (data || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', circuit: o.circuit || '', district: o.district || '' }); } });
     S.f._offSearchResults[need] = results;
   } catch(e) { S.f._offSearchResults[need] = []; console.warn('Official search failed:', e); }
   S.f._offSearchLoading[need] = false; updateOffSearchUI(need);
@@ -1076,7 +1075,8 @@ function renderOffSearchResultsInner(need) {
       html += '<div onclick="' + (alreadyTagged ? '' : 'tagOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')') + '" style="padding:10px;border-bottom:1px solid #f3f2f1;cursor:' + (alreadyTagged ? 'default' : 'pointer') + ';min-height:44px;display:flex;align-items:center;gap:8px' + (alreadyTagged ? ';opacity:.5' : '') + '">';
       html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12px;color:var(--navy)">' + esc(o.name) + '</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px"><span style="font-size:10px;padding:1px 6px;border-radius:8px;background:#7B1FA222;color:#7B1FA2;font-weight:600">' + esc(o.role) + '</span>';
-      if (o.circuit) html += '<span style="font-size:10px;color:var(--grey)">' + esc(o.circuit) + '</span>';
+      if (o.district) html += '<span style="font-size:10px;color:var(--grey)">' + esc(o.district) + '</span>';
+      if (o.circuit) html += '<span style="font-size:10px;color:var(--grey)"> \xb7 ' + esc(o.circuit) + '</span>';
       html += '</div><div style="font-size:10px;color:var(--teal);font-family:monospace;margin-top:1px">' + esc(o.email) + '</div></div>';
       if (alreadyTagged) html += '<span style="font-size:10px;color:var(--teal);font-weight:600">Tagged</span>';
       html += '</div>';
@@ -1098,19 +1098,19 @@ function renderOfficialSearch(need) {
   if (tagged.length) {
     html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">';
     tagged.forEach(function(o) {
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc(o.name) + ' <span style="font-weight:400;color:var(--grey)">(' + esc(o.role) + ')</span><button onclick="untagOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc(o.name) + ' <span style="font-weight:400;color:var(--grey)">(' + esc(o.role) + (o.district ? ', ' + esc(o.district) : '') + ')</span><button onclick="untagOfficial(\'' + needKey + '\',\'' + o.id + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
     });
     html += '</div>';
     html += '<div style="font-size:10px;color:var(--teal);margin-bottom:4px">\u2713 Tagged by unique ID \u2014 name changes or spelling variations won\'t affect who gets notified.</div>';
   }
   // Search input — oninput updates state + debounces search, does NOT call render()
-  html += '<div style="margin-top:4px"><input type="text" placeholder="Search for an official to tag (name or email)..." value="' + esc(q) + '" oninput="S.f._offSearchQ[\'' + needKey + '\']=this.value;clearTimeout(_offSearchTimer);_offSearchTimer=setTimeout(function(){searchOfficialsForNeed(\'' + needKey + '\',S.f._offSearchQ[\'' + needKey + '\'])},300)" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit"></div>';
+  html += '<div style="margin-top:4px"><input type="text" placeholder="Search for an official to notify (name or email address)..." value="' + esc(q) + '" oninput="S.f._offSearchQ[\'' + needKey + '\']=this.value;clearTimeout(_offSearchTimer);_offSearchTimer=setTimeout(function(){searchOfficialsForNeed(\'' + needKey + '\',S.f._offSearchQ[\'' + needKey + '\'])},300)" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:12px;font-family:inherit"></div>';
   // Results container — updated via targeted DOM update, not render()
   html += '<div id="' + offSearchContainerId(need) + '">' + renderOffSearchResultsInner(need) + '</div>';
   return html;
 }
 
-// Change 7: Dashboard tagging helpers (respond/resolve flows)
+// Dashboard tagging helpers (respond/resolve flows)
 
 // ── @MENTION SYSTEM (Facebook-style) ──
 var _mentionTimer = null;
@@ -1161,7 +1161,7 @@ function handleMentionInput(key, text, el) {
       var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: dist });
       var seen = {}; var results = [];
       (data || []).forEach(function(o) {
-        if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '' }); }
+        if (!seen[o.email]) { seen[o.email] = true; results.push({ id: o.id, name: o.full_name || '', role: o.role || '', email: o.email || '', district: o.district || '', circuit: o.circuit || '' }); }
       });
       S._mention.results = results;
       S._mention.loading = false;
@@ -1257,11 +1257,11 @@ function renderMentionDropdownInner(key) {
         html += '<div onclick="insertMention(\'' + keyEsc + '\',' + oJson + ')" style="padding:10px 12px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:10px">';
         html += '<div style="width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">' + initials + '</div>';
         html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + esc(o.name) + '</div>';
-        html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + '</div></div></div>';
+        html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + (o.district ? ' \xb7 ' + esc(o.district) : '') + '</div></div></div>';
       });
       html += '</div>';
     }
-    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0;font-style:italic">' + (recents.length ? 'Or keep typing to search...' : 'Type a name or email after @ to find a colleague') + '</div>';
+    html += '<div style="font-size:10px;color:var(--grey);padding:4px 0;font-style:italic">' + (recents.length ? 'Or keep typing to search...' : 'Type a name or email address after @') + '</div>';
     return html;
   }
   if (loading && !results.length) {
@@ -1279,7 +1279,7 @@ function renderMentionDropdownInner(key) {
     html += '<div onclick="insertMention(\'' + keyEsc + '\',' + oJson + ')" style="padding:10px 12px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:10px">';
     html += '<div style="width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">' + initials + '</div>';
     html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + esc(o.name) + '</div>';
-    html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + ' \xb7 ' + esc(o.email) + '</div></div></div>';
+    html += '<div style="font-size:11px;color:var(--grey)">' + esc(o.role) + (o.district ? ' \xb7 ' + esc(o.district) : '') + ' \xb7 ' + esc(o.email) + '</div></div></div>';
   });
   html += '</div>';
   return html;
@@ -1684,7 +1684,7 @@ function setSupReply(need,val){S._supReplyText[need]=val;}
 function supInitials(name){return (name||'?').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
 
 // ─── PENDING RESPONSE SYSTEM ───
-function togglePendReply(key){S._pendReply=S._pendReply===key?null:key;render();}
+function togglePendReply(key){S._pendReply=S._pendReply===key?null:key;S._pendReassign=null;render();}
 function setPendStatus(key,val){if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};S._pendReplyData[key].status=val;render();}
 function setPendComment(key,val){if(!S._pendReplyData)S._pendReplyData={};if(!S._pendReplyData[key])S._pendReplyData[key]={status:'In Progress',comment:''};S._pendReplyData[key].comment=val;}
 async function submitPendResponse(key,school,need){
@@ -1710,6 +1710,97 @@ async function submitPendResponse(key,school,need){
     showToast(status==='Completed'?'Marked as completed':'Response logged \u2014 '+status);
   }catch(e){console.warn('Failed to submit pending response:',e);showToast('Could not save \u2014 check your connection and try again');}
 }
+
+// ─── RE-ASSIGNMENT SYSTEM ───
+function togglePendReassign(key){
+  S._pendReassign = S._pendReassign===key ? null : key;
+  S._pendReply = null; // close response form if open
+  if (!S._pendReassignData[key]) S._pendReassignData[key] = {reason:'', assignee:null, searchQ:'', searchResults:[], searchLoading:false};
+  render();
+}
+function setPendReassignReason(key, val){
+  if (!S._pendReassignData[key]) S._pendReassignData[key] = {reason:'', assignee:null, searchQ:'', searchResults:[], searchLoading:false};
+  S._pendReassignData[key].reason = val;
+}
+var _reassignSearchTimer = null;
+function searchReassignOfficial(key, query){
+  if (!S._pendReassignData[key]) S._pendReassignData[key] = {reason:'', assignee:null, searchQ:'', searchResults:[], searchLoading:false};
+  S._pendReassignData[key].searchQ = query;
+  if (!query || query.length < 2) { S._pendReassignData[key].searchResults = []; S._pendReassignData[key].searchLoading = false; render(); return; }
+  S._pendReassignData[key].searchLoading = true; render();
+  if (_reassignSearchTimer) clearTimeout(_reassignSearchTimer);
+  _reassignSearchTimer = setTimeout(async function(){
+    try {
+      var {data} = await sb.rpc('search_officials', { search_query: query, filter_district: null });
+      var seen = {}; var results = [];
+      (data || []).forEach(function(o){ if (!seen[o.email] && o.email !== S.official.email) { seen[o.email] = true; results.push({ id:o.id, name:o.full_name||'', role:o.role||'', email:o.email||'', circuit:o.circuit||'', district:o.district||'' }); }});
+      S._pendReassignData[key].searchResults = results;
+    } catch(e) { S._pendReassignData[key].searchResults = []; console.warn('Reassign search failed:', e); }
+    S._pendReassignData[key].searchLoading = false; render();
+  }, 300);
+}
+function selectReassignOfficial(key, official){
+  if (!S._pendReassignData[key]) return;
+  S._pendReassignData[key].assignee = official;
+  S._pendReassignData[key].searchQ = '';
+  S._pendReassignData[key].searchResults = [];
+  render();
+}
+function removeReassignOfficial(key){
+  if (!S._pendReassignData[key]) return;
+  S._pendReassignData[key].assignee = null;
+  render();
+}
+async function submitPendReassign(key, school, need){
+  var rd = S._pendReassignData[key];
+  if (!rd || !rd.assignee) { showToast('Please search for and select the official to re-assign to'); return; }
+  if (!rd.reason || rd.reason.trim().length < 10) { showToast('Please provide a reason for re-assigning — at least a short sentence'); return; }
+  try {
+    var assignee = rd.assignee;
+    var reason = rd.reason.trim();
+    var row = {
+      support_need: need,
+      official_id: S._officialId,
+      official_name: S.official.full_name || 'Official',
+      official_role: S.official.role || '',
+      comment: 'Re-assigned to ' + assignee.name + ' (' + (assignee.role||'') + ')' + (assignee.district ? ', ' + assignee.district : '') + '\nReason: ' + reason,
+      scope_type: 'reassignment',
+      scope_entity: school || '',
+      details: {
+        status: 'Reassigned',
+        school: school,
+        reassigned_to: { id:assignee.id, name:assignee.name, role:assignee.role, email:assignee.email, district:assignee.district||'' },
+        reassigned_from: { id:S._officialId, name:S.official.full_name, role:S.official.role, email:S.official.email },
+        reason: reason
+      }
+    };
+    var {error} = await sb.from('support_responses').insert(row);
+    if (error) throw error;
+
+    // Notify the new assignee (fire-and-forget)
+    try {
+      notifyTagged({ toEmail:assignee.email, toName:assignee.name, fromName:S.official.full_name, fromRole:S.official.role, schools:school||'', supportNeed:need, subjects:[], moment:'requested' });
+    } catch(e) { console.warn('Reassign notification failed:', e); }
+
+    // Notify the original requester about the re-assignment
+    try {
+      var origDec = S.decisions.find(function(d){ var det = d.details||{}; return (det.support_needed||[]).includes(need); });
+      if (origDec) {
+        var origEmail = (origDec.details&&origDec.details.official_email) || origDec.logged_by_email || '';
+        if (origEmail && origEmail !== S.official.email) {
+          notifyTagged({ toEmail:origEmail, toName:origDec.made_by||'', fromName:S.official.full_name, fromRole:S.official.role, schools:school||'', supportNeed:need + ' (re-assigned to ' + assignee.name + ')', subjects:[], moment:'looped_in' });
+        }
+      }
+    } catch(e) { console.warn('Notify original requester failed:', e); }
+
+    delete S._pendReassignData[key];
+    S._pendReassign = null;
+    await loadSupResponses();
+    render();
+    showToast('Re-assigned to ' + assignee.name + ' — they have been notified');
+  } catch(e) { console.warn('Re-assignment failed:', e); showToast('Could not save — check your connection and try again'); }
+}
+
 function supTimeAgo(dateStr){
   if(!dateStr)return '';
   var d=new Date(dateStr);var now=new Date();var diff=Math.floor((now-d)/(1000*60*60*24));
@@ -2826,9 +2917,9 @@ function renderFormStep4(){
     <div class="field"><label>What Support Do These Schools Need?</label><div class="hint">Select all that apply \u2014 helps district officials prioritise and allocate resources</div><div class="checkbox-grp">${SUPPORT_NEEDED.map(s=>{const se=s.replace(/'/g,"\\\'").replace(/\u2014/g,'\u2014');const isChecked=S.f.support_needed.includes(s);const hasRoles=!!ROLE_SUPPORT_MAP[s];return`<label><input type="checkbox" ${isChecked?'checked':''} onchange="togCtx(S.f.support_needed,'${se}',this.checked,'support')"><span>${s}</span></label>${isChecked&&hasRoles?'<div style="margin:-4px 0 8px 28px;padding:8px 10px;background:#f8f9fc;border-radius:6px;border-left:2px solid var(--teal-md)"><div style="font-size:10px;color:var(--grey);margin-bottom:4px">Tag a specific official to notify (optional \u2014 leave blank to alert all matching-role officials)</div>'+renderOfficialSearch(s)+'</div>':''}`}).join('')}</div></div>
     <div class="field"><label>How Much Support Is Needed? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">How much help does this school need?</div><div class="radio-grp"><label><input type="radio" name="supportLvl" value="light" ${S.f.support_level==='light'?'checked':''} onchange="S.f.support_level='light';render()"><span><strong>Light touch</strong> \u2014 school is coping, just needs a check-in now and then</span></label><label><input type="radio" name="supportLvl" value="regular" ${S.f.support_level==='regular'?'checked':''} onchange="S.f.support_level='regular';render()"><span><strong>Regular support</strong> \u2014 needs regular visits, e.g. every two weeks</span></label><label><input type="radio" name="supportLvl" value="intensive" ${S.f.support_level==='intensive'?'checked':''} onchange="S.f.support_level='intensive';render()"><span><strong>Intensive support</strong> \u2014 serious challenges, needs a team effort from multiple people</span></label></div></div>
     <div class="field"><label>School context</label><div class="hint">Tap all that apply across schools visited</div><div style="margin-bottom:8px"><span class="tag-grp-title">Staffing:</span><div class="tags" style="display:inline-flex">${CTX_STAFFING.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_staffing.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_staffing,'${s}',this.checked,'staffing')"><span>${s}</span></label>`).join('')}</div></div><div style="margin-bottom:8px"><span class="tag-grp-title">Resources:</span><div class="tags" style="display:inline-flex">${CTX_RESOURCES.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_resources.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_resources,'${s}',this.checked,'resources')"><span>${s}</span></label>`).join('')}</div></div><div><span class="tag-grp-title">Learners:</span><div class="tags" style="display:inline-flex">${CTX_LEARNERS.map(s=>`<label class="tag tag-orange"><input type="checkbox" ${S.f.ctx_learners.includes(s)?'checked':''} onchange="togCtx(S.f.ctx_learners,'${s}',this.checked,'learners')"><span>${s}</span></label>`).join('')}</div></div></div>
-    <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Type @ to tag a colleague</div><div class="voice-row"><textarea id="ta-ctx" rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025... Type @ to tag a colleague" oninput="S.f.ctx_notes=this.value;handleMentionInput('ctx',this.value,this)">${esc(S.f.ctx_notes)}</textarea>${micBtn('ctx_notes','ta-ctx')}</div>${renderMentionDropdown('ctx')}</div>
+    <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">To notify a colleague, type @ and their name or email address</div><div class="voice-row"><textarea id="ta-ctx" rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025\u2026" oninput="S.f.ctx_notes=this.value;handleMentionInput('ctx',this.value,this)">${esc(S.f.ctx_notes)}</textarea>${micBtn('ctx_notes','ta-ctx')}</div>${renderMentionDropdown('ctx')}</div>
     <div class="field-row"><div class="field"><label>Educators / staff supported</label><div class="hint">Number of educators or officials you worked with</div><input type="number" placeholder="e.g. 8" min="0" value="${S.f.educators_supported}" oninput="S.f.educators_supported=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
-    ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><div class="hint">Type @ to tag a colleague for follow-up</div><div class="voice-row"><textarea id="ta-fup" rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation... Type @ to tag" oninput="S.f.follow_up_desc=this.value;handleMentionInput('fup',this.value,this)">${esc(S.f.follow_up_desc)}</textarea>${micBtn('follow_up_desc','ta-fup')}</div>${renderMentionDropdown('fup')}</div>`:''}
+    ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><div class="hint">To notify a colleague about this follow-up, type @ and their name or email address</div><div class="voice-row"><textarea id="ta-fup" rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation... to notify someone, type @ and their name or email address" oninput="S.f.follow_up_desc=this.value;handleMentionInput('fup',this.value,this)">${esc(S.f.follow_up_desc)}</textarea>${micBtn('follow_up_desc','ta-fup')}</div>${renderMentionDropdown('fup')}</div>`:''}
     <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Upload or link any supporting evidence — plans, reports, sign-in registers, SIPs, photos, or detailed notes that add context beyond what this form captures</div>
       <div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)">
@@ -3778,10 +3869,12 @@ function renderDashboard() {
        var needEsc = (it.need||'').replace(/'/g,"\\x27");
        var schoolEsc = (it.school||'').replace(/'/g,"\\x27");
 
-       // Check for existing responses from this user on this pending item
-       var existingResponses = (S._supResponses||[]).filter(function(r){return r.support_need===it.need && r.scope_type==='pending_response' && r.details && r.details.school===it.school;});
+       // Show existing responses (including reassignments)
+       var allPendResponses = (S._supResponses||[]).filter(function(r){return r.support_need===it.need && r.details && r.details.school===it.school && (r.scope_type==='pending_response' || r.scope_type==='reassignment');});
+       var existingResponses = allPendResponses.filter(function(r){return r.scope_type==='pending_response';});
+       var reassignment = allPendResponses.find(function(r){return r.scope_type==='reassignment';});
        var latestResponse = existingResponses.length ? existingResponses[existingResponses.length-1] : null;
-       var currentStatus = latestResponse && latestResponse.details ? latestResponse.details.status : null;
+       var currentStatus = reassignment ? 'Reassigned' : (latestResponse && latestResponse.details ? latestResponse.details.status : null);
 
        var authorInitials = (it.flaggedBy||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
        var c = '<div class="act-card" style="border-left:4px solid '+(it.isRequested?'#E65100':'var(--orange)')+'">';
@@ -3790,7 +3883,7 @@ function renderDashboard() {
        c += '<div class="act-post-hdr">';
        c += '<div class="act-avatar" style="background:'+(it.isRequested?'#E65100':'var(--orange)')+'">'+authorInitials+'</div>';
        c += '<div class="act-author"><div class="act-author-name">'+esc(it.flaggedBy||'Official')+'</div><div class="act-author-role">'+esc(it.need)+' \xb7 Flagged '+(ago||'')+'</div></div>';
-       if (currentStatus) c += '<span class="act-status-tag '+(currentStatus==='Completed'?'st-c':currentStatus==='Ongoing'?'st-ip':'st-pl')+'">'+esc(currentStatus)+'</span>';
+       if (currentStatus) c += '<span class="act-status-tag '+(currentStatus==='Completed'?'st-c':currentStatus==='Reassigned'?'st-pl':currentStatus==='Ongoing'?'st-ip':'st-pl')+'">'+esc(currentStatus)+'</span>';
        c += '</div>';
 
        // ── POST BODY ──
@@ -3804,19 +3897,25 @@ function renderDashboard() {
        c += '</div></div>';
 
        // Show existing responses
-       if (existingResponses.length) {
+       if (allPendResponses.length) {
          c += '<div style="padding:6px 14px;border-top:1px solid #f0f0f0;background:#FAFBFC">';
-         existingResponses.forEach(function(r){
+         allPendResponses.forEach(function(r){
            var rInitials = (r.official_name||'?').split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
-           c += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:var(--teal)">'+rInitials+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div><div class="sup-comment-text">'+renderCommentBody(r.comment||'')+'</div></div></div>';
+           var isReassign = r.scope_type === 'reassignment';
+           c += '<div class="sup-comment"><div class="sup-comment-avatar" style="background:'+(isReassign?'#546E7A':'var(--teal)')+'">'+rInitials+'</div><div class="sup-comment-body"><div class="sup-comment-hdr"><div><span class="sup-comment-name">'+esc(r.official_name||'')+'</span></div><span class="sup-comment-time">'+supTimeAgo(r.created_at)+'</span></div><div class="sup-comment-text">'+renderCommentBody(r.comment||'')+'</div></div></div>';
          });
          c += '</div>';
        }
 
+       var isReassigning = S._pendReassign === pendKey;
+
        // ── ACTION BAR ──
-       c += '<div class="act-action-bar">';
-       c += '<button class="act-action-btn'+(isReplying?' active':'')+'" onclick="event.stopPropagation();togglePendReply(\''+pendKeyEsc+'\')" style="flex:2">Log a response</button>';
-       c += '</div>';
+       if (!reassignment) {
+         c += '<div class="act-action-bar" style="gap:6px">';
+         c += '<button class="act-action-btn'+(isReplying?' active':'')+'" onclick="event.stopPropagation();togglePendReply(\''+pendKeyEsc+'\')" style="flex:2">Log a response</button>';
+         c += '<button class="act-action-btn'+(isReassigning?' active':'')+'" onclick="event.stopPropagation();togglePendReassign(\''+pendKeyEsc+'\')" style="flex:1;color:#546E7A;border-color:#d0d4db">Re-assign</button>';
+         c += '</div>';
+       }
 
        // ── INLINE RESPONSE FORM ──
        if (isReplying) {
@@ -3833,7 +3932,7 @@ function renderDashboard() {
          c += '</div></div>';
          // Comment
          c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">What did you do? <span style="font-weight:400">(optional for In Progress)</span></div>';
-         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. Visited the school, conducted lesson observation\u2026 Type @ to tag" id="pend-reply-'+pendId+'" oninput="setPendComment(\''+pendKeyEsc+'\',this.value);handleMentionInput(\''+pendKeyEsc+'\',this.value,this)">'+esc(pd.comment||'')+'</textarea>';
+         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. Visited the school, conducted lesson observation\u2026 to notify someone, type @ and their name or email address" id="pend-reply-'+pendId+'" oninput="setPendComment(\''+pendKeyEsc+'\',this.value);handleMentionInput(\''+pendKeyEsc+'\',this.value,this)">'+esc(pd.comment||'')+'</textarea>';
          c += renderMentionDropdown(pendKey);
          c += '</div>';
          // Attach
@@ -3842,6 +3941,53 @@ function renderDashboard() {
          c += '<div style="display:flex;gap:8px">';
          c += '<button onclick="togglePendReply(\''+pendKeyEsc+'\')" style="flex:0;padding:10px 16px;border-radius:8px;border:1px solid #d0d4db;background:#fff;color:var(--grey);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px">Cancel</button>';
          c += '<button onclick="submitPendResponse(\''+pendKeyEsc+'\',\''+schoolEsc+'\',\''+needEsc+'\')" style="flex:1;padding:10px 16px;border-radius:8px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px">Submit response</button>';
+         c += '</div></div>';
+       }
+
+       // ── INLINE RE-ASSIGNMENT FORM ──
+       if (isReassigning) {
+         var rd = S._pendReassignData[pendKey] || {reason:'', assignee:null, searchQ:'', searchResults:[], searchLoading:false};
+         var reassignId = 'reassign-'+pendId;
+         c += '<div style="padding:12px 14px;border-top:1px solid #f0f0f0;background:#FFF8F0">';
+         c += '<div style="font-size:13px;font-weight:700;color:#546E7A;margin-bottom:4px">Re-assign this support request</div>';
+         c += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:12px">If you are unable to attend to this request, you can re-assign it to a colleague. The person who raised the request will be notified of the change.</div>';
+
+         // Assignee search
+         c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">Who should handle this instead?</div>';
+         if (rd.assignee) {
+           var a = rd.assignee;
+           c += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#E8F5E9;border:1.5px solid #C8E6C9;border-radius:8px">';
+           c += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">'+esc(a.name)+'</div><div style="font-size:11px;color:var(--grey)">'+esc(a.role||'')+(a.district?' \xb7 '+esc(a.district):'')+'</div></div>';
+           c += '<button onclick="removeReassignOfficial(\''+pendKeyEsc+'\')" style="width:32px;height:32px;border-radius:50%;border:1px solid #C8E6C9;background:#fff;color:var(--grey);cursor:pointer;font-size:14px;font-family:inherit" title="Remove">\xd7</button>';
+           c += '</div>';
+         } else {
+           c += '<input type="text" placeholder="Search by name or email\u2026" value="'+esc(rd.searchQ||'')+'" oninput="searchReassignOfficial(\''+pendKeyEsc+'\',this.value)" style="width:100%;padding:10px 12px;border:1.5px solid #d0d4db;border-radius:8px;font-size:13px;font-family:inherit;min-height:44px">';
+           if (rd.searchLoading) {
+             c += '<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching\u2026</div>';
+           } else if (rd.searchQ && rd.searchQ.length >= 2 && !rd.searchResults.length) {
+             c += '<div style="font-size:11px;color:var(--grey);padding:6px 0">No officials found matching \u201c'+esc(rd.searchQ)+'\u201d</div>';
+           } else if (rd.searchResults.length) {
+             c += '<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto">';
+             rd.searchResults.forEach(function(o, idx){
+               c += '<div onclick="selectReassignOfficial(\''+pendKeyEsc+'\',S._pendReassignData[\''+pendKeyEsc+'\'].searchResults['+idx+'])" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;min-height:44px;display:flex;flex-direction:column;justify-content:center'+(idx===0?'':'')+'" onmouseover="this.style.background=\'#f0f7f7\'" onmouseout="this.style.background=\'#fff\'">';
+               c += '<div style="font-size:13px;font-weight:600;color:var(--navy)">'+esc(o.name)+'</div>';
+               c += '<div style="font-size:11px;color:var(--grey)">'+esc(o.role||'')+(o.district?' \xb7 '+esc(o.district):'')+'</div>';
+               c += '</div>';
+             });
+             c += '</div>';
+           }
+         }
+         c += '</div>';
+
+         // Reason
+         c += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:4px">Reason for re-assigning <span style="color:var(--red)">*</span></div>';
+         c += '<textarea class="reply-input" style="border-radius:8px" rows="2" placeholder="e.g. I am not the subject specialist for this area, or I am currently supporting other schools in another circuit\u2026" id="'+reassignId+'" oninput="setPendReassignReason(\''+pendKeyEsc+'\',this.value)">'+esc(rd.reason||'')+'</textarea>';
+         c += '</div>';
+
+         // Actions
+         c += '<div style="display:flex;gap:8px">';
+         c += '<button onclick="togglePendReassign(\''+pendKeyEsc+'\')" style="flex:0;padding:10px 16px;border-radius:8px;border:1px solid #d0d4db;background:#fff;color:var(--grey);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px">Cancel</button>';
+         c += '<button onclick="submitPendReassign(\''+pendKeyEsc+'\',\''+schoolEsc+'\',\''+needEsc+'\')" style="flex:1;padding:10px 16px;border-radius:8px;border:none;background:#546E7A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px">Re-assign</button>';
          c += '</div></div>';
        }
 
@@ -3995,7 +4141,7 @@ function renderDashboard() {
            });
          });
          _supHTML += '</select></div>';
-         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">Tap \uD83D\uDCCE to attach evidence \u2192</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
+         _supHTML += '<div class="reply-box"><textarea class="reply-input" placeholder="Write a response\u2026 to notify someone, type @ and their name or email address" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setSupReply(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)" id="reply-'+needId+'">'+esc(S._supReplyText[need]||'')+'</textarea><div class="reply-actions"><span class="attach-hint">Tap \uD83D\uDCCE to attach evidence \u2192</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+needEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="reply-send" onclick="submitSupResponse(\''+needEsc+'\')">Send</button></div></div>';
          _supHTML += renderAttachButton(need);
          _supHTML += renderMentionDropdown(need);
          _supHTML += '</div>';
@@ -4008,7 +4154,7 @@ function renderDashboard() {
          _supHTML += '<div class="sup-resolve-flow">';
          _supHTML += '<div class="sup-resolve-form">';
          _supHTML += '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px">Describe what was done to address this</div>';
-         _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery\u2026 Type @ to tag" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
+         _supHTML += '<textarea class="sup-resolve-textarea" id="resolve-ta-'+needId+'" placeholder="e.g. Arranged curriculum support materials delivery\u2026 to notify someone, type @ and their name or email address" rows="3" oninput="setSupResolveComment(\''+needEsc+'\',this.value);handleMentionInput(\''+needEsc+'\',this.value,this)">'+esc(S._supResolveComment[need]||'')+'</textarea>';
          _supHTML += '<div style="display:flex;align-items:center;gap:6px;margin:6px 0"><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\'resolve:'+needEsc+'\')" title="Attach evidence">\uD83D\uDCCE Attach file</button></div>';
          _supHTML += renderAttachButton('resolve:'+need);
          _supHTML += renderMentionDropdown(need);
@@ -4529,7 +4675,7 @@ ${tab==='tracker'?`
            }
 
            // Reply input always visible
-           html += '<div class="pt-reply"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 Type @ to tag" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><div class="pt-actions"><span class="attach-hint">Tap the clip icon to attach supporting evidence →</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div></div>';
+           html += '<div class="pt-reply"><textarea class="pt-input" id="act-reply-'+decIdEsc.replace(/'/g,'')+'" placeholder="Write a comment\u2026 to notify someone, type @ and their name or email address" rows="1" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\';setActReply(\''+decIdEsc+'\',this.value);handleMentionInput(\''+decIdEsc+'\',this.value,this)">'+esc(S._actReplyText[c.dec.id]||'')+'</textarea><div class="pt-actions"><span class="attach-hint">Tap the clip icon to attach supporting evidence →</span><button class="reply-attach" onclick="event.stopPropagation();triggerCommentAttach(\''+decIdEsc+'\')" title="Attach supporting evidence">\uD83D\uDCCE</button><button class="pt-send" onclick="submitActResponse(\''+decIdEsc+'\')">Send</button></div></div>';
            html += renderAttachButton(c.dec.id);
            html += renderMentionDropdown(c.dec.id);
            html += '</div>';
