@@ -915,7 +915,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.2';
+const APP_VERSION = '2026.04.03.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1295,6 +1295,10 @@ function updateMentionUI(key) {
 var _voiceRec = null;
 var _voiceTarget = null;
 var _voiceField = null;
+var _voiceTimer = null;
+var _voiceCountdown = null;
+var _voiceMaxSec = 90;
+var _voiceSecLeft = 0;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 var _voiceUsedBefore = (function(){try{return localStorage.getItem('ddd_voice_used')==='1'}catch(e){return false}})();
 
@@ -1303,10 +1307,22 @@ function showVoiceHint(btnId) {
   if (!btn) return;
   var hint = document.createElement('div');
   hint.className = 'voice-hint';
-  hint.innerHTML = 'Your phone may ask for microphone access. <strong>Tap Allow</strong> to continue. Speak clearly and tap the button again when done.';
+  hint.innerHTML = 'Your phone may ask for microphone access. <strong>Tap Allow</strong> to continue. Speak clearly — you have up to <strong>1 minute 30 seconds</strong>. Tap the button again when done.';
   btn.parentNode.style.position = 'relative';
   btn.parentNode.appendChild(hint);
-  setTimeout(function(){ if(hint.parentNode) hint.parentNode.removeChild(hint); }, 6000);
+  setTimeout(function(){ if(hint.parentNode) hint.parentNode.removeChild(hint); }, 7000);
+}
+
+function updateVoiceCountdownUI() {
+  var el = document.getElementById('voice-countdown');
+  if (!el) return;
+  var m = Math.floor(_voiceSecLeft / 60);
+  var s = _voiceSecLeft % 60;
+  var timeStr = m + ':' + (s < 10 ? '0' : '') + s;
+  el.textContent = timeStr;
+  if (_voiceSecLeft <= 15) el.style.color = '#E53935';
+  else if (_voiceSecLeft <= 30) el.style.color = '#E8952E';
+  else el.style.color = '#E53935';
 }
 
 function toggleVoice(fieldPath, textareaId) {
@@ -1325,8 +1341,34 @@ function toggleVoice(fieldPath, textareaId) {
   _voiceRec.interimResults = false;
   _voiceField = fieldPath;
   _voiceTarget = textareaId;
+  _voiceSecLeft = _voiceMaxSec;
   var btn = document.getElementById('mic-' + textareaId);
   if (btn) btn.classList.add('recording');
+  // Show countdown badge
+  if (btn && btn.parentNode) {
+    var badge = document.createElement('div');
+    badge.id = 'voice-countdown';
+    badge.style.cssText = 'font-size:11px;font-weight:700;color:#E53935;text-align:center;margin-top:2px;font-variant-numeric:tabular-nums';
+    btn.parentNode.appendChild(badge);
+    updateVoiceCountdownUI();
+  }
+  // Hide the "Record voice note" label while recording
+  if (btn && btn.parentNode) {
+    var lbl = btn.parentNode.querySelector('[data-voice-label]');
+    if (lbl) lbl.style.display = 'none';
+  }
+  // Start countdown timer
+  _voiceCountdown = setInterval(function(){
+    _voiceSecLeft--;
+    updateVoiceCountdownUI();
+    if (_voiceSecLeft <= 0) {
+      if (_voiceRec) { _voiceRec.stop(); }
+    }
+  }, 1000);
+  // Auto-stop safety net
+  _voiceTimer = setTimeout(function(){
+    if (_voiceRec) { _voiceRec.stop(); }
+  }, (_voiceMaxSec + 1) * 1000);
   _voiceRec.onresult = function(e) {
     var transcript = '';
     for (var i = e.resultIndex; i < e.results.length; i++) {
@@ -1339,7 +1381,7 @@ function toggleVoice(fieldPath, textareaId) {
       var el = document.getElementById(textareaId);
       var existing = el ? el.value : '';
       var newVal = existing ? existing.trimEnd() + ' ' + trimmed : trimmed;
-      if (el) { el.value = newVal; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+      if (el) { el.value = newVal; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 240) + 'px'; }
       var parts = fieldPath.split('.');
       if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
       else if (parts.length === 1) S.f[parts[0]] = newVal;
@@ -1355,15 +1397,28 @@ function toggleVoice(fieldPath, textareaId) {
   _voiceRec.start();
 }
 function stopVoice() {
+  if (_voiceTimer) { clearTimeout(_voiceTimer); _voiceTimer = null; }
+  if (_voiceCountdown) { clearInterval(_voiceCountdown); _voiceCountdown = null; }
   if (_voiceRec) { try{_voiceRec.stop()}catch(e){} _voiceRec = null; }
-  if (_voiceTarget) { var btn = document.getElementById('mic-' + _voiceTarget); if (btn) btn.classList.remove('recording'); }
+  // Remove countdown badge
+  var badge = document.getElementById('voice-countdown');
+  if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+  if (_voiceTarget) {
+    var btn = document.getElementById('mic-' + _voiceTarget);
+    if (btn) btn.classList.remove('recording');
+    // Restore label
+    if (btn && btn.parentNode) {
+      var lbl = btn.parentNode.querySelector('[data-voice-label]');
+      if (lbl) lbl.style.display = '';
+    }
+  }
   _voiceField = null; _voiceTarget = null;
 }
 function micBtn(fieldPath, taId) {
   if (!_speechSupported) return '';
   var isRec = _voiceField === fieldPath;
-  var label = '<div style="font-size:9px;color:var(--grey);text-align:center;margin-top:2px;line-height:1.3;max-width:48px">Record voice note</div>';
-  return '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><button type="button" class="voice-btn' + (isRec ? ' recording' : '') + '" id="mic-' + taId + '" onclick="event.preventDefault();toggleVoice(\'' + fieldPath + '\',\'' + taId + '\')" title="' + (isRec ? 'Tap to stop recording' : 'Tap to speak instead of typing') + '">' + (isRec ? '&#9632;' : '&#127908;') + '</button>' + label + '</div>';
+  var label = '<div data-voice-label style="font-size:9px;color:var(--grey);text-align:center;margin-top:2px;line-height:1.3;max-width:48px">' + (isRec ? '' : 'Record voice note') + '</div>';
+  return '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><button type="button" class="voice-btn' + (isRec ? ' recording' : '') + '" id="mic-' + taId + '" onclick="event.preventDefault();toggleVoice(\'' + fieldPath + '\',\'' + taId + '\')" title="' + (isRec ? 'Tap to stop recording' : 'Tap to speak instead of typing — up to 1 min 30 sec') + '">' + (isRec ? '&#9632;' : '&#127908;') + '</button>' + label + '</div>';
 }
 
 // ── COMMENT ATTACHMENTS ──
