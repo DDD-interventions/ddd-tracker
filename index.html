@@ -939,7 +939,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.7';
+const APP_VERSION = '2026.04.03.8';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1034,7 +1034,7 @@ async function notifyTagged(ctx) {
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Subject(s)</td><td style="padding:8px 0">' + subjList + '</td></tr>' +
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Logged by</td><td style="padding:8px 0">' + esc(ctx.fromName||'') + (ctx.fromRole?' (' + esc(ctx.fromRole) + ')':'') + '</td></tr>' +
      '</table>' +
-     '<div style="text-align:center;margin:20px 0 8px"><a href="' + safeHref + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Tracker</a></div>' +
+     '<div style="text-align:center;margin:20px 0 8px"><a href="' + safeHref + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Learner Improvement Interventions Tracker</a></div>' +
      '</div></div>';
    await fetch(NOTIFY_URL, {
      method:'POST', headers:{'Content-Type':'application/json'},
