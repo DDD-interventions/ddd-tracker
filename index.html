@@ -939,7 +939,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.8';
+const APP_VERSION = '2026.04.03.9';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1140,6 +1140,7 @@ function renderOfficialSearch(need) {
 
 // ── @MENTION SYSTEM (Facebook-style) ──
 var _mentionTimer = null;
+var _mentionDoneNames = [];
 function getRecentTagged() {
   try { var raw = localStorage.getItem('ddd_recent_tagged'); return raw ? JSON.parse(raw) : []; } catch(e) { return []; }
 }
@@ -1161,6 +1162,12 @@ function handleMentionInput(key, text, el) {
     return;
   }
   var query = before.slice(atIdx + 1);
+  // If query starts with an already-inserted mention name, don't re-trigger search
+  var isCompletedMention = _mentionDoneNames.some(function(name) { return query === name || query.startsWith(name + ' '); });
+  if (isCompletedMention) {
+    if (S._mention.active && S._mention.key === key) { S._mention.active = false; S._mention.results = []; updateMentionUI(key); }
+    return;
+  }
   if (query.includes(' ') && query.split(' ').length > 3) {
     if (S._mention.active) { S._mention.active = false; S._mention.results = []; updateMentionUI(key); }
     return;
@@ -1244,6 +1251,7 @@ function insertMention(key, official) {
   }
 
   addRecentTagged(official);
+  if (_mentionDoneNames.indexOf(official.name) === -1) _mentionDoneNames.push(official.name);
   S._mention = {active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false};
   render();
 
