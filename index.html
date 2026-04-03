@@ -656,6 +656,30 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .poa-start:hover{background:var(--orange);color:#fff}
 .poa-done{border:1.5px solid var(--green);background:#fff;color:var(--green)}
 .poa-done:hover{background:var(--green);color:#fff}
+/* Notification bell & pane */
+.notif-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);cursor:pointer;font-size:18px;transition:.15s;flex-shrink:0;font-family:inherit;padding:0}
+.notif-bell:hover{background:rgba(255,255,255,.2);color:#fff}
+.notif-badge{position:absolute;top:4px;right:4px;min-width:18px;height:18px;border-radius:9px;background:#E53935;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;pointer-events:none}
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;animation:fadeIn .15s}
+.notif-pane{position:fixed;top:0;right:0;width:100%;max-width:400px;height:100%;background:#fff;z-index:901;box-shadow:-4px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column;animation:notifSlide .2s ease-out}
+@keyframes notifSlide{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.notif-pane-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e8e6e4;flex-shrink:0;background:#FAFBFC}
+.notif-pane-title{font-size:16px;font-weight:700;color:var(--navy)}
+.notif-pane-close{width:44px;height:44px;border-radius:50%;border:none;background:none;color:var(--grey);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:inherit}
+.notif-pane-close:hover{background:var(--grey-lt);color:var(--navy)}
+.notif-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.notif-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:60px;transition:background .1s}
+.notif-item:hover{background:#f8f9fc}
+.notif-item:active{background:#f0f2f5}
+.notif-item.unread{background:#FFF8E1}
+.notif-item.unread:hover{background:#FFF3CD}
+.notif-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:13px;font-weight:600;color:var(--navy);line-height:1.4}
+.notif-desc{font-size:12px;color:var(--grey);line-height:1.4;margin-top:2px}
+.notif-time{font-size:11px;color:var(--grey);margin-top:3px}
+.notif-empty{padding:40px 20px;text-align:center;color:var(--grey);font-size:13px;line-height:1.6}
+@media(max-width:480px){.notif-pane{max-width:100%}}
 </style>
 </head>
 <body>
@@ -915,7 +939,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.6';
+const APP_VERSION = '2026.04.03.7';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -938,6 +962,8 @@ const S = {
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
  _actTagged:{},
  _commentAttach:{},
+ _notifOpen:false,
+ _notifLastSeen:(function(){try{return localStorage.getItem('ddd_notif_last_seen')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:'Term 1 2026',activity_date:today(),
@@ -1895,6 +1921,191 @@ function toggleSupSchoolDetail(need){
   if(el)el.classList.toggle('show');
 }
 
+// ─── NOTIFICATION SYSTEM ───
+function getNotifications() {
+  var notifs = [];
+  var myId = S._officialId;
+  var myEmail = S.official.email || '';
+  var myRole = S.official.role || '';
+  var myDistrict = S.official.district || '';
+  if (!myId) return notifs;
+
+  // 1. Pending support requests (specifically requested for you)
+  var pendResolved = {};
+  (S._supResponses || []).forEach(function(r) {
+    if (r.scope_type === 'resolution') pendResolved[r.support_need] = true;
+    if (r.scope_type === 'reopened') delete pendResolved[r.support_need];
+  });
+
+  (S.decisions || []).forEach(function(d) {
+    if (d.official_id === myId) return;
+    var det = d.details || {};
+    var needs = det.support_needed || [];
+    var taggedAll = det.tagged_officials || {};
+    needs.forEach(function(need) {
+      if (pendResolved[need]) return;
+      if (!ROLE_SUPPORT_MAP[need]) return;
+      var taggedForNeed = taggedAll[need] || [];
+      var isUUIDMatch = taggedForNeed.some(function(o) { return o.id === myId; });
+      var isRoleMatch = ROLE_SUPPORT_MAP[need].includes(myRole) && (det.district || '') === myDistrict;
+      if (!isUUIDMatch && !isRoleMatch) return;
+      notifs.push({
+        type: isUUIDMatch ? 'pending_request' : 'pending_role',
+        title: isUUIDMatch ? (det.official_name || d.made_by || 'An official') + ' requested your support' : 'Support needed in your district',
+        desc: need + ' — ' + (det.schools || 'school not specified'),
+        time: d.date || d.created_at || '',
+        navTo: 'pending',
+        key: (det.schools||'')+'::'+(need||''),
+        color: isUUIDMatch ? '#E65100' : 'var(--orange)'
+      });
+    });
+  });
+
+  // 2. Re-assignments to you
+  (S._supResponses || []).forEach(function(r) {
+    if (r.scope_type !== 'reassignment') return;
+    var det = r.details || {};
+    if (!det.reassigned_to || det.reassigned_to.id !== myId) return;
+    notifs.push({
+      type: 'reassignment',
+      title: (r.official_name || 'An official') + ' re-assigned a request to you',
+      desc: (r.support_need || '') + ' — ' + (det.school || ''),
+      time: r.created_at || '',
+      navTo: 'pending',
+      key: (det.school||'')+'::'+(r.support_need||''),
+      color: '#546E7A'
+    });
+  });
+
+  // 3. Responses on support threads you logged
+  var myNeeds = {};
+  (S.decisions || []).forEach(function(d) {
+    if (d.official_id !== myId) return;
+    var det = d.details || {};
+    (det.support_needed || []).forEach(function(n) { myNeeds[n] = true; });
+  });
+  (S._supResponses || []).forEach(function(r) {
+    if (r.official_id === myId) return;
+    if (!myNeeds[r.support_need]) return;
+    if (r.scope_type === 'resolution' || r.scope_type === 'pending_response' || r.scope_type === 'reassignment') {
+      var label = r.scope_type === 'resolution' ? 'marked as addressed' : r.scope_type === 'reassignment' ? 're-assigned' : 'responded to';
+      notifs.push({
+        type: 'support_update',
+        title: (r.official_name || 'An official') + ' ' + label + ' your support request',
+        desc: r.support_need || '',
+        time: r.created_at || '',
+        navTo: 'support',
+        key: r.support_need || '',
+        color: 'var(--teal)'
+      });
+    }
+  });
+
+  // 4. Comments on your activity posts
+  (S._actResponses || []).forEach(function(r) {
+    if (r.official_id === myId) return;
+    var myDec = (S.decisions || []).find(function(d) { return d.id === r.decision_id && d.official_id === myId; });
+    if (!myDec) return;
+    notifs.push({
+      type: 'activity_comment',
+      title: (r.official_name || 'An official') + ' commented on your activity',
+      desc: (r.comment || '').slice(0, 80) + (r.comment && r.comment.length > 80 ? '...' : ''),
+      time: r.created_at || '',
+      navTo: 'activity',
+      key: r.decision_id || '',
+      color: 'var(--blue)'
+    });
+  });
+
+  // Sort newest first
+  notifs.sort(function(a, b) { return (b.time || '').localeCompare(a.time || ''); });
+  return notifs;
+}
+
+function getNotifCount() {
+  var lastSeen = S._notifLastSeen || '';
+  return getNotifications().filter(function(n) { return n.time && n.time > lastSeen; }).length;
+}
+
+function toggleNotifPane() {
+  S._notifOpen = !S._notifOpen;
+  if (S._notifOpen) {
+    // Mark as seen after a short delay so the user sees the unread styling first
+    setTimeout(function() {
+      var now = new Date().toISOString();
+      S._notifLastSeen = now;
+      try { localStorage.setItem('ddd_notif_last_seen', now); } catch(e) {}
+    }, 1500);
+  }
+  render();
+}
+
+function closeNotifPane() {
+  S._notifOpen = false;
+  render();
+}
+
+function navigateToNotif(navTo, key) {
+  S._notifOpen = false;
+  if (navTo === 'pending' || navTo === 'support') {
+    S.view = 'dashboard';
+    S.dashTab = 'overview';
+    // Expand the relevant support need
+    if (navTo === 'support' && key) S._supExpanded[key] = true;
+    render();
+    // Scroll to the section after render
+    setTimeout(function() {
+      var target = navTo === 'pending' ? document.querySelector('[style*="background:#FFF8E1"]') : null;
+      if (!target && key) {
+        var safeKey = key.replace(/[^a-zA-Z0-9]/g, '');
+        target = document.getElementById('sup-card-' + safeKey);
+      }
+      if (!target) target = document.querySelector('.dash-section');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  } else if (navTo === 'activity') {
+    S.view = 'dashboard';
+    S.dashTab = 'overview';
+    if (key) { if (!S._actCardOpen) S._actCardOpen = {}; S._actCardOpen[key] = true; }
+    render();
+    setTimeout(function() {
+      if (key) {
+        var el = document.getElementById('act-card-' + key.replace(/[^a-zA-Z0-9]/g, ''));
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      }
+      var sec = document.querySelector('.dash-section');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  }
+}
+
+function renderNotifPane() {
+  var notifs = getNotifications();
+  var lastSeen = S._notifLastSeen || '';
+  var html = '<div class="notif-overlay" onclick="closeNotifPane()"></div>';
+  html += '<div class="notif-pane">';
+  html += '<div class="notif-pane-hdr"><div class="notif-pane-title">Notifications</div><button class="notif-pane-close" onclick="closeNotifPane()" title="Close">\xd7</button></div>';
+  html += '<div class="notif-list">';
+  if (!notifs.length) {
+    html += '<div class="notif-empty">No notifications yet.<br>When colleagues respond to your support requests or comment on your activities, they will appear here.</div>';
+  } else {
+    notifs.forEach(function(n, i) {
+      var isUnread = n.time && n.time > lastSeen;
+      var navTo = n.navTo || '';
+      var key = (n.key || '').replace(/'/g, "\\x27");
+      html += '<div class="notif-item' + (isUnread ? ' unread' : '') + '" onclick="navigateToNotif(\'' + navTo + '\',\'' + key + '\')">';
+      html += '<div class="notif-dot" style="background:' + (n.color || 'var(--grey)') + (isUnread ? '' : ';opacity:.3') + '"></div>';
+      html += '<div class="notif-body">';
+      html += '<div class="notif-title">' + esc(n.title) + '</div>';
+      html += '<div class="notif-desc">' + esc(n.desc) + '</div>';
+      html += '<div class="notif-time">' + relTimeAgo(n.time) + '</div>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div></div>';
+  return html;
+}
+
 // ─── ACTIVITY TRACKER ───
 function toggleActCard(id){S._actCardOpen=S._actCardOpen||{};S._actCardOpen[id]=!S._actCardOpen[id];render();}
 function setActReply(id,val){S._actReplyText[id]=val;}
@@ -2045,12 +2256,18 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
  if(S.outcomeModal) renderOutcomeModal();
  else { const stale=document.getElementById('outcome-modal-overlay'); if(stale)stale.remove(); }
+ // Notification pane
+ var notifEl = document.getElementById('notif-pane-root');
+ if (S._notifOpen) {
+   if (!notifEl) { notifEl = document.createElement('div'); notifEl.id = 'notif-pane-root'; document.body.appendChild(notifEl); }
+   notifEl.innerHTML = renderNotifPane();
+ } else if (notifEl) { notifEl.innerHTML = ''; }
 }
 
 function renderEmailGate() {
