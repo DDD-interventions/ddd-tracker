@@ -296,13 +296,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-filters-clear:hover{background:rgba(11,142,141,.2)}
 @media(max-width:500px){.dash-filters-row{grid-template-columns:1fr 1fr}}
 
-/* Barrier bars */
-.bar-chart{display:flex;flex-direction:column;gap:8px}
-.bar-row{display:flex;align-items:center;gap:8px}
-.bar-label{font-size:11px;color:var(--grey-dk);min-width:100px;max-width:120px;text-align:right;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:500px){.bar-label{min-width:70px;max-width:90px;font-size:10px}}
-.bar-track{flex:1;height:20px;background:var(--grey-lt);border-radius:4px;overflow:hidden;position:relative}
-.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:700;color:#fff;min-width:20px;transition:width .4s}
 
 /* Loading / Toast */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:12px;color:var(--grey)}
@@ -939,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.07.2';
+const APP_VERSION = '2026.04.07.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3916,11 +3909,7 @@ function renderDashboard() {
  // ── SORTED DATA ──
  const barriers = Object.entries(barrierCounts).sort((a,b)=>b[1]-a[1]);
  const topSubjects = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
- const topTasks = Object.entries(dddTaskCountsDirect).sort((a,b)=>b[1]-a[1]);
- const topCats = Object.entries(dddCatCountsDirect).sort((a,b)=>b[1]-a[1]);
- const totalTaskHits = topCats.reduce((s,c)=>s+c[1],0);
  const topThemes = Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]);
- const topTriggers = Object.entries(triggerCounts).sort((a,b)=>b[1]-a[1]);
  const actTypes = Object.entries(activityByType).sort((a,b)=>b[1]-a[1]);
  const districts = Object.values(districtData).sort((a,b)=>b.activities-a.activities);
  const months = Object.entries(monthlyData).sort((a,b)=>a[0].localeCompare(b[0]));
@@ -4604,7 +4593,7 @@ ${tab==='trends'?`
            }).join('') + '</div>';
          }
 
-         html += '<div onclick="toggleChall(\\x27'+bsEsc+'\\x27)" style="cursor:pointer;border-radius:10px;background:'+(isOpen?'#FAFBFC':'#fff')+';border:1.5px solid '+(isOpen?c:'#E8E6E4')+';padding:14px;transition:all .2s;-webkit-tap-highlight-color:transparent">'
+         html += '<div onclick="toggleChall(\x27'+bsEsc+'\x27)" style="cursor:pointer;border-radius:10px;background:'+(isOpen?'#FAFBFC':'#fff')+';border:1.5px solid '+(isOpen?c:'#E8E6E4')+';padding:14px;transition:all .2s;-webkit-tap-highlight-color:transparent">'
            + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
              + '<div style="min-width:42px;height:42px;border-radius:10px;background:'+c+'14;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:'+c+'">'+count+'</span></div>'
              + '<div style="flex:1;min-width:0">'
@@ -4624,21 +4613,47 @@ ${tab==='trends'?`
    </div>
  </div>
  <!-- ═══ SCHOOL OBSERVATIONS ═══ -->
- ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));return '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>School Observation Findings</h3><span style="font-size:11px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc">On-the-ground findings from school visits — what DDD data cannot show you.</div>'+(issues.length?'<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Issues found</div><div style="display:grid;gap:4px;margin-bottom:12px">'+issues.map(o=>{const n=obsNo[o.key]||0;const schools=(obsSchools[o.key]||[]).join(', ');return '<div style="padding:8px 10px;border-radius:6px;background:#FFEBEE;border-left:3px solid var(--red)"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1;line-height:1.4">'+esc(o.label)+'</span><span style="font-size:11px;font-weight:700;color:var(--red);white-space:nowrap">'+n+'× not in place</span></div>'+(schools?'<div style="font-size:10px;color:var(--grey);margin-top:3px">'+esc(schools)+'</div>':'')+'</div>';}).join('')+'</div>':'')+(inPlace.length?'<div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">In place</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+inPlace.map(o=>'<span style="font-size:11px;background:#E8F5E9;color:var(--green-dk);padding:3px 8px;border-radius:4px;line-height:1.4">'+esc(o.label)+' ('+obsYes[o.key]+'×)</span>').join('')+'</div>':'')+'</div></div>';})()}
+ ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));
+   var obsHtml = '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>School Observation Findings</h3><span style="font-size:12px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc" style="font-size:13px;line-height:1.6">What officials found on the ground during school visits.</div>';
+   /* Summary strip */
+   var issueCount = issues.reduce(function(s,o){return s+(obsNo[o.key]||0)},0);
+   var inPlaceCount = inPlace.reduce(function(s,o){return s+(obsYes[o.key]||0)},0);
+   if(issueCount || inPlaceCount) {
+     obsHtml += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+     if(issueCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red);line-height:1.2">'+issueCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Not in place</div></div>';
+     if(inPlaceCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--green);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2">'+inPlaceCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">In place</div></div>';
+     obsHtml += '</div>';
+   }
+   /* Issues cards */
+   if(issues.length) {
+     obsHtml += '<div style="display:grid;gap:10px;margin-bottom:16px">';
+     issues.forEach(function(o){
+       var n=obsNo[o.key]||0;
+       var schools=(obsSchools[o.key]||[]).join(', ');
+       obsHtml += '<div style="border-radius:10px;background:#fff;border:1.5px solid #FFCDD2;padding:14px">'
+         + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+           + '<div style="min-width:42px;height:42px;border-radius:10px;background:#FFEBEE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--red)">'+n+'</span></div>'
+           + '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div>'
+             + '<div style="font-size:12px;font-weight:700;color:var(--red);margin-top:2px">Not in place</div>'
+           + '</div>'
+         + '</div>'
+         + (schools ? '<div style="font-size:12px;color:var(--grey);line-height:1.5;padding:8px 10px;background:#FAFBFC;border-radius:6px;margin-top:4px">'+esc(schools)+'</div>' : '')
+       + '</div>';
+     });
+     obsHtml += '</div>';
+   }
+   /* In place tags */
+   if(inPlace.length) {
+     obsHtml += '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">In place</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+     inPlace.forEach(function(o){
+       obsHtml += '<span style="font-size:13px;background:#E8F5E9;color:var(--green-dk);padding:6px 10px;border-radius:6px;line-height:1.4">'+esc(o.label)+' ('+obsYes[o.key]+'&times;)</span>';
+     });
+     obsHtml += '</div>';
+   }
+   obsHtml += '</div></div>';
+   return obsHtml;
+ })()}
 
- <!-- ═══ ACTIVITY BREAKDOWN ═══ -->
- ${actTypes.length ? `<div class="dash-section">
-   <div class="dash-section-hdr"><h3>What Types of Support Are You Doing?</h3><span style="font-size:11px;color:var(--grey)">${totalActivities} total</span></div>
-   <div class="dash-section-body">
-     <div class="bar-chart">${actTypes.map(([type,count])=>{
-       const maxAct = actTypes[0][1];
-       const pct = Math.round((count/maxAct)*100);
-       const colors={'School support visit':'#0B8E8D','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#7AB648','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#E8952E','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
-       const c = colors[type]||'#607D8B';
-       return `<div class="bar-row"><div class="bar-label">${esc(type)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}">${count}</div></div></div>`;
-     }).join('')}</div>
-   </div>
- </div>` : ''}
 `:''}
 
 ${tab==='tracker'?`
