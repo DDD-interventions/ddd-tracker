@@ -939,7 +939,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.07.1';
+const APP_VERSION = '2026.04.07.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -4542,44 +4542,87 @@ ${tab==='trends'?`
 
  <!-- ═══ BARRIERS ANALYSIS ═══ -->
  <div class="dash-section" style="border-left:4px solid var(--red)">
-   <div class="dash-section-hdr"><h3>What Challenges Are Schools Facing?</h3><span style="font-size:11px;color:var(--grey)">${barriers.length} type${barriers.length!==1?'s':''} reported</span></div>
+   <div class="dash-section-hdr"><h3>What Challenges Are Schools Facing?</h3><span style="font-size:12px;color:var(--grey)">${barriers.length} type${barriers.length!==1?'s':''} reported</span></div>
    <div class="dash-section-body">
-     <div class="dash-section-desc">Problems ${_lYou} flagged during school visits. Tap any challenge to see which schools are affected.</div>
-     ${barriers.length ? `<div style="display:grid;gap:4px">${barriers.slice(0,10).map(([b,count])=>{
-       const maxB = barriers[0][1];
-       const pct = Math.round((count/maxB)*100);
-       const bColors = {'Vacant post(s)':'#E53935','Teaching outside specialisation':'#E8952E','High educator absenteeism':'#FF7043','Textbook shortage':'#1565C0','Infrastructure issues':'#607D8B','No devices/connectivity':'#7B1FA2','Overcrowded classrooms':'#FF9800','High absenteeism':'#E53935','LTSM not delivered':'#795548','Language barriers':'#0097A7','Acting principal/HoD':'#F44336','Welfare concerns':'#607D8B'};
-       const c = bColors[b] || '#607D8B';
-       const barrierDistricts = new Set();
-       decs.forEach(d=>{const det=d.details||{};const allB=[...(det.ctx_staffing||[]),...(det.ctx_resources||[]),...(det.ctx_learners||[])];if(allB.includes(b)&&det.district)barrierDistricts.add(det.district)});
-       const isOpen = S._challExpanded===b;
-       const bsEsc = esc(b).replace(/'/g,'\x27');
-       /* Build school detail for expanded view */
-       let detailHtml = '';
-       if(isOpen){
-         const entries = barrierSchools[b]||[];
-         /* Group by district, de-dupe schools within each */
-         const byDist = {};
-         entries.forEach(e=>{if(!byDist[e.district])byDist[e.district]=new Set();byDist[e.district].add(e.school);});
-         const distKeys = Object.keys(byDist).sort();
-         detailHtml = '<div style="padding:8px 0 4px;display:grid;gap:6px">' + distKeys.map(dk=>{
-           const sArr = [...byDist[dk]].sort();
-           return '<div style="background:#FAFBFC;border-radius:6px;padding:8px 10px;border-left:3px solid '+c+'"><div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">'+esc(dk)+'</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+sArr.map(s=>'<span style="font-size:11px;background:#fff;border:1px solid #E0E0E0;border-radius:4px;padding:2px 8px;color:var(--navy);line-height:1.4">'+esc(s)+'</span>').join('')+'</div></div>';
-         }).join('') + '</div>';
+     <div class="dash-section-desc" style="font-size:13px;line-height:1.6">Problems ${_lYou} flagged during school visits. Tap any challenge below to see which schools are affected.</div>
+     ${barriers.length ? (function(){
+       var BARRIER_CATS = {
+         'Staffing':['Vacant post(s)','Teaching outside specialisation','High educator absenteeism','Acting principal/HoD'],
+         'Resources':['Textbook shortage','Infrastructure issues','No devices/connectivity','LTSM not delivered','Overcrowded classrooms'],
+         'Learners':['High absenteeism','Language barriers','Welfare concerns']
+       };
+       var catColors = {'Staffing':'#E53935','Resources':'#1565C0','Learners':'#E8952E'};
+       var barrierMap = {};
+       barriers.forEach(function(b){ barrierMap[b[0]] = b[1]; });
+       var totalBarrierHits = barriers.reduce(function(s,b){return s+b[1]},0);
+       var html = '';
+
+       /* Category summary cards */
+       var catSummary = Object.keys(BARRIER_CATS).map(function(cat){
+         var catCount = 0;
+         BARRIER_CATS[cat].forEach(function(b){ catCount += barrierMap[b]||0; });
+         return {cat:cat, count:catCount};
+       }).filter(function(c){return c.count>0});
+
+       if(catSummary.length > 1) {
+         html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+         catSummary.forEach(function(cs){
+           var pct = totalBarrierHits ? Math.round((cs.count/totalBarrierHits)*100) : 0;
+           var col = catColors[cs.cat]||'#607D8B';
+           html += '<div style="flex:1;min-width:90px;background:#fff;border:2px solid '+col+';border-radius:10px;padding:10px 12px;text-align:center">'
+             + '<div style="font-size:22px;font-weight:800;color:'+col+';line-height:1.2">'+cs.count+'</div>'
+             + '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">'+cs.cat+'</div>'
+             + '<div style="font-size:11px;color:var(--grey)">'+pct+'% of reports</div>'
+             + '</div>';
+         });
+         html += '</div>';
        }
-       return '<div onclick="toggleChall(\x27'+bsEsc+'\x27)" style="cursor:pointer;padding:8px 10px;border-radius:8px;background:'+(isOpen?'#FAFBFC':'transparent')+';transition:background .2s">' +
-         '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
-           '<div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:11px;font-weight:600;color:var(--navy)">' + esc(b) + '</span></div></div>' +
-           '<span style="font-size:11px;font-weight:700;color:'+c+';white-space:nowrap">'+count+'× across '+barrierDistricts.size+' district'+(barrierDistricts.size!==1?'s':'')+'</span>' +
-           '<span style="font-size:10px;color:var(--grey);transition:transform .2s;display:inline-block;transform:rotate('+(isOpen?'90':'0')+'deg)">▶</span>' +
-         '</div>' +
-         '<div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden;margin-top:4px"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:4px;transition:width .4s"></div></div>' +
-         detailHtml +
-       '</div>';
-     }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No barriers recorded yet — that is either great news or the context sections are being skipped</div>'}
+
+       /* Individual challenge cards */
+       html += '<div style="display:grid;gap:10px">';
+       barriers.slice(0,12).forEach(function(bArr){
+         var b = bArr[0], count = bArr[1];
+         var maxB = barriers[0][1];
+         var bColors = {'Vacant post(s)':'#E53935','Teaching outside specialisation':'#E8952E','High educator absenteeism':'#FF7043','Textbook shortage':'#1565C0','Infrastructure issues':'#607D8B','No devices/connectivity':'#7B1FA2','Overcrowded classrooms':'#FF9800','High absenteeism':'#E53935','LTSM not delivered':'#795548','Language barriers':'#0097A7','Acting principal/HoD':'#F44336','Welfare concerns':'#607D8B'};
+         var c = bColors[b] || '#607D8B';
+         var barrierDists = new Set();
+         decs.forEach(function(d){var det=d.details||{};var allB=[].concat(det.ctx_staffing||[]).concat(det.ctx_resources||[]).concat(det.ctx_learners||[]);if(allB.includes(b)&&det.district)barrierDists.add(det.district)});
+         var isOpen = S._challExpanded===b;
+         var bsEsc = esc(b).replace(/'/g,'\\x27');
+         var pct = Math.round((count/maxB)*100);
+
+         /* Expanded school detail */
+         var detailHtml = '';
+         if(isOpen){
+           var entries = barrierSchools[b]||[];
+           var byDist = {};
+           entries.forEach(function(e){if(!byDist[e.district])byDist[e.district]=new Set();byDist[e.district].add(e.school);});
+           var distKeys = Object.keys(byDist).sort();
+           detailHtml = '<div style="padding:10px 0 4px;display:grid;gap:8px">' + distKeys.map(function(dk){
+             var sArr = Array.from(byDist[dk]).sort();
+             return '<div style="background:#fff;border-radius:8px;padding:10px 12px;border-left:4px solid '+c+'"><div style="font-size:12px;font-weight:700;color:var(--grey-dk);margin-bottom:6px">'+esc(dk)+'</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+sArr.map(function(s){return '<span style="font-size:13px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;padding:4px 10px;color:var(--navy);line-height:1.4">'+esc(s)+'</span>'}).join('')+'</div></div>';
+           }).join('') + '</div>';
+         }
+
+         html += '<div onclick="toggleChall(\\x27'+bsEsc+'\\x27)" style="cursor:pointer;border-radius:10px;background:'+(isOpen?'#FAFBFC':'#fff')+';border:1.5px solid '+(isOpen?c:'#E8E6E4')+';padding:14px;transition:all .2s;-webkit-tap-highlight-color:transparent">'
+           + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+             + '<div style="min-width:42px;height:42px;border-radius:10px;background:'+c+'14;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:'+c+'">'+count+'</span></div>'
+             + '<div style="flex:1;min-width:0">'
+               + '<div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(b)+'</div>'
+               + '<div style="font-size:12px;color:var(--grey);margin-top:2px">'+barrierDists.size+' district'+(barrierDists.size!==1?'s':'')+' affected</div>'
+             + '</div>'
+             + '<span style="font-size:14px;color:'+c+';transition:transform .2s;display:inline-block;transform:rotate('+(isOpen?'90':'0')+'deg);flex-shrink:0">'+(isOpen?'\u25BC':'\u25B6')+'</span>'
+           + '</div>'
+           + '<div style="height:8px;background:#ECEFF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:4px;transition:width .4s"></div></div>'
+           + (isOpen ? '' : '<div style="font-size:12px;color:'+c+';margin-top:6px;text-align:center;font-weight:500">Tap to see schools</div>')
+           + detailHtml
+         + '</div>';
+       });
+       html += '</div>';
+       return html;
+     })() : '<div style="text-align:center;color:var(--grey);padding:24px;font-size:13px;line-height:1.6">No challenges recorded yet. As officials log school visits and flag context issues, challenges will appear here.</div>'}
    </div>
  </div>
-
  <!-- ═══ SCHOOL OBSERVATIONS ═══ -->
  ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));return '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>School Observation Findings</h3><span style="font-size:11px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc">On-the-ground findings from school visits — what DDD data cannot show you.</div>'+(issues.length?'<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Issues found</div><div style="display:grid;gap:4px;margin-bottom:12px">'+issues.map(o=>{const n=obsNo[o.key]||0;const schools=(obsSchools[o.key]||[]).join(', ');return '<div style="padding:8px 10px;border-radius:6px;background:#FFEBEE;border-left:3px solid var(--red)"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1;line-height:1.4">'+esc(o.label)+'</span><span style="font-size:11px;font-weight:700;color:var(--red);white-space:nowrap">'+n+'× not in place</span></div>'+(schools?'<div style="font-size:10px;color:var(--grey);margin-top:3px">'+esc(schools)+'</div>':'')+'</div>';}).join('')+'</div>':'')+(inPlace.length?'<div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">In place</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+inPlace.map(o=>'<span style="font-size:11px;background:#E8F5E9;color:var(--green-dk);padding:3px 8px;border-radius:4px;line-height:1.4">'+esc(o.label)+' ('+obsYes[o.key]+'×)</span>').join('')+'</div>':'')+'</div></div>';})()}
 
