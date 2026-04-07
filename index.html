@@ -932,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.07.3';
+const APP_VERSION = '2026.04.07.6';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3776,7 +3776,7 @@ function renderDashboard() {
  const monthlyData = {};
  const triggerCounts = {};
  const supportRequests = [];
- const obsYes = {}, obsNo = {}, obsSchools = {};
+ const obsYes = {}, obsNo = {}, obsSchools = {}, obsYesSchools = {};
 
  decs.forEach(d => {
    const det = d.details || {};
@@ -3875,7 +3875,7 @@ function renderDashboard() {
      const oSchool = det.schools || '(unknown)';
      SCHOOL_OBS.forEach(function(o){
        var v = det.obs[o.key];
-       if (v === 'yes') { obsYes[o.key] = (obsYes[o.key]||0)+1; }
+       if (v === 'yes') { obsYes[o.key] = (obsYes[o.key]||0)+1; if(!obsYesSchools[o.key])obsYesSchools[o.key]=[];obsYesSchools[o.key].push(oSchool); }
        if (v === 'no') { obsNo[o.key] = (obsNo[o.key]||0)+1; if(!obsSchools[o.key])obsSchools[o.key]=[];obsSchools[o.key].push(oSchool); }
      });
    }
@@ -4614,39 +4614,63 @@ ${tab==='trends'?`
  </div>
  <!-- ═══ SCHOOL OBSERVATIONS ═══ -->
  ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));
-   var obsHtml = '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>School Observation Findings</h3><span style="font-size:12px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc" style="font-size:13px;line-height:1.6">What officials found on the ground during school visits.</div>';
+   var obsHtml = '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>What Did You Find at Schools?</h3><span style="font-size:12px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc" style="font-size:13px;line-height:1.6">Things officials checked during school visits and what they found.</div>';
    /* Summary strip */
    var issueCount = issues.reduce(function(s,o){return s+(obsNo[o.key]||0)},0);
    var inPlaceCount = inPlace.reduce(function(s,o){return s+(obsYes[o.key]||0)},0);
    if(issueCount || inPlaceCount) {
      obsHtml += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
-     if(issueCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red);line-height:1.2">'+issueCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Not in place</div></div>';
-     if(inPlaceCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--green);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2">'+inPlaceCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">In place</div></div>';
+     if(issueCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red);line-height:1.2">'+issueCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Needs attention</div></div>';
+     if(inPlaceCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--green);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2">'+inPlaceCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Working well</div></div>';
      obsHtml += '</div>';
    }
-   /* Issues cards */
+   /* Issue cards */
    if(issues.length) {
+     obsHtml += '<div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:10px">Needs attention</div>';
      obsHtml += '<div style="display:grid;gap:10px;margin-bottom:16px">';
      issues.forEach(function(o){
        var n=obsNo[o.key]||0;
        var schools=(obsSchools[o.key]||[]).join(', ');
+       /* Flip positive label to a problem statement */
+       var problemMap = {
+         'apip_current':'School does not have a current APIP',
+         'apip_implemented':'SMT is not implementing the APIP',
+         'cur_plans':'Educators do not have lesson plans or assessment plans',
+         'cur_dh_monitor':'DHs are not monitoring lesson plans or curriculum coverage',
+         'lw_sufficient':'Not enough formal and informal activities in learner books',
+         'lw_marking':'Educators are not marking work or corrections are not being done',
+         'tm_registers':'Time book and period register are not well-managed',
+         'tm_learner_att':'Learner attendance is not being tracked',
+         'tm_educator_att':'Educator attendance and leave control is not in place',
+         'tm_departures':'Early departures or late arrivals are unaccounted for'
+       };
+       var problemLabel = problemMap[o.key] || o.label;
        obsHtml += '<div style="border-radius:10px;background:#fff;border:1.5px solid #FFCDD2;padding:14px">'
-         + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+         + '<div style="display:flex;align-items:center;gap:10px">'
            + '<div style="min-width:42px;height:42px;border-radius:10px;background:#FFEBEE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--red)">'+n+'</span></div>'
-           + '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div>'
-             + '<div style="font-size:12px;font-weight:700;color:var(--red);margin-top:2px">Not in place</div>'
+           + '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(problemLabel)+'</div>'
+             + (schools ? '<div style="font-size:12px;color:var(--grey);margin-top:4px;line-height:1.5">At: '+esc(schools)+'</div>' : '')
            + '</div>'
          + '</div>'
-         + (schools ? '<div style="font-size:12px;color:var(--grey);line-height:1.5;padding:8px 10px;background:#FAFBFC;border-radius:6px;margin-top:4px">'+esc(schools)+'</div>' : '')
        + '</div>';
      });
      obsHtml += '</div>';
    }
-   /* In place tags */
+   /* Working well cards */
    if(inPlace.length) {
-     obsHtml += '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">In place</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+     obsHtml += '<div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px">Working well</div>';
+     obsHtml += '<div style="display:grid;gap:10px">';
      inPlace.forEach(function(o){
-       obsHtml += '<span style="font-size:13px;background:#E8F5E9;color:var(--green-dk);padding:6px 10px;border-radius:6px;line-height:1.4">'+esc(o.label)+' ('+obsYes[o.key]+'&times;)</span>';
+       var n = obsYes[o.key]||0;
+       var schools = (obsYesSchools[o.key]||[]).join(', ');
+       obsHtml += '<div style="border-radius:10px;background:#fff;border:1.5px solid #C8E6C9;padding:14px">'
+         + '<div style="display:flex;align-items:center;gap:10px">'
+           + '<div style="min-width:42px;height:42px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--green)">'+n+'</span></div>'
+           + '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div>'
+             + (schools ? '<div style="font-size:12px;color:var(--grey);margin-top:4px;line-height:1.5">At: '+esc(schools)+'</div>' : '<div style="font-size:12px;font-weight:600;color:var(--green);margin-top:2px">Found at '+n+' school'+(n!==1?'s':'')+'</div>')
+           + '</div>'
+         + '</div>'
+       + '</div>';
      });
      obsHtml += '</div>';
    }
