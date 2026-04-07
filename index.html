@@ -939,7 +939,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.03.9';
+const APP_VERSION = '2026.04.07.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -968,7 +968,7 @@ const S = {
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:'Term 1 2026',activity_date:today(),
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
- ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
+ ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',data_insight:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
@@ -2400,7 +2400,7 @@ function getFormProgress() {
    [f.grades.length > 0, 2],
    [!!f.description, 1],
    [f.sip_focus_areas.length > 0, 1],
-   // Step 3: DDD Connection
+   // Step 3: Data Connection
    [!!f.ddd_used, 3],
    [f.action_types.length > 0 && (!f.action_types.includes('Other') || !!f.action_other.trim()), 3],
    [f.decision_types.length > 0, 2],
@@ -2415,11 +2415,14 @@ function getFormProgress() {
    [!!f.doc_file || !!f.doc_url, 1],
  ];
  // DDD-specific fields only count when DDD was actually used
- const usedDDD = f.ddd_used && f.ddd_used !== 'no';
+ const usedDDD = f.ddd_used && f.ddd_used !== 'no' && f.ddd_used !== 'other-data';
  if (usedDDD) {
    checks.push([f.ddd_reports.length > 0, 2]);
    checks.push([!!f.insight_type, 2]);
    checks.push([!!f.insight_detail, 1]);
+ }
+ if (f.ddd_used === 'other-data') {
+   checks.push([!!(f.other_data_source && f.other_data_source.trim()), 2]);
  }
  let filled = 0, total = 0;
  for (const [done, w] of checks) { total += w; if (done) filled += w; }
@@ -2450,7 +2453,7 @@ function renderLiveProgress() {
 function renderForm() {
   const step = S.f.formStep;
   if(step===-1) return renderFormStart();
-  const steps = ['Where & When','What Happened','DDD Connection','Context & Follow-up','Review'];
+  const steps = ['Where & When','What Happened','Data Connection','Context & Follow-up','Review'];
   const stepColors = ['var(--teal)','var(--green)','var(--blue)','var(--orange)','var(--navy)'];
   const allErrs = S._validationErrors || [];
   const progressMessages = ['Let\'s start with the basics','Describe what you did','Link your work to the data','Nearly there \u2014 just context and follow-up','Check everything before submitting'];
@@ -2520,7 +2523,7 @@ function renderWelcome() {
     '</div>' +
     '<div class="pilot-notice" style="animation:fadeUp .4s ease .65s both">' +
       '<div class="pn-icon">🧪</div>' +
-      '<div class="pn-text"><strong>Pilot until 10 April 2026.</strong> Please log your Term 1 2026 school support activities — go back as far as you can. Your entries will help us test the tracker and decide on next steps.</div>' +
+      '<div class="pn-text"><strong>Pilot until 17 April 2026.</strong> Please log as many school support activities as possible — go back as far as you can. Your entries will help us test the tracker and decide on next steps.</div>' +
     '</div>' +
     '<div style="padding:0 18px 10px;animation:fadeUp .4s ease .7s both">' + renderNotifyToggle() + '</div>' +
     '<div class="welcome-cta">' +
@@ -3108,9 +3111,9 @@ function renderActionPicker(){
 }
 function renderFormStep3(){
   const phase=getPhaseForGrades();
-  const usedDDD=S.f.ddd_used && S.f.ddd_used!=='no';
-  return `<div class="section fade-in"><div class="sec-hdr blue" style="border-color:var(--blue)"><div><h2>3. DDD Data Connection</h2><p>Link DDD insight to your decision and action</p></div></div><div class="sec-body">
-    <div class="field" id="fld-ddd-used"><label>Was DDD data used?<span class="req">*</span></label><div class="radio-grp">${['Yes \u2014 directly triggered this','Yes \u2014 informed my approach','Partially','No'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
+  const usedDDD=S.f.ddd_used && S.f.ddd_used!=='no' && S.f.ddd_used!=='other-data';
+  return `<div class="section fade-in"><div class="sec-hdr blue" style="border-color:var(--blue)"><div><h2>3. Data That Informed Your Response</h2><p>What data guided your decision and action</p></div></div><div class="sec-body">
+    <div class="field" id="fld-ddd-used"><label>Was data used to inform this intervention?<span class="req">*</span></label><div class="radio-grp">${['Yes \u2014 DDD data directly triggered this','Yes \u2014 DDD data informed my approach','DDD data partially used','Yes \u2014 but from another source (not DDD)','No data used'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','other-data','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
     ${usedDDD ? `
       <div class="field"><label>What were you looking at on DDD?</label><div style="font-size:11px;color:var(--grey);margin:-4px 0 10px;line-height:1.4">Select everything that applies — pick the questions you were trying to answer</div>${renderDDDTasks()}</div>
       <div class="field"><label>When did you access this report?</label><input type="date" value="${S.f.ddd_access_date||''}" max="${today()}" onchange="S.f.ddd_access_date=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
@@ -3125,7 +3128,8 @@ function renderFormStep3(){
         ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
         ${S.f.insight_types.length&&!(S.f.insight_types.length===1&&S.f.insight_types[0]==='other-issue'&&!S.f.insight_detail)?(buildInsightStatement()?`<div style="margin-top:10px;background:var(--green-lt);border-radius:8px;padding:10px 12px;border-left:3px solid var(--green)"><div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.6">${buildInsightStatement()}</div></div>`:''):''}      </div>
     ` : ''}
-    ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs DDD data. But next time, try starting from the data. You can log into the dashboard yourself, or ask your Programme Manager or Subject Advisor for a data pack, presentation, or spreadsheet extract.</div></div>`:''}
+    ${S.f.ddd_used==='other-data'?`<div style="background:#E3F2FD;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:#1565C0;line-height:1.6;margin-bottom:10px">Good \u2014 using any data to inform your support is valuable. Please tell us what data you used.</div></div><div class="field"><label>What data source did you use?</label><div class="hint">e.g. SA-SAMS reports, school assessment records, provincial data, LURITS, own records</div><textarea rows="2" placeholder="Describe the data source briefly\u2026" oninput="S.f.other_data_source=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical">${esc(S.f.other_data_source||'')}</textarea></div>`:''}
+    ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs data. But next time, try starting from the data. You can log into the DDD Dashboard yourself, use SA-SAMS reports, or ask your Programme Manager or Subject Advisor for a data pack.</div></div>`:''}
 
     <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data that made you step in? Select all that apply.</div>${renderTriggerPicker()}</div>
     ${S.f.intervention_triggers.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for what made you act \u2014 please describe:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}
@@ -3158,7 +3162,7 @@ function renderFormStep4(){
   </div></div>`;
 }
 function rvRow(l,v){if(!v)return'';return`<div class="review-row"><span class="review-label">${l}</span><span class="review-value">${esc(String(v))}</span></div>`}
-function dddLbl(v){const m={'yes-direct':'Yes \u2014 directly triggered','yes-informed':'Yes \u2014 informed approach','partially':'Partially','no':'No'};return m[v]||'\u2014'}
+function dddLbl(v){const m={'yes-direct':'Yes \u2014 directly triggered','yes-informed':'Yes \u2014 informed approach','partially':'Partially','other-data':'Yes \u2014 other data source','no':'No'};return m[v]||'\u2014'}
 function supLbl(v){const m={'light':'Light touch','regular':'Regular support','intensive':'Intensive support'};return m[v]||'\u2014'}
 function renderFormReview(){
   const f=S.f;
@@ -3167,7 +3171,7 @@ function renderFormReview(){
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">DDD Connection</div>${rvRow('DDD Used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
@@ -3272,8 +3276,8 @@ function getValidationErrors() {
  if (!f.activity_type) errs.push({step:1,field:'activity_type',label:'Activity type',fieldId:'fld-activity'});
  if (f.activity_type==='Other'&&!f.activity_type_other.trim()) errs.push({step:1,field:'activity_type_other',label:'Activity type (please describe)',fieldId:'fld-activity'});
  if (!f.grades.length) errs.push({step:1,field:'grades',label:'Grades supported',fieldId:'fld-grades'});
- // Step 3: DDD Connection
- if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was DDD data used?',fieldId:'fld-ddd-used'});
+ // Step 3: Data Connection
+ if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was data used?',fieldId:'fld-ddd-used'});
  if (!f.action_types.length) errs.push({step:2,field:'action_types',label:'Intervention activity (action taken)',fieldId:'fld-action'});
  if (f.action_types.includes('Other')&&!f.action_other.trim()) errs.push({step:2,field:'action_other',label:'Intervention activity (please describe)',fieldId:'fld-action'});
  return errs;
@@ -3287,7 +3291,7 @@ function getStepErrors(stepIdx) {
 // Render inline validation banner
 function renderValidationBanner(errors) {
  if (!errors.length) return '';
- const stepNames = ['Where & When','What Happened','DDD Connection','Context & Follow-up','Review'];
+ const stepNames = ['Where & When','What Happened','Data Connection','Context & Follow-up','Review'];
  return `<div class="validation-banner">
    <h3>${errors.length} thing${errors.length>1?'s':''} still needed before you can submit</h3>
    <ul class="validation-missing">${errors.map(e =>
@@ -3340,7 +3344,7 @@ async function submitForm() {
  activity_type:S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type,
  intervention_theme:S.f.intervention_theme==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:S.f.intervention_theme,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
- ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null,
+ ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, other_data_source:S.f.other_data_source||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
  insight_types:S.f.insight_types,
  insight_detail:S.f.insight_detail,
@@ -3462,7 +3466,7 @@ function resetForm() {
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
- ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
+ ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'', follow_up:false, follow_up_desc:'',
@@ -3771,7 +3775,7 @@ function renderDashboard() {
  const themeCounts = {};
  const dddTaskCountsDirect = {};
  const dddCatCountsDirect = {};
- const dddUsageCounts = {direct:0,informed:0,partial:0,none:0};
+ const dddUsageCounts = {direct:0,informed:0,partial:0,otherData:0,none:0};
  const dddSourceCounts = {dashboard:0,presentation:0,spreadsheet:0,shared:0};
  const subjectCounts = {};
  const provinceCounts = {};
@@ -3826,6 +3830,7 @@ function renderDashboard() {
    if (det.ddd_used==='yes-direct') dddUsageCounts.direct++;
    else if (det.ddd_used==='yes-informed') dddUsageCounts.informed++;
    else if (det.ddd_used==='partially') dddUsageCounts.partial++;
+   else if (det.ddd_used==='other-data') dddUsageCounts.otherData++;
    else dddUsageCounts.none++;
 
    // DDD data source
@@ -3888,7 +3893,7 @@ function renderDashboard() {
 
  // ── DDD QUALITY ──
  const dddTotal = totalActivities || 1;
- const dddPct = Math.round(((dddUsageCounts.direct+dddUsageCounts.informed+dddUsageCounts.partial)/dddTotal)*100);
+ const dddPct = Math.round(((dddUsageCounts.direct+dddUsageCounts.informed+dddUsageCounts.partial+dddUsageCounts.otherData)/dddTotal)*100);
  const withNumbers = decs.filter(d=>{const det=d.details||{};return det.insight_pass_rate||det.insight_learners_affected||det.insight_threshold||det.insight_educator_absent||det.insight_attendance_days||det.insight_sba_exam_gap||det.insight_curriculum_pct}).length;
  const dddEntries = decs.filter(d=>{const det=d.details||{};return det.ddd_used&&det.ddd_used!=='no'}).length;
  const dataQualityPct = dddEntries ? Math.round((withNumbers/dddEntries)*100) : 0;
@@ -4484,7 +4489,11 @@ ${tab==='overview'?`
                <span style="font-size:13px;font-weight:700;color:var(--orange)">${dddUsageCounts.partial}</span>
              </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
-               <span style="font-size:11px;color:var(--grey-dk)">Did not use DDD</span>
+               <span style="font-size:11px;color:var(--grey-dk)">Other data source</span>
+               <span style="font-size:13px;font-weight:700;color:#5C6BC0">${dddUsageCounts.otherData}</span>
+             </div>
+             <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+               <span style="font-size:11px;color:var(--grey-dk)">No data used</span>
                <span style="font-size:13px;font-weight:700;color:var(--grey)">${dddUsageCounts.none}</span>
              </div>
            </div>
@@ -4528,66 +4537,6 @@ ${tab==='trends'?`
          </div>`;
        }).join('')}
      </div></div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No timeline data yet</div>'}
-   </div>
- </div>
-
- <!-- ═══ BARRIERS ANALYSIS ═══ -->
- <div class="dash-section" style="border-left:4px solid #7B1FA2">
-   <div class="dash-section-hdr"><h3>What Questions Are Driving Your Data Use?</h3><span style="font-size:11px;color:var(--grey)">${topCats.length} categor${topCats.length!==1?'ies':'y'}</span></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">When officials use the DDD Dashboard, these are the questions they are trying to answer. This shows where data is driving the most inquiry — and where awareness may need to grow.</div>
-     ${topCats.length ? `
-     <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-       <div style="position:relative;width:110px;height:110px;flex-shrink:0">
-         <svg viewBox="0 0 36 36" style="width:100%;height:100%">
-           ${(function(){
-             var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
-             var offset = 0;
-             return topCats.map(function(c){
-               var pct = totalTaskHits ? (c[1]/totalTaskHits)*100 : 0;
-               var color = catColors[c[0]] || '#999';
-               var s = '<circle cx="18" cy="18" r="15.5" fill="none" stroke="'+color+'" stroke-width="3.5" stroke-dasharray="'+pct+' '+(100-pct)+'" stroke-dashoffset="-'+offset+'" style="transform:rotate(-90deg);transform-origin:center"/>';
-               offset += pct;
-               return s;
-             }).join('');
-           })()}
-         </svg>
-       </div>
-       <div style="flex:1;display:grid;gap:6px">
-         ${topCats.map(function(c){
-           var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
-           var color = catColors[c[0]] || '#999';
-           var pct = totalTaskHits ? Math.round((c[1]/totalTaskHits)*100) : 0;
-           return '<div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:'+color+';flex-shrink:0"></span><span style="font-size:11px;color:var(--navy);flex:1">'+c[0]+'</span><span style="font-size:12px;font-weight:700;color:'+color+'">'+c[1]+' ('+pct+'%)</span></div>';
-         }).join('')}
-       </div>
-     </div>
-     <div style="font-size:10px;font-weight:700;color:#7B1FA2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Questions Officials Are Asking</div>
-     <div style="display:grid;gap:6px">
-       ${topTasks.slice(0,10).map(function(t){
-         var maxT = topTasks[0][1];
-         var pct = Math.max(Math.round((t[1]/maxT)*100), 6);
-         var taskObj = DDD_TASKS.find(function(d){ return d.q === t[0]; });
-         var catColors = {'Performance & Promotion':'#0B8E8D','Attendance':'#E8952E','Subjects & Curriculum':'#1565C0','Management & Staffing':'#7B1FA2','Trends & Year-on-Year':'#607D8B'};
-         var color = taskObj ? (catColors[taskObj.cat] || '#607D8B') : '#607D8B';
-         return '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px"><span style="font-size:11px;color:var(--navy);font-weight:500;flex:1;line-height:1.4">'+t[0]+'</span><span style="font-size:11px;font-weight:700;color:'+color+';white-space:nowrap">'+t[1]+'×</span></div><div style="height:6px;background:#ECEFF1;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width .4s"></div></div></div>';
-       }).join('')}
-     </div>
-     ${topTasks.length === 0 ? '' : '<div style="margin-top:12px;padding:8px 10px;background:#F8F9FA;border-radius:6px;font-size:10px;color:var(--grey);line-height:1.5">These questions map to the task-based report picker in the Log Activity form. If a category is low, officials may need guidance on those DDD reports.</div>'}
-     ` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No DDD data questions recorded yet — officials will see this once they select reports during logging</div>'}
-   </div>
- </div>
-
- <!-- ═══ INTERVENTION TRIGGERS ═══ -->
- <div class="dash-section" style="border-left:4px solid #E8952E">
-   <div class="dash-section-hdr"><h3>What Made Officials Decide to Act?</h3><span style="font-size:11px;color:var(--grey)">${topTriggers.length} trigger${topTriggers.length!==1?'s':''}</span></div>
-   <div class="dash-section-body">
-     <div class="dash-section-desc">The reasons officials gave for stepping in — what they saw in the data or context that prompted action. Understanding triggers helps the programme target support where it matters most.</div>
-     ${topTriggers.length ? `<div style="display:grid;gap:6px">${topTriggers.slice(0,12).map(function([t,count]){
-       const maxTr = topTriggers[0][1];
-       const pct = Math.max(Math.round((count/maxTr)*100), 6);
-       return '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px"><span style="font-size:11px;color:var(--navy);font-weight:500;flex:1;line-height:1.4">' + esc(t) + '</span><span style="font-size:11px;font-weight:700;color:#E8952E;white-space:nowrap">' + count + '\u00d7</span></div><div style="height:6px;background:#ECEFF1;border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:#E8952E;border-radius:3px;transition:width .4s"></div></div></div>';
-     }).join('')}</div>` : '<div style="text-align:center;color:var(--grey);padding:20px;font-size:12px">No intervention triggers recorded yet</div>'}
    </div>
  </div>
 
@@ -4794,8 +4743,20 @@ ${tab==='tracker'?`
          var isOpen = S._actCardOpen && S._actCardOpen[cardId];
 
          var rptArr = c.det.ddd_reports || [];
-         var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && rptArr.length > 0;
-         var chainDataLabel = usedDDD ? rptArr.join(', ') : 'No DDD data used';
+         var usedDDD = c.det.ddd_used && c.det.ddd_used !== 'no' && (rptArr.length > 0 || (c.det.ddd_tasks && c.det.ddd_tasks.length));
+         var chainDataLabel = (function(){
+           if (c.det.ddd_used === 'other-data') return c.det.other_data_source || 'Non-DDD data source';
+           if (!usedDDD) return 'No data used';
+           // Prefer stored task categories, then tasks/questions, then insight types
+           if (c.det.ddd_task_cats && c.det.ddd_task_cats.length) return c.det.ddd_task_cats.join(', ');
+           if (c.det.ddd_tasks && c.det.ddd_tasks.length) return c.det.ddd_tasks.slice(0,3).join('; ') + (c.det.ddd_tasks.length > 3 ? ' (+' + (c.det.ddd_tasks.length-3) + ' more)' : '');
+           if (c.det.insight_types && c.det.insight_types.length) return c.det.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join(', ');
+           // Fallback: reverse-map reports to categories
+           var cats = {};
+           DDD_TASKS.forEach(function(task){ if(task.reports.some(function(r){return rptArr.includes(r)})) cats[task.cat]=true; });
+           var catArr = Object.keys(cats);
+           return catArr.length ? catArr.join(', ') : rptArr.join(', ');
+         })();
          var decLabel = (c.det.decision_types&&c.det.decision_types.length)?c.det.decision_types.join('; '):(c.det.decision_type || (c.det.decision_other ? 'Other: '+c.det.decision_other : '\u2014'));
 
          var decResponses = (S._actResponses||[]).filter(function(r){return r.decision_id===c.dec.id && r.response_type==='comment'});
@@ -4825,7 +4786,7 @@ ${tab==='tracker'?`
          if (district) html += '<span class="act-meta-tag">'+esc(district)+'</span>';
          if (c.det.subjects && c.det.subjects.length) c.det.subjects.slice(0,3).forEach(function(s){ html += '<span class="act-meta-tag" style="background:#E8F5E9;color:#2E7D32">'+esc(s)+'</span>'; });
          if (c.hasFollowUp) html += '<span class="act-meta-tag" style="background:#FFF8E1;color:#F57F17;font-weight:700;border:1px solid #FFE082">Follow-up due</span>';
-         if (usedDDD) html += '<span class="act-meta-tag" style="background:#E3F2FD;color:#1565C0">Data-informed</span>';
+         if (usedDDD || c.det.ddd_used === 'other-data') html += '<span class="act-meta-tag" style="background:#E3F2FD;color:#1565C0">Data-informed</span>';
          html += '</div></div>';
 
          // ── ACTION BAR (Facebook-style) ──
