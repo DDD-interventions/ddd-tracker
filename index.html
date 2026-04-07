@@ -932,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.07.6';
+const APP_VERSION = '2026.04.07.7';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -4630,7 +4630,7 @@ ${tab==='trends'?`
      obsHtml += '<div style="display:grid;gap:10px;margin-bottom:16px">';
      issues.forEach(function(o){
        var n=obsNo[o.key]||0;
-       var schools=(obsSchools[o.key]||[]).join(', ');
+       var _rawSchools=obsSchools[o.key]||[];var _uniqSchools=[].concat(_rawSchools).filter(function(v,i,a){return a.indexOf(v)===i});var schools=_uniqSchools.slice(0,3).join(', ')+(_uniqSchools.length>3?' and '+(_uniqSchools.length-3)+' more':'');
        /* Flip positive label to a problem statement */
        var problemMap = {
          'apip_current':'School does not have a current APIP',
@@ -4662,7 +4662,7 @@ ${tab==='trends'?`
      obsHtml += '<div style="display:grid;gap:10px">';
      inPlace.forEach(function(o){
        var n = obsYes[o.key]||0;
-       var schools = (obsYesSchools[o.key]||[]).join(', ');
+       var _rawSchools=obsYesSchools[o.key]||[];var _uniqSchools=[].concat(_rawSchools).filter(function(v,i,a){return a.indexOf(v)===i});var schools=_uniqSchools.slice(0,3).join(', ')+(_uniqSchools.length>3?' and '+(_uniqSchools.length-3)+' more':'');
        obsHtml += '<div style="border-radius:10px;background:#fff;border:1.5px solid #C8E6C9;padding:14px">'
          + '<div style="display:flex;align-items:center;gap:10px">'
            + '<div style="min-width:42px;height:42px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--green)">'+n+'</span></div>'
