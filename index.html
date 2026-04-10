@@ -41,12 +41,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
 .form-group{background:#f7f9fc;border-radius:8px;padding:14px 14px 2px;margin:8px 0 12px}
 .form-group-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.form-progress-msg{text-align:center;font-size:11px;color:var(--grey);margin-top:4px;margin-bottom:-2px;font-style:italic}
+.form-progress-msg{text-align:center;font-size:12px;color:var(--teal);margin:6px auto 2px;font-style:italic;font-weight:500;max-width:420px;line-height:1.4}
 .grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .grade-grid label.tag{min-height:44px;display:flex;align-items:center;justify-content:center;padding:10px 8px;font-size:13px;border-radius:8px}
 @media(min-width:500px){.grade-grid{grid-template-columns:repeat(4,1fr)}}
 .school-count-indicator{font-size:12px;font-weight:600;color:var(--teal);margin-top:6px}
-.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden}
+.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
 .sec-hdr{padding:14px 18px 8px;border-left:4px solid var(--teal);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
 .sec-hdr:active{transform:scale(.99);opacity:.9}
 .sec-hdr h2{font-size:15px;font-weight:600;color:#323130}
@@ -84,7 +84,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-dd-filter{padding:8px 10px;border-bottom:1px solid #e8e6e4}
 .school-dd-filter input{width:100%;padding:10px 12px;border:2px solid var(--teal);border-radius:8px;font-size:14px;font-family:inherit}
 .school-dd-filter input:focus{outline:none;border-color:var(--teal)}
-.school-dd-list{max-height:300px;overflow-y:auto}
+.school-dd-list{max-height:45vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .school-dd-item{padding:12px 12px;font-size:13px;color:#323130;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f8f7f6;min-height:48px}
 .school-dd-item:hover{background:var(--teal-lt)}
 .school-dd-item.checked{background:#f0faf9;font-weight:600}
@@ -165,9 +165,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .wc-card .wc-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px}
 .wc-card .wc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
 .wc-card .wc-desc{font-size:11.5px;color:var(--grey);line-height:1.55}
-.welcome-proof{margin:16px 18px 0;padding:11px 14px;background:var(--green-lt);border-radius:8px;display:flex;align-items:center;gap:10px}
-.welcome-proof .wp-icon{font-size:18px}
-.welcome-proof .wp-text{font-size:11.5px;color:#2E7D32;line-height:1.5}
+
 .pilot-notice{margin:14px 18px 0;padding:12px 14px;background:#FFF3E0;border:1.5px solid #FF9800;border-radius:8px;display:flex;align-items:flex-start;gap:10px}
 .pilot-notice .pn-icon{font-size:18px;flex-shrink:0;margin-top:1px}
 .pilot-notice .pn-text{font-size:12px;color:#E65100;line-height:1.55}
@@ -932,7 +930,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.07.7';
+const APP_VERSION = '2026.04.10.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -950,7 +948,7 @@ const S = {
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
- _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false,
+ _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false, _dashPhaseFilter:'ALL',
  _supTagged:{},
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
  _actTagged:{},
@@ -1750,11 +1748,33 @@ function setPendReassignReason(key, val){
   S._pendReassignData[key].reason = val;
 }
 var _reassignSearchTimer = null;
+function _updateReassignResultsUI(key){
+  var rd=S._pendReassignData[key]||{searchQ:'',searchResults:[],searchLoading:false};
+  var el=document.getElementById('reassign-results-'+key.replace(/[^a-zA-Z0-9]/g,'_'));
+  if(!el)return;
+  var pendKeyEsc=key.replace(/'/g,"\\x27");
+  var html='';
+  if(rd.searchLoading){
+    html='<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching\u2026</div>';
+  }else if(rd.searchQ&&rd.searchQ.length>=2&&!rd.searchResults.length){
+    html='<div style="font-size:11px;color:var(--grey);padding:6px 0">No officials found matching \u201c'+esc(rd.searchQ)+'\u201d</div>';
+  }else if(rd.searchResults.length){
+    html='<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;-webkit-overflow-scrolling:touch">';
+    rd.searchResults.forEach(function(o,idx){
+      html+='<div onclick="selectReassignOfficial(\''+pendKeyEsc+'\',S._pendReassignData[\''+pendKeyEsc+'\'].searchResults['+idx+'])" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;min-height:44px;display:flex;flex-direction:column;justify-content:center" onmouseover="this.style.background=\'#f0f7f7\'" onmouseout="this.style.background=\'#fff\'">';
+      html+='<div style="font-size:13px;font-weight:600;color:var(--navy)">'+esc(o.name)+'</div>';
+      html+='<div style="font-size:11px;color:var(--grey)">'+esc(o.role||'')+(o.district?' \xb7 '+esc(o.district):'')+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
 function searchReassignOfficial(key, query){
   if (!S._pendReassignData[key]) S._pendReassignData[key] = {reason:'', assignee:null, searchQ:'', searchResults:[], searchLoading:false};
   S._pendReassignData[key].searchQ = query;
-  if (!query || query.length < 2) { S._pendReassignData[key].searchResults = []; S._pendReassignData[key].searchLoading = false; render(); return; }
-  S._pendReassignData[key].searchLoading = true; render();
+  if (!query || query.length < 2) { S._pendReassignData[key].searchResults = []; S._pendReassignData[key].searchLoading = false; _updateReassignResultsUI(key); return; }
+  S._pendReassignData[key].searchLoading = true; _updateReassignResultsUI(key);
   if (_reassignSearchTimer) clearTimeout(_reassignSearchTimer);
   _reassignSearchTimer = setTimeout(async function(){
     try {
@@ -1763,7 +1783,7 @@ function searchReassignOfficial(key, query){
       (data || []).forEach(function(o){ if (!seen[o.email] && o.email !== S.official.email) { seen[o.email] = true; results.push({ id:o.id, name:o.full_name||'', role:o.role||'', email:o.email||'', circuit:o.circuit||'', district:o.district||'' }); }});
       S._pendReassignData[key].searchResults = results;
     } catch(e) { S._pendReassignData[key].searchResults = []; console.warn('Reassign search failed:', e); }
-    S._pendReassignData[key].searchLoading = false; render();
+    S._pendReassignData[key].searchLoading = false; _updateReassignResultsUI(key);
   }, 300);
 }
 function selectReassignOfficial(key, official){
@@ -2490,8 +2510,7 @@ function renderWelcome() {
     firstName = esc(S.official.full_name.split(' ')[0]);
   }
   // Use programme-wide stats (from RPC, bypasses RLS)
-  var wpSchools = (S._programmeStats && S._programmeStats.schools) || 0;
-  var wpProvs = (S._programmeStats && S._programmeStats.provinces) || 0;
+
   var cards = '';
   var cardData = [
     ['📊', 'Show the impact of your support', 'Every activity you log connects your work to real learner outcomes — giving you evidence of what\u2019s working.', 'var(--teal)'],
@@ -2510,10 +2529,7 @@ function renderWelcome() {
       '<p>This tracker helps you <strong style="color:var(--teal-dk)">build a record of the difference you\u2019re making</strong> — so your work with schools doesn\u2019t go unnoticed.</p>' +
     '</div>' +
     '<div class="welcome-cards">' + cards + '</div>' +
-    '<div class="welcome-proof" style="animation:fadeUp .4s ease .55s both">' +
-      '<div class="wp-icon">🏫</div>' +
-      '<div class="wp-text"><strong>' + (wpSchools > 0 ? wpSchools.toLocaleString() + ' school' + (wpSchools !== 1 ? 's' : '') : '740+ schools') + '</strong> across ' + (wpProvs > 1 ? wpProvs + ' provinces' : '9 provinces') + ' are already being supported through DDD Data Informed interventions this year.</div>' +
-    '</div>' +
+
     '<div class="pilot-notice" style="animation:fadeUp .4s ease .65s both">' +
       '<div class="pn-icon">🧪</div>' +
       '<div class="pn-text"><strong>Pilot until 17 April 2026.</strong> Please log as many school support activities as possible — go back as far as you can. Your entries will help us test the tracker and decide on next steps.</div>' +
@@ -2621,10 +2637,80 @@ function renderFormStart(){
 // School picker helpers
 const PHASE_LABELS={P:'Primary',S:'Secondary',C:'Combined',I:'Intermediate'};
 function parseSchoolsArr(){return S.f.schools?S.f.schools.split(',').map(s=>s.trim()).filter(Boolean):[];}
-function addSchool(name){const arr=parseSchoolsArr();if(!arr.includes(name)){arr.push(name);S.f.schools=arr.join(', ');}render();_refocusSchoolFilter();}
-function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();_refocusSchoolFilter();}
+function addSchool(name){const arr=parseSchoolsArr();if(!arr.includes(name)){arr.push(name);S.f.schools=arr.join(', ');}if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}}
+function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.schools=arr.join(', ');S.f._vhExpanded=false;if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}}
 function _refocusSchoolFilter(){if(S.f._schoolDDOpen){setTimeout(function(){const el=document.getElementById('spFilter');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}},30);}}
 function toggleSchool(name){parseSchoolsArr().includes(name)?removeSchool(name):addSchool(name);}
+function _updateSchoolPickerInPlace(){
+  var listEl=document.querySelector('.school-picker .school-dd .school-dd-list');
+  var footEl=document.querySelector('.school-picker .school-dd .school-dd-foot');
+  var tagsEl=document.querySelector('.school-tags');
+  var countEl=document.querySelector('.school-count-indicator');
+  var trigEl=document.querySelector('.school-trigger span:first-child');
+  if(!listEl){render();_refocusSchoolFilter();return;}
+  var scrollTop=listEl.scrollTop;
+  var allSchools=getAvailableSchools();
+  var selected=parseSchoolsArr();
+  var q=(S.f._schoolQ||'').toLowerCase();
+  var filtered=q?allSchools.filter(function(s){return s[0].toLowerCase().includes(q)}):allSchools;
+  var phaseFilter=S.f._schoolPhaseFilter||'ALL';
+  var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+  var phaseFiltered=filtered;
+  if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
+  _spItems=phaseFiltered;
+  var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+  var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
+  var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
+  var html='';
+  if(phaseFiltered.length===0){
+    html='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
+  }else{
+    var showCircuit=!S.f.circuit;var circuitLookup={};
+    if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(var cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(var pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
+    var shown=phaseFiltered.slice(0,120);
+    for(var i=0;i<shown.length;i++){
+      var s=shown[i];var isChecked=selected.includes(s[0]);
+      var circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
+      var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
+      var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
+      var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
+      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+'</div></div>';
+    }
+    if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
+  }
+  listEl.innerHTML=html;
+  listEl.scrollTop=scrollTop;
+  if(footEl){var scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);footEl.innerHTML='<span>'+scope+' \xb7 '+phaseFiltered.length+' schools'+(phaseFilter!=='ALL'?' (filtered)':'')+'</span><span>'+selected.length+' selected</span>';}
+  if(trigEl)trigEl.textContent=selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':'Select school(s)...';
+  if(countEl)countEl.innerHTML=selected.length?selected.length+' school'+(selected.length!==1?'s':'')+' selected':'';
+  // Update tags area
+  if(tagsEl){
+    var allSch=getAvailableSchools();
+    tagsEl.innerHTML=selected.map(function(sn,idx){
+      var match=allSch.find(function(sc){return sc[0]===sn;});
+      var circuit=S.f.circuit||'';var district=S.f.district||'';
+      var phase=match&&match[1]?PHASE_LABELS[match[1]]||'':'';
+      var meta=[district,circuit,phase].filter(Boolean).join(' \xb7 ');
+      return '<span class="school-tag"><span class="st-info"><span class="st-name">'+esc(sn)+'</span>'+(meta?'<span class="st-meta">'+esc(meta)+'</span>':'')+'</span><button data-sp-rm="'+idx+'">Remove</button></span>';
+    }).join('');
+  }
+  _refocusSchoolFilter();
+}
+
+function _updatePhaseTabsUI(activeCode){
+  var tabContainer=document.querySelector('.school-dd [data-phase-tabs]');
+  if(!tabContainer)return;
+  var btns=tabContainer.querySelectorAll('button');
+  btns.forEach(function(btn){
+    var code=btn.getAttribute('data-phase');
+    var isActive=code===activeCode;
+    btn.style.borderColor=isActive?'var(--teal)':'#c8c6c4';
+    btn.style.background=isActive?'var(--teal-lt)':'#fff';
+    btn.style.color=isActive?'var(--teal-dk)':'var(--grey)';
+    btn.style.fontWeight=isActive?'700':'500';
+  });
+  _refocusSchoolFilter();
+}
 
 function getLookbackTerms(currentTerm) {
   var parts = currentTerm.split(' ');
@@ -2738,7 +2824,8 @@ function bulkSelectPhase(phase){
   const arr=parseSchoolsArr();
   const toAdd=phase==='ALL'?schools:schools.filter(s=>s[1]===phase);
   for(const s of toAdd){if(!arr.includes(s[0]))arr.push(s[0]);}
-  S.f.schools=arr.join(', ');S.f._vhExpanded=false;render();_refocusSchoolFilter();
+  S.f.schools=arr.join(', ');S.f._vhExpanded=false;
+  if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}
 }
 let _spItems=[];
 let _spFilterTimer=null;
@@ -2838,11 +2925,11 @@ function schoolPickerHTML(){
     // Phase filter tabs
     var phaseFilter=S.f._schoolPhaseFilter||'ALL';
     var phaseTabs=[['ALL','All'],['FET','FET Phase (Gr 10\u201312)'],['SENIOR','Senior Phase (Gr 7\u20139)'],['INTERMEDIATE','Intermediate (Gr 4\u20136)'],['FOUNDATION','Foundation (Gr R\u20133)']];
-    dd+='<div style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
+    dd+='<div data-phase-tabs style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
     for(var pt=0;pt<phaseTabs.length;pt++){
       var ptCode=phaseTabs[pt][0],ptLabel=phaseTabs[pt][1];
       var ptActive=phaseFilter===ptCode;
-      dd+='<button onclick="S.f._schoolPhaseFilter=\''+ptCode+'\';render();setTimeout(function(){var el=document.getElementById(\'spFilter\');if(el)el.focus();},50)" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ptActive?'var(--teal)':'#c8c6c4')+';background:'+(ptActive?'var(--teal-lt)':'#fff')+';color:'+(ptActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ptActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ptLabel+'</button>';
+      dd+='<button data-phase="'+ptCode+'" onclick="S.f._schoolPhaseFilter=\''+ptCode+'\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\''+ptCode+'\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ptActive?'var(--teal)':'#c8c6c4')+';background:'+(ptActive?'var(--teal-lt)':'#fff')+';color:'+(ptActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ptActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ptLabel+'</button>';
     }
     dd+='</div>';
 
@@ -2895,7 +2982,7 @@ document.addEventListener('click',function(e){
   const bulk=e.target.closest('[data-sp-bulk]');
   if(bulk){bulkSelectPhase(bulk.dataset.spBulk);return;}
   const clear=e.target.closest('[data-sp-clear]');
-  if(clear){S.f.schools='';render();return;}
+  if(clear){S.f.schools='';if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}return;}
   const addBtn=e.target.closest('[data-sp-add]');
   if(addBtn){const idx=parseInt(addBtn.dataset.spAdd);if(_spItems[idx])toggleSchool(_spItems[idx][0]);return;}
   const rmBtn=e.target.closest('[data-sp-rm]');
@@ -3490,6 +3577,7 @@ function initDashFilters() {
   };
   S._dashRoleFilter = 'ALL';
   S._dashSubjFilter = [];
+  S._dashPhaseFilter = 'ALL';
   S._dashSubjQ = '';
   S._dashSubjDDOpen = false;
 }
@@ -4181,20 +4269,22 @@ function renderDashboard() {
            c += '</div>';
          } else {
            c += '<input type="text" placeholder="Search by name or email\u2026" value="'+esc(rd.searchQ||'')+'" oninput="searchReassignOfficial(\''+pendKeyEsc+'\',this.value)" style="width:100%;padding:10px 12px;border:1.5px solid #d0d4db;border-radius:8px;font-size:13px;font-family:inherit;min-height:44px">';
+           c += '<div id="reassign-results-'+pendKey.replace(/[^a-zA-Z0-9]/g,'_')+'">';
            if (rd.searchLoading) {
              c += '<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching\u2026</div>';
            } else if (rd.searchQ && rd.searchQ.length >= 2 && !rd.searchResults.length) {
              c += '<div style="font-size:11px;color:var(--grey);padding:6px 0">No officials found matching \u201c'+esc(rd.searchQ)+'\u201d</div>';
            } else if (rd.searchResults.length) {
-             c += '<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto">';
+             c += '<div style="border:1px solid #e0e0e0;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;-webkit-overflow-scrolling:touch">';
              rd.searchResults.forEach(function(o, idx){
-               c += '<div onclick="selectReassignOfficial(\''+pendKeyEsc+'\',S._pendReassignData[\''+pendKeyEsc+'\'].searchResults['+idx+'])" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;min-height:44px;display:flex;flex-direction:column;justify-content:center'+(idx===0?'':'')+'" onmouseover="this.style.background=\'#f0f7f7\'" onmouseout="this.style.background=\'#fff\'">';
+               c += '<div onclick="selectReassignOfficial(\''+pendKeyEsc+'\',S._pendReassignData[\''+pendKeyEsc+'\'].searchResults['+idx+'])" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;min-height:44px;display:flex;flex-direction:column;justify-content:center" onmouseover="this.style.background=\'#f0f7f7\'" onmouseout="this.style.background=\'#fff\'">';
                c += '<div style="font-size:13px;font-weight:600;color:var(--navy)">'+esc(o.name)+'</div>';
                c += '<div style="font-size:11px;color:var(--grey)">'+esc(o.role||'')+(o.district?' \xb7 '+esc(o.district):'')+'</div>';
                c += '</div>';
              });
              c += '</div>';
            }
+           c += '</div>';
          }
          c += '</div>';
 
@@ -4727,7 +4817,17 @@ ${tab==='tracker'?`
          subjHTML+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+subjFilter.map(function(s){return'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:3px 8px;font-size:11px;font-weight:600">'+esc(s)+'<button onclick="event.stopPropagation();S._dashSubjFilter=S._dashSubjFilter.filter(function(x){return x!==\''+s.replace(/'/g,"\\x27")+'\'});render()" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 3px;line-height:1">&times;</button></span>';}).join('')+'</div>';
        }
 
-       return '<div style="margin:10px 0 6px"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Filter by designation</div>'+roleDD+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by subject</div>'+subjHTML+'</div>';
+       // Phase filter dropdown
+       var phaseFilterVal=S._dashPhaseFilter||'ALL';
+       var gradeToPhase={'R':'Foundation','1':'Foundation','2':'Foundation','3':'Foundation','4':'Intermediate','5':'Intermediate','6':'Intermediate','7':'Senior','8':'Senior','9':'Senior','10':'FET','11':'FET','12':'FET'};
+       var phaseCounts={Foundation:0,Intermediate:0,Senior:0,FET:0};
+       decs.forEach(function(d){var g=(d.details||{}).grades||[];var phases={};g.forEach(function(gr){var p=gradeToPhase[gr];if(p)phases[p]=true;});Object.keys(phases).forEach(function(p){phaseCounts[p]++;});});
+       var phaseDD='<select onchange="S._dashPhaseFilter=this.value;render()" style="width:100%;padding:10px 12px;font-size:13px;font-family:inherit;border:1.5px solid #c8c6c4;border-radius:8px;background:#fff;color:var(--navy);min-height:44px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url(\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22><path d=%22M0 0l6 8 6-8z%22 fill=%22%23999%22/></svg>\');background-repeat:no-repeat;background-position:right 12px center">';
+       phaseDD+='<option value="ALL"'+(phaseFilterVal==='ALL'?' selected':'')+'>All phases ('+decs.length+')</option>';
+       ['Foundation','Intermediate','Senior','FET'].forEach(function(p){if(phaseCounts[p]>0)phaseDD+='<option value="'+p+'"'+(phaseFilterVal===p?' selected':'')+'>'+p+' ('+phaseCounts[p]+')</option>';});
+       phaseDD+='</select>';
+
+       return '<div style="margin:10px 0 6px"><div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Filter by designation</div>'+roleDD+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by subject</div>'+subjHTML+'<div style="font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">Filter by phase</div>'+phaseDD+'</div>';
      })()}
 
      ${(function(){
@@ -4782,6 +4882,14 @@ ${tab==='tracker'?`
          if (subjFilter.length > 0) {
            var dSubjects = det.subjects || [];
            if (!dSubjects.some(function(s){return subjFilter.includes(s);})) return;
+         }
+         // Apply phase filter
+         var phaseFilterVal = S._dashPhaseFilter || 'ALL';
+         if (phaseFilterVal !== 'ALL') {
+           var _gtp={'R':'Foundation','1':'Foundation','2':'Foundation','3':'Foundation','4':'Intermediate','5':'Intermediate','6':'Intermediate','7':'Senior','8':'Senior','9':'Senior','10':'FET','11':'FET','12':'FET'};
+           var dGrades = det.grades || [];
+           var hasPhase = dGrades.some(function(g){return _gtp[g]===phaseFilterVal;});
+           if (!hasPhase) return;
          }
          var matchActs = acts.filter(function(a){return a.decision_id === d.id});
          if (matchActs.length) {
