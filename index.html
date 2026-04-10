@@ -930,7 +930,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.10.1';
+const APP_VERSION = '2026.04.10.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -2918,7 +2918,7 @@ function schoolPickerHTML(){
     dd+='</div>';
 
     // Filter input
-    if(allSchools.length>20){
+    if(allSchools.length>5){
       dd+='<div class="school-dd-filter"><input type="text" placeholder="Start typing a school name..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
     }
 
