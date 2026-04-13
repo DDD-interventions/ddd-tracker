@@ -932,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.13.1';
+const APP_VERSION = '2026.04.13.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -2677,7 +2677,8 @@ function _updateSchoolPickerInPlace(){
       var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
       var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
       var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
-      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+'</div></div>';
+      var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
+      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
     }
     if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
   }
@@ -2828,6 +2829,19 @@ function getUPSchoolNames(){
   var available=getAvailableSchools().map(function(s){return s[0];});
   return NSC_UP_SCHOOLS[d].map(function(s){return s.n;}).filter(function(n){return available.includes(n);});
 }
+function getSchoolD3Info(schoolName){
+  var d=S.f.district;if(!d||!NSC_UP_SCHOOLS[d])return null;
+  var list=NSC_UP_SCHOOLS[d];
+  for(var i=0;i<list.length;i++){if(list[i].n===schoolName)return list[i];}
+  return null;
+}
+function d3BadgeHTML(d3){
+  if(!d3)return '';
+  var tierMap={C:['Critical','#C62828'],S:['Severe','#E65100'],M:['Moderate','#F57F17']};
+  var t=tierMap[d3.t]||['','#999'];
+  var reason=d3.t==='M'?'Bachelor pass rate %s% is below 30% (pass rate: %s%)'.replace('%s',d3.b).replace('%s',d3.p):'NSC pass rate %s% is below %s%'.replace('%s',d3.p).replace('%s',d3.t==='C'?'50':'70');
+  return '<div style="font-size:10px;color:'+t[1]+';margin-top:2px;display:flex;align-items:center;gap:3px"><span style="font-weight:700">D3 '+t[0]+'</span><span>\u2014 '+reason+'</span></div>';
+}
 let _spItems=[];
 let _spFilterTimer=null;
 function schoolFilterInput(val){
@@ -2864,7 +2878,8 @@ function schoolFilterInput(val){
         var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
         var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
         var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
-        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+'</div></div>';
+        var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
+        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
@@ -2891,6 +2906,18 @@ function schoolPickerHTML(){
       const meta=[district,circuit,phase].filter(Boolean).join(' \xb7 ');
       return '<span class="school-tag"><span class="st-info"><span class="st-name">'+esc(s)+'</span>'+(meta?'<span class="st-meta">'+esc(meta)+'</span>':'')+'</span><button data-sp-rm="'+i+'">Remove</button></span>';
     }).join('')+'</div>';
+    // D3 underperformance banner for selected schools
+    var d3Alerts=selected.map(function(sn){return getSchoolD3Info(sn);}).filter(Boolean);
+    if(d3Alerts.length){
+      var tierMap={C:['Critical','#C62828','#FFF5F5'],S:['Severe','#E65100','#FFF8E1'],M:['Moderate','#F57F17','#FFFDE7']};
+      tags+='<div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">';
+      for(var ai=0;ai<d3Alerts.length;ai++){
+        var da=d3Alerts[ai];var dt=tierMap[da.t]||['','#999','#f5f5f5'];
+        var reason=da.t==='M'?'Met 70% pass rate (%s%) but bachelor pass rate of %s% is below the 30% threshold'.replace('%s',da.p).replace('%s',da.b):'NSC pass rate of %s% is below the %s% threshold'.replace('%s',da.p).replace('%s',da.t==='C'?'50':'70');
+        tags+='<div style="padding:8px 12px;border-radius:8px;border-left:4px solid '+dt[1]+';background:'+dt[2]+';font-size:12px;line-height:1.4"><span style="font-weight:700;color:'+dt[1]+'">'+esc(da.n)+'</span><span style="color:'+dt[1]+';font-weight:600"> \u2014 Circular D3 '+dt[0]+'</span><div style="color:#555;margin-top:2px">'+reason+'</div></div>';
+      }
+      tags+='</div>';
+    }
   }
 
   if(!hasDistrict){
@@ -2921,7 +2948,7 @@ function schoolPickerHTML(){
       var ftActive=phaseFilter===ftCode;
       dd+='<button data-phase="'+ftCode+'" onclick="S.f._schoolPhaseFilter=\''+ftCode+'\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\''+ftCode+'\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ftActive?'var(--teal)':'#c8c6c4')+';background:'+(ftActive?'var(--teal-lt)':'#fff')+';color:'+(ftActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ftActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ftLabel+'</button>';
     }
-    if(_upCount>0){var upActive=phaseFilter==='UP';dd+='<button data-phase="UP" onclick="S.f._schoolPhaseFilter=\'UP\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\'UP\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(upActive?'#C62828':'#c8c6c4')+';background:'+(upActive?'#FFF5F5':'#fff')+';color:'+(upActive?'#C62828':'var(--grey)')+';cursor:pointer;font-weight:'+(upActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">\u26a0 Circular D3 Underperforming Secondary Schools ('+_upCount+')</button>';}
+    if(_upCount>0){var upActive=phaseFilter==='UP';dd+='<button data-phase="UP" onclick="S.f._schoolPhaseFilter=\'UP\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\'UP\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(upActive?'#C62828':'#c8c6c4')+';background:'+(upActive?'#FFF5F5':'#fff')+';color:'+(upActive?'#C62828':'var(--grey)')+';cursor:pointer;font-weight:'+(upActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">Circular D3 Underperforming Secondary Schools ('+_upCount+')</button>';}
     if(selected.length>0)dd+='<button data-sp-clear style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid #c00;background:#fff;color:#c00;cursor:pointer;font-weight:600;font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">Clear all</button>';
     dd+='</div>';
 
@@ -2959,7 +2986,8 @@ function schoolPickerHTML(){
         var tBadge=s[1]&&typeBadgeLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+typeBadgeColors[s[1]]+'22;color:'+typeBadgeColors[s[1]]+';margin-left:6px;flex-shrink:0">'+typeBadgeLabels[s[1]]+'</span>':'';
         var phaseSub=s[1]&&phaseLabelsForType[s[1]]?phaseLabelsForType[s[1]]:'';
         var metaParts=[circLbl,phaseSub].filter(Boolean).join(' \xb7 ');
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+'</div></div>';
+        var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
+        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
