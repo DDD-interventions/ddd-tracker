@@ -932,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.13.4';
+const APP_VERSION = '2026.04.13.5';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -3357,10 +3357,7 @@ function renderSuccess() {
    <div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">What you found and did</div>
    <div style="font-size:13px;color:var(--navy);font-weight:600;line-height:1.6">${insight}</div>
    <div style="font-size:11px;color:var(--grey);margin-top:8px;line-height:1.5">This is a strong entry \u2014 real numbers from DDD data showing what you saw and how you responded.</div>
- </div>`:`<div style="margin-top:16px;padding:14px;background:var(--teal-lt);border-radius:8px;text-align:left">
-   <div style="font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Tip for next time</div>
-   <div style="font-size:12px;color:var(--navy);line-height:1.6">Try starting from the DDD data — whether you log into the dashboard yourself, use a presentation from your programme team, or work from a spreadsheet extract. Note the numbers you see \u2014 pass rates, how many learners, which subjects. Entries with real numbers help us show the difference your work is making.</div>
- </div>`}
+ </div>`:``}
  <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:12px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> at <strong>${esc(S.f.schools)}</strong><br> ${S.f.district}, ${S.f.province} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
  ${S.f.action_types.length ? 'Intervention activity: ' + esc(S.f.action_types.join('; ')) : ''}
  ${S.f.educators_supported ? ' \u00b7 ~' + S.f.educators_supported + ' educators' : ''}
