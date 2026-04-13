@@ -932,7 +932,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.13.3';
+const APP_VERSION = '2026.04.13.4';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -2842,7 +2842,7 @@ function d3BadgeHTML(d3){
   if(!d3)return '';
   var tierMap={C:['Critical','#C62828'],S:['Severe','#E65100'],M:['Moderate','#F57F17']};
   var t=tierMap[d3.t]||['','#999'];
-  var reason=d3.t==='M'?'Bachelor pass rate %s% is below 30% (pass rate: %s%)'.replace('%s',d3.b).replace('%s',d3.p):'NSC pass rate %s% is below %s%'.replace('%s',d3.p).replace('%s',d3.t==='C'?'50':'70');
+  var reason=d3.t==='M'?'Bachelor pass rate %s% is below 30% (pass rate: %s%)'.replace('%s',d3.b).replace('%s',d3.p):'NSC pass rate %s% is below 70%'.replace('%s',d3.p);
   return '<div style="font-size:10px;color:'+t[1]+';margin-top:2px;display:flex;align-items:center;gap:3px"><span style="font-weight:700">D3 '+t[0]+'</span><span>\u2014 '+reason+'</span></div>';
 }
 function d3AlertsInnerHTML(selected){
@@ -2852,7 +2852,7 @@ function d3AlertsInnerHTML(selected){
   var html='';
   for(var ai=0;ai<d3Alerts.length;ai++){
     var da=d3Alerts[ai];var dt=tierMap[da.t]||['','#999','#f5f5f5'];
-    var reason=da.t==='M'?'Met 70% pass rate (%s%) but bachelor pass rate of %s% is below the 30% threshold'.replace('%s',da.p).replace('%s',da.b):'NSC pass rate of %s% is below the %s% threshold'.replace('%s',da.p).replace('%s',da.t==='C'?'50':'70');
+    var reason=da.t==='M'?'Met 70% pass rate (%s%) but bachelor pass rate of %s% is below the 30% threshold'.replace('%s',da.p).replace('%s',da.b):'NSC pass rate of %s% is below the 70% threshold'.replace('%s',da.p);
     html+='<div style="padding:8px 12px;border-radius:8px;border-left:4px solid '+dt[1]+';background:'+dt[2]+';font-size:12px;line-height:1.4"><span style="font-weight:700;color:'+dt[1]+'">'+esc(da.n)+'</span><span style="color:'+dt[1]+';font-weight:600"> \u2014 Circular D3 '+dt[0]+'</span><div style="color:#555;margin-top:2px">'+reason+'</div></div>';
   }
   return html;
