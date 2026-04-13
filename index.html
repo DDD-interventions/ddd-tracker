@@ -930,7 +930,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.10.2';
+const APP_VERSION = '2026.04.10.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1850,7 +1850,7 @@ async function submitPendReassign(key, school, need){
 
 function supTimeAgo(dateStr){
   if(!dateStr)return '';
-  var d=new Date(dateStr);var now=new Date();var diff=Math.floor((now-d)/(1000*60*60*24));
+  var d=parseLocalDate(dateStr);var now=new Date();var diff=Math.floor((now-d)/(1000*60*60*24));
   if(diff<1)return 'Today';if(diff===1)return '1 day ago';if(diff<30)return diff+' days ago';
   var m=Math.floor(diff/30);return m===1?'1 month ago':m+' months ago';
 }
@@ -3990,7 +3990,7 @@ function renderDashboard() {
 
  // ── FOLLOW-UPS ──
  const followUpsWithAge = followUps.map(f => {
-   const daysSince = Math.floor((now - new Date(f.date)) / (1000*60*60*24));
+   const daysSince = Math.floor((now - parseLocalDate(f.date)) / (1000*60*60*24));
    return {...f, daysSince};
  }).sort((a,b) => b.daysSince - a.daysSince);
 
@@ -4129,7 +4129,7 @@ function renderDashboard() {
      if (!supByType[sr.need]) supByType[sr.need] = {count:0, entries:[], latestDate:null, subjects:{}};
      supByType[sr.need].count++;
      if (sr.subjects && sr.subjects.length) sr.subjects.forEach(function(sub){supByType[sr.need].subjects[sub]=(supByType[sr.need].subjects[sub]||0)+1;});
-     var dd = sr.date ? new Date(sr.date) : null;
+     var dd = sr.date ? parseLocalDate(sr.date) : null;
      if (dd && (!supByType[sr.need].latestDate || dd > supByType[sr.need].latestDate)) supByType[sr.need].latestDate = dd;
      supByType[sr.need].entries.push(sr);
    });
@@ -4167,7 +4167,7 @@ function renderDashboard() {
      _supHTML += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:12px">These schools have been flagged as needing support from '+(_myRole?'a '+_myRole.toLowerCase():'someone in your role')+'. Based on your district and role, these are waiting on you.</div>';
      function _renderPendCard(it) {
        var ago = '';
-       if (it.date) { var d = new Date(it.date); var diff = Math.floor((_pendNow - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
+       if (it.date) { var d = parseLocalDate(it.date); var diff = Math.floor((_pendNow - d) / (1000*60*60*24)); ago = diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
        var pendKey = (it.school||'')+'::'+(it.need||'');
        var pendKeyEsc = pendKey.replace(/'/g,"\\x27");
        var pendId = pendKey.replace(/[^a-zA-Z0-9]/g,'');
@@ -4319,7 +4319,7 @@ function renderDashboard() {
      _supHTML += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px">\u2713 Completed support requests ('+_pendCompleted.length+')</div>';
      _pendCompleted.forEach(function(it){
        var ago = '';
-       if (it.date) { var d=new Date(it.date); var diff=Math.floor((new Date()-d)/(1000*60*60*24)); ago=diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
+       if (it.date) { var d=parseLocalDate(it.date); var diff=Math.floor((new Date()-d)/(1000*60*60*24)); ago=diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
        _supHTML += '<div style="background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid #C8E6C9;opacity:.7">';
        _supHTML += '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">\u2705</span><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">'+esc(it.school)+'</div><div style="font-size:11px;color:var(--grey)">'+esc(it.need)+(it.subjects.length?' \xb7 '+esc(it.subjects.join(', ')):'')+'</div></div><span class="act-status-tag st-c">Completed</span></div>';
        _supHTML += '</div>';
@@ -4410,7 +4410,7 @@ function renderDashboard() {
        if (isAddressed) {
          _supHTML += '<div style="padding:8px 14px"><div class="sup-resolved-banner">';
          _supHTML += '<div class="sup-resolved-title">Addressed</div>';
-         var resDate = resInfo.date ? new Date(resInfo.date) : null;
+         var resDate = resInfo.date ? parseLocalDate(resInfo.date) : null;
          var resDateStr = resDate ? resDate.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
          _supHTML += '<div class="sup-resolved-by">By <strong>'+esc(resInfo.name)+'</strong>'+(resInfo.role?' ('+esc(resInfo.role)+')':'')+(resDateStr?' on '+resDateStr:'')+'</div>';
          _supHTML += '<div class="sup-resolved-comment">'+renderCommentBody(resInfo.comment||'')+'</div>';
@@ -4841,7 +4841,7 @@ ${tab==='tracker'?`
        for (var w=6; w>=0; w--) {
          var wStart = new Date(thisMonday.getTime() - w*weekMs);
          var wEnd = new Date(wStart.getTime() + weekMs);
-         var hit = myDecs.some(function(d){var dd=new Date(d.date||d.created_at);return dd>=wStart&&dd<wEnd;});
+         var hit = myDecs.some(function(d){var dd=parseLocalDate(d.date||d.created_at);return dd>=wStart&&dd<wEnd;});
          var isCurrent = w===0;
          weekHits.push({num:7-w, hit:hit, current:isCurrent});
        }
@@ -4918,7 +4918,7 @@ ${tab==='tracker'?`
        var html = '';
        var lastMonth = '';
        allChains.forEach(function(c, idx){
-         var dd = c.date ? new Date(c.date) : null;
+         var dd = c.date ? parseLocalDate(c.date) : null;
          var monthKey = dd ? dd.toLocaleString('en-ZA',{month:'long',year:'numeric'}) : 'Unknown';
          if (monthKey !== lastMonth) { html += '<div class="tl-month-hdr">'+esc(monthKey)+'</div>'; lastMonth = monthKey; }
 
@@ -5455,8 +5455,9 @@ function renderOutcomeModal(){
 
 // Coverage table row expand/collapse (mobile only)
 
-function fmtDate(d) { if(!d)return'—'; try{return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
-function relTimeAgo(d){if(!d)return'';try{var ms=Date.now()-new Date(d).getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
+function parseLocalDate(d){if(!d)return null;if(d instanceof Date)return d;var s=String(d);if(/^\d{4}-\d{2}-\d{2}$/.test(s)){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2],12,0,0);}return new Date(s);}
+function fmtDate(d) { if(!d)return'\u2014'; try{return parseLocalDate(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
+function relTimeAgo(d){if(!d)return'';try{var dt=parseLocalDate(d);var ms=Date.now()-dt.getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
 function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 // ═══════════════════════════════════
