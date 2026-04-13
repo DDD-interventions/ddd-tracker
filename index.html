@@ -2656,9 +2656,10 @@ function _updateSchoolPickerInPlace(){
   var q=(S.f._schoolQ||'').toLowerCase();
   var filtered=q?allSchools.filter(function(s){return s[0].toLowerCase().includes(q)}):allSchools;
   var phaseFilter=S.f._schoolPhaseFilter||'ALL';
-  var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+  var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C'],'P':['P'],'S':['S'],'C':['C']};
   var phaseFiltered=filtered;
-  if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
+  if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
+  else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
   _spItems=phaseFiltered;
   var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
   var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
