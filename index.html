@@ -2706,9 +2706,10 @@ function _updatePhaseTabsUI(activeCode){
   btns.forEach(function(btn){
     var code=btn.getAttribute('data-phase');
     var isActive=code===activeCode;
-    btn.style.borderColor=isActive?'var(--teal)':'#c8c6c4';
-    btn.style.background=isActive?'var(--teal-lt)':'#fff';
-    btn.style.color=isActive?'var(--teal-dk)':'var(--grey)';
+    var isUP=code==='UP';
+    btn.style.borderColor=isActive?(isUP?'#C62828':'var(--teal)'):'#c8c6c4';
+    btn.style.background=isActive?(isUP?'#FFF5F5':'var(--teal-lt)'):'#fff';
+    btn.style.color=isActive?(isUP?'#C62828':'var(--teal-dk)'):'var(--grey)';
     btn.style.fontWeight=isActive?'700':'500';
   });
   _refocusSchoolFilter();
@@ -2821,25 +2822,10 @@ function getAvailableSchools(){
   for(const cc of Object.keys(SCHOOLS_MAP[d])){for(const pair of SCHOOLS_MAP[d][cc]){if(!seen.has(pair[0])){seen.add(pair[0]);all.push(pair);}}}
   all.sort((a,b)=>a[0].localeCompare(b[0]));return all;
 }
-function bulkSelectPhase(phase){
-  const schools=getAvailableSchools();
-  const arr=parseSchoolsArr();
-  const toAdd=phase==='ALL'?schools:schools.filter(s=>s[1]===phase);
-  for(const s of toAdd){if(!arr.includes(s[0]))arr.push(s[0]);}
-  S.f.schools=arr.join(', ');S.f._vhExpanded=false;
-  if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}
-}
 function getUPSchoolNames(){
   var d=S.f.district;if(!d||!NSC_UP_SCHOOLS[d])return [];
   var available=getAvailableSchools().map(function(s){return s[0];});
   return NSC_UP_SCHOOLS[d].map(function(s){return s.n;}).filter(function(n){return available.includes(n);});
-}
-function bulkSelectUPSchools(){
-  var names=getUPSchoolNames();if(!names.length)return;
-  var arr=parseSchoolsArr();
-  for(var i=0;i<names.length;i++){if(!arr.includes(names[i]))arr.push(names[i]);}
-  S.f.schools=arr.join(', ');S.f._vhExpanded=false;
-  if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}
 }
 let _spItems=[];
 let _spFilterTimer=null;
@@ -2856,9 +2842,10 @@ function schoolFilterInput(val){
     const q=(S.f._schoolQ||'').toLowerCase();
     const filtered=q?allSchools.filter(function(s){return s[0].toLowerCase().includes(q)}):allSchools;
     var phaseFilter=S.f._schoolPhaseFilter||'ALL';
-    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C'],'P':['P'],'S':['S'],'C':['C']};
     var phaseFiltered=filtered;
-    if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
+    if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
+    else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
     _spItems=phaseFiltered;
     var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
     var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
@@ -2922,15 +2909,19 @@ function schoolPickerHTML(){
     // Quick-select buttons
     const counts={ALL:allSchools.length,P:0,S:0,C:0,I:0};
     for(const s of allSchools){if(s[1])counts[s[1]]=(counts[s[1]]||0)+1;}
-    dd+='<div style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:4px">';
-    dd+='<span style="font-size:10px;color:#999;line-height:24px;margin-right:2px">Quick select:</span>';
-    const btns=[['ALL','All Schools',counts.ALL,'#0B8E8D'],['P','All Primary',counts.P,'#7AB648'],['S','All Secondary',counts.S,'#1565C0'],['C','All Combined',counts.C,'#E8952E']];
-    for(const [code,lbl,cnt,clr] of btns){
-      if(cnt>0)dd+='<button data-sp-bulk="'+code+'" style="font-size:10px;padding:3px 8px;border:1px solid '+clr+';border-radius:12px;background:#fff;color:'+clr+';cursor:pointer;font-weight:600;font-family:inherit">'+lbl+' ('+cnt+')</button>';
+    // Filter tabs (type + phase + UP)
+    var phaseFilter=S.f._schoolPhaseFilter||'ALL';
+    var _upCount=getUPSchoolNames().length;
+    dd+='<div data-phase-tabs style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
+    var filterTabs=[['ALL','All ('+counts.ALL+')',counts.ALL],['P','Primary ('+counts.P+')',counts.P],['S','Secondary ('+counts.S+')',counts.S],['C','Combined ('+counts.C+')',counts.C],['FET','FET Phase (Gr 10\u201312)',null],['SENIOR','Senior Phase (Gr 7\u20139)',null],['INTERMEDIATE','Intermediate (Gr 4\u20136)',null],['FOUNDATION','Foundation (Gr R\u20133)',null]];
+    for(var ft=0;ft<filterTabs.length;ft++){
+      var ftCode=filterTabs[ft][0],ftLabel=filterTabs[ft][1],ftCnt=filterTabs[ft][2];
+      if(ftCnt===0)continue;
+      var ftActive=phaseFilter===ftCode;
+      dd+='<button data-phase="'+ftCode+'" onclick="S.f._schoolPhaseFilter=\''+ftCode+'\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\''+ftCode+'\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ftActive?'var(--teal)':'#c8c6c4')+';background:'+(ftActive?'var(--teal-lt)':'#fff')+';color:'+(ftActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ftActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ftLabel+'</button>';
     }
-    var _upNames=getUPSchoolNames();
-    if(_upNames.length>0)dd+='<button data-sp-bulk-up style="font-size:10px;padding:3px 8px;border:1.5px solid #C62828;border-radius:12px;background:#FFF5F5;color:#C62828;cursor:pointer;font-weight:600;font-family:inherit">UP Sec Schools ('+_upNames.length+')</button>';
-    if(selected.length>0)dd+='<button data-sp-clear style="font-size:10px;padding:3px 8px;border:1px solid #c00;border-radius:12px;background:#fff;color:#c00;cursor:pointer;font-weight:600;font-family:inherit">Clear all</button>';
+    if(_upCount>0){var upActive=phaseFilter==='UP';dd+='<button data-phase="UP" onclick="S.f._schoolPhaseFilter=\'UP\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\'UP\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(upActive?'#C62828':'#c8c6c4')+';background:'+(upActive?'#FFF5F5':'#fff')+';color:'+(upActive?'#C62828':'var(--grey)')+';cursor:pointer;font-weight:'+(upActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">\u26a0 UP Schools ('+_upCount+')</button>';}
+    if(selected.length>0)dd+='<button data-sp-clear style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid #c00;background:#fff;color:#c00;cursor:pointer;font-weight:600;font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">Clear all</button>';
     dd+='</div>';
 
     // Filter input
@@ -2938,21 +2929,12 @@ function schoolPickerHTML(){
       dd+='<div class="school-dd-filter"><input type="text" placeholder="Start typing a school name..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
     }
 
-    // Phase filter tabs
-    var phaseFilter=S.f._schoolPhaseFilter||'ALL';
-    var phaseTabs=[['ALL','All'],['FET','FET Phase (Gr 10\u201312)'],['SENIOR','Senior Phase (Gr 7\u20139)'],['INTERMEDIATE','Intermediate (Gr 4\u20136)'],['FOUNDATION','Foundation (Gr R\u20133)']];
-    dd+='<div data-phase-tabs style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
-    for(var pt=0;pt<phaseTabs.length;pt++){
-      var ptCode=phaseTabs[pt][0],ptLabel=phaseTabs[pt][1];
-      var ptActive=phaseFilter===ptCode;
-      dd+='<button data-phase="'+ptCode+'" onclick="S.f._schoolPhaseFilter=\''+ptCode+'\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\''+ptCode+'\')" style="font-size:11px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ptActive?'var(--teal)':'#c8c6c4')+';background:'+(ptActive?'var(--teal-lt)':'#fff')+';color:'+(ptActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ptActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ptLabel+'</button>';
-    }
-    dd+='</div>';
-
-    // Apply phase filter
-    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C']};
+    // Apply filter
+    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C'],'P':['P'],'S':['S'],'C':['C']};
     var phaseFiltered=filtered;
-    if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){
+    if(phaseFilter==='UP'){
+      var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});
+    }else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){
       var allowedTypes=phaseTypeMap[phaseFilter];
       phaseFiltered=filtered.filter(function(s){return s[1]&&allowedTypes.includes(s[1]);});
     }
@@ -2995,10 +2977,6 @@ function schoolPickerHTML(){
 document.addEventListener('click',function(e){
   const toggle=e.target.closest('[data-sp-toggle]');
   if(toggle){S.f._schoolDDOpen=!S.f._schoolDDOpen;S.f._schoolQ='';render();setTimeout(()=>{const el=document.getElementById('spFilter');if(el)el.focus();},50);return;}
-  const bulk=e.target.closest('[data-sp-bulk]');
-  if(bulk){bulkSelectPhase(bulk.dataset.spBulk);return;}
-  const bulkUp=e.target.closest('[data-sp-bulk-up]');
-  if(bulkUp){bulkSelectUPSchools();return;}
   const clear=e.target.closest('[data-sp-clear]');
   if(clear){S.f.schools='';if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}return;}
   const addBtn=e.target.closest('[data-sp-add]');
