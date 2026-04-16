@@ -892,7 +892,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.16.2';
+const APP_VERSION = '2026.04.16.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1217,9 +1217,26 @@ function getInterventionPDFBase64(dec, act, official) {
   return dataUri.split(',')[1] || null;
 }
 
+// Read a File object as base64 string (no data: prefix). Resolves to '' on failure.
+function _fileToBase64(file) {
+  return new Promise(function(resolve) {
+    try {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const dataUri = String(reader.result || '');
+        const idx = dataUri.indexOf(',');
+        resolve(idx > -1 ? dataUri.substring(idx + 1) : '');
+      };
+      reader.onerror = function() { resolve(''); };
+      reader.readAsDataURL(file);
+    } catch(e) { resolve(''); }
+  });
+}
+
 // Send the intervention audit PDF to the official who logged it.
+// Includes the user's uploaded supporting document as a 2nd attachment when available.
 // Fire-and-forget; resolves silently on any failure (PDF, network, worker, Resend).
-async function sendInterventionAuditEmail(dec, act, official) {
+async function sendInterventionAuditEmail(dec, act, official, docFile) {
   try {
     const toEmail = (dec && dec.logged_by_email) || (official && official.email) || '';
     if (!toEmail) { console.warn('audit email skipped: no recipient email'); return false; }
@@ -1233,6 +1250,23 @@ async function sendInterventionAuditEmail(dec, act, official) {
     const subject = '[DDD Tracker] Audit copy: ' + (schools || 'Intervention') + (dateStr ? ' \u2014 ' + dateStr : '');
     const safeHref = esc(window.location.href);
 
+    // Build attachments — start with the audit PDF, optionally add the user-uploaded doc
+    const attachments = [{ filename: filename, content: pdfB64 }];
+    let supportingDocAttached = false;
+    let supportingDocName = '';
+    if (docFile && docFile.size && docFile.size <= 7 * 1024 * 1024) {
+      const docB64 = await _fileToBase64(docFile);
+      if (docB64) {
+        supportingDocName = docFile.name || (act.supporting_doc_name || 'supporting-document');
+        attachments.push({ filename: supportingDocName, content: docB64 });
+        supportingDocAttached = true;
+      }
+    }
+
+    const introLine = supportingDocAttached
+      ? 'Your intervention has been recorded. The detailed PDF copy is attached for your records, along with the supporting document you uploaded.'
+      : 'Your intervention has been recorded. A detailed PDF copy is attached for your records' + (act.supporting_doc_url ? ', and includes a link to the supporting document you uploaded.' : '.');
+
     const bodyHTML =
       '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
       '<div style="background:#074445;padding:20px 24px;border-radius:8px 8px 0 0">' +
@@ -1241,11 +1275,12 @@ async function sendInterventionAuditEmail(dec, act, official) {
       '</div>' +
       '<div style="background:#fff;padding:20px 24px;border:1px solid #e8e6e4;border-top:none">' +
         '<p style="font-size:13px;color:#1A2332;line-height:1.6;margin:0 0 14px">Hi ' + esc((dec.made_by||'').split(' ')[0] || '') + ',</p>' +
-        '<p style="font-size:13px;color:#1A2332;line-height:1.6;margin:0 0 14px">Your intervention has been recorded. A detailed PDF copy is attached for your records, including all the information you submitted and a link to any supporting document you uploaded.</p>' +
+        '<p style="font-size:13px;color:#1A2332;line-height:1.6;margin:0 0 14px">' + introLine + '</p>' +
         '<table style="border-collapse:collapse;width:100%;font-size:12px;margin:12px 0">' +
         '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">School(s)</td><td style="padding:6px 0;color:#1A2332">' + esc(schools) + '</td></tr>' +
         (dateStr ? '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Date</td><td style="padding:6px 0;color:#1A2332">' + esc(dateStr) + '</td></tr>' : '') +
         '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Reference</td><td style="padding:6px 0;color:#1A2332;font-family:monospace;font-size:11px">' + esc(act.id || '') + '</td></tr>' +
+        (supportingDocAttached ? '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Attached</td><td style="padding:6px 0;color:#1A2332">Audit PDF + ' + esc(supportingDocName) + '</td></tr>' : '') +
         '</table>' +
         '<p style="font-size:11px;color:#607D8B;line-height:1.6;margin:14px 0 0;padding-top:14px;border-top:1px solid #f0f0f0">Keep this email for your audit trail. The attached PDF is a complete record of your submission.</p>' +
         '<div style="text-align:center;margin:18px 0 4px"><a href="' + safeHref + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Open the Tracker</a></div>' +
@@ -1259,7 +1294,7 @@ async function sendInterventionAuditEmail(dec, act, official) {
         to: [toEmail],
         subject: subject,
         html: bodyHTML,
-        attachments: [ { filename: filename, content: pdfB64 } ]
+        attachments: attachments
       })
     });
     if (!r.ok) { console.warn('audit email worker returned', r.status); return false; }
@@ -3600,10 +3635,14 @@ function renderSuccess() {
  const insight=buildInsightStatement();
  const auditEmail = (S.f.official_email || (S.official && S.official.email) || '');
  const showAudit = !!(S._auditEmailQueued && auditEmail);
+ const _hadDocFile = !!(S.f && S.f.doc_file);
+ const auditMsg = _hadDocFile
+   ? '<strong>A detailed PDF report and your supporting document have been emailed to ' + esc(auditEmail) + '</strong> \u2014 a complete audit copy of your submission.'
+   : '<strong>A detailed PDF report has been emailed to ' + esc(auditEmail) + '</strong> \u2014 everything you submitted plus a link to any supporting document you uploaded.';
  return `<div class="form-wrap"><div class="section"><div class="success fade-in"> <h2>Thank you!</h2> <p>Your activity has been recorded. You now have a record of the support you provided — and your dashboard will show the difference your work is making.</p>
  ${showAudit?`<div style="margin-top:16px;padding:12px 14px;background:var(--teal-lt);border-radius:8px;text-align:left;border-left:3px solid var(--teal)">
    <div style="font-size:10px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Audit copy sent</div>
-   <div style="font-size:12px;color:var(--navy);line-height:1.5"><strong>A detailed PDF report has been emailed to ${esc(auditEmail)}</strong> \u2014 everything you submitted plus a link to any supporting document you uploaded.</div>
+   <div style="font-size:12px;color:var(--navy);line-height:1.5">${auditMsg}</div>
  </div>`:''}
  ${insight?`<div style="margin-top:16px;padding:14px;background:var(--green-lt);border-radius:8px;text-align:left;border-left:3px solid var(--green)">
    <div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">What you found and did</div>
@@ -3799,9 +3838,11 @@ async function submitForm() {
     clearFormDraft();
 
  // Fire-and-forget: email a PDF audit copy to the official who logged it
+ // Capture doc_file reference now since S.f may be reset before the async email send completes
+ var _auditDocFile = S.f.doc_file || null;
  S._auditEmailQueued = !!((dec.logged_by_email || (S.official && S.official.email)) && window.jspdf && window.jspdf.jsPDF);
  if (S._auditEmailQueued) {
-   sendInterventionAuditEmail(dec, act, S.official).then(function(ok){
+   sendInterventionAuditEmail(dec, act, S.official, _auditDocFile).then(function(ok){
      if (!ok) { S._auditEmailQueued = false; if (S.submitted) render(); }
    });
  }
