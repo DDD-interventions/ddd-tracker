@@ -892,7 +892,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.16.3';
+const APP_VERSION = '2026.04.23.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -926,7 +926,7 @@ const S = {
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
  doc_url:'',doc_name:'',
-    sip_focus_areas:[],support_needed:[],support_level:'',doc_file:null,doc_file_name:'',
+    sip_focus_areas:[],support_needed:[],support_level:'',doc_file:null,doc_file_name:'',doc_files:[],doc_file_names:[],additional_data_sources:'',
     tagged_officials:{},_offSearchQ:{},_offSearchResults:{},_offSearchLoading:{},
     formStep:-1,intervention_trigger:'',intervention_trigger_other:'',intervention_triggers:[],_trigDDOpen:false,official_name:'',official_role:'',official_specialisation:'',official_email:'',
     insight_type:'',insight_types:[],_insightDDOpen:false,insight_pass_rate:'',insight_learners_affected:'',insight_threshold:'',insight_detail:'',insight_educator_absent:'',insight_attendance_days:'',insight_sba_exam_gap:'',insight_curriculum_pct:''
@@ -1120,6 +1120,7 @@ function generateInterventionPDF(dec, act, official) {
     ['Report Accessed', det.ddd_access_date],
     ['Logged into Dashboard', det.ddd_dashboard_confirmed === 'yes' ? 'Yes' : (det.ddd_dashboard_confirmed === 'no' ? 'No' : '')],
     ['Other Data Source', det.other_data_source],
+    ['Additional Data Sources', det.additional_data_sources],
     ['Data Issue', insightTypesLabel],
     ['Educators Affected', det.insight_educator_absent],
     ['Days Absent', det.insight_attendance_days ? (det.insight_attendance_days + '+') : ''],
@@ -1175,8 +1176,22 @@ function generateInterventionPDF(dec, act, official) {
     y = doc.lastAutoTable.finalY + 16;
   }
 
-  // ═══ Supporting Document ═══
-  if (act.supporting_doc_url || act.supporting_doc_name) {
+  // ═══ Supporting Document(s) ═══
+  var _supDocs = (det && det.supporting_docs) || [];
+  if (_supDocs.length > 1) {
+    sectionHeader('Supporting Documents (' + _supDocs.length + ')', PDF_COLOR.grey);
+    for (var di = 0; di < _supDocs.length; di++) {
+      doc.setFont('helvetica','normal').setFontSize(9);
+      doc.setTextColor.apply(doc, PDF_COLOR.navy);
+      doc.text((di+1) + '. ' + (_supDocs[di].name || 'Document'), margin, y); y += 14;
+      if (_supDocs[di].url) {
+        doc.setTextColor.apply(doc, PDF_COLOR.teal);
+        doc.setFont('helvetica','bold');
+        doc.textWithLink('Open document \u00BB', margin + 10, y, { url: _supDocs[di].url });
+        y += 14;
+      }
+    }
+  } else if (act.supporting_doc_url || act.supporting_doc_name) {
     sectionHeader('Supporting Document', PDF_COLOR.grey);
     doc.setFont('helvetica','normal').setFontSize(9);
     doc.setTextColor.apply(doc, PDF_COLOR.navy);
@@ -2946,15 +2961,17 @@ function _updateSchoolPickerInPlace(){
   }else{
     var showCircuit=!S.f.circuit;var circuitLookup={};
     if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(var cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(var pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
+    var _vhL={};if(S.decisions&&S.decisions.length){var _vhT=getLookbackTerms(S.f.term);for(var _vi=0;_vi<S.decisions.length;_vi++){var _vd=S.decisions[_vi];if(!_vd.details||!_vd.details.term||_vhT.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhL[_vsn])_vhL[_vsn]={total:0,byYou:0};_vhL[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhL[_vsn].byYou++;}}}
     var shown=phaseFiltered.slice(0,120);
     for(var i=0;i<shown.length;i++){
       var s=shown[i];var isChecked=selected.includes(s[0]);
       var circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
       var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
+      var _vh=_vhL[s[0]];var vhB='';if(_vh&&_vh.total>0){vhB='<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#FFF3E0;color:#E65100;margin-left:4px;flex-shrink:0">\u21BB '+_vh.total+'</span>';}
       var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
       var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
       var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
+      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
     }
     if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
   }
@@ -3162,15 +3179,17 @@ function schoolFilterInput(val){
     }else{
       const showCircuit=!S.f.circuit;const circuitLookup={};
       if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
+      var _vhL2={};if(S.decisions&&S.decisions.length){var _vhT2=getLookbackTerms(S.f.term);for(var _vi2=0;_vi2<S.decisions.length;_vi2++){var _vd2=S.decisions[_vi2];if(!_vd2.details||!_vd2.details.term||_vhT2.indexOf(_vd2.details.term)===-1)continue;var _vs2=(_vd2.details.schools||'').split(',');for(var _vk2=0;_vk2<_vs2.length;_vk2++){var _vsn2=_vs2[_vk2].trim();if(!_vsn2)continue;if(!_vhL2[_vsn2])_vhL2[_vsn2]={total:0,byYou:0};_vhL2[_vsn2].total++;if(_vd2.official_id&&_vd2.official_id===S._officialId)_vhL2[_vsn2].byYou++;}}}
       const shown=phaseFiltered.slice(0,120);
       for(let i=0;i<shown.length;i++){
         const s=shown[i];const isChecked=selected.includes(s[0]);
         const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
         var tBadge=s[1]&&tBLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+tBColors[s[1]]+'22;color:'+tBColors[s[1]]+';margin-left:6px;flex-shrink:0">'+tBLabels[s[1]]+'</span>':'';
+        var _vh2=_vhL2[s[0]];var vhB2='';if(_vh2&&_vh2.total>0){vhB2='<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#FFF3E0;color:#E65100;margin-left:4px;flex-shrink:0">\u21BB '+_vh2.total+'</span>';}
         var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
         var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
         var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
+        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB2+'</div>'+(mP?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
@@ -3257,6 +3276,9 @@ function schoolPickerHTML(){
       var typeBadgeColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
       var typeBadgeLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
       var phaseLabelsForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
+      // Build visit history lookup for dropdown badges
+      var _vhLookup={};
+      if(S.decisions&&S.decisions.length){var _vhTerms=getLookbackTerms(S.f.term);for(var _vdi=0;_vdi<S.decisions.length;_vdi++){var _vd=S.decisions[_vdi];if(!_vd.details||!_vd.details.term||_vhTerms.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhLookup[_vsn])_vhLookup[_vsn]={total:0,byYou:0};_vhLookup[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhLookup[_vsn].byYou++;}}}
       const shown=phaseFiltered.slice(0,120);
       const showCircuit=!S.f.circuit;
       const circuitLookup={};
@@ -3266,10 +3288,12 @@ function schoolPickerHTML(){
         const isChecked=selected.includes(s[0]);
         const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
         var tBadge=s[1]&&typeBadgeLabels[s[1]]?'<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+typeBadgeColors[s[1]]+'22;color:'+typeBadgeColors[s[1]]+';margin-left:6px;flex-shrink:0">'+typeBadgeLabels[s[1]]+'</span>':'';
+        var _vh=_vhLookup[s[0]];var vhBadge='';
+        if(_vh&&_vh.total>0){var _vhTip=_vh.total+' prior visit'+(_vh.total!==1?'s':'')+(_vh.byYou?' ('+_vh.byYou+' by you)':'');vhBadge='<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#FFF3E0;color:#E65100;margin-left:4px;flex-shrink:0" title="'+_vhTip+'">\u21BB '+_vh.total+'</span>';}
         var phaseSub=s[1]&&phaseLabelsForType[s[1]]?phaseLabelsForType[s[1]]:'';
         var metaParts=[circLbl,phaseSub].filter(Boolean).join(' \xb7 ');
         var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center">'+esc(s[0])+tBadge+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
+        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:10px;color:#999;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
@@ -3392,7 +3416,7 @@ function renderSubjectPicker(){
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
     <div class="field-row"><div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><div style="font-size:10px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Activity Type \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.activity_type,ACTIVITY_HINTS)}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${(()=>{const t=[...THEMES];if(S.f.district==='Lejweleputswa')t.splice(t.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');return t.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('');})()}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><div style="font-size:10px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Intervention Theme \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}${getSelHint(S.f.intervention_theme,THEME_HINTS)}</div></div>
-    <div class="field"><label>Subject(s)</label><div class="hint">Search and select subjects</div>${renderSubjectPicker()}</div>
+    <div class="field"><label>Subject(s)</label><div class="hint">Which subjects did your support focus on? This helps track where support is concentrated across the district and identify subjects that may be underserved</div>${renderSubjectPicker()}</div>
     <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
@@ -3502,7 +3526,7 @@ function renderFormStep3(){
   const phase=getPhaseForGrades();
   const usedDDD=S.f.ddd_used && S.f.ddd_used!=='no' && S.f.ddd_used!=='other-data';
   return `<div class="section fade-in"><div class="sec-hdr blue" style="border-color:var(--blue)"><div><h2>3. Data That Informed Your Response</h2><p>What data guided your decision and action</p></div></div><div class="sec-body">
-    <div class="field" id="fld-ddd-used"><label>Was data used to inform this intervention?<span class="req">*</span></label><div class="radio-grp">${['Yes \u2014 DDD data directly triggered this','Yes \u2014 DDD data informed my approach','DDD data partially used','Yes \u2014 but from another source (not DDD)','No data used'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','other-data','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
+    <div class="field" id="fld-ddd-used"><label>Did you use data to inform this intervention?<span class="req">*</span></label><div class="hint">As the visiting official, did you look at any data before or during your visit?</div><div class="radio-grp">${['Yes \u2014 DDD data directly triggered this','Yes \u2014 DDD data informed my approach','DDD data partially used','Yes \u2014 but from another source (not DDD)','No data used'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','other-data','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
     ${usedDDD ? `
       <div class="field"><label>What were you looking at on DDD?</label><div style="font-size:11px;color:var(--grey);margin:-4px 0 10px;line-height:1.4">Select everything that applies — pick the questions you were trying to answer</div>${renderDDDTasks()}</div>
       <div class="field"><label>When did you access this report?</label><input type="date" value="${S.f.ddd_access_date||''}" max="${today()}" onchange="S.f.ddd_access_date=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px"></div>
@@ -3514,17 +3538,18 @@ function renderFormStep3(){
         <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">What did you see in the data?</div>
         <div style="font-size:11px;color:var(--grey);margin-bottom:10px;line-height:1.5">Select all types of issues you observed</div>
         <div style="margin-bottom:10px">${renderInsightPicker()}</div>
-        ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
+        ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:12px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found in the data</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
         ${S.f.insight_types.length&&!(S.f.insight_types.length===1&&S.f.insight_types[0]==='other-issue'&&!S.f.insight_detail)?(buildInsightStatement()?`<div style="margin-top:10px;background:var(--green-lt);border-radius:8px;padding:10px 12px;border-left:3px solid var(--green)"><div style="font-size:10px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.6">${buildInsightStatement()}</div></div>`:''):''}      </div>
     ` : ''}
     ${S.f.ddd_used==='other-data'?`<div style="background:#E3F2FD;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:#1565C0;line-height:1.6;margin-bottom:10px">Good \u2014 using any data to inform your support is valuable. Please tell us what data you used.</div></div><div class="field"><label>What data source did you use?</label><div class="hint">e.g. SA-SAMS reports, school assessment records, provincial data, LURITS, own records</div><textarea rows="2" placeholder="Describe the data source briefly\u2026" oninput="S.f.other_data_source=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical">${esc(S.f.other_data_source||'')}</textarea></div>`:''}
     ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:12px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs data. But next time, try starting from the data. You can log into the DDD Dashboard yourself, use SA-SAMS reports, or ask your Programme Manager or Subject Advisor for a data pack.</div></div>`:''}
+    ${S.f.ddd_used&&S.f.ddd_used!=='no'&&S.f.ddd_used!=='other-data'?`<div class="field"><label>Additional data sources used <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Did you also use other data alongside DDD? e.g. SA-SAMS reports, school assessment records, LURITS, your own records, provincial spreadsheets</div><textarea rows="2" placeholder="e.g. Also used SA-SAMS attendance report and school's internal assessment tracker\u2026" oninput="S.f.additional_data_sources=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical">${esc(S.f.additional_data_sources||'')}</textarea></div>`:''}
 
-    <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data that made you step in? Select all that apply.</div>${renderTriggerPicker()}</div>
+    <div class="field"><label>As the visiting official, what made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data or at the school that prompted you to step in? Select all that apply.</div>${renderTriggerPicker()}</div>
     ${S.f.intervention_triggers.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for what made you act \u2014 please describe:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}
-    <div class="field"><label>Planned intervention(s)</label><div class="hint">What did you decide to do based on what the data showed you? Select all that apply.</div>${renderDecisionPicker()}</div>
+    <div class="field"><label>Planned intervention(s)</label><div class="hint">Based on what you observed, what did you decide to do? Select all that apply.</div>${renderDecisionPicker()}</div>
     ${S.f.decision_types.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for Planned Intervention \u2014 please describe:</label><input type="text" placeholder="e.g. Custom remediation plan..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:13px;font-family:inherit"></div>':''}
-    <div class="field" id="fld-action"><label>Action(s) taken<span class="req">*</span></label><div class="hint">What did you actually do on the ground? Select all that apply.</div>${renderActionPicker()}</div>
+    <div class="field" id="fld-action"><label>Action(s) you took<span class="req">*</span></label><div class="hint">What did you actually do on the ground during your visit? Select all that apply.</div>${renderActionPicker()}</div>
     ${S.f.action_types.includes('Other')?`<div class="field"><label>You selected \u201cOther\u201d for Action Taken \u2014 please describe:</label><textarea rows="2" placeholder="e.g. Arranged mentoring from neighbouring school..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
     
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(2,3)">Next &rarr;</button></div>
@@ -3539,12 +3564,13 @@ function renderFormStep4(){
     <div class="field"><label>Context note <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">To notify a colleague, type @ and their name or email address</div><div class="voice-row"><textarea id="ta-ctx" rows="2" placeholder="e.g. No permanent Maths educator since Term 3 2025\u2026" oninput="S.f.ctx_notes=this.value;handleMentionInput('ctx',this.value,this)">${esc(S.f.ctx_notes)}</textarea>${micBtn('ctx_notes','ta-ctx')}</div>${renderMentionDropdown('ctx')}</div>
     <div class="field-row"><div class="field"><label>Educators / staff supported</label><div class="hint">Number of educators or officials you worked with</div><input type="number" placeholder="e.g. 8" min="0" value="${S.f.educators_supported}" oninput="S.f.educators_supported=this.value"></div><div class="field"><label>Follow-up needed?</label><div class="radio-grp"><label><input type="radio" name="fup" value="yes" ${S.f.follow_up?'checked':''} onchange="S.f.follow_up=true;render()"><span>Yes</span></label><label><input type="radio" name="fup" value="no" ${!S.f.follow_up?'checked':''} onchange="S.f.follow_up=false;render()"><span>No</span></label></div></div></div>
     ${S.f.follow_up?`<div class="field"><label>Follow-up description</label><div class="hint">To notify a colleague about this follow-up, type @ and their name or email address</div><div class="voice-row"><textarea id="ta-fup" rows="2" placeholder="e.g. Return visit in 2 weeks to check implementation... to notify someone, type @ and their name or email address" oninput="S.f.follow_up_desc=this.value;handleMentionInput('fup',this.value,this)">${esc(S.f.follow_up_desc)}</textarea>${micBtn('follow_up_desc','ta-fup')}</div>${renderMentionDropdown('fup')}</div>`:''}
-    <div class="field"><label>Supporting document <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Upload or link any supporting evidence — plans, reports, sign-in registers, SIPs, photos, or detailed notes that add context beyond what this form captures</div>
-      <div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
-        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)">
-        <div class="upload-label">Tap to upload from your device</div><div class="upload-hint">PDF, Word, Excel, images \u2014 max 6MB</div>
-      </div>
-      ${S.f.doc_file?`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_name)}</span><span style="font-size:10px;color:var(--grey)">${(S.f.doc_file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="S.f.doc_file=null;S.f.doc_file_name='';render()" title="Remove">&times;</button></div>`:''}
+    <div class="field"><label>Supporting documents <span style="font-weight:400;color:var(--grey)">(optional — up to 5 files)</span></label><div class="hint">Upload supporting evidence — plans, reports, sign-in registers, SIPs, photos, curriculum coverage documents, or detailed notes that add context beyond what this form captures</div>
+      ${S.f.doc_files.length<5?`<div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)" multiple>
+        <div class="upload-label">Tap to upload from your device</div><div class="upload-hint">PDF, Word, Excel, images \u2014 max 6MB per file \u2014 ${5-S.f.doc_files.length} slot${5-S.f.doc_files.length!==1?'s':''} remaining</div>
+      </div>`:'<div style="text-align:center;font-size:12px;color:var(--orange);padding:10px;background:var(--orange-lt);border-radius:6px;margin-bottom:6px">Maximum 5 files reached</div>'}
+      ${S.f.doc_files.length?S.f.doc_files.map((file,idx)=>`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_names[idx]||file.name)}</span><span style="font-size:10px;color:var(--grey)">${(file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="removeDocFile(${idx})" title="Remove">&times;</button></div>`).join(''):''}
+      ${S.f.doc_file&&!S.f.doc_files.length?`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_name)}</span><span style="font-size:10px;color:var(--grey)">${(S.f.doc_file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="S.f.doc_file=null;S.f.doc_file_name='';render()" title="Remove">&times;</button></div>`:''}
       <div style="text-align:center;font-size:11px;color:var(--grey);margin:8px 0">\u2014 or paste a link \u2014</div>
       <input type="url" placeholder="Google Drive, OneDrive, SharePoint link..." value="${esc(S.f.doc_url)}" oninput="S.f.doc_url=this.value" style="margin-bottom:6px"><input type="text" placeholder="Document name (e.g. Maths SIP)" value="${esc(S.f.doc_name)}" oninput="S.f.doc_name=this.value">
     </div>
@@ -3562,16 +3588,17 @@ function renderFormReview(){
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_file_name?rvRow('Attached',''+f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
     ${_saveLaterBar()}
   </div></div>`;
 }
-function handleFileSelect(e){const file=e.target.files[0];if(file)attachFile(file)}
-function handleFileDrop(e){const file=e.dataTransfer.files[0];if(file)attachFile(file)}
-function attachFile(file){if(file.size>6*1024*1024){showToast('File too large — maximum 6MB');return}S.f.doc_file=file;S.f.doc_file_name=file.name;if(!S.f.doc_name)S.f.doc_name=file.name.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');render()}
+function handleFileSelect(e){var files=Array.from(e.target.files);for(var i=0;i<files.length;i++)attachFile(files[i]);e.target.value=''}
+function handleFileDrop(e){var files=Array.from(e.dataTransfer.files);for(var i=0;i<files.length;i++)attachFile(files[i])}
+function removeDocFile(idx){S.f.doc_files.splice(idx,1);S.f.doc_file_names.splice(idx,1);S.f.doc_file=S.f.doc_files[0]||null;S.f.doc_file_name=S.f.doc_file_names[0]||'';render()}
+function attachFile(file){if(file.size>6*1024*1024){showToast('File too large \u2014 maximum 6MB per file');return}if(S.f.doc_files.length>=5){showToast('Maximum 5 files \u2014 remove one to add more');return}S.f.doc_files.push(file);S.f.doc_file_names.push(file.name);S.f.doc_file=S.f.doc_files[0];S.f.doc_file_name=S.f.doc_file_names[0];if(!S.f.doc_name)S.f.doc_name=file.name.replace(/\.[^/.]+$/,'').replace(/[_-]/g,' ');render()}
 
 async function uploadSupportingDoc(file, actionId) {
  if (!file) return { url: null, name: null };
@@ -3743,7 +3770,7 @@ async function submitForm() {
  activity_type:S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type,
  intervention_theme:S.f.intervention_theme==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:S.f.intervention_theme,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
- ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, other_data_source:S.f.other_data_source||null,
+ ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
  insight_types:S.f.insight_types,
  insight_detail:S.f.insight_detail,
@@ -3813,8 +3840,24 @@ async function submitForm() {
  addToSubmitQueue(dec, act);
 
  try {
- // Upload supporting doc if attached
- if (S.f.doc_file) {
+ // Upload supporting doc(s) if attached
+ if (S.f.doc_files.length) {
+   showToast('Uploading ' + S.f.doc_files.length + ' document' + (S.f.doc_files.length>1?'s':'') + '...');
+   var uploadedDocs = [];
+   for (var fi = 0; fi < S.f.doc_files.length; fi++) {
+     try {
+       var uploaded = await uploadSupportingDoc(S.f.doc_files[fi], actId);
+       if (uploaded.url) uploadedDocs.push({ url: uploaded.url, name: uploaded.name || S.f.doc_file_names[fi] });
+     } catch (uploadErr) {
+       console.warn('File upload failed for ' + S.f.doc_file_names[fi] + ':', uploadErr.message);
+     }
+   }
+   if (uploadedDocs.length) {
+     act.supporting_doc_url = uploadedDocs[0].url;
+     act.supporting_doc_name = uploadedDocs[0].name;
+     details.supporting_docs = uploadedDocs;
+   }
+ } else if (S.f.doc_file) {
    showToast('Uploading document...');
    try {
      const uploaded = await uploadSupportingDoc(S.f.doc_file, actId);
@@ -3957,12 +4000,12 @@ function resetForm() {
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:S.f.term, activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
- ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
+ ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'',
-    sip_focus_areas:[], support_needed:[], support_level:'', doc_file:null, doc_file_name:'',
+    sip_focus_areas:[], support_needed:[], support_level:'', doc_file:null, doc_file_name:'', doc_files:[], doc_file_names:[],
     tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
     formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, official_specialisation_other:S.f.official_specialisation_other,
     insight_type:'', insight_types:[], _insightDDOpen:false, insight_pass_rate:'', insight_learners_affected:'', insight_threshold:'', insight_detail:'', insight_educator_absent:'', insight_attendance_days:'', insight_sba_exam_gap:'', insight_curriculum_pct:''
@@ -4151,7 +4194,7 @@ function exportAllDataCSV() {
    'Obs: APIP Current','Obs: APIP Implemented','Obs: Lesson Plans','Obs: DH Monitoring','Obs: Learner Activities','Obs: Marking Done','Obs: Time Registers','Obs: Learner Attendance','Obs: Educator Attendance','Obs: Departures Controlled',
    'Follow-Up','Follow-Up Description','Performance Focus Areas','Support Needed','Support Level',
    'Action Taken','Action Responsible','Action Status','Action Notes',
-   'Supporting Doc','Supporting Doc URL','Outcome Metric','Outcome Value','Outcome Description',
+   'Supporting Doc','Supporting Doc URL','Additional Data Sources','Additional Supporting Docs','Outcome Metric','Outcome Value','Outcome Description',
    'Decision ID','Action ID'
  ];
 
@@ -4222,6 +4265,8 @@ function buildExportRow(d, det, a, o) {
    a ? (a.notes || '') : '',
    a ? (a.supporting_doc_name || '') : '',
    a ? (a.supporting_doc_url || '') : '',
+   det.additional_data_sources || '',
+   det.supporting_docs ? det.supporting_docs.map(function(d){return d.name}).join('; ') : '',
    o ? (o.metric || '') : '',
    o ? (o.value || '') : '',
    o ? (o.description || '') : '',
