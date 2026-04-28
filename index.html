@@ -889,13 +889,23 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.27.1';
+const APP_VERSION = '2026.04.28.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
 const today = () => new Date().toISOString().slice(0,10);
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+// Gazetted 2026 SA public school term boundaries (Department of Basic Education).
+// Holiday windows fold into the term that just ended so e.g. a "Holiday revision programme"
+// logged on 30 March still reads as Term 1.
+function deriveTermFromDate(dateStr){
+  var iso = (dateStr||today()).slice(0,10);
+  if (iso < '2026-04-08') return 'Term 1 2026';
+  if (iso < '2026-07-21') return 'Term 2 2026';
+  if (iso < '2026-10-06') return 'Term 3 2026';
+  return 'Term 4 2026';
+}
 
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
@@ -916,7 +926,7 @@ const S = {
  _notifLastSeen:(function(){try{return localStorage.getItem('ddd_notif_last_seen')||''}catch(e){return''}})(),
  openSections:{1:false,2:false,3:false,4:false},
  f: {
- province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:'Term 1 2026',activity_date:today(),
+ province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:deriveTermFromDate(today()),activity_date:today(),
  activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
@@ -3326,7 +3336,7 @@ function renderFormStep1(){
   const _schoolCount = _schoolArr.length;
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     <div class="form-group"><div class="form-group-label">Date and term</div>
-    <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value"></div></div>
+    <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value;S.f.term=deriveTermFromDate(this.value);render()"></div></div>
     </div>
     <div class="form-group"><div class="form-group-label">School location</div>
     <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
@@ -3991,7 +4001,7 @@ function resetForm() {
  S._auditEmailQueued = false;
  clearFormDraft();
  S.f = {
- province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:S.f.term, activity_date:today(),
+ province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:deriveTermFromDate(today()), activity_date:today(),
  activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
