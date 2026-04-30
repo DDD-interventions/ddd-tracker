@@ -889,7 +889,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.2';
+const APP_VERSION = '2026.04.30.3';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1802,11 +1802,23 @@ function toggleVoice(fieldPath, textareaId) {
     } else if (e.error === 'audio-capture') {
       showToast('Could not access the microphone \u2014 please check your phone Settings');
     } else if (e.error === 'network') {
-      showToast('No network connection \u2014 voice input needs internet to work');
+      // 'network' from Web Speech API does NOT necessarily mean the user is
+      // offline. Browsers stream audio to a remote speech service (Google's,
+      // for Chromium); this error fires when that service is unreachable —
+      // common on Brave, ungoogled-Chromium, locked-down Edge builds, and
+      // networks that block googleapis.com. Telling a user who is clearly
+      // online "no network connection" is misleading and unactionable.
+      showToast('Voice input isn\u2019t working right now \u2014 please type instead, or try Chrome on your phone');
     } else if (e.error === 'no-speech') {
       // 'no-speech' is benign — onend will still run and we'll show the
       // "didn't catch that" hint there if appropriate. Don't double-toast.
       _voiceErrored = false;
+    } else if (e.error === 'aborted') {
+      // User-initiated stop (e.g. tapping mic again). Not really an error.
+      _voiceErrored = false;
+    } else {
+      // language-not-supported, bad-grammar, or any future error code.
+      showToast('Voice input isn\u2019t working right now \u2014 please type instead');
     }
     // Do NOT call stop/finalize here — onend always runs after onerror.
   };
