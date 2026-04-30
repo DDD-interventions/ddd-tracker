@@ -889,7 +889,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.1';
+const APP_VERSION = '2026.04.30.2';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1610,6 +1610,17 @@ function updateMentionUI(key) {
 }
 
 // ── VOICE RECORDING ──
+// Design notes:
+//  * Transcript chunks are accumulated during the session and committed ONCE
+//    in onend — never inside onresult. With continuous=true, onresult fires
+//    after every natural pause; popping a confirm()/inserting text mid-stream
+//    interrupts the user and produced multiple dialogs on Android Chrome.
+//  * When switching from field A → field B without first tapping stop, we
+//    detach A's onresult/onerror/onend BEFORE calling stop(). Otherwise A's
+//    async onend would later run and tear down B's session via the shared
+//    global state. This was the main "voice doesn't work across fields" bug.
+//  * No confirm() dialog — the textarea remains editable, so users correct
+//    typos directly (Facebook-UX-as-reference principle).
 var _voiceRec = null;
 var _voiceTarget = null;
 var _voiceField = null;
@@ -1617,6 +1628,9 @@ var _voiceTimer = null;
 var _voiceCountdown = null;
 var _voiceMaxSec = 90;
 var _voiceSecLeft = 0;
+var _voiceTranscript = '';
+var _voiceStartedAt = 0;
+var _voiceErrored = false;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 var _voiceUsedBefore = (function(){try{return localStorage.getItem('ddd_voice_used')==='1'}catch(e){return false}})();
 
@@ -1643,15 +1657,95 @@ function updateVoiceCountdownUI() {
   else el.style.color = '#E53935';
 }
 
+// Tear down timers, badge and recording state on the button — but do NOT
+// touch _voiceRec / _voiceField / _voiceTarget / _voiceTranscript here so the
+// caller can still read them to commit the transcript.
+function _resetVoiceUI() {
+  if (_voiceTimer) { clearTimeout(_voiceTimer); _voiceTimer = null; }
+  if (_voiceCountdown) { clearInterval(_voiceCountdown); _voiceCountdown = null; }
+  var badge = document.getElementById('voice-countdown');
+  if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
+  if (_voiceTarget) {
+    var btn = document.getElementById('mic-' + _voiceTarget);
+    if (btn) btn.classList.remove('recording');
+    if (btn && btn.parentNode) {
+      var lbl = btn.parentNode.querySelector('[data-voice-label]');
+      if (lbl) lbl.style.display = '';
+    }
+  }
+}
+
+// Insert the accumulated transcript into the current target textarea + state.
+function _commitVoiceTranscript() {
+  if (!_voiceTranscript || !_voiceField || !_voiceTarget) return;
+  var el = document.getElementById(_voiceTarget);
+  var existing = el ? el.value : '';
+  var newVal = existing ? existing.trimEnd() + ' ' + _voiceTranscript : _voiceTranscript;
+  if (el) {
+    el.value = newVal;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 240) + 'px';
+    // Fire input event so any oninput handlers (e.g. mention dropdown) run.
+    try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+  }
+  var parts = _voiceField.split('.');
+  if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
+  else if (parts.length === 1) S.f[parts[0]] = newVal;
+}
+
+// Called by onend — finalize the session: commit text, then clear state.
+function _finalizeVoice() {
+  var hadTranscript = !!_voiceTranscript;
+  var duration = _voiceStartedAt ? (Date.now() - _voiceStartedAt) : 0;
+  var errored = _voiceErrored;
+  _commitVoiceTranscript();
+  _resetVoiceUI();
+  _voiceRec = null;
+  _voiceField = null;
+  _voiceTarget = null;
+  _voiceTranscript = '';
+  _voiceStartedAt = 0;
+  _voiceErrored = false;
+  // Helpful nudge only when the user clearly tried to record but nothing came back.
+  if (!hadTranscript && !errored && duration > 2000) {
+    showToast('Didn\u2019t catch that \u2014 please speak clearly and try again');
+  }
+}
+
 function toggleVoice(fieldPath, textareaId) {
-  if (!_speechSupported) { showToast('Voice input is not available on this browser — try using Chrome on your phone'); return; }
-  if (_voiceRec && _voiceField === fieldPath) { _voiceRec.stop(); return; }
-  if (_voiceRec) { _voiceRec.stop(); _voiceRec = null; }
+  if (!_speechSupported) { showToast('Voice input is not available on this browser \u2014 try using Chrome on your phone'); return; }
+
+  // Same-field tap = stop request. Let the recognizer's own onend run _finalizeVoice.
+  if (_voiceRec && _voiceField === fieldPath) {
+    try { _voiceRec.stop(); } catch(e) {}
+    return;
+  }
+
+  // Switching fields: detach old handlers FIRST so the old recognizer's async
+  // onend can't later run and tear down the new session via shared globals.
+  // Commit anything captured for the previous field, then reset state synchronously.
+  if (_voiceRec) {
+    var oldRec = _voiceRec;
+    oldRec.onresult = null;
+    oldRec.onerror = null;
+    oldRec.onend = null;
+    try { oldRec.stop(); } catch(e) {}
+    _commitVoiceTranscript();
+    _resetVoiceUI();
+    _voiceRec = null;
+    _voiceField = null;
+    _voiceTarget = null;
+    _voiceTranscript = '';
+    _voiceStartedAt = 0;
+    _voiceErrored = false;
+  }
+
   if (!_voiceUsedBefore) {
     _voiceUsedBefore = true;
-    try{localStorage.setItem('ddd_voice_used','1')}catch(e){}
+    try { localStorage.setItem('ddd_voice_used','1') } catch(e) {}
     showVoiceHint('mic-' + textareaId);
   }
+
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   _voiceRec = new SR();
   _voiceRec.lang = 'en-ZA';
@@ -1660,6 +1754,10 @@ function toggleVoice(fieldPath, textareaId) {
   _voiceField = fieldPath;
   _voiceTarget = textareaId;
   _voiceSecLeft = _voiceMaxSec;
+  _voiceTranscript = '';
+  _voiceStartedAt = Date.now();
+  _voiceErrored = false;
+
   var btn = document.getElementById('mic-' + textareaId);
   if (btn) btn.classList.add('recording');
   // Show countdown badge
@@ -1680,57 +1778,57 @@ function toggleVoice(fieldPath, textareaId) {
     _voiceSecLeft--;
     updateVoiceCountdownUI();
     if (_voiceSecLeft <= 0) {
-      if (_voiceRec) { _voiceRec.stop(); }
+      if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
     }
   }, 1000);
   // Auto-stop safety net
   _voiceTimer = setTimeout(function(){
-    if (_voiceRec) { _voiceRec.stop(); }
+    if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
   }, (_voiceMaxSec + 1) * 1000);
+
+  // Accumulate final results — DO NOT commit/confirm here. onend handles commit.
   _voiceRec.onresult = function(e) {
-    var transcript = '';
     for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) transcript += e.results[i][0].transcript;
-    }
-    if (transcript) {
-      var trimmed = transcript.trim();
-      var ok = confirm('Is this what you said?\n\n"' + trimmed + '"\n\nTap OK to use this text, or Cancel to discard and try again.');
-      if (!ok) return;
-      var el = document.getElementById(textareaId);
-      var existing = el ? el.value : '';
-      var newVal = existing ? existing.trimEnd() + ' ' + trimmed : trimmed;
-      if (el) { el.value = newVal; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 240) + 'px'; }
-      var parts = fieldPath.split('.');
-      if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
-      else if (parts.length === 1) S.f[parts[0]] = newVal;
+      if (e.results[i].isFinal) {
+        var chunk = (e.results[i][0].transcript || '').trim();
+        if (chunk) _voiceTranscript += (_voiceTranscript ? ' ' : '') + chunk;
+      }
     }
   };
   _voiceRec.onerror = function(e) {
-    if (e.error === 'not-allowed') {
-      showToast('Microphone access was not allowed — check your phone Settings to allow microphone for this browser');
+    _voiceErrored = true;
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      showToast('Microphone access was not allowed \u2014 please check your phone Settings');
+    } else if (e.error === 'audio-capture') {
+      showToast('Could not access the microphone \u2014 please check your phone Settings');
+    } else if (e.error === 'network') {
+      showToast('No network connection \u2014 voice input needs internet to work');
+    } else if (e.error === 'no-speech') {
+      // 'no-speech' is benign — onend will still run and we'll show the
+      // "didn't catch that" hint there if appropriate. Don't double-toast.
+      _voiceErrored = false;
     }
-    stopVoice();
+    // Do NOT call stop/finalize here — onend always runs after onerror.
   };
-  _voiceRec.onend = function() { stopVoice(); };
-  _voiceRec.start();
-}
-function stopVoice() {
-  if (_voiceTimer) { clearTimeout(_voiceTimer); _voiceTimer = null; }
-  if (_voiceCountdown) { clearInterval(_voiceCountdown); _voiceCountdown = null; }
-  if (_voiceRec) { try{_voiceRec.stop()}catch(e){} _voiceRec = null; }
-  // Remove countdown badge
-  var badge = document.getElementById('voice-countdown');
-  if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
-  if (_voiceTarget) {
-    var btn = document.getElementById('mic-' + _voiceTarget);
-    if (btn) btn.classList.remove('recording');
-    // Restore label
-    if (btn && btn.parentNode) {
-      var lbl = btn.parentNode.querySelector('[data-voice-label]');
-      if (lbl) lbl.style.display = '';
-    }
+  _voiceRec.onend = function() { _finalizeVoice(); };
+
+  try {
+    _voiceRec.start();
+  } catch(e) {
+    showToast('Could not start voice recording \u2014 please try again');
+    _resetVoiceUI();
+    _voiceRec = null;
+    _voiceField = null;
+    _voiceTarget = null;
+    _voiceTranscript = '';
+    _voiceStartedAt = 0;
   }
-  _voiceField = null; _voiceTarget = null;
+}
+
+// Kept as a thin programmatic stop entry point (used nowhere else now, but
+// preserved in case external code references it).
+function stopVoice() {
+  if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
 }
 function micBtn(fieldPath, taId) {
   if (!_speechSupported) return '';
