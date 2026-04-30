@@ -889,7 +889,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.28.1';
+const APP_VERSION = '2026.04.30.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1893,6 +1893,7 @@ async function handleOtpSubmit() {
    // Session is now set - JWT attached to all future requests
    const { data: officials } = await sb.from('officials')
      .select('id,full_name,role,province,district,email,details')
+     .eq('email', S._otpEmail)
      .limit(1);
 
    const official = officials?.[0];
