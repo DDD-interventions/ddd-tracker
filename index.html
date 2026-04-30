@@ -285,6 +285,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* Dashboard filter bar */
 .dash-filters{background:linear-gradient(135deg,#1A2332 0%,#2A3A4E 100%);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.dash-term-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}
 .dash-filters-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
 .dash-filter-grp label{display:block;font-size:9px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 .dash-filter-grp select{width:100%;padding:7px 8px;border:1.5px solid rgba(255,255,255,.2);border-radius:6px;font-size:12px;font-weight:600;font-family:inherit;color:#fff;background:rgba(255,255,255,.1);cursor:pointer;appearance:auto;-webkit-appearance:auto}
@@ -889,7 +890,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.5';
+const APP_VERSION = '2026.04.30.6';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -917,6 +918,7 @@ const S = {
  dashScope:'My Activities', dashPeriod:'All Time', dashTab:'overview', dashViewScope:'all',
  // Dashboard filters
  dashFilter: { province:'All', district:'All', circuit:'All', school:'All' },
+ dashTermFilter: { year: new Date().getFullYear(), term: 'All' },
  _dashRoleFilter:'ALL', _dashSubjFilter:[], _dashSubjQ:'', _dashSubjDDOpen:false, _dashPhaseFilter:'ALL',
  _supTagged:{},
  _mention:{active:false, key:'', elId:'', query:'', results:[], recents:[], loading:false},
@@ -4165,11 +4167,42 @@ function initDashFilters() {
     circuit: 'All',
     school: 'All'
   };
+  S.dashTermFilter = { year: new Date().getFullYear(), term: 'All' };
   S._dashRoleFilter = 'ALL';
   S._dashSubjFilter = [];
   S._dashPhaseFilter = 'ALL';
   S._dashSubjQ = '';
   S._dashSubjDDOpen = false;
+}
+
+// Extract year + term number from a decision. Uses det.term ("Term N YYYY")
+// when present, else derives from d.date. Returns {year:Number, termNum:Number}
+// or null if neither is parseable.
+function _decisionYearTerm(d) {
+  const det = d.details || {};
+  if (det.term) {
+    const m = /^Term\s+(\d)\s+(\d{4})$/.exec(det.term);
+    if (m) return { year: parseInt(m[2], 10), termNum: parseInt(m[1], 10) };
+  }
+  if (d.date) {
+    const t = deriveTermFromDate(d.date);
+    const m2 = /^Term\s+(\d)\s+(\d{4})$/.exec(t);
+    if (m2) return { year: parseInt(m2[2], 10), termNum: parseInt(m2[1], 10) };
+  }
+  return null;
+}
+
+// Years to offer in the Year dropdown: every year present in the loaded
+// decisions, plus the current calendar year (so the user can select it even
+// before any data exists for it). Sorted descending (most recent first).
+function getDashYears() {
+  const years = new Set();
+  years.add(new Date().getFullYear());
+  (S.decisions || []).forEach(function(d) {
+    const yt = _decisionYearTerm(d);
+    if (yt) years.add(yt.year);
+  });
+  return [...years].sort(function(a, b) { return b - a; });
 }
 
 function getClientScope() {
@@ -4191,6 +4224,7 @@ function getClientScope() {
 
 function applyDashFilters(decs) {
   const f = S.dashFilter;
+  const tf = S.dashTermFilter || { year: new Date().getFullYear(), term: 'All' };
   return decs.filter(d => {
     const det = d.details || {};
     if (f.province !== 'All' && (det.province || '') !== f.province) return false;
@@ -4199,6 +4233,18 @@ function applyDashFilters(decs) {
     if (f.school !== 'All') {
       const schools = (det.schools || '').split(',').map(s => s.trim());
       if (!schools.includes(f.school)) return false;
+    }
+    // Term/Year filter — uses det.term when present, falls back to deriving
+    // from d.date so older rows missing det.term aren't silently dropped.
+    const yt = _decisionYearTerm(d);
+    if (!yt) {
+      // Genuinely no term and no date — only allow it through when no time
+      // filter is set at all. With a year selected we exclude these rows
+      // because we cannot place them in time.
+      if (tf.year || (tf.term && tf.term !== 'All')) return false;
+    } else {
+      if (tf.year && yt.year !== tf.year) return false;
+      if (tf.term && tf.term !== 'All' && yt.termNum !== tf.term) return false;
     }
     return true;
   });
@@ -4248,8 +4294,14 @@ function renderFilterBar(decs) {
 
   const provLocked = scope === 'district' || scope === 'own';
   const distLocked = scope === 'own';
-  const hasFilters = f.province !== 'All' || f.district !== 'All' || f.circuit !== 'All' || f.school !== 'All';
+  const tf = S.dashTermFilter || { year: new Date().getFullYear(), term: 'All' };
+  const years = getDashYears();
+  const hasFilters = f.province !== 'All' || f.district !== 'All' || f.circuit !== 'All' || f.school !== 'All'
+    || tf.year !== new Date().getFullYear() || tf.term !== 'All';
   const filtered = applyDashFilters(decs);
+  const termScopeLabel = (tf.term === 'All')
+    ? ('All terms in ' + tf.year)
+    : ('Term ' + tf.term + ' ' + tf.year);
 
   function sel(options, current, field, disabled) {
     const blockSchool = (field === 'school' && f.district === 'All');
@@ -4272,7 +4324,27 @@ function renderFilterBar(decs) {
       '</select>';
   }
 
+  function yearSel() {
+    return '<select onchange="S.dashTermFilter.year=parseInt(this.value,10);render()">' +
+      years.map(function(y) {
+        return '<option value="' + y + '"' + (tf.year === y ? ' selected' : '') + '>' + y + '</option>';
+      }).join('') +
+      '</select>';
+  }
+
+  function termSel() {
+    var opts = '<option value="All"' + (tf.term === 'All' ? ' selected' : '') + '>All terms</option>';
+    for (var t = 1; t <= 4; t++) {
+      opts += '<option value="' + t + '"' + (tf.term === t ? ' selected' : '') + '>Term ' + t + '</option>';
+    }
+    return '<select onchange="var v=this.value;S.dashTermFilter.term=(v===\'All\'?\'All\':parseInt(v,10));render()">' + opts + '</select>';
+  }
+
   return '<div class="dash-filters">' +
+    '<div class="dash-term-row">' +
+      '<div class="dash-filter-grp"><label>Year</label>' + yearSel() + '</div>' +
+      '<div class="dash-filter-grp"><label>Term</label>' + termSel() + '</div>' +
+    '</div>' +
     '<div class="dash-filters-row">' +
       '<div class="dash-filter-grp"><label>Province</label>' + sel(provinces, f.province, 'province', provLocked) + '</div>' +
       '<div class="dash-filter-grp"><label>District</label>' + sel(districts, f.district, 'district', distLocked) + '</div>' +
@@ -4280,7 +4352,7 @@ function renderFilterBar(decs) {
       '<div class="dash-filter-grp"><label>School</label>' + sel(schools, f.school, 'school', false) + '</div>' +
     '</div>' +
     '<div class="dash-filters-info">' +
-      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":"") + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
+      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":"") + ' &nbsp;·&nbsp; ' + termScopeLabel + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
       '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
       ((S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:10px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
