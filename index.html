@@ -889,7 +889,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.3';
+const APP_VERSION = '2026.04.30.5';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1611,16 +1611,20 @@ function updateMentionUI(key) {
 
 // ── VOICE RECORDING ──
 // Design notes:
-//  * Transcript chunks are accumulated during the session and committed ONCE
-//    in onend — never inside onresult. With continuous=true, onresult fires
-//    after every natural pause; popping a confirm()/inserting text mid-stream
-//    interrupts the user and produced multiple dialogs on Android Chrome.
+//  * Final transcripts are inserted into the textarea LIVE as the user speaks
+//    (in onresult), not buffered until onend. This restores the
+//    immediate-feedback property the original code had via its confirm()
+//    dialog — without the multi-dialog problem. The textarea is editable, so
+//    users can correct typos directly (Facebook-UX-as-reference principle).
 //  * When switching from field A → field B without first tapping stop, we
 //    detach A's onresult/onerror/onend BEFORE calling stop(). Otherwise A's
 //    async onend would later run and tear down B's session via the shared
 //    global state. This was the main "voice doesn't work across fields" bug.
-//  * No confirm() dialog — the textarea remains editable, so users correct
-//    typos directly (Facebook-UX-as-reference principle).
+//  * 'network' errors are SILENT (matching the original behavior). They do
+//    not mean the user is offline — they mean the browser's speech service is
+//    unreachable, often intermittently. A loud toast on every miss makes a
+//    usable feature feel broken; the gentle "didn't catch that" hint
+//    (>2s recordings with no result) is enough nudge to retry.
 var _voiceRec = null;
 var _voiceTarget = null;
 var _voiceField = null;
@@ -1629,6 +1633,7 @@ var _voiceCountdown = null;
 var _voiceMaxSec = 90;
 var _voiceSecLeft = 0;
 var _voiceTranscript = '';
+var _voiceCaptured = false;
 var _voiceStartedAt = 0;
 var _voiceErrored = false;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -1695,7 +1700,11 @@ function _commitVoiceTranscript() {
 
 // Called by onend — finalize the session: commit text, then clear state.
 function _finalizeVoice() {
-  var hadTranscript = !!_voiceTranscript;
+  // hadTranscript is true if EITHER the unflushed accumulator has text OR we
+  // already live-committed at least one chunk via onresult. Without this, a
+  // successful session that already inserted everything live would falsely
+  // fall into the "didn't catch that" branch below.
+  var hadTranscript = !!_voiceTranscript || _voiceCaptured;
   var duration = _voiceStartedAt ? (Date.now() - _voiceStartedAt) : 0;
   var errored = _voiceErrored;
   _commitVoiceTranscript();
@@ -1704,6 +1713,7 @@ function _finalizeVoice() {
   _voiceField = null;
   _voiceTarget = null;
   _voiceTranscript = '';
+  _voiceCaptured = false;
   _voiceStartedAt = 0;
   _voiceErrored = false;
   // Helpful nudge only when the user clearly tried to record but nothing came back.
@@ -1736,6 +1746,7 @@ function toggleVoice(fieldPath, textareaId) {
     _voiceField = null;
     _voiceTarget = null;
     _voiceTranscript = '';
+    _voiceCaptured = false;
     _voiceStartedAt = 0;
     _voiceErrored = false;
   }
@@ -1755,6 +1766,7 @@ function toggleVoice(fieldPath, textareaId) {
   _voiceTarget = textareaId;
   _voiceSecLeft = _voiceMaxSec;
   _voiceTranscript = '';
+  _voiceCaptured = false;
   _voiceStartedAt = Date.now();
   _voiceErrored = false;
 
@@ -1786,13 +1798,25 @@ function toggleVoice(fieldPath, textareaId) {
     if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
   }, (_voiceMaxSec + 1) * 1000);
 
-  // Accumulate final results — DO NOT commit/confirm here. onend handles commit.
+  // Insert each final result into the textarea as soon as it arrives, so the
+  // user sees text appearing as they speak — same immediate-feedback property
+  // the original code had via its (problematic) confirm() dialog. The textarea
+  // remains editable so the user can correct anything; no confirm needed.
   _voiceRec.onresult = function(e) {
+    var newChunks = '';
     for (var i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
         var chunk = (e.results[i][0].transcript || '').trim();
-        if (chunk) _voiceTranscript += (_voiceTranscript ? ' ' : '') + chunk;
+        if (chunk) newChunks += (newChunks ? ' ' : '') + chunk;
       }
+    }
+    if (newChunks) {
+      _voiceCaptured = true;
+      // Stage in _voiceTranscript so _commitVoiceTranscript can use the same
+      // commit path; clear it after so we don't re-commit on the next event.
+      _voiceTranscript = newChunks;
+      _commitVoiceTranscript();
+      _voiceTranscript = '';
     }
   };
   _voiceRec.onerror = function(e) {
@@ -1801,21 +1825,19 @@ function toggleVoice(fieldPath, textareaId) {
       showToast('Microphone access was not allowed \u2014 please check your phone Settings');
     } else if (e.error === 'audio-capture') {
       showToast('Could not access the microphone \u2014 please check your phone Settings');
-    } else if (e.error === 'network') {
-      // 'network' from Web Speech API does NOT necessarily mean the user is
-      // offline. Browsers stream audio to a remote speech service (Google's,
-      // for Chromium); this error fires when that service is unreachable —
-      // common on Brave, ungoogled-Chromium, locked-down Edge builds, and
-      // networks that block googleapis.com. Telling a user who is clearly
-      // online "no network connection" is misleading and unactionable.
-      showToast('Voice input isn\u2019t working right now \u2014 please type instead, or try Chrome on your phone');
-    } else if (e.error === 'no-speech') {
-      // 'no-speech' is benign — onend will still run and we'll show the
-      // "didn't catch that" hint there if appropriate. Don't double-toast.
+    } else if (e.error === 'no-speech' || e.error === 'aborted' || e.error === 'network') {
+      // Silent paths — match the original code's behavior so the user can
+      // simply tap again to retry. 'network' from Web Speech API does NOT
+      // mean the user is offline; it means the browser's speech service is
+      // unreachable. This is intermittent on flaky networks and persistent on
+      // Brave / locked-down corporate networks. A loud toast on every miss
+      // makes a usable feature feel broken; staying silent + the gentle
+      // "didn't catch that" hint (only on >2s recordings with no result)
+      // gives the user the right nudge without the alarm.
       _voiceErrored = false;
-    } else if (e.error === 'aborted') {
-      // User-initiated stop (e.g. tapping mic again). Not really an error.
-      _voiceErrored = false;
+      if (e.error === 'network' && window.console && console.warn) {
+        console.warn('SpeechRecognition: network error \u2014 speech service unreachable from this browser/network');
+      }
     } else {
       // language-not-supported, bad-grammar, or any future error code.
       showToast('Voice input isn\u2019t working right now \u2014 please type instead');
@@ -6175,16 +6197,41 @@ function restoreFormDraft(opts) {
 // Background version checker
 let _updateAvailable = false;
 let _updateBannerShown = false;
+let _lastRemoteVersion = null;
+
+// Compare two YYYY.MM.DD.N version strings.
+// Returns 1 if a > b, -1 if a < b, 0 if equal. Missing/garbled segments → 0.
+function _compareVersions(a, b) {
+  if (!a || !b) return 0;
+  var ap = String(a).split('.').map(function(p){ return parseInt(p, 10) || 0; });
+  var bp = String(b).split('.').map(function(p){ return parseInt(p, 10) || 0; });
+  for (var i = 0; i < Math.max(ap.length, bp.length); i++) {
+    var x = ap[i] || 0;
+    var y = bp[i] || 0;
+    if (x > y) return 1;
+    if (x < y) return -1;
+  }
+  return 0;
+}
+
+function _getDismissedVersion() {
+  try { return localStorage.getItem('ddd_dismissed_update'); } catch(e) { return null; }
+}
 
 async function checkForUpdates() {
   try {
     const resp = await fetch(VERSION_CHECK_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) return;
     const remoteVersion = (await resp.text()).trim();
-    if (remoteVersion && remoteVersion !== APP_VERSION) {
-      _updateAvailable = true;
-      handleUpdateAvailable();
-    }
+    _lastRemoteVersion = remoteVersion;
+    // Only show the banner when remote is STRICTLY NEWER than what's loaded.
+    // A stale version.txt (older than the running app — common when a deploy
+    // bumps the HTML but forgets to bump version.txt) must NOT trigger a nag.
+    if (!remoteVersion || _compareVersions(remoteVersion, APP_VERSION) <= 0) return;
+    // And don't re-nag for a remote version the user has already dismissed.
+    if (remoteVersion === _getDismissedVersion()) return;
+    _updateAvailable = true;
+    handleUpdateAvailable();
   } catch(e) { /* Silently fail — user might be offline */ }
 }
 
@@ -6210,6 +6257,9 @@ function showUpdateBanner() {
 
 function applyUpdate() {
   saveFormDraft();
+  // User chose to update — clear any prior dismissal so the next genuinely
+  // newer version can prompt them again.
+  try { localStorage.removeItem('ddd_dismissed_update'); } catch(e) {}
   try { localStorage.setItem('ddd_auto_restore_once', '1'); } catch(e) {}
   _intentionalReload = true;
   window.location.reload();
@@ -6218,8 +6268,13 @@ function applyUpdate() {
 function dismissUpdateBanner() {
   const banner = document.getElementById('update-banner');
   if (banner) banner.classList.remove('visible');
-  // Re-check in 5 minutes
-  setTimeout(() => { _updateBannerShown = false; if (_updateAvailable) handleUpdateAvailable(); }, 5 * 60 * 1000);
+  // Remember this exact remote version so we don't re-show the same banner.
+  // A genuinely NEWER version detected later will still trigger a fresh
+  // banner because checkForUpdates compares against the dismissed version.
+  if (_lastRemoteVersion) {
+    try { localStorage.setItem('ddd_dismissed_update', _lastRemoteVersion); } catch(e) {}
+  }
+  _updateBannerShown = false;
 }
 
 // INIT 
