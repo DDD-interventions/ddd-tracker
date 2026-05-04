@@ -890,7 +890,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.6';
+const APP_VERSION = '2026.04.30.7';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1618,6 +1618,14 @@ function updateMentionUI(key) {
 //    immediate-feedback property the original code had via its confirm()
 //    dialog — without the multi-dialog problem. The textarea is editable, so
 //    users can correct typos directly (Facebook-UX-as-reference principle).
+//  * AUTO-RESTART on premature end. The Web Speech API auto-stops after
+//    ~8–10s of detected silence even with continuous=true, and Android
+//    Chrome's silence detection is unreliable (soft speech / breath pauses
+//    register as silence). Without auto-restart users perceive the feature
+//    as "cuts off after 10 seconds". We track whether the user *intended* to
+//    stop (_voiceShouldRestart). When onend fires with the flag still set
+//    and time remaining on the 90s cap, we transparently start a fresh
+//    recognizer for the same target. The user sees one continuous session.
 //  * When switching from field A → field B without first tapping stop, we
 //    detach A's onresult/onerror/onend BEFORE calling stop(). Otherwise A's
 //    async onend would later run and tear down B's session via the shared
@@ -1638,6 +1646,16 @@ var _voiceTranscript = '';
 var _voiceCaptured = false;
 var _voiceStartedAt = 0;
 var _voiceErrored = false;
+// True while the user wants the session to continue; cleared when they
+// tap stop, switch fields, or hit a fatal/permanent error. Used by onend
+// to decide between "auto-restart" and "finalize".
+var _voiceShouldRestart = false;
+// Tracks consecutive recognizer ends that produced no transcript. If this
+// climbs too high (e.g. persistent network failure, hardware permission glitch
+// that doesn't surface as 'not-allowed'), we stop auto-restarting to avoid
+// hammering the speech service / draining battery on a hopeless loop.
+var _voiceConsecutiveEmpty = 0;
+var _VOICE_MAX_EMPTY_RESTARTS = 4;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 var _voiceUsedBefore = (function(){try{return localStorage.getItem('ddd_voice_used')==='1'}catch(e){return false}})();
 
@@ -1718,17 +1736,98 @@ function _finalizeVoice() {
   _voiceCaptured = false;
   _voiceStartedAt = 0;
   _voiceErrored = false;
+  _voiceShouldRestart = false;
   // Helpful nudge only when the user clearly tried to record but nothing came back.
   if (!hadTranscript && !errored && duration > 2000) {
     showToast('Didn\u2019t catch that \u2014 please speak clearly and try again');
   }
 }
 
+// Build, wire and start a fresh SpeechRecognition instance for the
+// currently-active _voiceTarget / _voiceField. Used both on initial start
+// (toggleVoice) and on auto-restart (from onend when the recognizer ended
+// prematurely but the user still wants to be recording).
+function _createAndStartVoiceRec() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = new SR();
+  rec.lang = 'en-ZA';
+  rec.continuous = true;
+  rec.interimResults = false;
+
+  rec.onresult = function(e) {
+    var newChunks = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        var chunk = (e.results[i][0].transcript || '').trim();
+        if (chunk) newChunks += (newChunks ? ' ' : '') + chunk;
+      }
+    }
+    if (newChunks) {
+      _voiceCaptured = true;
+      _voiceConsecutiveEmpty = 0; // got a result — reset the dead-loop guard
+      _voiceTranscript = newChunks;
+      _commitVoiceTranscript();
+      _voiceTranscript = '';
+    }
+  };
+
+  rec.onerror = function(e) {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      _voiceErrored = true;
+      _voiceShouldRestart = false; // permission denied — don't loop
+      showToast('Microphone access was not allowed \u2014 please check your phone Settings');
+    } else if (e.error === 'audio-capture') {
+      _voiceErrored = true;
+      _voiceShouldRestart = false; // hardware issue — don't loop
+      showToast('Could not access the microphone \u2014 please check your phone Settings');
+    } else if (e.error === 'no-speech' || e.error === 'aborted' || e.error === 'network') {
+      // Recoverable. Stay silent (matches original behaviour) and let onend's
+      // auto-restart logic decide whether to continue.
+      if (e.error === 'network' && window.console && console.warn) {
+        console.warn('SpeechRecognition: network error \u2014 speech service unreachable; will retry');
+      }
+    } else {
+      // language-not-supported, bad-grammar, or any future error code: treat
+      // as fatal so we don't burn cycles restarting into the same failure.
+      _voiceErrored = true;
+      _voiceShouldRestart = false;
+      showToast('Voice input isn\u2019t working right now \u2014 please type instead');
+    }
+    // Do NOT call stop/finalize here — onend always runs after onerror.
+  };
+
+  rec.onend = function() {
+    // If the user still wants to be recording AND there's time remaining on
+    // the 90s cap, transparently spin up a fresh recognizer. Web Speech in
+    // Chrome/Android auto-stops after ~8–10s of perceived silence even with
+    // continuous=true; without this, a single pause kills the session.
+    _voiceConsecutiveEmpty++;
+    if (_voiceShouldRestart && _voiceSecLeft > 0 && _voiceField && _voiceTarget
+        && _voiceConsecutiveEmpty <= _VOICE_MAX_EMPTY_RESTARTS) {
+      try {
+        _voiceRec = _createAndStartVoiceRec();
+        return;
+      } catch (e) {
+        // start() can throw if called too quickly after the previous stop.
+        // Fall through to finalize so we don't leave the UI in a half-state.
+        if (window.console && console.warn) console.warn('Voice auto-restart failed:', e);
+      }
+    }
+    _voiceShouldRestart = false;
+    _finalizeVoice();
+  };
+
+  rec.start();
+  return rec;
+}
+
 function toggleVoice(fieldPath, textareaId) {
   if (!_speechSupported) { showToast('Voice input is not available on this browser \u2014 try using Chrome on your phone'); return; }
 
-  // Same-field tap = stop request. Let the recognizer's own onend run _finalizeVoice.
+  // Same-field tap = stop request. Clear the restart flag first so the
+  // recognizer's onend runs _finalizeVoice instead of restarting.
   if (_voiceRec && _voiceField === fieldPath) {
+    _voiceShouldRestart = false;
     try { _voiceRec.stop(); } catch(e) {}
     return;
   }
@@ -1741,6 +1840,7 @@ function toggleVoice(fieldPath, textareaId) {
     oldRec.onresult = null;
     oldRec.onerror = null;
     oldRec.onend = null;
+    _voiceShouldRestart = false;
     try { oldRec.stop(); } catch(e) {}
     _commitVoiceTranscript();
     _resetVoiceUI();
@@ -1759,11 +1859,6 @@ function toggleVoice(fieldPath, textareaId) {
     showVoiceHint('mic-' + textareaId);
   }
 
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  _voiceRec = new SR();
-  _voiceRec.lang = 'en-ZA';
-  _voiceRec.continuous = true;
-  _voiceRec.interimResults = false;
   _voiceField = fieldPath;
   _voiceTarget = textareaId;
   _voiceSecLeft = _voiceMaxSec;
@@ -1771,6 +1866,8 @@ function toggleVoice(fieldPath, textareaId) {
   _voiceCaptured = false;
   _voiceStartedAt = Date.now();
   _voiceErrored = false;
+  _voiceShouldRestart = true;
+  _voiceConsecutiveEmpty = 0;
 
   var btn = document.getElementById('mic-' + textareaId);
   if (btn) btn.classList.add('recording');
@@ -1787,70 +1884,26 @@ function toggleVoice(fieldPath, textareaId) {
     var lbl = btn.parentNode.querySelector('[data-voice-label]');
     if (lbl) lbl.style.display = 'none';
   }
-  // Start countdown timer
+  // Start countdown timer. When time runs out, clear the restart flag so
+  // onend correctly finalizes instead of looping.
   _voiceCountdown = setInterval(function(){
     _voiceSecLeft--;
     updateVoiceCountdownUI();
     if (_voiceSecLeft <= 0) {
+      _voiceShouldRestart = false;
       if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
     }
   }, 1000);
   // Auto-stop safety net
   _voiceTimer = setTimeout(function(){
+    _voiceShouldRestart = false;
     if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
   }, (_voiceMaxSec + 1) * 1000);
 
-  // Insert each final result into the textarea as soon as it arrives, so the
-  // user sees text appearing as they speak — same immediate-feedback property
-  // the original code had via its (problematic) confirm() dialog. The textarea
-  // remains editable so the user can correct anything; no confirm needed.
-  _voiceRec.onresult = function(e) {
-    var newChunks = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        var chunk = (e.results[i][0].transcript || '').trim();
-        if (chunk) newChunks += (newChunks ? ' ' : '') + chunk;
-      }
-    }
-    if (newChunks) {
-      _voiceCaptured = true;
-      // Stage in _voiceTranscript so _commitVoiceTranscript can use the same
-      // commit path; clear it after so we don't re-commit on the next event.
-      _voiceTranscript = newChunks;
-      _commitVoiceTranscript();
-      _voiceTranscript = '';
-    }
-  };
-  _voiceRec.onerror = function(e) {
-    _voiceErrored = true;
-    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      showToast('Microphone access was not allowed \u2014 please check your phone Settings');
-    } else if (e.error === 'audio-capture') {
-      showToast('Could not access the microphone \u2014 please check your phone Settings');
-    } else if (e.error === 'no-speech' || e.error === 'aborted' || e.error === 'network') {
-      // Silent paths — match the original code's behavior so the user can
-      // simply tap again to retry. 'network' from Web Speech API does NOT
-      // mean the user is offline; it means the browser's speech service is
-      // unreachable. This is intermittent on flaky networks and persistent on
-      // Brave / locked-down corporate networks. A loud toast on every miss
-      // makes a usable feature feel broken; staying silent + the gentle
-      // "didn't catch that" hint (only on >2s recordings with no result)
-      // gives the user the right nudge without the alarm.
-      _voiceErrored = false;
-      if (e.error === 'network' && window.console && console.warn) {
-        console.warn('SpeechRecognition: network error \u2014 speech service unreachable from this browser/network');
-      }
-    } else {
-      // language-not-supported, bad-grammar, or any future error code.
-      showToast('Voice input isn\u2019t working right now \u2014 please type instead');
-    }
-    // Do NOT call stop/finalize here — onend always runs after onerror.
-  };
-  _voiceRec.onend = function() { _finalizeVoice(); };
-
   try {
-    _voiceRec.start();
+    _voiceRec = _createAndStartVoiceRec();
   } catch(e) {
+    _voiceShouldRestart = false;
     showToast('Could not start voice recording \u2014 please try again');
     _resetVoiceUI();
     _voiceRec = null;
@@ -1864,6 +1917,7 @@ function toggleVoice(fieldPath, textareaId) {
 // Kept as a thin programmatic stop entry point (used nowhere else now, but
 // preserved in case external code references it).
 function stopVoice() {
+  _voiceShouldRestart = false;
   if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
 }
 function micBtn(fieldPath, taId) {
