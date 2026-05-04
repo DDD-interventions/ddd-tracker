@@ -890,7 +890,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.04.30.7';
+const APP_VERSION = '2026.05.04.1';
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -1656,6 +1656,11 @@ var _voiceShouldRestart = false;
 // hammering the speech service / draining battery on a hopeless loop.
 var _voiceConsecutiveEmpty = 0;
 var _VOICE_MAX_EMPTY_RESTARTS = 4;
+// Handle for the setTimeout that re-starts the recognizer after a silence
+// cutoff. Tracked so toggleVoice can cancel it if the user taps stop or
+// switches fields during the brief gap between stop and restart.
+var _voicePendingRestart = null;
+var _VOICE_RESTART_DELAY_MS = 300;
 var _speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 var _voiceUsedBefore = (function(){try{return localStorage.getItem('ddd_voice_used')==='1'}catch(e){return false}})();
 
@@ -1727,6 +1732,7 @@ function _finalizeVoice() {
   var hadTranscript = !!_voiceTranscript || _voiceCaptured;
   var duration = _voiceStartedAt ? (Date.now() - _voiceStartedAt) : 0;
   var errored = _voiceErrored;
+  if (_voicePendingRestart) { clearTimeout(_voicePendingRestart); _voicePendingRestart = null; }
   _commitVoiceTranscript();
   _resetVoiceUI();
   _voiceRec = null;
@@ -1739,7 +1745,7 @@ function _finalizeVoice() {
   _voiceShouldRestart = false;
   // Helpful nudge only when the user clearly tried to record but nothing came back.
   if (!hadTranscript && !errored && duration > 2000) {
-    showToast('Didn\u2019t catch that \u2014 please speak clearly and try again');
+    showToast('Voice input didn\u2019t pick up audio \u2014 please type instead, or try again');
   }
 }
 
@@ -1796,22 +1802,50 @@ function _createAndStartVoiceRec() {
     // Do NOT call stop/finalize here — onend always runs after onerror.
   };
 
+  // Diagnostics: log lifecycle so we can tell from DevTools whether the
+  // mic is reaching the recognizer at all, vs. transcripts not coming back.
+  // If onaudiostart fires but onresult never does, the audio path is fine
+  // and the speech service is the failure. If onaudiostart never fires,
+  // the mic isn't reaching the new recognizer (typically a stop→start
+  // timing issue on Android Chrome).
+  if (window.console && console.debug) {
+    rec.onaudiostart = function() { console.debug('[voice] audiostart'); };
+    rec.onspeechstart = function() { console.debug('[voice] speechstart'); };
+    rec.onspeechend = function() { console.debug('[voice] speechend'); };
+  }
+
   rec.onend = function() {
     // If the user still wants to be recording AND there's time remaining on
     // the 90s cap, transparently spin up a fresh recognizer. Web Speech in
     // Chrome/Android auto-stops after ~8–10s of perceived silence even with
     // continuous=true; without this, a single pause kills the session.
+    //
+    // We defer the new start() by ~300ms because Chrome on Android sometimes
+    // hasn't released the mic stream yet by the time onend fires. Starting
+    // a fresh recognizer immediately can produce a "live" recognizer that
+    // never actually receives audio — onaudiostart fires but no transcript
+    // ever arrives. The short pause lets the audio pipeline reset cleanly.
     _voiceConsecutiveEmpty++;
     if (_voiceShouldRestart && _voiceSecLeft > 0 && _voiceField && _voiceTarget
         && _voiceConsecutiveEmpty <= _VOICE_MAX_EMPTY_RESTARTS) {
-      try {
-        _voiceRec = _createAndStartVoiceRec();
-        return;
-      } catch (e) {
-        // start() can throw if called too quickly after the previous stop.
-        // Fall through to finalize so we don't leave the UI in a half-state.
-        if (window.console && console.warn) console.warn('Voice auto-restart failed:', e);
-      }
+      // Clear the active rec so toggleVoice doesn't think we're still going.
+      _voiceRec = null;
+      _voicePendingRestart = setTimeout(function() {
+        _voicePendingRestart = null;
+        // Re-check: user may have tapped stop or switched fields during the gap.
+        if (!_voiceShouldRestart || _voiceSecLeft <= 0 || !_voiceField || !_voiceTarget) {
+          _finalizeVoice();
+          return;
+        }
+        try {
+          _voiceRec = _createAndStartVoiceRec();
+        } catch (e) {
+          if (window.console && console.warn) console.warn('Voice auto-restart failed:', e);
+          _voiceShouldRestart = false;
+          _finalizeVoice();
+        }
+      }, _VOICE_RESTART_DELAY_MS);
+      return;
     }
     _voiceShouldRestart = false;
     _finalizeVoice();
@@ -1824,24 +1858,41 @@ function _createAndStartVoiceRec() {
 function toggleVoice(fieldPath, textareaId) {
   if (!_speechSupported) { showToast('Voice input is not available on this browser \u2014 try using Chrome on your phone'); return; }
 
-  // Same-field tap = stop request. Clear the restart flag first so the
-  // recognizer's onend runs _finalizeVoice instead of restarting.
-  if (_voiceRec && _voiceField === fieldPath) {
+  // Same-field tap = stop request. This covers two states:
+  //  (a) recognizer is live (_voiceRec is set) — clear flag, stop it, let
+  //      onend run _finalizeVoice.
+  //  (b) we're in the gap between auto-restarts (_voiceRec null but
+  //      _voicePendingRestart active) — cancel the pending restart and
+  //      finalize directly so the user's stop tap takes effect immediately.
+  if (_voiceField === fieldPath && (_voiceRec || _voicePendingRestart)) {
     _voiceShouldRestart = false;
-    try { _voiceRec.stop(); } catch(e) {}
+    if (_voicePendingRestart) {
+      clearTimeout(_voicePendingRestart);
+      _voicePendingRestart = null;
+      _finalizeVoice();
+    } else {
+      try { _voiceRec.stop(); } catch(e) {}
+    }
     return;
   }
 
   // Switching fields: detach old handlers FIRST so the old recognizer's async
   // onend can't later run and tear down the new session via shared globals.
+  // Also cancel any pending auto-restart so it doesn't fire mid-switch.
   // Commit anything captured for the previous field, then reset state synchronously.
-  if (_voiceRec) {
-    var oldRec = _voiceRec;
-    oldRec.onresult = null;
-    oldRec.onerror = null;
-    oldRec.onend = null;
+  if (_voiceRec || _voicePendingRestart) {
     _voiceShouldRestart = false;
-    try { oldRec.stop(); } catch(e) {}
+    if (_voicePendingRestart) {
+      clearTimeout(_voicePendingRestart);
+      _voicePendingRestart = null;
+    }
+    if (_voiceRec) {
+      var oldRec = _voiceRec;
+      oldRec.onresult = null;
+      oldRec.onerror = null;
+      oldRec.onend = null;
+      try { oldRec.stop(); } catch(e) {}
+    }
     _commitVoiceTranscript();
     _resetVoiceUI();
     _voiceRec = null;
@@ -1885,19 +1936,34 @@ function toggleVoice(fieldPath, textareaId) {
     if (lbl) lbl.style.display = 'none';
   }
   // Start countdown timer. When time runs out, clear the restart flag so
-  // onend correctly finalizes instead of looping.
+  // onend correctly finalizes instead of looping. Also covers the case where
+  // we're in the gap between auto-restarts (no live _voiceRec) — cancel the
+  // pending restart and finalize directly.
   _voiceCountdown = setInterval(function(){
     _voiceSecLeft--;
     updateVoiceCountdownUI();
     if (_voiceSecLeft <= 0) {
       _voiceShouldRestart = false;
-      if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
+      if (_voicePendingRestart) {
+        clearTimeout(_voicePendingRestart);
+        _voicePendingRestart = null;
+        _finalizeVoice();
+      } else if (_voiceRec) {
+        try { _voiceRec.stop(); } catch(e) {}
+      }
     }
   }, 1000);
-  // Auto-stop safety net
+  // Auto-stop safety net (fires 1s after the countdown should already have
+  // hit zero — belt-and-braces in case the interval misses a tick).
   _voiceTimer = setTimeout(function(){
     _voiceShouldRestart = false;
-    if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
+    if (_voicePendingRestart) {
+      clearTimeout(_voicePendingRestart);
+      _voicePendingRestart = null;
+      _finalizeVoice();
+    } else if (_voiceRec) {
+      try { _voiceRec.stop(); } catch(e) {}
+    }
   }, (_voiceMaxSec + 1) * 1000);
 
   try {
@@ -1918,6 +1984,7 @@ function toggleVoice(fieldPath, textareaId) {
 // preserved in case external code references it).
 function stopVoice() {
   _voiceShouldRestart = false;
+  if (_voicePendingRestart) { clearTimeout(_voicePendingRestart); _voicePendingRestart = null; }
   if (_voiceRec) { try { _voiceRec.stop(); } catch(e) {} }
 }
 function micBtn(fieldPath, taId) {
