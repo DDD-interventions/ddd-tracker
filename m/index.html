@@ -2456,6 +2456,7 @@ function closeMentionPicker(){
   state.form._mentionBucket = '';
   state.form._mentionQuery = '';
   state.form._mentionResults = [];
+  destroyMentionLayer();
   renderLogVisitForm();
 }
 
