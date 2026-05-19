@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>DDD Tracker — Mobile (v0.2)</title>
+<title>DDD Tracker — Mobile (v0.3)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23074445'/%3E%3Ctext x='50' y='62' font-family='Segoe UI,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%237AB648'%3EDDD%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -332,6 +332,81 @@ input,textarea{font-family:inherit}
 @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1)}}
 .success-icon{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dk));color:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;margin:8px auto 16px;font-weight:800;animation:pop .4s ease;box-shadow:0 6px 16px rgba(122,182,72,.4)}
 .success-icon::after{content:'✓'}
+
+/* ═══════════════════════ WIZARD (Session 3) ═══════════════════════ */
+.form-progress-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px 10px;background:#fff;border-bottom:1px solid #ECEFF1;flex-shrink:0;gap:6px}
+.form-prog-pill{flex:1;height:6px;border-radius:3px;background:#ECEFF1;cursor:pointer;transition:background .2s;position:relative}
+.form-prog-pill.done{background:var(--teal)}
+.form-prog-pill.active{background:var(--teal-dk)}
+.form-prog-pill.active::after{content:'';position:absolute;top:-3px;left:50%;width:12px;height:12px;border-radius:50%;background:var(--teal-dk);transform:translateX(-50%);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.step-section{display:flex;flex-direction:column;gap:14px}
+.form-section-hdr{font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 -4px;padding-bottom:6px;border-bottom:1px solid #ECEFF1}
+.hint-sm{font-size:10.5px;color:var(--grey);margin:-2px 0 6px;line-height:1.4}
+.radio-grp{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.radio-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #ECEFF1;border-radius:8px;cursor:pointer;background:#fff;transition:all .15s;font-size:13px;color:#323130;line-height:1.4}
+.radio-row.active{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk)}
+.radio-row input{margin-top:2px;flex-shrink:0;accent-color:var(--teal)}
+.radio-row span{flex:1;min-width:0}
+.info-card{padding:10px 13px;border-radius:8px;font-size:11.5px;line-height:1.5;margin-bottom:10px}
+.info-blue{background:var(--blue-lt);color:#1565C0;border-left:3px solid var(--blue)}
+.info-grey{background:#f8f9fa;color:var(--grey-dk);border-left:3px solid var(--grey)}
+
+/* School observation checklist */
+.obs-toggle{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f0f7f7;border:1.5px solid #C8E6E6;border-radius:8px;cursor:pointer;text-align:left;color:var(--teal-dk);font-family:inherit}
+.obs-chev{font-size:11px;color:var(--teal-dk);flex-shrink:0;width:14px;text-align:center}
+.obs-toggle-body{flex:1;min-width:0}
+.obs-toggle-title{font-size:12.5px;font-weight:700;color:var(--teal-dk)}
+.obs-toggle-sub{font-size:10.5px;color:var(--grey);margin-top:1px}
+.obs-toggle-cnt{font-size:10.5px;font-weight:700;color:var(--teal);background:#D0E4E4;padding:3px 8px;border-radius:10px;flex-shrink:0}
+.obs-list{margin-top:8px;border:1px solid #C8E6E6;border-radius:0 0 8px 8px;background:#FAFEFE;padding:10px 12px}
+.obs-grp-hdr{font-size:10.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid #E0EDED}
+.obs-grp-hdr:first-child{margin-top:0}
+.obs-grp{display:flex;flex-direction:column;gap:5px}
+.obs-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;background:#fff;border:1px solid #E0E0E0;transition:all .15s}
+.obs-row.obs-yes{background:#E8F5E9;border-color:#C8E6C9}
+.obs-row.obs-no{background:#FFEBEE;border-color:#FFCDD2}
+.obs-label{flex:1;font-size:11.5px;color:var(--navy);line-height:1.4}
+.obs-yn{display:flex;gap:5px;flex-shrink:0}
+.obs-btn{width:34px;height:28px;border-radius:5px;border:1.5px solid #C8C6C4;background:#fff;color:#999;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.obs-y.active{border-color:var(--green);background:var(--green);color:#fff}
+.obs-n.active{border-color:var(--red);background:var(--red);color:#fff}
+
+/* DDD task cards */
+.tq-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.tq-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #ECEFF1;border-radius:8px;background:#fff;cursor:pointer;transition:all .15s}
+.tq-card.sel{border-color:var(--teal);background:var(--teal-lt)}
+.tq-chk{width:20px;height:20px;border-radius:5px;border:1.5px solid #C8C6C4;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+.tq-card.sel .tq-chk{background:var(--teal);border-color:var(--teal)}
+.tq-q{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.35}
+.tq-cat{font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;font-weight:700}
+.tq-expand{width:100%;margin-top:8px;padding:8px;background:#F5F8FA;border:1.5px dashed #C8D0D8;border-radius:8px;color:var(--teal-dk);font-size:11.5px;font-weight:600;font-family:inherit;cursor:pointer}
+.tq-expand:active{background:#E8EEF2}
+
+/* Chip multi-select scroll container (for long lists) */
+.chip-scroll{max-height:230px;overflow-y:auto;border:1px solid #ECEFF1;border-radius:8px;padding:8px;background:#FAFBFC;-webkit-overflow-scrolling:touch}
+.chip-pick-orange{background:#fff;border-color:#F5D5A8;color:var(--orange-dk)}
+.chip-pick-orange.active{background:var(--orange-lt);border-color:var(--orange);color:var(--orange-dk)}
+
+/* Context groupings */
+.ctx-group{margin-top:8px}
+.ctx-group:first-of-type{margin-top:4px}
+.ctx-group-label{font-size:10.5px;font-weight:700;color:var(--orange-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+
+/* Review screen */
+.review-banner{background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:11px 13px;font-size:12px;font-weight:600;color:#F57F17;line-height:1.5}
+.rv-card{background:#fff;border:1px solid #ECEFF1;border-radius:10px;padding:0;overflow:hidden;margin-top:4px}
+.rv-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:10px 13px;background:#FAFBFC;border-bottom:1px solid #ECEFF1}
+.rv-hdr.c-teal{color:var(--teal-dk)}
+.rv-hdr.c-green{color:var(--green-dk)}
+.rv-hdr.c-blue{color:#0d4a8a}
+.rv-hdr.c-orange{color:var(--orange-dk)}
+.rv-row{display:flex;gap:10px;padding:8px 13px;border-top:1px solid #F3F2F1;font-size:12px;line-height:1.4}
+.rv-row:first-of-type{border-top:none}
+.rv-label{font-weight:600;color:var(--grey-dk);min-width:110px;flex-shrink:0}
+.rv-value{flex:1;color:var(--navy);word-break:break-word}
+.rv-confirm{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid #C8C6C4;border-radius:8px;cursor:pointer;background:#fff;margin-top:6px;font-size:12px;color:var(--navy);line-height:1.5;font-weight:500}
+.rv-confirm.on{border-color:var(--green);background:var(--green-lt)}
+.rv-confirm input{width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)}
 </style>
 </head>
 <body>
@@ -357,14 +432,14 @@ input,textarea{font-family:inherit}
   </div>
   <div class="login-foot">
     Need help? Email <a href="mailto:victor@newleaders.co.za">victor@newleaders.co.za</a><br>
-    <span style="opacity:.7">Mobile preview — v0.2 (Session 2)</span>
+    <span style="opacity:.7">Mobile preview — v0.3 (Session 3)</span>
   </div>
 </div>
 
 <!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
 <div id="app" class="app">
 
-  <div id="dev-banner" class="dev-banner show">Preview build · v0.2 (Session 2) — Log a visit is live</div>
+  <div id="dev-banner" class="dev-banner show">Preview build · v0.3 (Session 3) — Full 5-step wizard live</div>
 
   <!-- Header (varies by tab) -->
   <header id="hdr-home" class="hdr" style="display:block">
@@ -535,6 +610,64 @@ const SUBJECT_GROUPS = [
 ];
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
 const DISTRICTS = {"Eastern Cape":["Alfred Nzo East","Alfred Nzo West","Amathole East","Amathole West","Buffalo City","Chris Hani East","Chris Hani West","Joe Gqabi","Nelson Mandela","O R Tambo Coastal","O R Tambo Inland","Sarah Baartman"],"Free State":["Fezile Dabi","Lejweleputswa","Mangaung Metro","Thabo Mofutsanyana","Xhariep"],"Gauteng":["Ekurhuleni North","Ekurhuleni South","Gauteng East","Gauteng North","Gauteng West","Johannesburg Central","Johannesburg East","Johannesburg North","Johannesburg South","Johannesburg West","Sedibeng East","Sedibeng West","Tshwane North","Tshwane South","Tshwane West"],"KwaZulu-Natal":["Amajuba","Harry Gwala","Ilembe","King Cetshwayo","Pinetown","Ugu","Umgungundlovu","Umkhanyakude","Umlazi","Umzinyathi","Uthukela","Zululand"],"Limpopo":["Capricorn North","Capricorn South","Mogalakwena","Mopani East","Mopani West","Sekhukhune East","Sekhukhune South","Vhembe East","Vhembe West","Waterberg"],"Mpumalanga":["Bohlabela","Ehlanzeni","Gert Sibande","Nkangala"],"North West":["Ditsobotla","Greater Taung","Jb Marks","Kagisano Molopo","Madibeng","Mahikeng","Maquassi Hills","Matlosana","Moretele","Moses Kotane","Naledi","Ramotshere Moiloa","Ratlou","Rustenburg","Tswaing"],"Northern Cape":["Frances Baard","John Taolo Gaetsewe","Namakwa","Pixley-Ka-Seme","Zf Mgcawu"],"Western Cape":["Cape Winelands","Eden And Central Karoo","Metro Central","Metro East","Metro North","Metro South","Overberg","Partnership Schools","West Coast"]};
+
+/* Circuits (district → circuits map) — used in Step 1 as optional drilldown */
+const CIRCUITS_MAP = {"Alfred Nzo East":["Ane Circuit 1","Ane Circuit 2","Ane Circuit 3","Ane Circuit 4","Ane Circuit 5","Ane Circuit 6","Ane Circuit 7","Ane Circuit 8"],"Alfred Nzo West":["Anw Blorweni","Anw Fort Donald","Anw Kuali Nzo","Anw Ladykok","Anw Lesedi","Anw Letsema","Anw Magudlaphi","Anw Mkemane","Anw Mnceba 01","Anw Mnceba 02","Anw Moshesh","Anw Mt Currie","Anw N2","Anw Nolangeni","Anw Ntabankulu Central","Anw Ntabatye","Anw Ntenetyana","Anw Ntsizwa","Anw Nunge Range","Anw Shinta","Anw Simaka-Maka","Anw Simanyene","Anw Zimthuma","Anw Zinyosini"],"Amathole East":["Ae Beleni Circuit","Ae Bhadi Circuit","Ae Blue Sky Circuit","Ae Blythswood Circuit","Ae Buru Circuit","Ae Cunningham Circuit","Ae Elliotdale Village Circuit","Ae Ilingelethu Circuit","Ae J.S. Skenjana Circuit","Ae Jongulwandle Circuit","Ae Kamvalihle Circuit","Ae King Zwelidumile Circuit","Ae Kwantshunqe Circuit","Ae L.M.Malgas Circuit","Ae Lengeni Circuit","Ae Lower Gwadu Circuit","Ae Mandende Circuit","Ae Manyano Circuit","Ae Mbhashe Circuit","Ae Msobomvu Circuit","Ae Njingini Circuit","Ae Nomkqubela Circuit","Ae Nompumelelo Circuit","Ae Notinara Circuit","Ae Patricia Noah Circuit","Ae Ukhozi Circuit","Ae Upper Ngculu Circuit","Ae Willowvale Circuit"],"Amathole West":["Aw Circuit 1","Aw Circuit 10","Aw Circuit 11","Aw Circuit 12","Aw Circuit 13","Aw Circuit 14","Aw Circuit 2","Aw Circuit 3","Aw Circuit 4","Aw Circuit 5","Aw Circuit 6","Aw Circuit 7","Aw Circuit 8","Aw Circuit 9"],"Buffalo City":["Bc Amagasela-Quzini","Bc City Centre","Bc City Eastern Side","Bc Dimbaza","Bc Elotheni","Bc Fort Pato","Bc Gompo","Bc Great Kei","Bc Ingqanga Nentsiba Zayo","Bc King Williamstown","Bc Litha-Ndevana","Bc Nahoon River","Bc Ntabozuko","Bc Oceanside","Bc Sophumelela","Bc Zwelitsha"],"Chris Hani East":["Che All Saints","Che Bojane","Che Cala","Che Clarkebury","Che Elliot","Che Ikwezi","Che Iliso","Che Laphumilanga","Che Mabelentombi","Che Manzana","Che Mtawelanga","Che Mzantsi","Che Nciba","Che Nkondlo","Che Seplan","Che Sisonke","Che Zabasa"],"Chris Hani West":["Chw Cacadu","Chw Cradock","Chw Ezibeleni","Chw Isibane","Chw Lukhanji","Chw Macubeni","Chw Mid","Chw Middelburg","Chw Nciba","Chw Ndonga","Chw Nonesi","Chw Ntabethemba","Chw Qoqodala","Chw Sada","Chw Sikumtwa","Chw Tarka-Hofmeyer","Chw Vaalzwa"],"Joe Gqabi":["Jg Central","Jg Eastern","Jg Ekhephini","Jg Fairview","Jg Gariep","Jg Hd Ndzeleni","Jg Highlands","Jg Lahlangubo","Jg Maclear","Jg Maletswai","Jg Ngxaza","Jg Orange","Jg Solomzi","Jg Ugie","Jg Ukhahlamba","Jg Western"],"Nelson Mandela":["Nm Algoa-1","Nm Algoa-2","Nm Algoa-3","Nm Algoa-4","Nm Algoa-5","Nm Central-1","Nm Central-2","Nm Central-3","Nm Central-4","Nm Central-5","Nm Tinara-1","Nm Tinara-2","Nm Tinara-3","Nm Tinara-4","Nm Tinara-5","Nm-Independent","Nm-Lsen"],"O R Tambo Coastal":["Ortc Circuit 1","Ortc Circuit 10","Ortc Circuit 11","Ortc Circuit 12","Ortc Circuit 13","Ortc Circuit 14","Ortc Circuit 15","Ortc Circuit 16","Ortc Circuit 17","Ortc Circuit 2","Ortc Circuit 3","Ortc Circuit 4","Ortc Circuit 5","Ortc Circuit 6","Ortc Circuit 7","Ortc Circuit 8","Ortc Circuit 9","Ortc Hlwahlwazi","Ortc Khanyisa","Ortc Lusikisiki Central","Ortc Malangeni","Ortc Mfundisweni","Ortc Mtontsasa","Ortc Palmtop","Ortc Qaukeni","Ortc Sigcau"],"O R Tambo Inland":["Orti Circuit 1","Orti Circuit 10","Orti Circuit 11","Orti Circuit 12","Orti Circuit 13","Orti Circuit 14","Orti Circuit 15","Orti Circuit 16","Orti Circuit 17","Orti Circuit 18","Orti Circuit 19","Orti Circuit 2","Orti Circuit 20","Orti Circuit 21","Orti Circuit 22","Orti Circuit 23","Orti Circuit 24","Orti Circuit 25","Orti Circuit 3","Orti Circuit 4","Orti Circuit 5","Orti Circuit 6","Orti Circuit 7","Orti Circuit 8","Orti Circuit 9"],"Sarah Baartman":["Sb Baviaans","Sb Blue Crane","Sb Camdeboo","Sb Kou-Kamma","Sb Kouga Coastal","Sb Kouga Inland","Sb Makana 1","Sb Makana 2","Sb Ndlambe","Sb Sundays River Valley"],"Fezile Dabi":["Fd Circuit 01","Fd Circuit 02","Fd Circuit 03","Fd Circuit 04","Fd Circuit 05","Fd Circuit 06","Fd Circuit 07"],"Lejweleputswa":["Lejwe Circuit 01","Lejwe Circuit 02","Lejwe Circuit 03","Lejwe Circuit 04","Lejwe Circuit 05","Lejwe Circuit 06","Lejwe Circuit 07","Lejwe Circuit 08","Lejwe Circuit 09","Lejwe Circuit 10"],"Mangaung Metro":["M Circuit 01","M Circuit 02","M Circuit 03","M Circuit 04","M Circuit 05","M Circuit 06","M Circuit 07","M Circuit 08","M Circuit 09","M Circuit 10","M Circuit 12","M Circuit S1"],"Thabo Mofutsanyana":["Tmed Circuit 01","Tmed Circuit 02","Tmed Circuit 03","Tmed Circuit 04","Tmed Circuit 05","Tmed Circuit 06","Tmed Circuit 07","Tmed Circuit 08","Tmed Circuit 09","Tmed Circuit 10","Tmed Circuit 11","Tmed Circuit 12","Tmed Circuit 13"],"Xhariep":["X Circuit 01","X Circuit 02","X Circuit 03","X Circuit 04"],"Ekurhuleni North":["En Circuit 01","En Circuit 02","En Circuit 03","En Circuit 04"],"Ekurhuleni South":["Es Circuit 01","Es Circuit 02","Es Circuit 03","Es Circuit 04","Es Circuit 05"],"Gauteng East":["Ge Circuit 01","Ge Circuit 02","Ge Circuit 03","Ge Circuit 04","Ge Circuit 05"],"Gauteng North":["Gn Circuit 01","Gn Circuit 02","Gn Circuit 03"],"Gauteng West":["Gw Circuit 01","Gw Circuit 02","Gw Circuit 03","Gw Circuit 04","Gw Circuit 05"],"Johannesburg Central":["Jc Circuit 01","Jc Circuit 02","Jc Circuit 03","Jc Circuit 04","Jc Circuit 05","Jc Circuit 06"],"Johannesburg East":["Je Circuit 01","Je Circuit 02","Je Circuit 03"],"Johannesburg North":["Jn Circuit 01","Jn Circuit 02","Jn Circuit 03","Jn Circuit 04"],"Johannesburg South":["Js Circuit 01","Js Circuit 02","Js Circuit 03"],"Johannesburg West":["Jw Circuit 01","Jw Circuit 02","Jw Circuit 03","Jw Circuit 04"],"Sedibeng East":["Se Circuit 01","Se Circuit 02","Se Circuit 03"],"Sedibeng West":["Sw Circuit 01","Sw Circuit 02","Sw Circuit 03","Sw Circuit 04"],"Tshwane North":["Tn Circuit 01","Tn Circuit 02","Tn Circuit 03","Tn Circuit 04"],"Tshwane South":["Ts Circuit 01","Ts Circuit 02","Ts Circuit 03","Ts Circuit 04","Ts Circuit 05"],"Tshwane West":["Tw Circuit 01","Tw Circuit 02","Tw Circuit 03","Tw Circuit 04"],"Amajuba":["Dannhauser","Newcastle"],"Harry Gwala":["Ixopo","Pholela","Umzimkhulu"],"Ilembe":["Maphumulo","Ndwedwe","Stanger"],"King Cetshwayo":["Imfolozi","Mthonjaneni","Nkandla","Umhlathuze","Umlalazi"],"Pinetown":["Durban Northwest","Mafukuzela Ghandi","Umhlathuzana"],"Ugu":["Emzumbe","Sayidi","Scottburgh"],"Umgungundlovu":["Umngeni","Umsunduzi","Vulindlela"],"Umkhanyakude":["Hlabisa","Ingwavuma","Ubombo","Umhlabuyalingana"],"Umlazi":["Durban Central","Phumelela","Umbumbulu"],"Umzinyathi":["Endumeni/Nquthu","Msinga","Umvoti"],"Uthukela":["Bergville","Estcourt","Mnambithi"],"Zululand":["Bhekuzulu","Mahlabathini","Nongoma","Paulpietersburg","Pongola"],"Capricorn North":["Bahananwa North","Bahananwa South","Bahlaloga","Bakone-Vlakfontein","Bochum East","Bochum West","Koloti","Maleboho Central","Maleboho East","Maleboho West","Maune","Mogoshi","Moletjie","Moloto","Sekgosese Central","Sekgosese West"],"Capricorn South":["Dimamo","Kgakotlou","Lebopo","Lebowakgomo","Lepelle(Capricorn South)","Magatle","Mamabolo","Mankweng","Maraba","Mogodumo","Moletlane","Mphahlele","Nokotlou","Pietersburg","Sepitsi","Seshego"],"Mogalakwena":["Bakenberg North","Bakenberg South","Baltimore","Mahwelereng","Mapela","Matlalane","Mogalakwena","Mokopane","Potgietersrus"],"Mopani East":["Groot Letaba","Klein Letaba","Lulekani","Mamaila","Manombe","Modjadji","Molototsi","Namakgale","Nsami","Rakwadu 1","Sekgosese East 1","Sekgosese East 2","Shamavunga"],"Mopani West":["Khujwana","Lepelle(Mopani West)","Mafarana","Makhutswe","Mawa","Motupa","Nkowankowa","Nwanedzi","Rakwadu 2","Shiluvane","Thabina","Tzaneen","Xihoko"],"Sekhukhune East":["Bogwasha","Dilokong","Drakensberg","Driekop","Leolo","Lepellane","Mabulane","Malegale","Malokela","Mmashadi","Mohlaletse","Moroke","Ngwaabe","Schoonoord","Seotlong","Tubatse"],"Sekhukhune South":["Eensaam","Glen Cowie","Groblersdal","Hlogotlou","Lepelle(Sekhukhune South)","Lobethal","Manthole","Masemola","Motetema","Moutse Central","Moutse East","Moutse West","Ngwaritsi","Phokoane","Rakgwadi","Tsimanyane"],"Vhembe East":["Dzindi","Luvuvhu","Malamulele Central","Malamulele East","Malamulele North East","Malamulele South","Malamulele West","Mudaswali","Mutshindudi","Mvudi","Niani East","Niani West","Sambandou","Sibasa","Tshilamba","Tshinane","Vhumbedzi","Vhuronga 1"],"Vhembe West":["Dzondo","Elim","Hlanganani Central","Hlanganani North","Hlanganani South","Lwamondo","Nzhelele Central","Nzhelele East","Nzhelele West","Sekgosese North","Soutpansberg East","Soutpansberg North","Soutpansberg West","Vhuronga 2"],"Waterberg":["Dwaalboom","Ellisras","Naboomspruit","Nylstroom","Palala North","Palala South","Thabazimbi","Vaalwater","Warmbad"],"Bohlabela":["Cottondale","Greenvalley","Lehukwe","Maboke","Mafemani","Manyeleti","Maripe","Marite","Mashishing","Matsavana","Mkhuhlu","Ngwaritsane","Sabie","Shatale","Thulamahashe","Ximhungwe"],"Ehlanzeni":["Insikazi","Khulangwane","Lubombo","Malelane","Mbombela","Mgwenya","Nkomazi Central","Nkomazi East","Nkomazi West","Nkululeko","Sikhulile","Umjindi","White Hazy 1","White Hazy 2","White River"],"Gert Sibande":["Bethal","Breyten","Carolina","Dipaliseng","Dundonald","Highveld Ridge East","Highveld Ridge West","Kwathandeka","Lekwa East","Lekwa West","Manzana","Mashishila","Mkhondo East","Mkhondo West","Mpuluzi","Msukaligwa 1","Msukaligwa 2","Volksrust","Wakkerstroom"],"Nkangala":["Buhlebesizwe","Emakhazeni","Emalahleni 1","Emalahleni 2","Emalahleni 3","Emthambothini","Kwaggafontein East","Kwaggafontein West","Kwamhlanga Ne","Kwamhlanga Sw","Libangeni","Marapyane","Mmametlhake","Nokaneng","Phumula","Siyabuswa 1","Siyabuswa 2","Steve Tshwete 1","Steve Tshwete 2","Steve Tshwete 3","Victor Khanye"],"Ditsobotla":["Bodibe","Coligny","Itsoseng","Lichtenburg"],"Greater Taung":["Ba Ga Mothibi","Manthe","Mokgareng","Pudumong","Reivilo","Taung Central"],"Jb Marks":["Retlakgona-Jb Marks","Super A","Tshing"],"Kagisano Molopo":["Ganyesa","Morokweng 1","Morokweng 2","Tlaakgameng"],"Madibeng":["Ditlou","Kopano-Madibeng","Kwena","Morula","Retlakgona-Madibeng","Toloane"],"Mahikeng":["Botshabelo","Central","Kopano-Mahikeng","Mmabatho","Montshioa Stadt","Tshwaranang"],"Maquassi Hills":["Naledi"],"Matlosana":["Jc Motaung","Meepong","Naledi-Matlosana","Refentse","Tswelelopele"],"Moretele":["Makapanstad Central","Makapanstad North","Makapanstad West","Rekopantswe","Tswaing"],"Moses Kotane":["Dinaledi","Kopano-Moses Kotane","Madikwe","Mankwe","Mogale","Retladirela-Moses Kotane"],"Naledi":["Lekwa-Teemane","Mamusa","Naledi"],"Ramotshere Moiloa":["Lerato","Motswedi","Nietverdiendt","Zeerust"],"Ratlou":["Kraaima","Madibogo","Makgobistadt"],"Rustenburg":["Areaganeng","Boinelo","Boitshoko","Bokamoso","Bonesang","Bosaneng","Kgetleng","Retladirela-Rustenburg"],"Tswaing":["Delareyville","Ganapan","Mahunwana"],"Frances Baard":["F1","F2","F3","F4","F5","F6","F7","F8"],"John Taolo Gaetsewe":["K1","K2","K3","K4","K5","K6","K7","K8"],"Namakwa":["N1","N2","N3","N4"],"Pixley-Ka-Seme":["P1","P2","P3","P4","P5"],"Zf Mgcawu":["S1","S2","S3","S4","S5"],"Cape Winelands":["Cp Circuit 1","Cp Circuit 10","Cp Circuit 2","Cp Circuit 3","Cp Circuit 4","Cp Circuit 5","Cp Circuit 6","Cp Circuit 7","Cp Circuit 8","Cp Circuit 9"],"Eden And Central Karoo":["Eck Circuit 1","Eck Circuit 2","Eck Circuit 3","Eck Circuit 4","Eck Circuit 5","Eck Circuit 6","Eck Circuit 7","Eck Circuit 8"],"Metro Central":["Mc Circuit 1","Mc Circuit 10","Mc Circuit 2","Mc Circuit 3","Mc Circuit 4","Mc Circuit 5","Mc Circuit 6","Mc Circuit 7","Mc Circuit 8","Mc Circuit 9"],"Metro East":["Me Circuit 1","Me Circuit 2","Me Circuit 3","Me Circuit 4","Me Circuit 5","Me Circuit 6","Me Circuit 7","Me Circuit 8","Me Circuit 9"],"Metro North":["Mn Circuit 1","Mn Circuit 10","Mn Circuit 2","Mn Circuit 3","Mn Circuit 4","Mn Circuit 5","Mn Circuit 6","Mn Circuit 7","Mn Circuit 8","Mn Circuit 9"],"Metro South":["Ms Circuit 1","Ms Circuit 2","Ms Circuit 3","Ms Circuit 4","Ms Circuit 5","Ms Circuit 6","Ms Circuit 7","Ms Circuit 8","Ms Circuit 9"],"Overberg":["Ob Circuit 1","Ob Circuit 2","Ob Circuit 3"],"Partnership Schools":["Acorn Education","Common Good","Education Ally"],"West Coast":["Wc Circuit 1","Wc Circuit 2","Wc Circuit 3","Wc Circuit 4","Wc Circuit 5"]};
+
+/* Designation and Specialisation lists (Step 1 — "your details") */
+const DESIGNATIONS = ["Chief Director","Chief Education Specialist","Deputy Chief Education Specialist","Deputy Director General","Deputy Minister","Director","Director General","Member","Senior Education Specialist","Circuit Manager","Subject Advisor","Cluster Lead","Provincial Manager","District Director","Principal","Deputy Principal","Departmental Head","Teacher","Other"];
+const SPECIALISATIONS = ["Corporate Services","Curriculum","DDD Project Role","Education Partners","EMIS & IT","Management & Governance","Other"];
+
+/* Step 2 — Performance focus areas + school observation checklist */
+const SIP_FOCUS_AREAS = ["Reading and literacy","Maths and numeracy","Improving specific subjects","Learner attendance and keeping learners in school","Covering the curriculum on time","Tests, exams and marking","Educator training and mentoring","School leadership and management","Working with parents and the community"];
+const SCHOOL_OBS = [
+  {group:'APIP',key:'apip_current',label:'School has a current APIP with timelines and strategies'},
+  {group:'APIP',key:'apip_implemented',label:'SMT is actively implementing the APIP'},
+  {group:'Curriculum',key:'cur_plans',label:'Educators have lesson plans and assessment plans'},
+  {group:'Curriculum',key:'cur_dh_monitor',label:'DHs are monitoring lesson plans and curriculum coverage'},
+  {group:'Learner Work',key:'lw_sufficient',label:'Sufficient formal and informal activities in learner books'},
+  {group:'Learner Work',key:'lw_marking',label:'Educators are marking work and corrections are being done'},
+  {group:'Time Management',key:'tm_registers',label:'Time book and period register are well-managed'},
+  {group:'Time Management',key:'tm_learner_att',label:'Learner attendance is being tracked'},
+  {group:'Time Management',key:'tm_educator_att',label:'Educator attendance and leave control is in place'},
+  {group:'Time Management',key:'tm_departures',label:'No early departures or late arrivals unaccounted for'}
+];
+
+/* Step 3 — DDD task-based report picker, insight types, triggers, decisions, actions */
+const DDD_TASKS = [
+  {q:"Which learners are at risk of not being promoted?",cat:"Performance & Promotion",primary:true,reports:["FET Promotion Profiles","Senior Phase Promotion Profiles","Intermediate Phase Promotion Profiles"]},
+  {q:"How are learners performing across grades or subjects?",cat:"Performance & Promotion",primary:true,reports:["Promotion by Grade","School Achievement Report"]},
+  {q:"How is a specific learner doing across their subjects?",cat:"Performance & Promotion",primary:true,reports:["Learner Chart Report"]},
+  {q:"How is the school or district performing overall?",cat:"Performance & Promotion",primary:true,reports:["School Dashboard"]},
+  {q:"What are the predicted year-end promotion numbers?",cat:"Performance & Promotion",primary:true,reports:["Term 4 Promotion Predictions"]},
+  {q:"Are learners and educators attending? How are weekly numbers tracking?",cat:"Attendance",primary:true,reports:["Term to Date"]},
+  {q:"What does curriculum coverage and subject performance look like?",cat:"Subjects & Curriculum",primary:false,reports:["Curriculum Overview"]},
+  {q:"How are Grade 6 learners performing?",cat:"Subjects & Curriculum",primary:false,reports:["Grade 6 Performance Insights"]},
+  {q:"How is the school doing on management and governance?",cat:"Management & Staffing",primary:false,reports:["Management & Governance Overview"]},
+  {q:"What is the staffing and educator picture at the school?",cat:"Management & Staffing",primary:false,reports:["Educator Info"]},
+  {q:"Which learners are over-age for their grade?",cat:"Management & Staffing",primary:false,reports:["Over-age Learners"]},
+  {q:"How do results compare to previous years?",cat:"Trends & Year-on-Year",primary:false,reports:["Promotions By Year","Enrolment By Year","Learner Promotion Rate"]},
+  {q:"Are subject results or attendance improving over time?",cat:"Trends & Year-on-Year",primary:false,reports:["Subject Trends","Attendance Trend"]},
+  {q:"Which schools have not submitted data, or what is the attrition?",cat:"Trends & Year-on-Year",primary:false,reports:["Schools Outstanding","Attrition Information"]}
+];
+const INSIGHT_TYPE_OPTIONS = [
+  {value:'subject-performance',label:'Subject / pass rate issue'},
+  {value:'learner-attendance',label:'Learner attendance issue'},
+  {value:'educator-attendance',label:'Educator attendance issue'},
+  {value:'sba-exam-gap',label:'SBA-Exam mark gap'},
+  {value:'curriculum-coverage',label:'Curriculum coverage issue'},
+  {value:'promotion-criteria',label:'Promotion criteria / at-risk learners'},
+  {value:'other-issue',label:'Other data issue'}
+];
+const INTERVENTION_TRIGGERS = ["Learners below 30% (not passing)","Learners at 30-39% (close to passing)","Learners missing one thing they need to be promoted","Big gap between SBA marks and exam marks","Learners absent a lot and doing badly","Progressed learners who need extra support","School flagged as underperforming (Circular D3)","Subject pass rate dropping from one term to the next","Parts of the curriculum not being covered","High educator absenteeism","Educator teaching outside their specialisation","Vacant educator post(s) affecting delivery","Educator not covering the curriculum on time","Educator needing subject content support","Educator not using data to inform teaching","High learner dropout or transfers out","Late or missing SA-SAMS submissions","School leadership or governance concerns","Other"];
+const DECISIONS = ["Provide targeted support to identified learners","Prioritise schools for support visits","Develop Subject Improvement Plan","Investigate SBA-exam gap","Send in subject support","Adjust teaching strategy","Move resources where they're needed","Set up extra classes","Set performance targets","Activate attendance monitoring","Escalate to management","Meet with parents/guardians","Support progressed learners (policy requirement)","Check and improve assessment tasks","Arrange educator coaching or mentoring","Address curriculum pacing gaps","Schedule a data review meeting","Request staffing or HR intervention","Arrange school-to-school peer learning","Other"];
+const ACTIONS = ["Educator coaching / mentoring","Lesson modelling / demonstration","Learners grouped into support bands","Learner support agreement signed","Support plan for progressed learners","Remedial scheduling","Extra lessons / revision classes","Past papers & worksheet packs distributed","Exam technique workshop conducted","Language / literacy support sessions","SBA targets set with learners","Assessment moderation","Attendance monitoring plan activated","Resource / material provision","Differentiated teaching arranged","Educator reassignment to subject","Curriculum pacing support","Assessment task review & moderation","Master trainer session delivered","DDD dashboard access support provided","Parent meeting arranged","Term review meeting held","Referral to SMT / DMT / PED","SA-SAMS data corrected to improve reporting","Accountability meeting with school","Peer learning (school-to-school)","Diagnostic assessment administered","Data pack prepared for meeting","School visit schedule reprioritised","Other"];
+
+/* Step 4 — Support needs, support level, context (staffing/resources/learners) */
+const SUPPORT_NEEDED = ["More visits from subject advisors","A specialist to help with a specific subject","Help for progressed learners","Mentoring for the principal or Departmental Heads","Staffing problem — needs to go to HR/PED","Learning materials and resources","Learner welfare or psychosocial support","Building or infrastructure problem","On track — keep doing what we're doing"];
+const CTX_STAFFING = ["All posts filled","Vacant post(s)","Teaching outside specialisation","Acting principal/Departmental Head","High educator absenteeism"];
+const CTX_RESOURCES = ["Adequate","Textbook shortage","No devices/connectivity","Infrastructure issues","LTSM not delivered"];
+const CTX_LEARNERS = ["No major concerns","High absenteeism","Welfare concerns","Overcrowded classrooms","Language barriers","Progressed learners present","Learning difficulties / barriers"];
 const QUEUE_KEY = 'ddd_mobile_submit_queue';
 
 /* ID generator — mirrors web tracker exactly */
@@ -554,6 +687,8 @@ const state = {
   interventions: [],
   decisions: [],
   schoolStatus: [],
+  schoolsByDistrict: {},   // cache: 'Province||District' -> [school_status rows]
+  pickerLoading: false,    // school picker per-district fetch in flight
   filter: { schools:'all', activity:'all' },
   loading: { initial:true },
   form: null,         // populated when log-visit modal opens
@@ -561,15 +696,30 @@ const state = {
   pickerSearch: ''    // school picker filter
 };
 
-/* Default empty form */
+/* Default empty form — full web-tracker parity (5-step wizard) */
 function emptyForm(){
+  const today = new Date().toISOString().slice(0,10);
   return {
-    activity_date: new Date().toISOString().slice(0,10),  // YYYY-MM-DD
-    school_id: '',     // public.school_status.id
-    schools: '',       // school name (text — what gets written to decisions)
+    // Wizard step (0–4)
+    formStep: 0,
+
+    // Step 1: Where & When
+    activity_date: today,
+    term: deriveTerm(today),
     province: '',
     district: '',
+    circuit: '',
+    school_id: '',                  // public.school_status.id
+    schools: '',                    // school name (text — what gets written to decisions)
     phase: '',
+    official_name: '',
+    official_email: '',
+    official_role: '',
+    official_role_other: '',
+    official_specialisation: '',
+    official_specialisation_other: '',
+
+    // Step 2: What Happened
     activity_type: '',
     activity_type_other: '',
     intervention_theme: '',
@@ -577,10 +727,58 @@ function emptyForm(){
     subjects: [],
     subjects_other: '',
     grades: [],
+    sip_focus_areas: [],
     description: '',
+    obs: { apip_current:'', apip_implemented:'', cur_plans:'', cur_dh_monitor:'',
+           lw_sufficient:'', lw_marking:'', tm_registers:'', tm_learner_att:'',
+           tm_educator_att:'', tm_departures:'' },
+
+    // Step 3: Data Connection
+    ddd_used: '',                   // 'yes-direct' | 'yes-informed' | 'partially' | 'other-data' | 'no'
+    ddd_reports: [],
+    ddd_reports_other: '',
+    ddd_access_date: '',
+    ddd_data_source: '',            // 'dashboard' | 'presentation' | 'spreadsheet' | 'shared'
+    ddd_data_source_person: '',
+    ddd_dashboard_confirmed: '',    // 'yes' | 'no'
+    other_data_source: '',
+    additional_data_sources: '',
+    insight_types: [],
+    insight_detail: '',
+    intervention_triggers: [],
+    intervention_trigger_other: '',
+    decision_types: [],
+    decision_other: '',
+    action_types: [],
+    action_other: '',
+
+    // Step 4: Context & Follow-up
+    support_needed: [],
+    support_level: '',              // 'light' | 'regular' | 'intensive'
+    ctx_staffing: [],
+    ctx_resources: [],
+    ctx_learners: [],
+    ctx_notes: '',
+    educators_supported: '',
     follow_up: false,
-    follow_up_desc: ''
+    follow_up_desc: '',
+    doc_url: '',
+    doc_name: '',
+    tagged_officials: {},
+
+    // Step 5: Review
+    _reviewConfirmed: false
   };
+}
+
+/* Derive Term from activity date — mirrors web tracker */
+function deriveTerm(iso){
+  if(!iso) return '';
+  const y = iso.slice(0,4);
+  if(iso < y+'-04-08') return 'Term 1 '+y;
+  if(iso < y+'-07-21') return 'Term 2 '+y;
+  if(iso < y+'-10-06') return 'Term 3 '+y;
+  return 'Term 4 '+y;
 }
 
 /* ═══════════════════════ UTILITIES ═══════════════════════ */
@@ -1049,154 +1247,79 @@ function openLogVisitForm(){
       state.form.district = state.official.district;
     }
   }
+  // Pre-fill official self-identification from logged-in profile
+  state.form.official_name  = state.official.full_name || '';
+  state.form.official_email = state.official.email || '';
+  if(state.official.role && DESIGNATIONS.indexOf(state.official.role) > -1){
+    state.form.official_role = state.official.role;
+  }
+  state.form.formStep = 0;
   renderLogVisitForm();
 }
 
+/* ═══════════════════════ FORM WIZARD ROUTER ═══════════════════════ */
 function renderLogVisitForm(errMsg){
   const f = state.form;
-  const themes = themesFor(f.district);
-  const schoolSelected = !!f.schools;
+  if(!f){ return; }
+  const step = typeof f.formStep==='number' ? f.formStep : 0;
+  const stepNames = ['Where & When','What Happened','Data Connection','Context & Follow-up','Review'];
+  const stepBody =
+      step===0 ? renderFormStep1()
+    : step===1 ? renderFormStep2()
+    : step===2 ? renderFormStep3()
+    : step===3 ? renderFormStep4()
+    :            renderFormReview();
+  const stepFoot =
+      step===0 ? '<button class="form-btn form-btn-secondary" onclick="closeLogForm()">Cancel</button>' +
+                 '<button class="form-btn form-btn-primary" onclick="goStep(1)">Next →</button>'
+    : step===4 ? '<button class="form-btn form-btn-secondary" onclick="goStep(3)">← Back</button>' +
+                 '<button class="form-btn form-btn-primary" onclick="submitVisit()" '+((state.submitting||!f._reviewConfirmed)?'disabled':'')+'>' +
+                   (state.submitting ? '<span class="spinner"></span>Submitting…' : 'Submit') +
+                 '</button>'
+    : '<button class="form-btn form-btn-secondary" onclick="goStep('+(step-1)+')">← Back</button>' +
+      '<button class="form-btn form-btn-primary" onclick="goStep('+(step+1)+')">'+(step===3?'Review →':'Next →')+'</button>';
 
   const body =
     '<div class="modal form-modal">' +
       '<div class="form-hdr">' +
         '<div>' +
           '<div class="form-hdr-title">Log a school visit</div>' +
-          '<div class="form-hdr-sub">Quick capture — full detail can be added on web later</div>' +
+          '<div class="form-hdr-sub">Step '+(step+1)+' of 5 · '+esc(stepNames[step])+'</div>' +
         '</div>' +
         '<button class="form-close" onclick="closeLogForm()" aria-label="Close">✕</button>' +
       '</div>' +
+      '<div class="form-progress-bar">' +
+        stepNames.map((n,i) =>
+          '<div class="form-prog-pill'+(i===step?' active':i<step?' done':'')+'" onclick="goStep('+i+')">'+(i+1)+'</div>'
+        ).join('') +
+      '</div>' +
       '<div class="form-body">' +
         (errMsg ? '<div class="form-err">'+esc(errMsg)+'</div>' : '') +
-
-        // Date
-        '<div class="form-field">' +
-          '<label class="form-label">When did this happen<span class="req">*</span></label>' +
-          '<input type="date" class="form-input" value="'+esc(f.activity_date)+'" max="'+new Date().toISOString().slice(0,10)+'" oninput="state.form.activity_date=this.value">' +
-        '</div>' +
-
-        // Province + District (mirrors web tracker flow)
-        '<div class="form-field-row">' +
-          '<div>' +
-            '<label class="form-label">Province<span class="req">*</span></label>' +
-            '<select class="form-select" onchange="onProvinceChange(this.value)">' +
-              '<option value="">Select...</option>' +
-              Object.keys(DISTRICTS).map(p => '<option '+(f.province===p?'selected':'')+'>'+esc(p)+'</option>').join('') +
-            '</select>' +
-          '</div>' +
-          '<div>' +
-            '<label class="form-label">District<span class="req">*</span></label>' +
-            '<select class="form-select" '+(f.province?'':'disabled')+' onchange="onDistrictChange(this.value)">' +
-              '<option value="">'+(f.province?'Select...':'Pick province first')+'</option>' +
-              (f.province ? (DISTRICTS[f.province]||[]).map(d => '<option '+(f.district===d?'selected':'')+'>'+esc(d)+'</option>').join('') : '') +
-            '</select>' +
-          '</div>' +
-        '</div>' +
-
-        // School
-        '<div class="form-field">' +
-          '<label class="form-label">School<span class="req">*</span></label>' +
-          (schoolSelected
-            ? '<button class="school-pick-btn filled" onclick="openSchoolPicker()">' +
-                '<div class="school-pick-icon">🏫</div>' +
-                '<div class="school-pick-body">' +
-                  '<div class="school-pick-name">'+esc(f.schools)+'</div>' +
-                  '<div class="school-pick-meta">'+esc(f.province||'')+(f.district?' · '+esc(f.district):'')+(f.phase?' · '+esc(f.phase):'')+(f.school_id?'':' · manual entry')+'</div>' +
-                '</div>' +
-                '<div class="school-pick-chev">›</div>' +
-              '</button>'
-            : '<button class="school-pick-btn" '+(f.district?'':'disabled style="opacity:.55"')+' onclick="'+(f.district?'openSchoolPicker()':'')+'">' +
-                '<div class="school-pick-icon">🏫</div>' +
-                '<div class="school-pick-body"><div class="school-pick-empty">'+(f.district?'Tap to select school':'Pick province &amp; district first')+'</div></div>' +
-                '<div class="school-pick-chev">›</div>' +
-              '</button>'
-          ) +
-        '</div>' +
-
-        // Activity type
-        '<div class="form-field">' +
-          '<label class="form-label">Activity type<span class="req">*</span></label>' +
-          '<select class="form-select" onchange="state.form.activity_type=this.value;if(this.value!==\'Other\')state.form.activity_type_other=\'\';renderLogVisitForm()">' +
-            '<option value="">Select...</option>' +
-            ACTIVITY_TYPES.map(t => '<option '+(f.activity_type===t?'selected':'')+'>'+esc(t)+'</option>').join('') +
-          '</select>' +
-          (f.activity_type==='Other'
-            ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Describe the activity..." value="'+esc(f.activity_type_other)+'" oninput="state.form.activity_type_other=this.value">'
-            : ''
-          ) +
-        '</div>' +
-
-        // Intervention theme
-        '<div class="form-field">' +
-          '<label class="form-label">Intervention theme<span class="req">*</span></label>' +
-          '<select class="form-select" onchange="state.form.intervention_theme=this.value;if(this.value!==\'Other\')state.form.intervention_theme_other=\'\';renderLogVisitForm()">' +
-            '<option value="">Select...</option>' +
-            themes.map(t => '<option '+(f.intervention_theme===t?'selected':'')+'>'+esc(t)+'</option>').join('') +
-          '</select>' +
-          (f.intervention_theme==='Other'
-            ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Describe the theme..." value="'+esc(f.intervention_theme_other)+'" oninput="state.form.intervention_theme_other=this.value">'
-            : ''
-          ) +
-        '</div>' +
-
-        // Grades
-        '<div class="form-field">' +
-          '<label class="form-label">Grade(s)<span class="opt">optional · tap all that apply</span></label>' +
-          '<div class="grade-grid">' +
-            GRADES.map(g => '<button class="chip-grade'+(f.grades.includes(g)?' active':'')+'" onclick="toggleGrade(\''+g+'\')">'+(g==='R'?'R':'Gr '+g)+'</button>').join('') +
-          '</div>' +
-        '</div>' +
-
-        // Subjects
-        '<div class="form-field">' +
-          '<label class="form-label">Subject(s)<span class="opt">optional</span></label>' +
-          SUBJECT_GROUPS.map(g =>
-            '<div class="subj-group">' +
-              '<div class="subj-group-label">'+esc(g.label)+'</div>' +
-              '<div class="chip-multi">' +
-                g.items.map(s => '<button class="chip-pick'+(f.subjects.includes(s)?' active':'')+'" onclick="toggleSubject(\''+esc(s).replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
-              '</div>' +
-            '</div>'
-          ).join('') +
-        '</div>' +
-
-        // Description
-        '<div class="form-field">' +
-          '<label class="form-label">What happened<span class="req">*</span></label>' +
-          '<textarea class="form-textarea" placeholder="Brief notes on what you observed, discussed, or supported..." oninput="state.form.description=this.value">'+esc(f.description)+'</textarea>' +
-          '<div style="font-size:10.5px;color:var(--grey);margin-top:5px;line-height:1.4">Voice notes &amp; photos coming in Session 3.</div>' +
-        '</div>' +
-
-        // Follow-up
-        '<div class="form-field">' +
-          '<label class="followup-toggle" onclick="toggleFollowup()">' +
-            '<div class="followup-check'+(f.follow_up?' on':'')+'" id="followup-check"></div>' +
-            '<div class="followup-label">Follow-up needed<span class="sub">Creates an action item linked to this visit</span></div>' +
-          '</label>' +
-          (f.follow_up
-            ? '<div class="followup-box">' +
-                '<label class="form-label" style="margin-bottom:5px">What\'s the follow-up?</label>' +
-                '<textarea class="form-textarea" style="background:#fff;min-height:60px" placeholder="e.g. Return next term to check curriculum coverage..." oninput="state.form.follow_up_desc=this.value">'+esc(f.follow_up_desc)+'</textarea>' +
-              '</div>'
-            : ''
-          ) +
-        '</div>' +
-
-        '<div style="height:6px"></div>' +
+        stepBody +
       '</div>' +
       '<div class="form-foot">' +
-        '<button class="form-btn form-btn-secondary" onclick="closeLogForm()" '+(state.submitting?'disabled':'')+'>Cancel</button>' +
-        '<button class="form-btn form-btn-primary" onclick="submitVisit()" '+(state.submitting?'disabled':'')+'>' +
-          (state.submitting ? '<span class="spinner"></span>Submitting…' : 'Submit visit') +
-        '</button>' +
+        stepFoot +
       '</div>' +
     '</div>';
 
   document.getElementById('modal-content').outerHTML = body;
-  // Re-attach modal-content id to the new node (so closeModal still works)
   const newNode = document.querySelector('#modal-bg .modal');
   if(newNode) newNode.id = 'modal-content';
   document.getElementById('modal-bg').classList.add('show');
+}
+
+function goStep(target){
+  if(!state.form) return;
+  const current = state.form.formStep;
+  // When advancing, validate current step. Allow going back without validation.
+  if(target > current){
+    const err = validateStep(current);
+    if(err){ renderLogVisitForm(err); return; }
+  }
+  state.form.formStep = target;
+  renderLogVisitForm();
+  // Scroll body to top
+  setTimeout(()=>{ const b = document.querySelector('#modal-content .form-body'); if(b) b.scrollTop = 0; }, 0);
 }
 
 function closeLogForm(){
@@ -1208,18 +1331,637 @@ function closeLogForm(){
   state.form = null;
 }
 
+/* ─── STEP 1 — Where & When ─── */
+function renderFormStep1(){
+  const f = state.form;
+  const schoolSelected = !!f.schools;
+  const circuits = (CIRCUITS_MAP[f.district]||[]).filter(c => c);
+  return ''+
+    '<div class="step-section">' +
+      // Date + Term
+      '<div class="form-field-row">' +
+        '<div>' +
+          '<label class="form-label">Date<span class="req">*</span></label>' +
+          '<input type="date" class="form-input" value="'+esc(f.activity_date)+'" max="'+new Date().toISOString().slice(0,10)+'" onchange="onDateChange(this.value)">' +
+        '</div>' +
+        '<div>' +
+          '<label class="form-label">Term</label>' +
+          '<input type="text" class="form-input" value="'+esc(f.term)+'" readonly style="background:#FAFBFC;color:var(--grey-dk)">' +
+        '</div>' +
+      '</div>' +
+
+      // Province + District
+      '<div class="form-field-row">' +
+        '<div>' +
+          '<label class="form-label">Province<span class="req">*</span></label>' +
+          '<select class="form-select" onchange="onProvinceChange(this.value)">' +
+            '<option value="">Select...</option>' +
+            Object.keys(DISTRICTS).map(p => '<option '+(f.province===p?'selected':'')+'>'+esc(p)+'</option>').join('') +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label class="form-label">District<span class="req">*</span></label>' +
+          '<select class="form-select" '+(f.province?'':'disabled')+' onchange="onDistrictChange(this.value)">' +
+            '<option value="">'+(f.province?'Select...':'Pick province first')+'</option>' +
+            (f.province ? (DISTRICTS[f.province]||[]).map(d => '<option '+(f.district===d?'selected':'')+'>'+esc(d)+'</option>').join('') : '') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+
+      // Circuit (optional)
+      (circuits.length
+        ? '<div class="form-field">' +
+            '<label class="form-label">Circuit<span class="opt">optional</span></label>' +
+            '<select class="form-select" onchange="state.form.circuit=this.value;renderLogVisitForm()">' +
+              '<option value="">Select circuit...</option>' +
+              circuits.map(c => '<option '+(f.circuit===c?'selected':'')+'>'+esc(c)+'</option>').join('') +
+            '</select>' +
+          '</div>'
+        : '') +
+
+      // School picker button
+      '<div class="form-field">' +
+        '<label class="form-label">School<span class="req">*</span></label>' +
+        (schoolSelected
+          ? '<button class="school-pick-btn filled" onclick="openSchoolPicker()">' +
+              '<div class="school-pick-icon">🏫</div>' +
+              '<div class="school-pick-body">' +
+                '<div class="school-pick-name">'+esc(f.schools)+'</div>' +
+                '<div class="school-pick-meta">'+esc(f.province||'')+(f.district?' · '+esc(f.district):'')+(f.phase?' · '+esc(f.phase):'')+(f.school_id?'':' · manual entry')+'</div>' +
+              '</div>' +
+              '<div class="school-pick-chev">›</div>' +
+            '</button>'
+          : '<button class="school-pick-btn" '+(f.district?'':'disabled style="opacity:.55"')+' onclick="'+(f.district?'openSchoolPicker()':'')+'">' +
+              '<div class="school-pick-icon">🏫</div>' +
+              '<div class="school-pick-body"><div class="school-pick-empty">'+(f.district?'Tap to select school':'Pick province &amp; district first')+'</div></div>' +
+              '<div class="school-pick-chev">›</div>' +
+            '</button>') +
+      '</div>' +
+
+      // Your details
+      '<div class="form-section-hdr">Your details</div>' +
+      '<div class="form-field">' +
+        '<label class="form-label">Your name<span class="req">*</span></label>' +
+        '<input type="text" class="form-input" placeholder="e.g. Ms F Moshoeshoe" value="'+esc(f.official_name)+'" oninput="state.form.official_name=this.value">' +
+      '</div>' +
+      '<div class="form-field">' +
+        '<label class="form-label">Email address<span class="req">*</span></label>' +
+        '<input type="email" class="form-input" placeholder="e.g. name@education.gov.za" value="'+esc(f.official_email)+'" oninput="state.form.official_email=this.value">' +
+      '</div>' +
+      '<div class="form-field-row">' +
+        '<div>' +
+          '<label class="form-label">Designation<span class="req">*</span></label>' +
+          '<select class="form-select" onchange="state.form.official_role=this.value;if(this.value!==\'Other\')state.form.official_role_other=\'\';renderLogVisitForm()">' +
+            '<option value="">Select...</option>' +
+            DESIGNATIONS.map(r => '<option '+(f.official_role===r?'selected':'')+'>'+esc(r)+'</option>').join('') +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label class="form-label">Specialisation<span class="req">*</span></label>' +
+          '<select class="form-select" onchange="state.form.official_specialisation=this.value;if(this.value!==\'Other\')state.form.official_specialisation_other=\'\';renderLogVisitForm()">' +
+            '<option value="">Select...</option>' +
+            SPECIALISATIONS.map(s => '<option '+(f.official_specialisation===s?'selected':'')+'>'+esc(s)+'</option>').join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      (f.official_role==='Other'
+        ? '<div class="form-field"><label class="form-label">Specify designation</label><input type="text" class="form-input" placeholder="e.g. Curriculum Implementer..." value="'+esc(f.official_role_other)+'" oninput="state.form.official_role_other=this.value"></div>'
+        : '') +
+      (f.official_specialisation==='Other'
+        ? '<div class="form-field"><label class="form-label">Specify specialisation</label><input type="text" class="form-input" placeholder="e.g. ICT in Education..." value="'+esc(f.official_specialisation_other)+'" oninput="state.form.official_specialisation_other=this.value"></div>'
+        : '') +
+    '</div>';
+}
+
+/* ─── STEP 2 — What Happened ─── */
+function renderFormStep2(){
+  const f = state.form;
+  const themes = themesFor(f.district);
+  return ''+
+    '<div class="step-section">' +
+      // Activity type
+      '<div class="form-field">' +
+        '<label class="form-label">Activity Type<span class="req">*</span></label>' +
+        '<select class="form-select" onchange="state.form.activity_type=this.value;if(this.value!==\'Other\')state.form.activity_type_other=\'\';renderLogVisitForm()">' +
+          '<option value="">Select...</option>' +
+          ACTIVITY_TYPES.map(t => '<option '+(f.activity_type===t?'selected':'')+'>'+esc(t)+'</option>').join('') +
+        '</select>' +
+        (f.activity_type==='Other'
+          ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Describe the activity..." value="'+esc(f.activity_type_other)+'" oninput="state.form.activity_type_other=this.value">'
+          : '') +
+      '</div>' +
+
+      // Theme
+      '<div class="form-field">' +
+        '<label class="form-label">Intervention Theme<span class="req">*</span></label>' +
+        '<select class="form-select" onchange="state.form.intervention_theme=this.value;if(this.value!==\'Other\')state.form.intervention_theme_other=\'\';renderLogVisitForm()">' +
+          '<option value="">Select...</option>' +
+          themes.map(t => '<option '+(f.intervention_theme===t?'selected':'')+'>'+esc(t)+'</option>').join('') +
+        '</select>' +
+        (f.intervention_theme==='Other'
+          ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Describe the theme..." value="'+esc(f.intervention_theme_other)+'" oninput="state.form.intervention_theme_other=this.value">'
+          : '') +
+      '</div>' +
+
+      // Subjects
+      '<div class="form-field">' +
+        '<label class="form-label">Subject(s)<span class="opt">tap to select</span></label>' +
+        '<div class="hint-sm">Which subjects did your support focus on?</div>' +
+        SUBJECT_GROUPS.map(g =>
+          '<div class="subj-group">' +
+            '<div class="subj-group-label">'+esc(g.label)+'</div>' +
+            '<div class="chip-multi">' +
+              g.items.map(s => '<button class="chip-pick'+(f.subjects.includes(s)?' active':'')+'" onclick="toggleSubject(\''+esc(s).replace(/\\\\/g,"\\\\\\\\").replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
+            '</div>' +
+          '</div>'
+        ).join('') +
+        '<button class="chip-pick'+(f.subjects.includes('Other')?' active':'')+'" style="margin-top:8px" onclick="toggleSubject(\'Other\')">Other</button>' +
+        (f.subjects.includes('Other')
+          ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Specify..." value="'+esc(f.subjects_other)+'" oninput="state.form.subjects_other=this.value">'
+          : '') +
+      '</div>' +
+
+      // Grades
+      '<div class="form-field">' +
+        '<label class="form-label">Grade(s)<span class="req">*</span></label>' +
+        '<div class="hint-sm">Tap all that apply</div>' +
+        '<div class="grade-grid">' +
+          GRADES.map(g => '<button class="chip-grade'+(f.grades.includes(g)?' active':'')+'" onclick="toggleGrade(\''+g+'\')">'+(g==='R'?'R':'Gr '+g)+'</button>').join('') +
+        '</div>' +
+      '</div>' +
+
+      // Performance focus areas
+      '<div class="form-field">' +
+        '<label class="form-label">Performance Focus Area(s)<span class="opt">optional</span></label>' +
+        '<div class="hint-sm">Select all areas this activity addresses</div>' +
+        '<div class="chip-multi">' +
+          SIP_FOCUS_AREAS.map(a => '<button class="chip-pick'+(f.sip_focus_areas.includes(a)?' active':'')+'" onclick="toggleSipFocus(\''+esc(a).replace(/'/g,"\\'")+'\')">'+esc(a)+'</button>').join('') +
+        '</div>' +
+      '</div>' +
+
+      // Description
+      '<div class="form-field">' +
+        '<label class="form-label">Brief description<span class="opt">1-2 lines</span></label>' +
+        '<textarea class="form-textarea" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="state.form.description=this.value">'+esc(f.description)+'</textarea>' +
+      '</div>' +
+
+      // Observation checklist (collapsible)
+      '<div class="form-field">' +
+        '<button class="obs-toggle" onclick="state.form._obsOpen=!state.form._obsOpen;renderLogVisitForm()">' +
+          '<span class="obs-chev">'+(f._obsOpen?'▼':'▶')+'</span>' +
+          '<div class="obs-toggle-body">' +
+            '<div class="obs-toggle-title">School observation checklist</div>' +
+            '<div class="obs-toggle-sub">Optional — quick yes/no check of school status</div>' +
+          '</div>' +
+          (countObs(f.obs)>0 ? '<span class="obs-toggle-cnt">'+countObs(f.obs)+'/10</span>' : '') +
+        '</button>' +
+        (f._obsOpen ? renderObsChecklist() : '') +
+      '</div>' +
+    '</div>';
+}
+
+function renderObsChecklist(){
+  const f = state.form;
+  let html = '<div class="obs-list">';
+  let lastGrp = '';
+  SCHOOL_OBS.forEach(o => {
+    if(o.group !== lastGrp){
+      if(lastGrp) html += '</div>';
+      html += '<div class="obs-grp-hdr">'+esc(o.group)+'</div><div class="obs-grp">';
+      lastGrp = o.group;
+    }
+    const v = f.obs[o.key]||'';
+    const kEsc = o.key.replace(/'/g,"\\'");
+    html +=
+      '<div class="obs-row '+(v==='yes'?'obs-yes':v==='no'?'obs-no':'')+'">' +
+        '<div class="obs-label">'+esc(o.label)+'</div>' +
+        '<div class="obs-yn">' +
+          '<button class="obs-btn obs-y'+(v==='yes'?' active':'')+'" onclick="toggleObs(\''+kEsc+'\',\'yes\')">✓</button>' +
+          '<button class="obs-btn obs-n'+(v==='no'?' active':'')+'" onclick="toggleObs(\''+kEsc+'\',\'no\')">✗</button>' +
+        '</div>' +
+      '</div>';
+  });
+  if(lastGrp) html += '</div>';
+  html += '</div>';
+  return html;
+}
+function countObs(obs){
+  return SCHOOL_OBS.filter(o => obs[o.key]!=='').length;
+}
+function toggleObs(key, val){
+  if(!state.form) return;
+  state.form.obs[key] = (state.form.obs[key]===val) ? '' : val;
+  renderLogVisitForm();
+}
+
+/* ─── STEP 3 — Data Connection ─── */
+function renderFormStep3(){
+  const f = state.form;
+  const usedDDD = f.ddd_used && f.ddd_used!=='no' && f.ddd_used!=='other-data';
+  return ''+
+    '<div class="step-section">' +
+      // DDD used radio
+      '<div class="form-field">' +
+        '<label class="form-label">Did you use data to inform this intervention?<span class="req">*</span></label>' +
+        '<div class="hint-sm">Did you look at any data before or during this activity?</div>' +
+        '<div class="radio-grp">' +
+          [
+            {v:'yes-direct',  l:'Yes — DDD data directly triggered this'},
+            {v:'yes-informed',l:'Yes — DDD data informed my approach'},
+            {v:'partially',   l:'DDD data partially used'},
+            {v:'other-data',  l:'Yes — but from another source (not DDD)'},
+            {v:'no',          l:'No data used'}
+          ].map(o =>
+            '<label class="radio-row'+(f.ddd_used===o.v?' active':'')+'">' +
+              '<input type="radio" name="dddUsed" value="'+o.v+'" '+(f.ddd_used===o.v?'checked':'')+' onchange="state.form.ddd_used=this.value;renderLogVisitForm()">' +
+              '<span>'+esc(o.l)+'</span>' +
+            '</label>'
+          ).join('') +
+        '</div>' +
+      '</div>' +
+
+      (usedDDD ? renderDDDDetails() : '') +
+
+      (f.ddd_used==='other-data'
+        ? '<div class="form-field">' +
+            '<div class="info-card info-blue">Good — using any data to inform your support is valuable. Tell us what data you used.</div>' +
+            '<label class="form-label">What data source did you use?</label>' +
+            '<div class="hint-sm">e.g. SA-SAMS reports, school assessment records, LURITS, own records</div>' +
+            '<textarea class="form-textarea" placeholder="Describe the data source briefly..." oninput="state.form.other_data_source=this.value">'+esc(f.other_data_source||'')+'</textarea>' +
+          '</div>'
+        : '') +
+
+      (f.ddd_used==='no'
+        ? '<div class="form-field"><div class="info-card info-grey">No problem — not every activity needs data. But next time, try starting from the data: log into the DDD Dashboard, use SA-SAMS reports, or ask your Programme Manager for a data pack.</div></div>'
+        : '') +
+
+      // Intervention triggers (multi)
+      '<div class="form-field">' +
+        '<label class="form-label">What made you decide to act?<span class="opt">optional</span></label>' +
+        '<div class="hint-sm">Select all that apply.</div>' +
+        '<div class="chip-multi chip-scroll">' +
+          INTERVENTION_TRIGGERS.map(t => '<button class="chip-pick'+(f.intervention_triggers.includes(t)?' active':'')+'" onclick="toggleTrigger(\''+esc(t).replace(/'/g,"\\'")+'\')">'+esc(t)+'</button>').join('') +
+        '</div>' +
+        (f.intervention_triggers.includes('Other')
+          ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Specify..." value="'+esc(f.intervention_trigger_other)+'" oninput="state.form.intervention_trigger_other=this.value">'
+          : '') +
+      '</div>' +
+
+      // Planned interventions (multi)
+      '<div class="form-field">' +
+        '<label class="form-label">Planned intervention(s)<span class="opt">optional</span></label>' +
+        '<div class="hint-sm">Based on what you observed, what did you decide to do? Select all that apply.</div>' +
+        '<div class="chip-multi chip-scroll">' +
+          DECISIONS.map(d => '<button class="chip-pick'+(f.decision_types.includes(d)?' active':'')+'" onclick="toggleDecision(\''+esc(d).replace(/'/g,"\\'")+'\')">'+esc(d)+'</button>').join('') +
+        '</div>' +
+        (f.decision_types.includes('Other')
+          ? '<input type="text" class="form-input" style="margin-top:8px" placeholder="Specify..." value="'+esc(f.decision_other)+'" oninput="state.form.decision_other=this.value">'
+          : '') +
+      '</div>' +
+
+      // Actions taken (multi) — REQUIRED
+      '<div class="form-field">' +
+        '<label class="form-label">Action(s) you took<span class="req">*</span></label>' +
+        '<div class="hint-sm">What did you actually do? Select all that apply.</div>' +
+        '<div class="chip-multi chip-scroll">' +
+          ACTIONS.map(a => '<button class="chip-pick'+(f.action_types.includes(a)?' active':'')+'" onclick="toggleAction(\''+esc(a).replace(/'/g,"\\'")+'\')">'+esc(a)+'</button>').join('') +
+        '</div>' +
+        (f.action_types.includes('Other')
+          ? '<textarea class="form-textarea" style="margin-top:8px" placeholder="Specify..." oninput="state.form.action_other=this.value">'+esc(f.action_other)+'</textarea>'
+          : '') +
+      '</div>' +
+    '</div>';
+}
+
+function renderDDDDetails(){
+  const f = state.form;
+  // DDD task picker — show primary tasks always, expand for more
+  const taskCards = DDD_TASKS.map((t,i) => {
+    const sel = isDDDTaskSel(i);
+    return (t.primary || f._tqOpen)
+      ? '<div class="tq-card'+(sel?' sel':'')+'" onclick="toggleDDDTask('+i+')">' +
+          '<div class="tq-chk">'+(sel?'✓':'')+'</div>' +
+          '<div><div class="tq-q">'+esc(t.q)+'</div><div class="tq-cat">'+esc(t.cat)+'</div></div>' +
+        '</div>'
+      : '';
+  }).filter(x=>x).join('');
+  const extraCount = DDD_TASKS.filter(t=>!t.primary).length;
+  return ''+
+    '<div class="form-field">' +
+      '<label class="form-label">What were you looking at on DDD?</label>' +
+      '<div class="hint-sm">Select everything that applies — pick the questions you were trying to answer.</div>' +
+      '<div class="tq-list">'+taskCards+'</div>' +
+      '<button class="tq-expand" onclick="state.form._tqOpen=!state.form._tqOpen;renderLogVisitForm()">' +
+        (f._tqOpen?'Show fewer ▲':'More options ('+extraCount+') ▼') +
+      '</button>' +
+    '</div>' +
+
+    '<div class="form-field">' +
+      '<label class="form-label">When did you access this report?<span class="opt">optional</span></label>' +
+      '<input type="date" class="form-input" value="'+esc(f.ddd_access_date||'')+'" max="'+new Date().toISOString().slice(0,10)+'" onchange="state.form.ddd_access_date=this.value">' +
+    '</div>' +
+
+    '<div class="form-field">' +
+      '<label class="form-label">How did you access the DDD data?<span class="req">*</span></label>' +
+      '<div class="radio-grp">' +
+        [
+          {v:'dashboard',   l:'Logged into the DDD Dashboard myself'},
+          {v:'presentation',l:'Received a presentation (e.g. PowerPoint) with DDD data'},
+          {v:'spreadsheet', l:'Received a spreadsheet (e.g. Excel) with DDD data'},
+          {v:'shared',      l:'Someone showed or presented the data to me'}
+        ].map(o =>
+          '<label class="radio-row'+(f.ddd_data_source===o.v?' active':'')+'">' +
+            '<input type="radio" name="dddSrc" value="'+o.v+'" '+(f.ddd_data_source===o.v?'checked':'')+' onchange="onDDDSourceChange(this.value)">' +
+            '<span>'+esc(o.l)+'</span>' +
+          '</label>'
+        ).join('') +
+      '</div>' +
+    '</div>' +
+
+    (f.ddd_data_source && f.ddd_data_source!=='dashboard'
+      ? '<div class="form-field"><label class="form-label">Who prepared or shared this data?</label>' +
+          '<div class="hint-sm">e.g. Programme Manager, Subject Advisor, Provincial Official</div>' +
+          '<input type="text" class="form-input" placeholder="e.g. John Mokoena (Programme Manager)" value="'+esc(f.ddd_data_source_person)+'" oninput="state.form.ddd_data_source_person=this.value">' +
+        '</div>'
+      : '') +
+
+    // Insight types
+    '<div class="form-field">' +
+      '<label class="form-label">What did you see in the data?</label>' +
+      '<div class="hint-sm">Select all types of issues you observed.</div>' +
+      '<div class="chip-multi">' +
+        INSIGHT_TYPE_OPTIONS.map(o => '<button class="chip-pick'+(f.insight_types.includes(o.value)?' active':'')+'" onclick="toggleInsight(\''+o.value+'\')">'+esc(o.label)+'</button>').join('') +
+      '</div>' +
+    '</div>' +
+
+    (f.insight_types.length
+      ? '<div class="form-field">' +
+          '<label class="form-label">Describe what you found</label>' +
+          '<textarea class="form-textarea" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="state.form.insight_detail=this.value">'+esc(f.insight_detail)+'</textarea>' +
+        '</div>'
+      : '') +
+
+    '<div class="form-field">' +
+      '<label class="form-label">Additional data sources used<span class="opt">optional</span></label>' +
+      '<div class="hint-sm">Did you also use other data alongside DDD? e.g. SA-SAMS, LURITS, school records</div>' +
+      '<textarea class="form-textarea" placeholder="e.g. Also used SA-SAMS attendance report..." oninput="state.form.additional_data_sources=this.value">'+esc(f.additional_data_sources||'')+'</textarea>' +
+    '</div>';
+}
+
+/* DDD task picker helpers */
+function isDDDTaskSel(idx){
+  const t = DDD_TASKS[idx]; if(!t) return false;
+  return t.reports.every(r => state.form.ddd_reports.includes(r));
+}
+function toggleDDDTask(idx){
+  const t = DDD_TASKS[idx]; if(!t) return;
+  const all = isDDDTaskSel(idx);
+  if(all){
+    t.reports.forEach(r => {
+      // Only remove if no other selected task still needs this report
+      const usedByOther = DDD_TASKS.some((tt,ti) => ti!==idx && tt.reports.includes(r) && tt.reports.every(rr=>state.form.ddd_reports.includes(rr)));
+      if(!usedByOther){
+        const i = state.form.ddd_reports.indexOf(r);
+        if(i!==-1) state.form.ddd_reports.splice(i,1);
+      }
+    });
+  } else {
+    t.reports.forEach(r => { if(!state.form.ddd_reports.includes(r)) state.form.ddd_reports.push(r); });
+  }
+  renderLogVisitForm();
+}
+function onDDDSourceChange(v){
+  state.form.ddd_data_source = v;
+  state.form.ddd_dashboard_confirmed = (v==='dashboard') ? 'yes' : 'no';
+  if(v==='dashboard') state.form.ddd_data_source_person = '';
+  renderLogVisitForm();
+}
+
+/* ─── STEP 4 — Context & Follow-up ─── */
+function renderFormStep4(){
+  const f = state.form;
+  return ''+
+    '<div class="step-section">' +
+      // Support needed
+      '<div class="form-field">' +
+        '<label class="form-label">What support does this school need?<span class="opt">optional</span></label>' +
+        '<div class="hint-sm">Select all that apply — helps district officials prioritise.</div>' +
+        '<div class="chip-multi">' +
+          SUPPORT_NEEDED.map(s => '<button class="chip-pick'+(f.support_needed.includes(s)?' active':'')+'" onclick="toggleSupport(\''+esc(s).replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
+        '</div>' +
+      '</div>' +
+
+      // Support level
+      '<div class="form-field">' +
+        '<label class="form-label">How much support is needed?<span class="opt">optional</span></label>' +
+        '<div class="radio-grp">' +
+          [
+            {v:'light',    t:'Light touch',     d:'School is coping, just needs a check-in now and then'},
+            {v:'regular',  t:'Regular support', d:'Needs regular visits, e.g. every two weeks'},
+            {v:'intensive',t:'Intensive support',d:'Serious challenges, needs a team effort from multiple people'}
+          ].map(o =>
+            '<label class="radio-row'+(f.support_level===o.v?' active':'')+'">' +
+              '<input type="radio" name="supLvl" value="'+o.v+'" '+(f.support_level===o.v?'checked':'')+' onchange="state.form.support_level=this.value;renderLogVisitForm()">' +
+              '<span><strong>'+esc(o.t)+'</strong> — '+esc(o.d)+'</span>' +
+            '</label>'
+          ).join('') +
+        '</div>' +
+      '</div>' +
+
+      // School context — staffing / resources / learners
+      '<div class="form-field">' +
+        '<label class="form-label">School context<span class="opt">tap all that apply</span></label>' +
+        '<div class="ctx-group">' +
+          '<div class="ctx-group-label">Staffing</div>' +
+          '<div class="chip-multi">' +
+            CTX_STAFFING.map(s => '<button class="chip-pick chip-pick-orange'+(f.ctx_staffing.includes(s)?' active':'')+'" onclick="toggleCtx(\'staffing\',\''+esc(s).replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="ctx-group">' +
+          '<div class="ctx-group-label">Resources</div>' +
+          '<div class="chip-multi">' +
+            CTX_RESOURCES.map(s => '<button class="chip-pick chip-pick-orange'+(f.ctx_resources.includes(s)?' active':'')+'" onclick="toggleCtx(\'resources\',\''+esc(s).replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="ctx-group">' +
+          '<div class="ctx-group-label">Learners</div>' +
+          '<div class="chip-multi">' +
+            CTX_LEARNERS.map(s => '<button class="chip-pick chip-pick-orange'+(f.ctx_learners.includes(s)?' active':'')+'" onclick="toggleCtx(\'learners\',\''+esc(s).replace(/'/g,"\\'")+'\')">'+esc(s)+'</button>').join('') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // Context note
+      '<div class="form-field">' +
+        '<label class="form-label">Context note<span class="opt">optional</span></label>' +
+        '<textarea class="form-textarea" placeholder="e.g. No permanent Maths educator since Term 3 2025..." oninput="state.form.ctx_notes=this.value">'+esc(f.ctx_notes)+'</textarea>' +
+      '</div>' +
+
+      // Educators supported
+      '<div class="form-field">' +
+        '<label class="form-label">Educators / staff supported<span class="opt">optional</span></label>' +
+        '<input type="number" class="form-input" min="0" placeholder="e.g. 8" value="'+esc(f.educators_supported)+'" oninput="state.form.educators_supported=this.value">' +
+      '</div>' +
+
+      // Follow-up
+      '<div class="form-field">' +
+        '<label class="followup-toggle" onclick="toggleFollowup()">' +
+          '<div class="followup-check'+(f.follow_up?' on':'')+'"></div>' +
+          '<div class="followup-label">Follow-up needed<span class="sub">Creates an action item linked to this visit</span></div>' +
+        '</label>' +
+        (f.follow_up
+          ? '<div class="followup-box">' +
+              '<label class="form-label" style="margin-bottom:5px">What\'s the follow-up?</label>' +
+              '<textarea class="form-textarea" style="background:#fff;min-height:60px" placeholder="e.g. Return next term to check curriculum coverage..." oninput="state.form.follow_up_desc=this.value">'+esc(f.follow_up_desc)+'</textarea>' +
+            '</div>'
+          : '') +
+      '</div>' +
+
+      // Supporting documents — link only on mobile (file upload deferred)
+      '<div class="form-field">' +
+        '<label class="form-label">Supporting document link<span class="opt">optional</span></label>' +
+        '<div class="hint-sm">Paste a Google Drive, OneDrive, or SharePoint link. File upload coming soon.</div>' +
+        '<input type="url" class="form-input" placeholder="https://drive.google.com/..." value="'+esc(f.doc_url)+'" oninput="state.form.doc_url=this.value">' +
+        '<input type="text" class="form-input" style="margin-top:6px" placeholder="Document name (e.g. Maths SIP)" value="'+esc(f.doc_name)+'" oninput="state.form.doc_name=this.value">' +
+      '</div>' +
+    '</div>';
+}
+
+/* ─── STEP 5 — Review ─── */
+function renderFormReview(){
+  const f = state.form;
+  const errs = collectAllErrors();
+  const fmtArr = a => a && a.length ? a.join(', ') : '—';
+  const dddLbl = v => ({'yes-direct':'Yes — directly triggered','yes-informed':'Yes — informed approach','partially':'Partially','other-data':'Yes — other data source','no':'No'}[v]||'—');
+  const supLbl = v => ({'light':'Light touch','regular':'Regular support','intensive':'Intensive support'}[v]||'—');
+  const obsAnswered = SCHOOL_OBS.filter(o => f.obs[o.key]!=='').length;
+  const obsYes = SCHOOL_OBS.filter(o => f.obs[o.key]==='yes').length;
+  const obsNo  = SCHOOL_OBS.filter(o => f.obs[o.key]==='no').length;
+  const obsIssues = SCHOOL_OBS.filter(o => f.obs[o.key]==='no').map(o => o.label);
+
+  const role = (f.official_role==='Other'&&f.official_role_other)?'Other: '+f.official_role_other:f.official_role;
+  const spec = (f.official_specialisation==='Other'&&f.official_specialisation_other)?'Other: '+f.official_specialisation_other:f.official_specialisation;
+  const act  = (f.activity_type==='Other'&&f.activity_type_other)?'Other: '+f.activity_type_other:f.activity_type;
+  const thm  = (f.intervention_theme==='Other'&&f.intervention_theme_other)?'Other: '+f.intervention_theme_other:f.intervention_theme;
+
+  return ''+
+    '<div class="step-section">' +
+      '<div class="review-banner">Please check carefully. You cannot change this after submitting.</div>' +
+      (errs.length
+        ? '<div class="form-err">' + errs.length + ' required field' + (errs.length>1?'s':'') + ' still missing:<ul style="margin:6px 0 0 18px">' +
+            errs.map(e => '<li style="cursor:pointer" onclick="goStep('+e.step+')">'+esc(e.label)+' (Step '+(e.step+1)+')</li>').join('') +
+          '</ul></div>'
+        : '') +
+
+      '<div class="rv-card"><div class="rv-hdr c-teal">Location & Date</div>' +
+        rvRow('Term',f.term)+rvRow('Date',f.activity_date)+rvRow('Province',f.province)+rvRow('District',f.district)+rvRow('Circuit',f.circuit)+rvRow('School',f.schools)+rvRow('Phase',f.phase)+
+        rvRow('Official',f.official_name)+rvRow('Email',f.official_email)+rvRow('Designation',role)+rvRow('Specialisation',spec)+
+      '</div>' +
+
+      '<div class="rv-card"><div class="rv-hdr c-green">Activity</div>' +
+        rvRow('Activity',act)+rvRow('Theme',thm)+
+        rvRow('Subjects',f.subjects.map(s => s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))+
+        rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')+
+        rvRow('Focus areas',fmtArr(f.sip_focus_areas)==='—'?'':f.sip_focus_areas.join('; '))+
+        rvRow('Description',f.description)+
+        (obsAnswered ? rvRow('Observation', obsYes+' in place, '+obsNo+' not in place ('+obsAnswered+'/10)') : '') +
+        (obsIssues.length ? rvRow('Issues found', obsIssues.join('; ')) : '') +
+      '</div>' +
+
+      '<div class="rv-card"><div class="rv-hdr c-blue">Data Connection</div>' +
+        rvRow('Data used',dddLbl(f.ddd_used))+
+        (f.ddd_reports.length?rvRow('Reports',f.ddd_reports.join(', ')):'')+
+        rvRow('Access date',f.ddd_access_date)+
+        rvRow('Source',f.ddd_data_source)+
+        rvRow('Source person',f.ddd_data_source_person)+
+        rvRow('Other source',f.other_data_source)+
+        rvRow('Additional sources',f.additional_data_sources)+
+        rvRow('Data issues',f.insight_types.length?f.insight_types.map(v=>{const m=INSIGHT_TYPE_OPTIONS.find(o=>o.value===v);return m?m.label:v}).join('; '):'')+
+        rvRow('Detail',f.insight_detail)+
+        rvRow('What made you act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):'')+
+        rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')+
+        rvRow('Action(s)',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')+
+      '</div>' +
+
+      '<div class="rv-card"><div class="rv-hdr c-orange">Context & Follow-up</div>' +
+        rvRow('Support needed',fmtArr(f.support_needed)==='—'?'':f.support_needed.join('; '))+
+        rvRow('Support level',supLbl(f.support_level))+
+        rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].join(', '))+
+        rvRow('Notes',f.ctx_notes)+
+        rvRow('Educators supported',f.educators_supported)+
+        rvRow('Follow-up',f.follow_up?'Yes':'No')+
+        (f.follow_up?rvRow('Follow-up detail',f.follow_up_desc):'')+
+        (f.doc_url?rvRow('Document link',f.doc_name||f.doc_url):'')+
+      '</div>' +
+
+      '<label class="rv-confirm'+(f._reviewConfirmed?' on':'')+'">' +
+        '<input type="checkbox" '+(f._reviewConfirmed?'checked':'')+' onchange="state.form._reviewConfirmed=this.checked;renderLogVisitForm()">' +
+        '<span>I confirm this information is correct and complete</span>' +
+      '</label>' +
+    '</div>';
+}
+
+function rvRow(label,value){
+  if(value===null || value===undefined || value==='') return '';
+  return '<div class="rv-row"><span class="rv-label">'+esc(label)+'</span><span class="rv-value">'+esc(String(value))+'</span></div>';
+}
+
+/* ─── Multi-select togglers ─── */
 function toggleSubject(s){
   if(!state.form) return;
   const i = state.form.subjects.indexOf(s);
-  if(i>-1) state.form.subjects.splice(i,1);
-  else state.form.subjects.push(s);
+  if(i>-1) state.form.subjects.splice(i,1); else state.form.subjects.push(s);
   renderLogVisitForm();
 }
 function toggleGrade(g){
   if(!state.form) return;
   const i = state.form.grades.indexOf(g);
-  if(i>-1) state.form.grades.splice(i,1);
-  else state.form.grades.push(g);
+  if(i>-1) state.form.grades.splice(i,1); else state.form.grades.push(g);
+  renderLogVisitForm();
+}
+function toggleSipFocus(a){
+  if(!state.form) return;
+  const i = state.form.sip_focus_areas.indexOf(a);
+  if(i>-1) state.form.sip_focus_areas.splice(i,1); else state.form.sip_focus_areas.push(a);
+  renderLogVisitForm();
+}
+function toggleTrigger(t){
+  if(!state.form) return;
+  const i = state.form.intervention_triggers.indexOf(t);
+  if(i>-1) state.form.intervention_triggers.splice(i,1); else state.form.intervention_triggers.push(t);
+  renderLogVisitForm();
+}
+function toggleDecision(d){
+  if(!state.form) return;
+  const i = state.form.decision_types.indexOf(d);
+  if(i>-1) state.form.decision_types.splice(i,1); else state.form.decision_types.push(d);
+  renderLogVisitForm();
+}
+function toggleAction(a){
+  if(!state.form) return;
+  const i = state.form.action_types.indexOf(a);
+  if(i>-1) state.form.action_types.splice(i,1); else state.form.action_types.push(a);
+  renderLogVisitForm();
+}
+function toggleInsight(v){
+  if(!state.form) return;
+  const i = state.form.insight_types.indexOf(v);
+  if(i>-1) state.form.insight_types.splice(i,1); else state.form.insight_types.push(v);
+  renderLogVisitForm();
+}
+function toggleSupport(s){
+  if(!state.form) return;
+  const i = state.form.support_needed.indexOf(s);
+  if(i>-1) state.form.support_needed.splice(i,1); else state.form.support_needed.push(s);
+  renderLogVisitForm();
+}
+function toggleCtx(group,val){
+  if(!state.form) return;
+  const arrName = 'ctx_'+group;
+  const arr = state.form[arrName];
+  if(!Array.isArray(arr)) return;
+  const i = arr.indexOf(val);
+  if(i>-1) arr.splice(i,1); else arr.push(val);
   renderLogVisitForm();
 }
 function toggleFollowup(){
@@ -1229,16 +1971,15 @@ function toggleFollowup(){
   renderLogVisitForm();
 }
 
-/* ─── Province / District handlers ─── */
+/* ─── Province / District / Date handlers ─── */
 function onProvinceChange(p){
   if(!state.form) return;
   state.form.province = p;
-  // Clear district + school when province changes
   state.form.district = '';
+  state.form.circuit  = '';
   state.form.school_id = '';
   state.form.schools = '';
   state.form.phase = '';
-  // Lejweleputswa special: theme valid only when district matches; clearing district clears that theme
   if(state.form.intervention_theme === 'Lejweleputswa Underperforming Schools Support Programme'){
     state.form.intervention_theme = '';
   }
@@ -1247,7 +1988,7 @@ function onProvinceChange(p){
 function onDistrictChange(d){
   if(!state.form) return;
   state.form.district = d;
-  // Clear school when district changes (it may no longer be in the new district)
+  state.form.circuit  = '';
   state.form.school_id = '';
   state.form.schools = '';
   state.form.phase = '';
@@ -1256,37 +1997,66 @@ function onDistrictChange(d){
   }
   renderLogVisitForm();
 }
-
+function onDateChange(v){
+  if(!state.form) return;
+  state.form.activity_date = v;
+  state.form.term = deriveTerm(v);
+  renderLogVisitForm();
+}
 /* ─── School picker (swaps form body) ─── */
-function openSchoolPicker(){
+async function loadSchoolsForDistrict(province, district){
+  if(!province || !district) return [];
+  const key = province + '||' + district;
+  if(state.schoolsByDistrict[key]) return state.schoolsByDistrict[key];
+  const { data, error } = await sb.from('school_status')
+    .select('id,province,district,school_name,phase,stage,stage_reason,stage_changed_at,stage_changed_by')
+    .eq('province', province)
+    .eq('district', district)
+    .order('school_name', { ascending:true })
+    .limit(2000);
+  if(error){
+    console.warn('schools fetch failed', error);
+    return [];
+  }
+  state.schoolsByDistrict[key] = data || [];
+  return state.schoolsByDistrict[key];
+}
+
+async function openSchoolPicker(){
   if(!state.form || !state.form.district){
     showToast('Pick province and district first');
     return;
   }
   state.pickerSearch = '';
-  renderSchoolPicker();
+  state.pickerLoading = true;
+  renderSchoolPicker();              // first paint — shows loader
+  await loadSchoolsForDistrict(state.form.province, state.form.district);
+  state.pickerLoading = false;
+  renderSchoolPicker();              // second paint — schools now in cache
 }
 function renderSchoolPicker(){
   const f = state.form;
   const q = (state.pickerSearch||'').toLowerCase().trim();
-  // Filter to schools in the form's province + district
-  let list = state.schoolStatus.filter(s =>
-    (s.province||'') === f.province &&
-    (s.district||'') === f.district
-  );
+  const key = (f.province||'') + '||' + (f.district||'');
+  const cached = state.schoolsByDistrict[key];
+  const loading = state.pickerLoading;
+  // Use cached list when available, else empty (loader will be shown)
+  let list = cached ? cached.slice() : [];
   if(q) list = list.filter(s => (s.school_name||'').toLowerCase().includes(q));
   list.sort((a,b)=>(a.school_name||'').localeCompare(b.school_name||''));
 
   // Exact-match check — if user typed a name not in the list, offer to use it as-is
   const exactMatch = q && list.some(s => (s.school_name||'').toLowerCase() === q);
-  const showManualEntry = q && !exactMatch && q.length >= 3;
+  const showManualEntry = q && !exactMatch && q.length >= 3 && !loading;
+
+  const trackedLbl = loading ? 'loading…' : ((cached?cached.length:0)+' tracked');
 
   const body =
     '<div class="modal form-modal">' +
       '<div class="form-hdr">' +
         '<div>' +
           '<div class="form-hdr-title">Pick a school</div>' +
-          '<div class="form-hdr-sub">'+esc(f.district)+' · '+esc(f.province)+' · '+list.length+' tracked</div>' +
+          '<div class="form-hdr-sub">'+esc(f.district)+' · '+esc(f.province)+' · '+trackedLbl+'</div>' +
         '</div>' +
         '<button class="form-close" onclick="renderLogVisitForm()" aria-label="Back">✕</button>' +
       '</div>' +
@@ -1306,25 +2076,27 @@ function renderSchoolPicker(){
           : ''
         ) +
         '<div class="picker-list">' +
-          (list.length===0 && !showManualEntry
-            ? '<div class="picker-empty">'+
-                (q
-                  ? 'No tracked schools match "'+esc(state.pickerSearch)+'" in '+esc(f.district)+'.<br><br>Type at least 3 letters to add a school name manually.'
-                  : 'No schools tracked in this district yet.<br><br>Type a school name above to log a visit anyway.')+
-              '</div>'
-            : list.slice(0,200).map(s => {
-                const stage = STAGES.find(x=>x.key===(s.stage||'not_engaged')) || STAGES[0];
-                const color = colorFromString(s.school_name||'');
-                const safeId = String(s.id||'').replace(/'/g,"\\'");
-                return '<div class="picker-school" onclick="selectSchool(\''+safeId+'\')">' +
-                  '<div class="sc-avatar" style="background:'+color+'">'+esc(initials(s.school_name))+'</div>' +
-                  '<div class="sc-body">' +
-                    '<div class="sc-name">'+esc(s.school_name)+'</div>' +
-                    '<div class="sc-meta">'+(s.phase?esc(s.phase):'—')+'</div>' +
-                    '<div class="sc-badges"><span class="badge badge-stage '+stage.cls+'">'+esc(stage.label)+'</span></div>' +
-                  '</div>' +
-                '</div>';
-              }).join('')
+          (loading
+            ? '<div class="full-spinner"><span class="spinner"></span>Loading schools…</div>'
+            : (list.length===0 && !showManualEntry
+              ? '<div class="picker-empty">'+
+                  (q
+                    ? 'No tracked schools match "'+esc(state.pickerSearch)+'" in '+esc(f.district)+'.<br><br>Type at least 3 letters to add a school name manually.'
+                    : 'No schools tracked in this district yet.<br><br>Type a school name above to log a visit anyway.')+
+                '</div>'
+              : list.slice(0,300).map(s => {
+                  const stage = STAGES.find(x=>x.key===(s.stage||'not_engaged')) || STAGES[0];
+                  const color = colorFromString(s.school_name||'');
+                  const safeId = String(s.id||'').replace(/'/g,"\\'");
+                  return '<div class="picker-school" onclick="selectSchool(\''+safeId+'\')">' +
+                    '<div class="sc-avatar" style="background:'+color+'">'+esc(initials(s.school_name))+'</div>' +
+                    '<div class="sc-body">' +
+                      '<div class="sc-name">'+esc(s.school_name)+'</div>' +
+                      '<div class="sc-meta">'+(s.phase?esc(s.phase):'—')+'</div>' +
+                      '<div class="sc-badges"><span class="badge badge-stage '+stage.cls+'">'+esc(stage.label)+'</span></div>' +
+                    '</div>' +
+                  '</div>';
+                }).join(''))
           ) +
         '</div>' +
       '</div>' +
@@ -1335,11 +2107,12 @@ function renderSchoolPicker(){
   if(newNode) newNode.id = 'modal-content';
 }
 function selectSchool(id){
-  const s = state.schoolStatus.find(x => String(x.id)===String(id));
+  const key = (state.form.province||'') + '||' + (state.form.district||'');
+  const list = state.schoolsByDistrict[key] || [];
+  const s = list.find(x => String(x.id)===String(id));
   if(!s){ renderLogVisitForm(); return; }
   state.form.school_id = s.id;
   state.form.schools   = s.school_name;
-  // Province + district already set on the form; trust school_status values too
   state.form.phase     = s.phase || '';
   renderLogVisitForm();
 }
@@ -1353,18 +2126,67 @@ function useManualSchoolName(){
 }
 
 /* ─── Validation ─── */
+/* ─── Validation — per step + total ─── */
+const STEP_FIELD_DEFS = [
+  // Step 0 — Where & When
+  [
+    { test:f=>!f.activity_date,         label:'Date',          step:0 },
+    { test:f=>!f.province,              label:'Province',      step:0 },
+    { test:f=>!f.district,              label:'District',      step:0 },
+    { test:f=>!f.schools,               label:'School',        step:0 },
+    { test:f=>!f.official_name.trim(),  label:'Your name',     step:0 },
+    { test:f=>!f.official_email.trim(), label:'Email',         step:0 },
+    { test:f=>!f.official_role,         label:'Designation',   step:0 },
+    { test:f=>f.official_role==='Other' && !f.official_role_other.trim(), label:'Other designation', step:0 },
+    { test:f=>!f.official_specialisation, label:'Specialisation', step:0 },
+    { test:f=>f.official_specialisation==='Other' && !f.official_specialisation_other.trim(), label:'Other specialisation', step:0 }
+  ],
+  // Step 1 — What Happened
+  [
+    { test:f=>!f.activity_type, label:'Activity type', step:1 },
+    { test:f=>f.activity_type==='Other' && !f.activity_type_other.trim(), label:'Other activity type', step:1 },
+    { test:f=>!f.intervention_theme, label:'Intervention theme', step:1 },
+    { test:f=>f.intervention_theme==='Other' && !f.intervention_theme_other.trim(), label:'Other theme', step:1 },
+    { test:f=>!f.grades.length, label:'Grade(s)', step:1 }
+  ],
+  // Step 2 — Data Connection
+  [
+    { test:f=>!f.ddd_used, label:'Data use answer', step:2 },
+    { test:f=>['yes-direct','yes-informed','partially'].indexOf(f.ddd_used)>-1 && !f.ddd_data_source, label:'How DDD data was accessed', step:2 },
+    { test:f=>!f.action_types.length, label:'Action(s) taken', step:2 },
+    { test:f=>f.action_types.includes('Other') && !f.action_other.trim(), label:'Other action description', step:2 }
+  ],
+  // Step 3 — Context & Follow-up
+  [
+    { test:f=>f.follow_up && !f.follow_up_desc.trim(), label:'Follow-up description', step:3 }
+  ]
+];
+
+function validateStep(stepIdx){
+  const f = state.form; if(!f) return 'Form not ready.';
+  const defs = STEP_FIELD_DEFS[stepIdx] || [];
+  for(const d of defs){ if(d.test(f)) return 'Please fix: '+d.label+'.'; }
+  return null;
+}
+
+function collectAllErrors(){
+  const f = state.form; if(!f) return [];
+  const errs = [];
+  STEP_FIELD_DEFS.forEach(defs => defs.forEach(d => { if(d.test(f)) errs.push(d); }));
+  return errs;
+}
+
 function validateForm(){
-  const f = state.form;
-  if(!f.activity_date) return 'Please pick the visit date.';
-  if(!f.province) return 'Please pick a province.';
-  if(!f.district) return 'Please pick a district.';
-  if(!f.schools) return 'Please pick a school.';
-  if(!f.activity_type) return 'Please select an activity type.';
-  if(f.activity_type==='Other' && !f.activity_type_other.trim()) return 'Please describe the "Other" activity type.';
-  if(!f.intervention_theme) return 'Please select an intervention theme.';
-  if(f.intervention_theme==='Other' && !f.intervention_theme_other.trim()) return 'Please describe the "Other" intervention theme.';
-  if(!f.description || !f.description.trim()) return 'Please add a short description of what happened.';
-  if(f.follow_up && !f.follow_up_desc.trim()) return 'Please describe the follow-up, or untick the follow-up box.';
+  // Used by submitVisit — returns first error message, or null
+  const errs = collectAllErrors();
+  if(errs.length){
+    state.form.formStep = errs[0].step;
+    return 'Please fix: '+errs[0].label+'.';
+  }
+  if(!state.form._reviewConfirmed){
+    state.form.formStep = 4;
+    return 'Please tick the confirmation box before submitting.';
+  }
   return null;
 }
 
@@ -1431,80 +2253,132 @@ async function flushQueue(){
   return { flushed, remaining: failed.length };
 }
 
-/* ─── Build dec + act payloads (mirrors web tracker schema) ─── */
+/* ─── Build dec + act payloads (mirrors web tracker schema exactly) ─── */
 function buildPayloads(){
   const f = state.form;
   const activityType = f.activity_type==='Other' && f.activity_type_other
     ? 'Other: '+f.activity_type_other : f.activity_type;
   const theme = f.intervention_theme==='Other' && f.intervention_theme_other
     ? 'Other: '+f.intervention_theme_other : f.intervention_theme;
+  const subjectsExpanded = f.subjects.map(s => s==='Other' && f.subjects_other ? 'Other: '+f.subjects_other : s);
+  const role = f.official_role==='Other' && f.official_role_other ? 'Other: '+f.official_role_other : f.official_role;
+  const spec = f.official_specialisation==='Other' && f.official_specialisation_other ? 'Other: '+f.official_specialisation_other : f.official_specialisation;
 
-  // Details JSONB — mirrors the web tracker dual-write contract
+  // Joined decision / action strings (web tracker pattern)
+  const decisionStr = f.decision_types.length
+    ? (f.decision_types.includes('Other') && f.decision_other
+        ? f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; ')
+        : f.decision_types.join('; '))
+    : '';
+  const actionStr = f.action_types.length
+    ? (f.action_types.includes('Other') && f.action_other
+        ? f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; ')
+        : f.action_types.join('; '))
+    : '';
+  const triggersStr = f.intervention_triggers.length
+    ? (f.intervention_triggers.includes('Other') && f.intervention_trigger_other
+        ? f.intervention_triggers.filter(t=>t!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; ')
+        : f.intervention_triggers.join('; '))
+    : '';
+
+  // Build a plain-language insight statement
+  const insightLabels = f.insight_types.map(v => {
+    const m = INSIGHT_TYPE_OPTIONS.find(o => o.value===v);
+    return m ? m.label : v;
+  });
+  const insightStatement = insightLabels.length
+    ? insightLabels.join(', ') + (f.insight_detail ? ' — ' + f.insight_detail : '')
+    : (f.insight_detail || '');
+
+  // Details JSONB — mirrors web tracker dual-write contract
   const details = {
     province: f.province,
     district: f.district,
-    circuit: '',
+    circuit: f.circuit || '',
     schools: f.schools,
-    term: '',
+    term: f.term || '',
     activity_type: activityType,
     intervention_theme: theme,
-    subjects: f.subjects,
+    subjects: subjectsExpanded,
     grades: f.grades,
     description: f.description,
-    // Defaults for fields the lean mobile form doesn't ask
-    ddd_used: '',
-    ddd_reports: [],
-    insight_detail: '',
-    insight_statement: '',
-    decision_types: [],
-    action_types: [],
-    obs: {},
-    sip_focus_areas: [],
-    support_needed: [],
-    tagged_officials: {},  // OBJECT not array — per verified schema
+    ddd_used: f.ddd_used,
+    ddd_reports: f.ddd_reports,
+    ddd_access_date: f.ddd_access_date || null,
+    ddd_data_source: f.ddd_data_source || null,
+    ddd_data_source_person: f.ddd_data_source_person || null,
+    ddd_dashboard_confirmed: f.ddd_dashboard_confirmed || null,
+    other_data_source: f.other_data_source || null,
+    additional_data_sources: f.additional_data_sources || null,
+    insight_type: f.insight_types[0] || '',
+    insight_types: f.insight_types,
+    insight_detail: f.insight_detail,
+    insight_statement: insightStatement,
+    intervention_trigger: f.intervention_triggers[0] || '',
+    intervention_triggers: f.intervention_triggers,
+    intervention_trigger_other: f.intervention_trigger_other || '',
+    decision_type: f.decision_types[0] || '',
+    decision_types: f.decision_types,
+    action_types: f.action_types,
+    obs: Object.assign({}, f.obs),
+    sip_focus_areas: f.sip_focus_areas,
+    support_needed: f.support_needed,
+    support_level: f.support_level || '',
+    ctx_staffing: f.ctx_staffing,
+    ctx_resources: f.ctx_resources,
+    ctx_learners: f.ctx_learners,
+    ctx_notes: f.ctx_notes,
+    educators_supported: f.educators_supported ? parseInt(f.educators_supported, 10) : null,
     follow_up: !!f.follow_up,
     follow_up_desc: f.follow_up_desc || '',
-    official_name: state.official.full_name || '',
-    official_email: state.official.email || '',
-    official_role: state.official.role || '',
-    source_form: 'mobile-lean-v1'
+    tagged_officials: f.tagged_officials || {},   // OBJECT not array — per verified schema
+    official_name: f.official_name || state.official.full_name || '',
+    official_email: f.official_email || state.official.email || '',
+    official_role: role || state.official.role || '',
+    official_specialisation: spec || '',
+    source_form: 'mobile-v3'
   };
+
+  const ctxFactors = [...f.ctx_staffing, ...f.ctx_resources, ...f.ctx_learners].join(', ') + (f.ctx_notes ? ' | ' + f.ctx_notes : '');
 
   const decId = genId('DEC');
   const dec = {
     id: decId,
     official_id: state.scope.official_id,        // CRITICAL — must match get_official_scope for RLS
     intervention_id: (state.interventions[0] && state.interventions[0].id) || null,
-    ddd_tool: '',
+    ddd_tool: f.ddd_reports.join(', '),
     data_viewed: activityType + ' — ' + f.schools,
-    insight: f.description,
-    decision_made: activityType,
-    contextual_factors: '',
-    made_by: state.official.full_name || 'User',
+    insight: insightStatement || f.insight_detail || f.description,
+    decision_made: decisionStr || activityType,
+    contextual_factors: ctxFactors,
+    made_by: f.official_name || state.official.full_name || 'User',
     date: f.activity_date,
     details: details,
-    logged_by: state.official.full_name || '',
-    logged_by_email: state.official.email || '',
+    logged_by: f.official_name || state.official.full_name || '',
+    logged_by_email: f.official_email || state.official.email || '',
     logged_via: 'mobile'
   };
 
-  let act = null;
-  if(f.follow_up){
-    act = {
-      id: genId('ACT'),
-      official_id: state.scope.official_id,
-      decision_id: decId,
-      intervention_id: dec.intervention_id,
-      action_taken: 'Follow-up scheduled (mobile)',
-      responsible: state.official.full_name || 'User',
-      status: 'In Progress',
-      target_date: null,
-      notes: 'Follow-up: ' + f.follow_up_desc,
-      logged_by: state.official.full_name || '',
-      logged_by_email: state.official.email || '',
-      logged_via: 'mobile'
-    };
-  }
+  // ALWAYS create an action row (web-tracker parity) — uses action_types if any,
+  // otherwise falls back to "Follow-up" when follow_up is on, otherwise the activity itself.
+  const actionTaken = actionStr || (f.follow_up ? 'Follow-up scheduled (mobile)' : activityType);
+  const act = {
+    id: genId('ACT'),
+    official_id: state.scope.official_id,
+    decision_id: decId,
+    intervention_id: dec.intervention_id,
+    action_taken: actionTaken,
+    responsible: f.official_name || state.official.full_name || 'User',
+    status: 'In Progress',
+    target_date: null,
+    notes: f.follow_up ? 'Follow-up: ' + f.follow_up_desc : '',
+    supporting_doc_url: f.doc_url || '',
+    supporting_doc_name: f.doc_name || '',
+    logged_by: f.official_name || state.official.full_name || '',
+    logged_by_email: f.official_email || state.official.email || '',
+    logged_via: 'mobile'
+  };
+
   return { dec, act };
 }
 
