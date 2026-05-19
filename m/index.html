@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>DDD Tracker — Mobile (v0.3.2)</title>
+<title>DDD Tracker — Mobile (v0.4.0)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23074445'/%3E%3Ctext x='50' y='62' font-family='Segoe UI,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%237AB648'%3EDDD%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -270,6 +270,37 @@ input,textarea{font-family:inherit}
 .form-input,.form-select,.form-textarea{width:100%;padding:12px 13px;border:1.5px solid #E1DFDD;border-radius:10px;font-size:14px;background:#FAFBFC;color:var(--navy);outline:none;font-family:inherit;transition:border-color .15s,background .15s}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--teal);background:#fff}
 .form-textarea{resize:vertical;min-height:90px;line-height:1.5}
+
+/* ── Photo capture (Session 4) ── */
+.photo-strip { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 0 }
+.photo-thumb { position:relative; width:84px; height:84px; border-radius:10px; overflow:hidden; background:#f3f2f1; border:1.5px solid #e1dfdd; flex-shrink:0 }
+.photo-thumb img { width:100%; height:100%; object-fit:cover; display:block }
+.photo-thumb-rm { position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.65); color:#fff; border:0; font-size:13px; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0 }
+.photo-thumb-rm:active { background:rgba(0,0,0,.85) }
+.photo-buttons { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+.photo-btn { flex:1; min-width:140px; display:flex; align-items:center; justify-content:center; gap:8px; padding:13px 14px; border:1.5px dashed #0B8E8D; border-radius:10px; background:#E6F4F4; color:#0B5C5B; font-weight:600; font-size:13.5px; cursor:pointer; min-height:48px }
+.photo-btn:active { background:#CDE9E9 }
+.photo-btn-icon { font-size:18px }
+.spinner-sm { width:13px; height:13px; border:2px solid #c8c6c4; border-top-color:#0B8E8D; border-radius:50%; display:inline-block; animation:spin .8s linear infinite; vertical-align:middle; margin-right:6px }
+
+/* ── Mention picker (Session 4) ── */
+.mention-btn { margin-top:6px; padding:8px 12px; border:1.5px solid #c8c6c4; border-radius:18px; background:#fafafa; color:var(--teal-dk); font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; min-height:36px }
+.mention-btn:active { background:#f0f0f0 }
+.mention-chips { display:flex; flex-wrap:wrap; gap:5px; margin:0 0 6px }
+.mention-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:14px; background:#E6F4F4; color:#0B5C5B; font-size:12px; font-weight:600 }
+.mention-chip button { border:0; background:transparent; color:#0B5C5B; font-size:14px; line-height:1; cursor:pointer; padding:0 0 0 2px; opacity:.7 }
+.mention-chip button:active { opacity:1 }
+.mention-modal { padding:0 }
+.mention-search { padding:14px 14px 8px; border-bottom:1px solid #edebe9 }
+.mention-search input { width:100%; padding:11px 12px; border:1.5px solid #c8c6c4; border-radius:8px; font-size:14px; font-family:inherit; box-sizing:border-box }
+.mention-results { max-height:60vh; overflow-y:auto; padding:6px 0 14px }
+.mention-row { display:flex; align-items:center; gap:11px; padding:10px 14px; cursor:pointer; min-height:56px }
+.mention-row:active { background:#f3f2f1 }
+.mention-row.checked { background:#E6F4F4 }
+.mention-tick { width:22px; flex-shrink:0; font-size:15px; color:#0B8E8D; font-weight:700; text-align:center }
+.mention-name { font-size:14px; font-weight:600 }
+.mention-meta { font-size:11px; color:var(--grey); margin-top:2px }
+.mention-empty { padding:24px 14px; text-align:center; color:var(--grey); font-size:13px }
 .form-select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23607D8B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 
 .school-pick-btn{width:100%;padding:12px 13px;border:1.5px solid #E1DFDD;border-radius:10px;background:#FAFBFC;display:flex;align-items:center;gap:10px;text-align:left;color:var(--navy);font-size:14px;min-height:46px}
@@ -431,14 +462,14 @@ input,textarea{font-family:inherit}
   </div>
   <div class="login-foot">
     Need help? Email <a href="mailto:victor@newleaders.co.za">victor@newleaders.co.za</a><br>
-    <span style="opacity:.7">Mobile preview — v0.3.2 (Session 3 · master school list)</span>
+    <span style="opacity:.7">Mobile preview — v0.4.0 (Session 4 · photos + mentions)</span>
   </div>
 </div>
 
 <!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
 <div id="app" class="app">
 
-  <div id="dev-banner" class="dev-banner show">Preview build · v0.3.2 — school picker now shows full SA master list</div>
+  <div id="dev-banner" class="dev-banner show">Preview build · v0.4.0 — photo capture + @ mentions</div>
 
   <!-- Header (varies by tab) -->
   <header id="hdr-home" class="hdr" style="display:block">
@@ -673,6 +704,13 @@ const CTX_RESOURCES = ["Adequate","Textbook shortage","No devices/connectivity",
 const CTX_LEARNERS = ["No major concerns","High absenteeism","Welfare concerns","Overcrowded classrooms","Language barriers","Progressed learners present","Learning difficulties / barriers"];
 const QUEUE_KEY = 'ddd_mobile_submit_queue';
 
+/* Photo capture config (Session 4) */
+const PHOTO_BUCKET       = 'visit-photos';
+const MAX_PHOTOS         = 5;
+const MAX_PHOTO_WIDTH    = 1600;        // px, longest edge
+const PHOTO_JPEG_QUALITY = 0.75;
+const MAX_PHOTO_BYTES    = 8 * 1024 * 1024;  // 8 MB pre-compression hard cap
+
 /* ID generator — mirrors web tracker exactly */
 const genId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 
@@ -768,6 +806,17 @@ function emptyForm(){
     doc_url: '',
     doc_name: '',
     tagged_officials: {},
+
+    // Photos (mobile-only — stored as blobs until submit, then uploaded to Supabase Storage)
+    _photoBlobs: [],     // [{previewUrl, blob, name, size}]
+    _photoUploading: false,
+
+    // Mention picker UI state
+    _mentionOpen: false,
+    _mentionBucket: '',  // 'description' | 'follow_up'
+    _mentionQuery: '',
+    _mentionResults: [],
+    _mentionLoading: false,
 
     // Step 5: Review
     _reviewConfirmed: false
@@ -1337,7 +1386,16 @@ function goStep(target){
   renderLogVisitForm();
 }
 
+function _cleanupForm(){
+  destroyMentionLayer();
+  try {
+    if(state.form && state.form._photoBlobs){
+      state.form._photoBlobs.forEach(p => { try { URL.revokeObjectURL(p.previewUrl); } catch(e){} });
+    }
+  } catch(e){}
+}
 function closeLogForm(){
+  _cleanupForm();
   if(state.submitting) return;
   // Restore standard modal shell so future modals work normally
   const wrap = document.getElementById('modal-bg');
@@ -1514,10 +1572,12 @@ function renderFormStep2(){
         '</div>' +
       '</div>' +
 
-      // Description
+      // Description (with @-mention picker)
       '<div class="form-field">' +
         '<label class="form-label">Brief description<span class="opt">1-2 lines</span></label>' +
+        renderMentionChips('description') +
         '<textarea class="form-textarea" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="state.form.description=this.value">'+esc(f.description)+'</textarea>' +
+        '<button type="button" class="mention-btn" onclick="openMentionPicker(\'description\')">@ Tag a colleague</button>' +
       '</div>' +
 
       // Observation checklist (collapsible)
@@ -1818,7 +1878,7 @@ function renderFormStep4(){
         '<input type="number" class="form-input" min="0" placeholder="e.g. 8" value="'+esc(f.educators_supported)+'" oninput="state.form.educators_supported=this.value">' +
       '</div>' +
 
-      // Follow-up
+      // Follow-up (with mention picker on follow-up description)
       '<div class="form-field">' +
         '<label class="followup-toggle" onclick="toggleFollowup()">' +
           '<div class="followup-check'+(f.follow_up?' on':'')+'"></div>' +
@@ -1827,15 +1887,38 @@ function renderFormStep4(){
         (f.follow_up
           ? '<div class="followup-box">' +
               '<label class="form-label" style="margin-bottom:5px">What\'s the follow-up?</label>' +
+              renderMentionChips('follow_up') +
               '<textarea class="form-textarea" style="background:#fff;min-height:60px" placeholder="e.g. Return next term to check curriculum coverage..." oninput="state.form.follow_up_desc=this.value">'+esc(f.follow_up_desc)+'</textarea>' +
+              '<button type="button" class="mention-btn" onclick="openMentionPicker(\'follow_up\')">@ Tag a colleague</button>' +
             '</div>'
           : '') +
       '</div>' +
 
-      // Supporting documents — link only on mobile (file upload deferred)
+      // Photos (Session 4 — up to 5, compressed client-side, uploaded on submit)
+      '<div class="form-field">' +
+        '<label class="form-label">Photos<span class="opt">up to '+MAX_PHOTOS+'</span></label>' +
+        '<div class="hint-sm">Capture evidence from the visit — classroom, work samples, sign-off forms.</div>' +
+        renderPhotoStrip() +
+        (f._photoBlobs.length < MAX_PHOTOS
+          ? '<div class="photo-buttons">' +
+              '<label class="photo-btn">' +
+                '<input type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoInput(event)">' +
+                '<span class="photo-btn-icon">📷</span><span>Take photo</span>' +
+              '</label>' +
+              '<label class="photo-btn">' +
+                '<input type="file" accept="image/*" multiple style="display:none" onchange="handlePhotoInput(event)">' +
+                '<span class="photo-btn-icon">🖼</span><span>Choose from gallery</span>' +
+              '</label>' +
+            '</div>'
+          : '<div class="hint-sm" style="color:#E65100;margin-top:6px">Maximum of '+MAX_PHOTOS+' photos reached. Remove one to add another.</div>'
+        ) +
+        (f._photoUploading ? '<div class="hint-sm" style="margin-top:6px"><span class="spinner spinner-sm"></span> Processing photo…</div>' : '') +
+      '</div>' +
+
+      // Supporting documents — link only on mobile (file upload deferred to Session 6)
       '<div class="form-field">' +
         '<label class="form-label">Supporting document link<span class="opt">optional</span></label>' +
-        '<div class="hint-sm">Paste a Google Drive, OneDrive, or SharePoint link. File upload coming soon.</div>' +
+        '<div class="hint-sm">Paste a Google Drive, OneDrive, or SharePoint link. File upload coming in a later release.</div>' +
         '<input type="url" class="form-input" placeholder="https://drive.google.com/..." value="'+esc(f.doc_url)+'" oninput="state.form.doc_url=this.value">' +
         '<input type="text" class="form-input" style="margin-top:6px" placeholder="Document name (e.g. Maths SIP)" value="'+esc(f.doc_name)+'" oninput="state.form.doc_name=this.value">' +
       '</div>' +
@@ -1904,8 +1987,15 @@ function renderFormReview(){
         rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].join(', '))+
         rvRow('Notes',f.ctx_notes)+
         rvRow('Educators supported',f.educators_supported)+
+        (function(){
+          const buckets = f.tagged_officials || {};
+          const all = [];
+          Object.keys(buckets).forEach(b => (buckets[b]||[]).forEach(o => { if(!all.find(x=>x.id===o.id)) all.push(o); }));
+          return all.length ? rvRow('Tagged colleagues', all.map(o => o.full_name).join(', ')) : '';
+        })()+
         rvRow('Follow-up',f.follow_up?'Yes':'No')+
         (f.follow_up?rvRow('Follow-up detail',f.follow_up_desc):'')+
+        (f._photoBlobs.length?rvRow('Photos',f._photoBlobs.length+' attached'):'')+
         (f.doc_url?rvRow('Document link',f.doc_name||f.doc_url):'')+
       '</div>' +
 
@@ -2208,6 +2298,296 @@ function validateForm(){
   return null;
 }
 
+
+/* ─── PHOTOS (Session 4) ─── */
+function handlePhotoInput(ev){
+  const files = Array.from(ev.target.files || []);
+  ev.target.value = ''; // allow re-picking same file
+  if(!files.length) return;
+  addPhotos(files);
+}
+
+async function addPhotos(files){
+  if(!state.form) return;
+  const remaining = MAX_PHOTOS - state.form._photoBlobs.length;
+  if(remaining <= 0){ showToast('Maximum '+MAX_PHOTOS+' photos'); return; }
+  const toAdd = files.slice(0, remaining);
+  state.form._photoUploading = true;
+  renderLogVisitForm();
+  for(const file of toAdd){
+    if(!file.type || !file.type.startsWith('image/')){
+      showToast('Skipped non-image: '+(file.name||'file'));
+      continue;
+    }
+    if(file.size > MAX_PHOTO_BYTES){
+      showToast('Skipped (too large): '+(file.name||'file'));
+      continue;
+    }
+    try {
+      const blob = await compressImage(file);
+      const previewUrl = URL.createObjectURL(blob);
+      state.form._photoBlobs.push({
+        previewUrl, blob,
+        name: file.name || 'photo.jpg',
+        size: blob.size
+      });
+    } catch(e){
+      console.warn('compress failed', e);
+      showToast('Could not process photo');
+    }
+  }
+  state.form._photoUploading = false;
+  renderLogVisitForm();
+}
+
+function removePhoto(idx){
+  if(!state.form || !state.form._photoBlobs[idx]) return;
+  try { URL.revokeObjectURL(state.form._photoBlobs[idx].previewUrl); } catch(e){}
+  state.form._photoBlobs.splice(idx, 1);
+  renderLogVisitForm();
+}
+
+function renderPhotoStrip(){
+  const blobs = (state.form && state.form._photoBlobs) || [];
+  if(!blobs.length) return '';
+  return '<div class="photo-strip">' + blobs.map((p, i) =>
+    '<div class="photo-thumb">' +
+      '<img src="'+p.previewUrl+'" alt="">' +
+      '<button class="photo-thumb-rm" onclick="removePhoto('+i+')" aria-label="Remove photo">×</button>' +
+    '</div>'
+  ).join('') + '</div>';
+}
+
+function compressImage(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        URL.revokeObjectURL(url);
+        const longest = Math.max(img.width, img.height);
+        const scale = longest > MAX_PHOTO_WIDTH ? (MAX_PHOTO_WIDTH / longest) : 1;
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
+          if(blob) resolve(blob);
+          else reject(new Error('toBlob returned null'));
+        }, 'image/jpeg', PHOTO_JPEG_QUALITY);
+      } catch(e){ reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result); // data URL
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+
+function dataUrlToBlob(dataUrl){
+  const [meta, b64] = dataUrl.split(',');
+  const type = (meta.match(/data:(.*?);base64/) || [,'image/jpeg'])[1];
+  const bin = atob(b64);
+  const len = bin.length;
+  const bytes = new Uint8Array(len);
+  for(let i=0; i<len; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type });
+}
+
+/* Uploads blobs to Supabase Storage. Returns [{path, name, size}] for storing in details.photos. */
+async function uploadVisitPhotos(officialId, decId, blobs){
+  const out = [];
+  for(let i=0; i<blobs.length; i++){
+    const item = blobs[i];
+    const safeName = (item.name||'photo.jpg').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 60);
+    const path = (officialId||'unknown') + '/' + decId + '/' + Date.now() + '_' + i + '_' + safeName;
+    const finalName = safeName.toLowerCase().endsWith('.jpg') || safeName.toLowerCase().endsWith('.jpeg') ? path : path.replace(/\.[^.]+$/, '') + '.jpg';
+    try {
+      const { error } = await sb.storage.from(PHOTO_BUCKET).upload(finalName, item.blob, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: 'image/jpeg'
+      });
+      if(error) throw error;
+      out.push({ path: finalName, name: item.name || 'photo.jpg', size: item.size || (item.blob && item.blob.size) || 0 });
+    } catch(e){
+      console.warn('photo upload failed', e);
+      // Skip this photo but keep going — don't fail the whole submit on one bad upload
+    }
+  }
+  return out;
+}
+
+/* ─── MENTIONS (Session 4) ─── */
+function renderMentionChips(bucket){
+  const tagged = (state.form && state.form.tagged_officials && state.form.tagged_officials[bucket]) || [];
+  if(!tagged.length) return '';
+  return '<div class="mention-chips">' + tagged.map(o =>
+    '<span class="mention-chip">@'+esc(o.full_name||o.email||'colleague')+
+      '<button onclick="removeMention(\'' + bucket + '\',\'' + String(o.id).replace(/'/g,"\\'") + '\')" aria-label="Remove">×</button>' +
+    '</span>'
+  ).join('') + '</div>';
+}
+
+function openMentionPicker(bucket){
+  if(!state.form) return;
+  state.form._mentionOpen   = true;
+  state.form._mentionBucket = bucket;
+  state.form._mentionQuery  = '';
+  state.form._mentionResults = [];
+  searchOfficials('');
+  renderMentionPicker();
+}
+
+function closeMentionPicker(){
+  if(!state.form) return;
+  state.form._mentionOpen = false;
+  state.form._mentionBucket = '';
+  state.form._mentionQuery = '';
+  state.form._mentionResults = [];
+  renderLogVisitForm();
+}
+
+let _mentionSearchTimer = null;
+function onMentionSearchInput(val){
+  if(!state.form) return;
+  state.form._mentionQuery = val;
+  if(_mentionSearchTimer) clearTimeout(_mentionSearchTimer);
+  _mentionSearchTimer = setTimeout(() => searchOfficials(val), 200);
+  renderMentionPicker(); // immediate re-render to reflect input value
+}
+
+async function searchOfficials(q){
+  if(!state.form) return;
+  state.form._mentionLoading = true;
+  renderMentionPicker();
+  try {
+    const trimmed = (q||'').trim();
+    let query = sb.from('officials')
+      .select('id,full_name,role,province,district,email')
+      .eq('is_active', true)
+      .order('full_name', { ascending:true })
+      .limit(40);
+    if(trimmed){
+      // Search across name OR email
+      query = query.or('full_name.ilike.%'+trimmed+'%,email.ilike.%'+trimmed+'%');
+    } else if(state.official && state.official.province){
+      // No query — bias to user's province for fast picks
+      query = query.eq('province', state.official.province);
+    }
+    const { data, error } = await query;
+    if(error){ console.warn('officials search failed', error); state.form._mentionResults = []; }
+    else { state.form._mentionResults = data || []; }
+  } catch(e){
+    console.warn('officials search exception', e);
+    state.form._mentionResults = [];
+  }
+  state.form._mentionLoading = false;
+  renderMentionPicker();
+}
+
+function renderMentionPicker(){
+  if(!state.form || !state.form._mentionOpen) return;
+  const f = state.form;
+  const bucket = f._mentionBucket;
+  const tagged = (f.tagged_officials[bucket]) || [];
+  const taggedIds = new Set(tagged.map(o => String(o.id)));
+  const results = f._mentionResults || [];
+  const loading = f._mentionLoading;
+
+  const body =
+    '<div class="modal form-modal mention-modal" id="mention-modal">' +
+      '<div class="form-hdr">' +
+        '<div>' +
+          '<div class="form-hdr-title">Tag a colleague</div>' +
+          '<div class="form-hdr-sub">'+(bucket==='follow_up'?'Tagged on follow-up':'Tagged on description')+' · '+tagged.length+' selected</div>' +
+        '</div>' +
+        '<button class="form-close" onclick="closeMentionPicker()" aria-label="Done">Done</button>' +
+      '</div>' +
+      '<div class="mention-search">' +
+        '<input type="text" placeholder="Search by name or email…" value="'+esc(f._mentionQuery)+'" oninput="onMentionSearchInput(this.value)" autocapitalize="words" autocorrect="off">' +
+      '</div>' +
+      '<div class="mention-results">' +
+        (loading
+          ? '<div class="mention-empty"><span class="spinner spinner-sm"></span> Searching…</div>'
+          : (results.length === 0
+              ? '<div class="mention-empty">'+(f._mentionQuery ? 'No matches for "'+esc(f._mentionQuery)+'"' : 'No colleagues found')+'</div>'
+              : results.map(o => {
+                  const checked = taggedIds.has(String(o.id));
+                  const meta = [o.role, o.province, o.district].filter(Boolean).join(' · ');
+                  const safeId = String(o.id).replace(/'/g,"\\'");
+                  return '<div class="mention-row'+(checked?' checked':'')+'" onclick="toggleMention(\''+safeId+'\')">' +
+                    '<div class="mention-tick">'+(checked?'✓':'')+'</div>' +
+                    '<div style="flex:1;min-width:0">' +
+                      '<div class="mention-name">'+esc(o.full_name||o.email||'(unnamed)')+'</div>' +
+                      (meta ? '<div class="mention-meta">'+esc(meta)+'</div>' : '') +
+                    '</div>' +
+                  '</div>';
+                }).join('')
+            )
+        ) +
+      '</div>' +
+    '</div>';
+
+  // Render mention modal as a sibling layer above the form (full-screen overlay)
+  let layer = document.getElementById('mention-layer');
+  if(!layer){
+    layer = document.createElement('div');
+    layer.id = 'mention-layer';
+    layer.className = 'modal-bg show';
+    layer.style.zIndex = '4000';
+    document.body.appendChild(layer);
+  }
+  layer.innerHTML = body;
+  layer.classList.add('show');
+}
+
+function toggleMention(id){
+  if(!state.form) return;
+  const bucket = state.form._mentionBucket;
+  if(!state.form.tagged_officials[bucket]) state.form.tagged_officials[bucket] = [];
+  const list = state.form.tagged_officials[bucket];
+  const existing = list.findIndex(o => String(o.id)===String(id));
+  if(existing > -1){
+    list.splice(existing, 1);
+  } else {
+    const found = (state.form._mentionResults || []).find(o => String(o.id)===String(id));
+    if(found){
+      // Store only the fields we need (matches web-tracker contract)
+      list.push({
+        id: found.id,
+        full_name: found.full_name,
+        role: found.role || '',
+        province: found.province || '',
+        district: found.district || '',
+        email: found.email || ''
+      });
+    }
+  }
+  renderMentionPicker();
+}
+
+function removeMention(bucket, id){
+  if(!state.form || !state.form.tagged_officials[bucket]) return;
+  state.form.tagged_officials[bucket] = state.form.tagged_officials[bucket].filter(o => String(o.id)!==String(id));
+  renderLogVisitForm();
+}
+
+/* Tear down mention layer when form closes */
+function destroyMentionLayer(){
+  const layer = document.getElementById('mention-layer');
+  if(layer) layer.remove();
+}
+
 /* ─── Submit queue (mirrors web tracker pattern) ─── */
 function getQueue(){
   try { return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); } catch(e) { return []; }
@@ -2252,6 +2632,29 @@ async function flushQueue(){
             failed.push(item); continue;
           }
         } else actOk = true;
+      }
+      // After dec+act success, retry any pending photos
+      if(decOk && actOk && item.pending_photos && item.pending_photos.length){
+        try {
+          const blobs = item.pending_photos.map(p => ({
+            blob: dataUrlToBlob(p.base64),
+            name: p.name,
+            size: p.size
+          }));
+          const photos = await uploadVisitPhotos(
+            (item.dec && item.dec.official_id) || 'unknown',
+            item.dec.id,
+            blobs
+          );
+          if(photos.length){
+            const newDetails = Object.assign({}, item.dec.details || {}, { photos: photos });
+            const { error: upErr } = await sb.from('decisions').update({ details: newDetails }).eq('id', item.dec.id);
+            if(upErr) console.warn('queued photo patch failed', upErr);
+          }
+        } catch(pe){
+          console.warn('queued photo upload failed', pe);
+          // Photos lost but visit synced — don't re-queue (item.pending_photos discarded)
+        }
       }
       if(decOk && actOk) flushed++;
       else failed.push(item);
@@ -2411,6 +2814,9 @@ async function submitVisit(){
   // 1. Save to local queue FIRST — web-tracker parity (protects against network failure mid-insert)
   enqueue(dec, act);
 
+  // Pull photo blobs aside before queue serialisation
+  const photoBlobs = (state.form && state.form._photoBlobs) ? state.form._photoBlobs.slice() : [];
+
   let networkOk = false;
   let errorMsg = '';
   try {
@@ -2426,12 +2832,42 @@ async function submitVisit(){
         throw r2.error;
       }
     }
-    // Both inserts succeeded — clear from queue
+    // Both inserts succeeded — now upload photos (best-effort, won't fail submit)
+    if(photoBlobs.length){
+      try {
+        const photos = await uploadVisitPhotos(state.scope.official_id, dec.id, photoBlobs);
+        if(photos.length){
+          // PATCH the dec row's details.photos
+          const newDetails = Object.assign({}, dec.details || {}, { photos: photos });
+          const { error: upErr } = await sb.from('decisions').update({ details: newDetails }).eq('id', dec.id);
+          if(upErr) console.warn('photo path patch failed', upErr);
+        }
+      } catch(pe){ console.warn('photo upload step failed', pe); }
+    }
     dequeue(dec.id);
     networkOk = true;
   } catch(e){
     console.warn('submit failed', e);
     errorMsg = e.message || String(e);
+    // If we failed before inserting and have photos, base64-encode them onto the queue item
+    if(photoBlobs.length){
+      try {
+        const pending = [];
+        for(const p of photoBlobs){
+          const b64 = await blobToBase64(p.blob);
+          pending.push({ base64: b64, name: p.name, size: p.size });
+        }
+        const q = getQueue();
+        const idx = q.findIndex(it => it.dec.id===dec.id);
+        if(idx > -1){
+          q[idx].pending_photos = pending;
+          saveQueue(q);
+        }
+      } catch(qe){
+        console.warn('could not stash photos for offline retry', qe);
+        showToast('Visit saved offline; photos were not queued (storage full)');
+      }
+    }
   }
 
   state.submitting = false;
@@ -2460,6 +2896,7 @@ function showSubmitSuccess(){
   const wrap = document.getElementById('modal-bg');
   wrap.innerHTML = body;
   wrap.classList.add('show');
+  _cleanupForm();
   state.form = null;
 }
 function showSubmitOfflineSaved(errorMsg){
@@ -2480,6 +2917,7 @@ function showSubmitOfflineSaved(errorMsg){
   renderPendingBanner();
 }
 function closeLogFormAndGoActivity(){
+  _cleanupForm();
   closeLogForm();
   goTab('activity');
 }
