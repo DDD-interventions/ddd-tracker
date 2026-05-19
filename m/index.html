@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#074445">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>DDD Tracker — Mobile</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23074445'/%3E%3Ctext x='50' y='62' font-family='Segoe UI,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%237AB648'%3EDDD%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ─────────────────────── BRAND TOKENS ─────────────────────── */
+:root{
+  --teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;
+  --green:#7AB648;--green-dk:#5FAD56;--green-lt:#E8F5E9;
+  --orange:#E8952E;--orange-lt:#FFF3E0;--orange-dk:#D17A1A;
+  --navy:#1A2332;
+  --grey:#607D8B;--grey-lt:#ECEFF1;--grey-dk:#37474F;--grey-md:#A0A8B0;
+  --red:#E53935;--red-lt:#FFEBEE;
+  --blue:#1565C0;--blue-lt:#E3F2FD;
+  --bg:#F3F2F1;--card:#FFFFFF;
+  --stage-not:#90A4AE;--stage-vis:#1565C0;--stage-sup:#E8952E;
+  --stage-imp:#0B8E8D;--stage-sus:#7AB648;
+  --sev-c:#C62828;--sev-s:#E65100;--sev-m:#F57F17;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior-y:contain}
+body{font-family:'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:#323130;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea{font-family:inherit}
+
+/* ─────────────────────── APP SHELL ─────────────────────── */
+.app{display:none;height:100vh;flex-direction:column}
+.app.active{display:flex}
+
+/* Header — gradient, matches existing tracker */
+.hdr{background:linear-gradient(135deg,#074445 0%,#0F7B7D 50%,#0A6B4F 100%);color:#fff;padding:calc(var(--safe-top) + 14px) 18px 14px;flex-shrink:0;position:relative;z-index:10}
+.hdr::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--green),var(--orange))}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.hdr-greet-wrap{flex:1;min-width:0}
+.hdr-eyebrow{font-size:9px;font-weight:700;letter-spacing:2px;color:#B8DCDC;text-transform:uppercase;margin-bottom:3px}
+.hdr-greet{font-size:19px;font-weight:700;line-height:1.2;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-sub{font-size:11px;color:#B8DCDC;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7AB648,#5FAD56);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.2);cursor:pointer}
+.hdr-simple{padding-top:calc(var(--safe-top) + 16px);padding-bottom:14px}
+.hdr-title{font-size:20px;font-weight:700;letter-spacing:-.2px}
+.hdr-simple .hdr-sub{font-size:11px;color:#B8DCDC;margin-top:2px}
+
+/* Scope badge */
+.scope-badge{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;text-transform:uppercase;letter-spacing:.4px;margin-top:6px;backdrop-filter:blur(4px)}
+.scope-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green)}
+
+/* Content */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--safe-bot) + 96px);scroll-behavior:smooth}
+.content::-webkit-scrollbar{width:0}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─────────────────────── COMMON COMPONENTS ─────────────────────── */
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--grey-dk);margin:18px 4px 8px;display:flex;justify-content:space-between;align-items:center}
+.section-label .sl-link{font-size:11px;font-weight:600;color:var(--teal);text-transform:none;letter-spacing:0;cursor:pointer;text-decoration:none}
+.card{background:var(--card);border-radius:14px;border:1px solid #ECECEC;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.card+.card{margin-top:10px}
+.empty-state{padding:24px 16px;text-align:center;color:var(--grey)}
+.empty-state-emoji{font-size:32px;margin-bottom:8px;opacity:.7}
+.empty-state-text{font-size:13px;line-height:1.5}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 0%,#e0e0e0 50%,#f0f0f0 100%);background-size:200% 100%;animation:skel 1.4s infinite;border-radius:6px}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* Stat strip */
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat-tile{background:var(--card);border-radius:14px;border:1px solid #ECECEC;padding:14px 6px 12px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:transform .12s,box-shadow .12s;min-height:78px}
+.stat-tile:active{transform:scale(.97)}
+.stat-num{font-size:22px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.stat-num.c-navy{color:var(--navy)}
+.stat-num.c-red{color:var(--red)}
+.stat-num.c-teal{color:var(--teal)}
+.stat-num.c-green{color:var(--green-dk)}
+.stat-num.c-orange{color:var(--orange-dk)}
+.stat-label{font-size:9.5px;font-weight:600;color:var(--grey);margin-top:6px;letter-spacing:.3px;text-transform:uppercase}
+
+/* Activity mini list (Home) */
+.act-mini{padding:12px 14px;display:flex;gap:11px;align-items:flex-start;border-top:1px solid #f3f2f1}
+.act-mini:first-child{border-top:none}
+.act-mini-bullet{width:8px;height:8px;border-radius:50%;background:var(--teal);margin-top:5px;flex-shrink:0;box-shadow:0 0 0 3px var(--teal-lt)}
+.act-mini-body{flex:1;min-width:0}
+.act-mini-title{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-mini-meta{font-size:10.5px;color:var(--grey);margin-top:2px}
+
+/* ─────────────────────── SCHOOLS TAB ─────────────────────── */
+.search-bar{background:#fff;border-radius:14px;border:1px solid #E1DFDD;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.search-bar input{flex:1;border:none;outline:none;font-size:14px;background:transparent;color:var(--navy)}
+.search-bar input::placeholder{color:#A0A8B0}
+.search-bar .sb-icon{color:var(--grey);font-size:16px}
+.chip-row{display:flex;gap:7px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:99px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);cursor:pointer;white-space:nowrap;transition:all .15s;min-height:32px}
+.chip:active{transform:scale(.96)}
+.chip.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 8px rgba(11,142,141,.3)}
+.chip .chip-count{margin-left:5px;opacity:.65;font-weight:700}
+.chip.active .chip-count{opacity:1}
+
+.school-card{padding:13px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid #f3f2f1;display:flex;align-items:flex-start;gap:11px}
+.school-card:last-child{border-bottom:none}
+.school-card:active{background:#f7f9fc}
+.sc-avatar{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;letter-spacing:-.3px;text-transform:uppercase}
+.sc-body{flex:1;min-width:0}
+.sc-name{font-size:13.5px;font-weight:700;color:var(--navy);line-height:1.25;letter-spacing:-.1px}
+.sc-meta{font-size:10.5px;color:var(--grey);margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sc-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--grey-lt);flex-shrink:0}
+.sc-badges{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.4px;line-height:1}
+.badge-sev-c{background:#FFEBEE;color:var(--sev-c);border:1px solid #FFCDD2}
+.badge-sev-s{background:#FFF3E0;color:var(--sev-s);border:1px solid #FFE0B2}
+.badge-sev-m{background:#FFFDE7;color:var(--sev-m);border:1px solid #FFF59D}
+.badge-stage{color:#fff}
+.badge-stage::before{content:'';width:5px;height:5px;border-radius:50%;background:#fff;flex-shrink:0}
+.bs-not{background:var(--stage-not)}
+.bs-vis{background:var(--stage-vis)}
+.bs-sup{background:var(--stage-sup)}
+.bs-imp{background:var(--stage-imp)}
+.bs-sus{background:var(--stage-sus)}
+.badge-via-mobile{background:var(--green-lt);color:var(--green-dk);border:1px solid #C8E6C9}
+
+/* ─────────────────────── ACTIVITY TAB ─────────────────────── */
+.act-tabs{display:flex;gap:7px;margin-bottom:12px}
+.act-tab{flex:1;padding:9px 8px;font-size:11.5px;font-weight:600;border-radius:10px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);cursor:pointer;text-align:center;transition:all .15s;min-height:36px}
+.act-tab.active{background:var(--teal-lt);color:var(--teal-dk);border-color:var(--teal)}
+
+.post{background:var(--card);border-radius:14px;border:1px solid #ECECEC;box-shadow:0 1px 3px rgba(0,0,0,.04);padding:14px;margin-bottom:10px}
+.post-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.post-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7AB648,#5FAD56);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;text-transform:uppercase}
+.post-hdr-body{flex:1;min-width:0}
+.post-school{font-size:13px;font-weight:700;color:var(--navy);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-meta{font-size:10.5px;color:var(--grey);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.post-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--grey-lt);flex-shrink:0}
+.post-act-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;margin-bottom:8px;letter-spacing:.2px}
+.pat-visit{background:#E0F4F4;color:var(--teal-dk)}
+.pat-coach{background:#F3E5F5;color:#6A1B9A}
+.pat-train{background:#E8F5E9;color:#2E7D32}
+.pat-data{background:var(--blue-lt);color:var(--blue)}
+.pat-obs{background:#FFF3E0;color:#E65100}
+.pat-default{background:var(--grey-lt);color:var(--grey-dk)}
+.post-text{font-size:12.5px;color:var(--navy);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.post-text.expanded{-webkit-line-clamp:unset}
+.post-foot{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f3f2f1;font-size:10.5px;color:var(--grey);gap:8px;flex-wrap:wrap}
+.pf-status{display:flex;align-items:center;gap:5px;font-weight:600}
+.pf-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.pf-dot.followup{background:var(--orange)}
+
+/* ─────────────────────── INSIGHTS TAB ─────────────────────── */
+.insight-hero{background:linear-gradient(135deg,#074445 0%,#0B8E8D 100%);border-radius:16px;padding:18px 16px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(7,68,69,.25)}
+.insight-hero::after{content:'';position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(122,182,72,.3) 0%,transparent 70%)}
+.ih-label{font-size:9.5px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#B8DCDC;margin-bottom:6px;position:relative;z-index:1}
+.ih-num{font-size:36px;font-weight:800;line-height:1;letter-spacing:-1px;position:relative;z-index:1}
+.ih-num .ih-denom{font-size:18px;color:#B8DCDC;font-weight:700}
+.ih-desc{font-size:11.5px;color:#B8DCDC;margin-top:8px;line-height:1.5;position:relative;z-index:1}
+
+.insight-card{background:#fff;border-radius:14px;border:1px solid #ECECEC;box-shadow:0 1px 3px rgba(0,0,0,.04);padding:16px 14px;margin-bottom:10px}
+.ic-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.ic-title{font-size:13px;font-weight:700;color:var(--navy)}
+.ic-link{font-size:11px;font-weight:600;color:var(--teal);cursor:pointer}
+
+.stage-bars{display:flex;flex-direction:column;gap:11px}
+.stage-row{display:grid;grid-template-columns:100px 1fr 32px;align-items:center;gap:10px;font-size:11.5px}
+.stage-label{font-weight:600;color:var(--navy);display:flex;align-items:center;gap:5px}
+.stage-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.stage-bar-wrap{height:10px;background:#F0F2F5;border-radius:5px;overflow:hidden}
+.stage-bar{height:100%;border-radius:5px;transition:width .8s ease}
+.stage-count{font-weight:800;color:var(--navy);text-align:right;font-size:13px}
+
+.sev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sev-tile{padding:14px 8px;border-radius:11px;text-align:center;border:1.5px solid}
+.sev-tile.c{background:#FFEBEE;border-color:#FFCDD2}
+.sev-tile.s{background:#FFF3E0;border-color:#FFE0B2}
+.sev-tile.m{background:#FFFDE7;border-color:#FFF59D}
+.sev-num{font-size:26px;font-weight:800;line-height:1}
+.sev-tile.c .sev-num{color:var(--sev-c)}
+.sev-tile.s .sev-num{color:var(--sev-s)}
+.sev-tile.m .sev-num{color:var(--sev-m)}
+.sev-tile-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:5px}
+.sev-tile.c .sev-tile-label{color:var(--sev-c)}
+.sev-tile.s .sev-tile-label{color:var(--sev-s)}
+.sev-tile.m .sev-tile-label{color:var(--sev-m)}
+
+/* ─────────────────────── FAB ─────────────────────── */
+.fab{position:fixed;bottom:calc(var(--safe-bot) + 86px);right:18px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dk));color:#fff;border:none;font-size:30px;font-weight:300;cursor:pointer;box-shadow:0 8px 20px rgba(122,182,72,.5),0 2px 4px rgba(0,0,0,.1);display:none;align-items:center;justify-content:center;z-index:20;transition:transform .15s;line-height:1}
+.fab.visible{display:flex}
+.fab:active{transform:scale(.92)}
+
+/* ─────────────────────── TAB BAR ─────────────────────── */
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E1DFDD;display:flex;height:calc(72px + var(--safe-bot));padding-bottom:var(--safe-bot);z-index:18;box-shadow:0 -2px 8px rgba(0,0,0,.04)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--grey);transition:color .15s;padding:6px 4px;position:relative}
+.tab svg{width:24px;height:24px;stroke-width:2;transition:transform .2s}
+.tab span{font-size:10.5px;font-weight:600;letter-spacing:.2px}
+.tab.active{color:var(--teal)}
+.tab.active svg{transform:scale(1.08)}
+.tab.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:30px;height:3px;background:var(--teal);border-radius:0 0 3px 3px}
+
+/* ─────────────────────── MODAL ─────────────────────── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex;animation:fadeIn .2s}
+.modal{background:#fff;width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:18px 18px calc(24px + var(--safe-bot));max-height:88%;overflow-y:auto;animation:slideUp .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(40px)}to{transform:translateY(0)}}
+.modal-grab{width:42px;height:4px;background:#E1DFDD;border-radius:2px;margin:0 auto 14px}
+.modal h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.modal p{font-size:12.5px;color:var(--grey);line-height:1.5;margin-bottom:14px}
+.modal-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.2px}
+.modal-btn.secondary{background:#F0F2F5;color:var(--navy)}
+.modal-btn+.modal-btn{margin-top:8px}
+
+/* ─────────────────────── LOGIN SCREEN ─────────────────────── */
+.login-screen{display:none;height:100vh;flex-direction:column;background:linear-gradient(180deg,#074445 0%,#0B8E8D 100%);color:#fff;padding:calc(var(--safe-top) + 40px) 24px calc(var(--safe-bot) + 24px)}
+.login-screen.active{display:flex}
+.login-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.login-logo{width:80px;height:80px;border-radius:22px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--green);margin-bottom:24px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15)}
+.login-title{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.login-sub{font-size:14px;color:#B8DCDC;font-weight:500;line-height:1.5;max-width:280px}
+.login-form{background:#fff;color:#323130;border-radius:20px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,.2)}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--grey-dk);margin-bottom:6px}
+.login-field input{width:100%;padding:13px 14px;border:1.5px solid #E1DFDD;border-radius:10px;font-size:15px;outline:none;background:#FAFBFC;transition:border-color .15s,background .15s}
+.login-field input:focus{border-color:var(--teal);background:#fff}
+.login-field input.pin-input{font-size:24px;font-weight:700;text-align:center;letter-spacing:12px;padding-left:24px}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-dk));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.3px;margin-top:6px;transition:transform .12s,opacity .15s}
+.login-btn:active{transform:scale(.98)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-error{background:#FFEBEE;border:1px solid #FFCDD2;color:var(--sev-c);font-size:12px;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-weight:500;line-height:1.4}
+.login-info{background:#E3F2FD;border:1px solid #BBDEFB;color:var(--blue);font-size:11.5px;padding:9px 12px;border-radius:8px;margin-bottom:14px;font-weight:500;line-height:1.5}
+.login-foot{text-align:center;font-size:11px;color:#B8DCDC;margin-top:18px;line-height:1.5}
+.login-foot a{color:#fff;text-decoration:underline;font-weight:600}
+
+/* ─────────────────────── TOAST ─────────────────────── */
+.toast{position:fixed;bottom:calc(var(--safe-bot) + 100px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:100;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─────────────────────── BANNER (preview state) ─────────────────────── */
+.dev-banner{position:fixed;top:0;left:0;right:0;background:#FFFDE7;border-bottom:1px solid #FFF59D;color:#5D4037;font-size:11px;font-weight:600;padding:6px 12px;text-align:center;z-index:30;letter-spacing:.2px;display:none}
+.dev-banner.show{display:block}
+
+/* Spinner */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.full-spinner{display:flex;align-items:center;justify-content:center;padding:32px;color:var(--grey);font-size:13px;font-weight:600}
+.full-spinner .spinner{border-color:#E0E0E0;border-top-color:var(--teal);margin-right:10px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN SCREEN ═══════════════════════ -->
+<div id="login-screen" class="login-screen active">
+  <div class="login-hero">
+    <div class="login-logo">DDD</div>
+    <div class="login-title">DDD Tracker</div>
+    <div class="login-sub">Log school visits, photos &amp; observations from your phone</div>
+  </div>
+  <div class="login-form" id="login-form">
+    <div id="login-error" class="login-error" style="display:none"></div>
+    <div class="login-field">
+      <label for="login-email">Your work email</label>
+      <input id="login-email" type="email" autocomplete="email" inputmode="email" placeholder="you@newleaders.co.za" autocapitalize="off" autocorrect="off">
+    </div>
+    <div class="login-field" id="pin-field" style="display:none">
+      <label for="login-pin">4-digit PIN</label>
+      <input id="login-pin" type="tel" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" class="pin-input">
+    </div>
+    <button id="login-btn" class="login-btn">Continue →</button>
+  </div>
+  <div class="login-foot">
+    Need help? Email <a href="mailto:victor@newleaders.co.za">victor@newleaders.co.za</a><br>
+    <span style="opacity:.7">Mobile preview — Session 1 (read-only)</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
+<div id="app" class="app">
+
+  <div id="dev-banner" class="dev-banner show">Preview build · read-only · v0.1 (Session 1)</div>
+
+  <!-- Header (varies by tab) -->
+  <header id="hdr-home" class="hdr" style="display:block">
+    <div class="hdr-top">
+      <div class="hdr-greet-wrap">
+        <div class="hdr-eyebrow">DDD Interventions</div>
+        <div class="hdr-greet" id="hdr-greet">Welcome</div>
+        <div class="hdr-sub" id="hdr-sub">—</div>
+        <span class="scope-badge" id="hdr-scope">Loading</span>
+      </div>
+      <div class="hdr-avatar" id="hdr-avatar" onclick="showProfileModal()">??</div>
+    </div>
+  </header>
+  <header id="hdr-schools" class="hdr hdr-simple" style="display:none">
+    <div class="hdr-title">Schools</div>
+    <div class="hdr-sub" id="hdr-schools-sub">—</div>
+  </header>
+  <header id="hdr-activity" class="hdr hdr-simple" style="display:none">
+    <div class="hdr-title">Activity</div>
+    <div class="hdr-sub" id="hdr-activity-sub">Recent visits &amp; submissions</div>
+  </header>
+  <header id="hdr-insights" class="hdr hdr-simple" style="display:none">
+    <div class="hdr-title">Insights</div>
+    <div class="hdr-sub" id="hdr-insights-sub">Coverage · progress · severity</div>
+  </header>
+
+  <!-- Content area -->
+  <main class="content">
+
+    <!-- ─────────── HOME ─────────── -->
+    <section id="screen-home" class="screen active">
+      <div class="stat-strip" id="home-stats">
+        <div class="stat-tile"><div class="stat-num c-navy skeleton" style="height:24px;width:30px;margin:0 auto">&nbsp;</div><div class="stat-label">My visits</div></div>
+        <div class="stat-tile"><div class="stat-num c-teal skeleton" style="height:24px;width:30px;margin:0 auto">&nbsp;</div><div class="stat-label">Schools</div></div>
+        <div class="stat-tile"><div class="stat-num c-green skeleton" style="height:24px;width:30px;margin:0 auto">&nbsp;</div><div class="stat-label">This week</div></div>
+      </div>
+
+      <div class="section-label">Recent activity<span class="sl-link" onclick="goTab('activity')">See all →</span></div>
+      <div id="home-recent" class="card"><div class="full-spinner"><span class="spinner"></span>Loading…</div></div>
+    </section>
+
+    <!-- ─────────── SCHOOLS ─────────── -->
+    <section id="screen-schools" class="screen">
+      <div class="search-bar">
+        <span class="sb-icon">🔍</span>
+        <input id="schools-search" type="text" placeholder="Search schools, district…" autocapitalize="off">
+      </div>
+      <div class="chip-row" id="schools-chips">
+        <button class="chip active" data-filter="all">All <span class="chip-count" id="chip-all">0</span></button>
+        <button class="chip" data-filter="implementing">Implementing <span class="chip-count" id="chip-implementing">0</span></button>
+        <button class="chip" data-filter="supported">Supported <span class="chip-count" id="chip-supported">0</span></button>
+        <button class="chip" data-filter="visited">Visited <span class="chip-count" id="chip-visited">0</span></button>
+        <button class="chip" data-filter="sustained">Sustained <span class="chip-count" id="chip-sustained">0</span></button>
+      </div>
+      <div id="schools-list" class="card"><div class="full-spinner"><span class="spinner"></span>Loading schools…</div></div>
+    </section>
+
+    <!-- ─────────── ACTIVITY ─────────── -->
+    <section id="screen-activity" class="screen">
+      <div class="act-tabs">
+        <button class="act-tab active" data-act-filter="all">All <span style="opacity:.6" id="actcount-all">0</span></button>
+        <button class="act-tab" data-act-filter="mine">Mine <span style="opacity:.6" id="actcount-mine">0</span></button>
+        <button class="act-tab" data-act-filter="mobile">Via mobile <span style="opacity:.6" id="actcount-mobile">0</span></button>
+      </div>
+      <div id="activity-list"><div class="full-spinner"><span class="spinner"></span>Loading activity…</div></div>
+    </section>
+
+    <!-- ─────────── INSIGHTS ─────────── -->
+    <section id="screen-insights" class="screen">
+      <div class="insight-hero" id="insight-hero">
+        <div class="ih-label">My coverage</div>
+        <div class="ih-num"><span class="skeleton" style="display:inline-block;height:32px;width:80px">&nbsp;</span></div>
+        <div class="ih-desc">Loading scope…</div>
+      </div>
+
+      <div class="insight-card">
+        <div class="ic-hdr">
+          <div class="ic-title">Implementation progress</div>
+          <div class="ic-link" onclick="goTab('schools')">View schools →</div>
+        </div>
+        <div class="stage-bars" id="stage-bars"><div class="full-spinner"><span class="spinner"></span>Loading…</div></div>
+      </div>
+
+      <div class="insight-card">
+        <div class="ic-hdr">
+          <div class="ic-title">Activity by source</div>
+        </div>
+        <div id="source-bars" style="display:flex;flex-direction:column;gap:11px"><div class="full-spinner"><span class="spinner"></span>Loading…</div></div>
+        <div style="font-size:11px;color:var(--grey);margin-top:13px;line-height:1.5;padding-top:11px;border-top:1px solid #f3f2f1">
+          Tracking how decisions are being logged — web vs mobile — to support the execution chain reporting line.
+        </div>
+      </div>
+      <div style="height:30px"></div>
+    </section>
+
+  </main>
+
+  <!-- Floating Action Button (Home + Schools tabs) -->
+  <button id="fab" class="fab visible" onclick="showFabModal()">+</button>
+
+  <!-- Bottom tab bar -->
+  <nav class="tabbar">
+    <button class="tab active" data-tab="home" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l9-9 9 9M5 10v10h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="tab" data-tab="schools" onclick="goTab('schools')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Schools</span>
+    </button>
+    <button class="tab" data-tab="activity" onclick="goTab('activity')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Activity</span>
+    </button>
+    <button class="tab" data-tab="insights" onclick="goTab('insights')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Insights</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ═══════════════════════ MODALS ═══════════════════════ -->
+<div id="modal-bg" class="modal-bg" onclick="if(event.target.id==='modal-bg')closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ═══════════════════════ CONFIG ═══════════════════════ */
+const SUPA_URL = 'https://bqznmupkqsxxlyiiqrys.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxem5tdXBrcXN4eGx5aWlxcnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExMjUwNDEsImV4cCI6MjA4NjcwMTA0MX0.gtltfQ6YjsyqzHZLhtZbAF2XR6D-_plUr7HRJUXg0DY';
+
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+});
+
+const STAGES = [
+  { key:'not_engaged', label:'Not engaged', color:'var(--stage-not)', cls:'bs-not' },
+  { key:'visited',     label:'Visited',     color:'var(--stage-vis)', cls:'bs-vis' },
+  { key:'supported',   label:'Supported',   color:'var(--stage-sup)', cls:'bs-sup' },
+  { key:'implementing',label:'Implementing',color:'var(--stage-imp)', cls:'bs-imp' },
+  { key:'sustained',   label:'Sustained',   color:'var(--stage-sus)', cls:'bs-sus' }
+];
+
+/* App state */
+const state = {
+  official: null,     // public.officials row
+  scope: null,        // { scope, province, district, official_id }
+  interventions: [],
+  decisions: [],
+  schoolStatus: [],
+  filter: { schools:'all', activity:'all' },
+  loading: { initial:true }
+};
+
+/* ═══════════════════════ UTILITIES ═══════════════════════ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initials(name){ if(!name) return '?'; const parts=String(name).trim().split(/\s+/); return ((parts[0]?.[0]||'')+(parts[parts.length-1]?.[0]||'')).toUpperCase().slice(0,2); }
+function colorFromString(str){
+  let h=0; for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  const palette=['#0B8E8D','#7AB648','#E8952E','#5FAD56','#1565C0','#6A1B9A','#0F7B7D','#E65100','#37474F'];
+  return palette[Math.abs(h)%palette.length];
+}
+function timeAgo(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr), now=new Date(), diff=(now-d)/1000;
+  if(diff<60) return 'just now';
+  if(diff<3600) return Math.floor(diff/60)+'m ago';
+  if(diff<86400) return Math.floor(diff/3600)+'h ago';
+  if(diff<2592000) return Math.floor(diff/86400)+'d ago';
+  return d.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+}
+function greetingFor(name){
+  const h=new Date().getHours();
+  const g = h<12?'Good morning' : h<17?'Good afternoon' : 'Good evening';
+  return g + ', ' + (String(name||'').split(' ')[0]||'there');
+}
+function activityTag(type){
+  const t=String(type||'').toLowerCase();
+  if(t.includes('coach')||t.includes('mentor')) return {cls:'pat-coach', label:type};
+  if(t.includes('workshop')||t.includes('training')) return {cls:'pat-train', label:type};
+  if(t.includes('data')||t.includes('review meeting')) return {cls:'pat-data', label:type};
+  if(t.includes('observ')) return {cls:'pat-obs', label:type};
+  if(t.includes('visit')) return {cls:'pat-visit', label:type};
+  return {cls:'pat-default', label:type||'Activity'};
+}
+function showToast(msg, ms){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'), ms||2500);
+}
+function showError(msg){
+  const e=document.getElementById('login-error');
+  e.textContent=msg; e.style.display='block';
+}
+function clearError(){ document.getElementById('login-error').style.display='none'; }
+
+/* ═══════════════════════ LOGIN ═══════════════════════ */
+const emailInput=document.getElementById('login-email');
+const pinInput=document.getElementById('login-pin');
+const pinField=document.getElementById('pin-field');
+const loginBtn=document.getElementById('login-btn');
+let stage='email';
+
+function setStage(s){
+  stage=s;
+  if(s==='email'){
+    pinField.style.display='none';
+    loginBtn.textContent='Continue →';
+  } else {
+    pinField.style.display='block';
+    loginBtn.innerHTML='Sign in →';
+    setTimeout(()=>pinInput.focus(),50);
+  }
+}
+
+loginBtn.addEventListener('click', async()=>{
+  clearError();
+  if(stage==='email'){
+    const email=(emailInput.value||'').trim().toLowerCase();
+    if(!email||!email.includes('@')){
+      showError('Please enter a valid email address.'); return;
+    }
+    emailInput.value=email;
+    setStage('pin');
+    return;
+  }
+  // stage = pin → sign in
+  const email=(emailInput.value||'').trim().toLowerCase();
+  const pin=(pinInput.value||'').trim();
+  if(!/^\d{4}$/.test(pin)){
+    showError('PIN must be exactly 4 digits.'); return;
+  }
+  loginBtn.disabled=true;
+  loginBtn.innerHTML='<span class="spinner"></span>Signing in…';
+  try {
+    const { data: authData, error: authErr } = await sb.auth.signInWithPassword({
+      email, password: 'DD' + pin
+    });
+    if(authErr){
+      const msg=authErr.message||'';
+      if(msg.toLowerCase().includes('invalid login')) showError('Incorrect email or PIN. Please try again.');
+      else showError('Sign-in failed: '+msg);
+      return;
+    }
+    await loadProfile(email);
+  } catch(e){
+    showError('Unexpected error: '+(e.message||e));
+  } finally {
+    loginBtn.disabled=false;
+    loginBtn.innerHTML='Sign in →';
+  }
+});
+
+emailInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); loginBtn.click(); } });
+pinInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); loginBtn.click(); } });
+pinInput.addEventListener('input', e=>{
+  e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);
+  if(e.target.value.length===4) loginBtn.click();
+});
+
+/* ═══════════════════════ DATA LOADING ═══════════════════════ */
+async function loadProfile(email){
+  // 1. Fetch the official's profile by email
+  // CRITICAL: include .eq('email', ...) — without it RLS can return wrong row
+  const { data: officials, error: oErr } = await sb.from('officials')
+    .select('id,auth_id,full_name,role,province,district,email,details,scope,directorate,organisation,phone,is_active')
+    .eq('email', email).limit(1);
+  if(oErr){ showError('Profile fetch failed: '+oErr.message); return; }
+  if(!officials || !officials.length){
+    showError('Account not linked. Contact victor@newleaders.co.za.');
+    await sb.auth.signOut();
+    return;
+  }
+  state.official = officials[0];
+
+  // 2. Fetch the official's scope via RPC
+  const { data: scopeRows, error: sErr } = await sb.rpc('get_official_scope', { p_auth_id: state.official.auth_id });
+  if(sErr){ console.warn('scope rpc failed', sErr); }
+  state.scope = (scopeRows && scopeRows[0]) ? scopeRows[0] : { scope:'own', province:state.official.province, district:state.official.district, official_id:state.official.id };
+
+  // 3. Enter the app
+  enterApp();
+
+  // 4. Kick off background data loads (don't block UI)
+  loadInterventions();
+  loadDecisions();
+  loadSchoolStatus();
+}
+
+async function loadInterventions(){
+  // RLS allows officials to see interventions where scope matches their own scope
+  const { data, error } = await sb.from('interventions')
+    .select('id,entity_name,province,district,type,subject,grade,phase,stage,description,schools,learners')
+    .limit(50);
+  if(error){ console.warn('interventions load failed', error); return; }
+  state.interventions = data || [];
+  // No UI to render yet in Session 1 — they'll drive Session 2's "Log a visit"
+}
+
+async function loadDecisions(){
+  // Fetch recent decisions visible under the user's scope.
+  // RLS filters automatically based on get_official_scope().
+  const { data, error } = await sb.from('decisions')
+    .select('id,date,activity_date,created_at,province,district,schools,activity_type,intervention_theme,description,insight_detail,details,official_id,official_name,logged_by,logged_via,follow_up,follow_up_completed')
+    .order('created_at', { ascending:false })
+    .limit(50);
+  if(error){
+    console.warn('decisions load failed', error);
+    renderHomeRecent([]);
+    renderActivity([]);
+    renderHomeStats({ visits:0, schools:0, week:0 });
+    return;
+  }
+  state.decisions = data || [];
+  renderHomeStats(computeHomeStats(state.decisions));
+  renderHomeRecent(state.decisions.slice(0,3));
+  renderActivity(state.decisions);
+  renderActivityCounts(state.decisions);
+  renderSourceBars(state.decisions);
+}
+
+async function loadSchoolStatus(){
+  const { data, error } = await sb.from('school_status')
+    .select('id,province,district,school_name,phase,stage,stage_reason,stage_changed_at,stage_changed_by')
+    .limit(500);
+  if(error){
+    console.warn('school_status load failed', error);
+    renderSchoolsList([]);
+    renderStageBars([]);
+    return;
+  }
+  state.schoolStatus = data || [];
+  renderSchoolsList(state.schoolStatus);
+  renderSchoolsChipCounts(state.schoolStatus);
+  renderStageBars(state.schoolStatus);
+  renderInsightHero(state.schoolStatus, state.decisions);
+}
+
+/* ═══════════════════════ APP RENDER ═══════════════════════ */
+function enterApp(){
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  // Personalise header
+  const o=state.official;
+  document.getElementById('hdr-greet').textContent = greetingFor(o.full_name);
+  document.getElementById('hdr-sub').textContent = (o.role||'') + (o.role && o.province ? ' · ' : '') + (o.province||'') + (o.district && o.district!=='All' ? ' · '+o.district : '');
+  document.getElementById('hdr-avatar').textContent = initials(o.full_name);
+  document.getElementById('hdr-avatar').style.background = 'linear-gradient(135deg,'+colorFromString(o.full_name||o.email)+', '+colorFromString((o.email||'')+'!')+')';
+  const scopeLbl = (state.scope.scope || 'own').toUpperCase() + ' SCOPE';
+  document.getElementById('hdr-scope').textContent = scopeLbl;
+  document.getElementById('hdr-schools-sub').textContent = scopeForSubtitle();
+}
+
+function scopeForSubtitle(){
+  const s=state.scope; const o=state.official;
+  if(s.scope==='national') return 'All provinces · ' + (state.schoolStatus.length||'—') + ' schools tracked';
+  if(s.scope==='province') return s.province + ' · ' + (state.schoolStatus.length||'—') + ' schools tracked';
+  if(s.scope==='district') return s.province + ' · ' + s.district + ' · ' + (state.schoolStatus.length||'—') + ' schools tracked';
+  return (o.district||'My') + ' schools — your own scope';
+}
+
+/* ─── HOME ─── */
+function computeHomeStats(decisions){
+  const me=state.official.id;
+  const mine = decisions.filter(d => d.official_id===me);
+  const weekAgo = Date.now() - 7*86400000;
+  const thisWeek = decisions.filter(d => new Date(d.created_at).getTime() > weekAgo);
+  const uniqueSchools = new Set(decisions.map(d => d.schools || (d.details && d.details.schools)).filter(Boolean));
+  return { visits: mine.length, schools: uniqueSchools.size, week: thisWeek.length };
+}
+function renderHomeStats(stats){
+  const wrap=document.getElementById('home-stats');
+  wrap.innerHTML =
+    '<div class="stat-tile" onclick="goTab(\'activity\')"><div class="stat-num c-navy">'+stats.visits+'</div><div class="stat-label">My visits</div></div>' +
+    '<div class="stat-tile" onclick="goTab(\'schools\')"><div class="stat-num c-teal">'+stats.schools+'</div><div class="stat-label">Schools touched</div></div>' +
+    '<div class="stat-tile" onclick="goTab(\'activity\')"><div class="stat-num c-green">'+stats.week+'</div><div class="stat-label">This week</div></div>';
+}
+
+function renderHomeRecent(decisions){
+  const wrap=document.getElementById('home-recent');
+  if(!decisions.length){
+    wrap.innerHTML='<div class="empty-state"><div class="empty-state-emoji">📋</div><div class="empty-state-text">No activity to show yet.<br>Once you start logging visits, they\'ll appear here.</div></div>';
+    return;
+  }
+  wrap.innerHTML = decisions.map(d => {
+    const school = d.schools || (d.details && d.details.schools) || '—';
+    const t = d.activity_type || (d.details && d.details.activity_type) || 'Activity';
+    return '<div class="act-mini" onclick="goTab(\'activity\')">' +
+      '<div class="act-mini-bullet"></div>' +
+      '<div class="act-mini-body">' +
+        '<div class="act-mini-title">'+esc(t)+' · '+esc(school)+'</div>' +
+        '<div class="act-mini-meta">'+esc(timeAgo(d.created_at))+(d.logged_by ? ' · '+esc(d.logged_by) : '')+'</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+/* ─── SCHOOLS ─── */
+function applySchoolFilter(schools){
+  const f=state.filter.schools;
+  const q=(document.getElementById('schools-search').value||'').trim().toLowerCase();
+  let list = schools.slice();
+  if(f!=='all') list = list.filter(s => (s.stage||'not_engaged')===f);
+  if(q) list = list.filter(s => (s.school_name||'').toLowerCase().includes(q) || (s.district||'').toLowerCase().includes(q));
+  list.sort((a,b)=>(a.school_name||'').localeCompare(b.school_name||''));
+  return list;
+}
+function renderSchoolsList(schools){
+  const wrap=document.getElementById('schools-list');
+  const list=applySchoolFilter(schools);
+  if(!list.length){
+    wrap.innerHTML='<div class="empty-state"><div class="empty-state-emoji">🏫</div><div class="empty-state-text">No schools match the current filter.<br>Try a different status or clear your search.</div></div>';
+    return;
+  }
+  wrap.innerHTML = list.slice(0,100).map(s => {
+    const stage = STAGES.find(x=>x.key===(s.stage||'not_engaged')) || STAGES[0];
+    const color = colorFromString(s.school_name||'');
+    return '<div class="school-card" onclick="showSchoolDetail('+JSON.stringify(s.id||'').replace(/"/g,'&quot;')+')">' +
+      '<div class="sc-avatar" style="background:'+color+'">'+esc(initials(s.school_name))+'</div>' +
+      '<div class="sc-body">' +
+        '<div class="sc-name">'+esc(s.school_name)+'</div>' +
+        '<div class="sc-meta">'+esc(s.province||'')+'<span class="dot"></span>'+esc(s.district||'')+(s.phase ? '<span class="dot"></span>'+esc(s.phase) : '')+'</div>' +
+        '<div class="sc-badges">' +
+          '<span class="badge badge-stage '+stage.cls+'">'+esc(stage.label)+'</span>' +
+        '</div>' +
+      '</div></div>';
+  }).join('');
+}
+function renderSchoolsChipCounts(schools){
+  const counts = { all:schools.length };
+  STAGES.forEach(s => counts[s.key]=0);
+  schools.forEach(s => { counts[s.stage||'not_engaged']=(counts[s.stage||'not_engaged']||0)+1; });
+  document.getElementById('chip-all').textContent = counts.all;
+  document.getElementById('chip-implementing').textContent = counts.implementing||0;
+  document.getElementById('chip-supported').textContent = counts.supported||0;
+  document.getElementById('chip-visited').textContent = counts.visited||0;
+  document.getElementById('chip-sustained').textContent = counts.sustained||0;
+}
+document.getElementById('schools-chips').addEventListener('click', e=>{
+  const btn=e.target.closest('.chip'); if(!btn) return;
+  document.querySelectorAll('#schools-chips .chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  state.filter.schools=btn.dataset.filter;
+  renderSchoolsList(state.schoolStatus);
+});
+document.getElementById('schools-search').addEventListener('input', ()=>renderSchoolsList(state.schoolStatus));
+
+/* ─── ACTIVITY ─── */
+function renderActivity(decisions){
+  const wrap=document.getElementById('activity-list');
+  const f=state.filter.activity;
+  const me=state.official.id;
+  let list = decisions;
+  if(f==='mine')   list = list.filter(d => d.official_id===me);
+  if(f==='mobile') list = list.filter(d => d.logged_via==='mobile');
+  if(!list.length){
+    wrap.innerHTML='<div class="card"><div class="empty-state"><div class="empty-state-emoji">💬</div><div class="empty-state-text">Nothing here yet.</div></div></div>';
+    return;
+  }
+  wrap.innerHTML = list.slice(0,30).map(d => renderPost(d)).join('');
+}
+function renderPost(d){
+  const school = d.schools || (d.details && d.details.schools) || '—';
+  const type   = d.activity_type || (d.details && d.details.activity_type) || 'Activity';
+  const desc   = d.description || d.insight || '';
+  const tag    = activityTag(type);
+  const author = d.logged_by || d.official_name || '—';
+  const dateStr= timeAgo(d.created_at);
+  const isMine = d.official_id===state.official.id;
+  const viaMobile = d.logged_via==='mobile';
+  return '<div class="post">' +
+    '<div class="post-hdr">' +
+      '<div class="post-avatar" style="background:linear-gradient(135deg,'+colorFromString(author)+','+colorFromString(author+'!')+')">'+esc(initials(author))+'</div>' +
+      '<div class="post-hdr-body">' +
+        '<div class="post-school">'+esc(school)+'</div>' +
+        '<div class="post-meta">'+esc(author)+(isMine?' (you)':'')+'<span class="dot"></span>'+esc(dateStr)+(d.province?'<span class="dot"></span>'+esc(d.province):'')+'</div>' +
+      '</div>' +
+    '</div>' +
+    '<span class="post-act-tag '+tag.cls+'">'+esc(tag.label)+'</span>' +
+    (desc ? '<div class="post-text" onclick="this.classList.toggle(\'expanded\')">'+esc(desc)+'</div>' : '') +
+    '<div class="post-foot">' +
+      '<div class="pf-status"><span class="pf-dot'+(d.follow_up && !d.follow_up_completed ? ' followup':'')+'"></span>'+(d.follow_up && !d.follow_up_completed?'Follow-up':'Logged')+'</div>' +
+      (viaMobile ? '<span class="badge badge-via-mobile">📱 Mobile</span>' : '') +
+    '</div>' +
+    '</div>';
+}
+function renderActivityCounts(decisions){
+  const me=state.official.id;
+  document.getElementById('actcount-all').textContent = decisions.length;
+  document.getElementById('actcount-mine').textContent = decisions.filter(d=>d.official_id===me).length;
+  document.getElementById('actcount-mobile').textContent = decisions.filter(d=>d.logged_via==='mobile').length;
+}
+document.querySelectorAll('.act-tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.act-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    state.filter.activity=t.dataset.actFilter;
+    renderActivity(state.decisions);
+  });
+});
+
+/* ─── INSIGHTS ─── */
+function renderInsightHero(schools, decisions){
+  const wrap=document.getElementById('insight-hero');
+  const me=state.official.id;
+  const mine = decisions.filter(d=>d.official_id===me).length;
+  const total = decisions.length;
+  const scopeLabel = state.scope.scope==='national' ? 'national' :
+                     state.scope.scope==='province' ? state.scope.province :
+                     state.scope.scope==='district' ? state.scope.district :
+                     'your own';
+  wrap.innerHTML =
+    '<div class="ih-label">Activity visible · '+esc(scopeLabel)+'</div>' +
+    '<div class="ih-num">'+mine+'<span class="ih-denom">/'+total+'</span></div>' +
+    '<div class="ih-desc">visits you\'ve logged out of '+total+' total decisions visible at your '+esc(state.scope.scope||'own')+' scope.</div>';
+}
+function renderStageBars(schools){
+  const wrap=document.getElementById('stage-bars');
+  const counts = {}; STAGES.forEach(s => counts[s.key]=0);
+  schools.forEach(s => { counts[s.stage||'not_engaged']=(counts[s.stage||'not_engaged']||0)+1; });
+  const total = schools.length || 1;
+  wrap.innerHTML = STAGES.map(s => {
+    const c = counts[s.key]||0;
+    const pct = (c/total)*100;
+    return '<div class="stage-row">' +
+      '<div class="stage-label"><span class="stage-dot" style="background:'+s.color+'"></span>'+s.label+'</div>' +
+      '<div class="stage-bar-wrap"><div class="stage-bar" style="width:'+pct.toFixed(1)+'%;background:'+s.color+'"></div></div>' +
+      '<div class="stage-count">'+c+'</div>' +
+    '</div>';
+  }).join('');
+}
+function renderSourceBars(decisions){
+  const wrap=document.getElementById('source-bars');
+  const webCount    = decisions.filter(d=>d.logged_via!=='mobile').length;
+  const mobileCount = decisions.filter(d=>d.logged_via==='mobile').length;
+  const total = webCount+mobileCount || 1;
+  wrap.innerHTML =
+    '<div class="stage-row">' +
+      '<div class="stage-label"><span class="stage-dot" style="background:var(--blue)"></span>Web</div>' +
+      '<div class="stage-bar-wrap"><div class="stage-bar" style="width:'+(webCount/total*100).toFixed(1)+'%;background:var(--blue)"></div></div>' +
+      '<div class="stage-count">'+webCount+'</div>' +
+    '</div>' +
+    '<div class="stage-row">' +
+      '<div class="stage-label"><span class="stage-dot" style="background:var(--green)"></span>Mobile</div>' +
+      '<div class="stage-bar-wrap"><div class="stage-bar" style="width:'+(mobileCount/total*100).toFixed(1)+'%;background:var(--green)"></div></div>' +
+      '<div class="stage-count">'+mobileCount+'</div>' +
+    '</div>';
+}
+
+/* ═══════════════════════ NAV ═══════════════════════ */
+const SCREENS=['home','schools','activity','insights'];
+function goTab(name){
+  SCREENS.forEach(s=>{
+    document.getElementById('screen-'+s).classList.toggle('active', s===name);
+    const h=document.getElementById('hdr-'+s);
+    if(h) h.style.display = (s===name) ? '' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.tab===name);
+  });
+  document.getElementById('fab').classList.toggle('visible', name==='home'||name==='schools');
+  document.querySelector('.content').scrollTop=0;
+}
+
+/* ═══════════════════════ MODALS ═══════════════════════ */
+function openModal(html){
+  document.getElementById('modal-content').innerHTML = '<div class="modal-grab"></div>' + html;
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('show'); }
+
+function showFabModal(){
+  openModal(
+    '<h3>Log a school visit</h3>' +
+    '<p>In Session 2, this opens a quick-capture form: pick school → activity type → voice note + photos → submit. We haven\'t built it yet — this is just the preview shell.</p>' +
+    '<button class="modal-btn" onclick="closeModal()">Got it</button>'
+  );
+}
+
+function showSchoolDetail(id){
+  const s = state.schoolStatus.find(x=>x.id===id);
+  if(!s){ closeModal(); return; }
+  const currentIdx = STAGES.findIndex(x=>x.key===(s.stage||'not_engaged'));
+  const stagesHtml = STAGES.map((st,i)=>{
+    const status = i<currentIdx ? 'done' : (i===currentIdx ? 'current' : 'todo');
+    const bg = status==='done' ? 'background:#F1F8F4;border-color:#C8E6C9' :
+               status==='current' ? 'background:#FFF3E0;border-color:#FFE0B2;font-weight:700' :
+               'background:#fff';
+    const tickBg = status==='done' ? 'background:var(--green);color:#fff' :
+                   status==='current' ? 'background:var(--orange);color:#fff' :
+                   'background:#ECECEC;color:#999';
+    const tick = status==='done' ? '✓' : (i+1);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;border:1px solid #ECECEC;font-size:12px;color:var(--navy);'+bg+'">' +
+      '<div style="width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;'+tickBg+'">'+tick+'</div>' +
+      '<div>'+st.label+'</div>' +
+    '</div>';
+  }).join('');
+
+  openModal(
+    '<h3>'+esc(s.school_name)+'</h3>' +
+    '<p>'+esc(s.province||'')+(s.district?' · '+esc(s.district):'')+(s.phase?' · '+esc(s.phase):'')+'</p>' +
+    '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:#F5F9F9;border:1px solid #DDEBEB;border-radius:10px;margin-bottom:14px">' +
+      '<div>' +
+        '<div style="font-size:11px;color:var(--grey);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Current stage</div>' +
+        '<div style="font-size:13px;color:var(--navy);font-weight:700;margin-top:2px">'+esc(STAGES[currentIdx].label)+'</div>' +
+        (s.stage_changed_at ? '<div style="font-size:10.5px;color:var(--grey);margin-top:2px">Updated '+esc(timeAgo(s.stage_changed_at))+'</div>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:var(--grey-dk);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px">Progress path</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px">'+stagesHtml+'</div>' +
+    '<div style="font-size:11.5px;color:var(--grey);margin-top:14px;line-height:1.5;padding:10px 12px;background:#FAFAFA;border-radius:8px">Stage updates with evidence are coming in Session 3. Read-only for now.</div>' +
+    '<button class="modal-btn secondary" style="margin-top:14px" onclick="closeModal()">Close</button>'
+  );
+}
+
+function showProfileModal(){
+  const o=state.official; const s=state.scope;
+  openModal(
+    '<h3>'+esc(o.full_name)+'</h3>' +
+    '<p>'+esc(o.role||'')+'<br>'+esc(o.email||'')+'</p>' +
+    '<div style="background:#F5F9F9;border-radius:10px;padding:12px;font-size:12px;line-height:1.8;margin-bottom:14px">' +
+      '<div><strong>Province:</strong> '+esc(o.province||'—')+'</div>' +
+      '<div><strong>District:</strong> '+esc(o.district||'—')+'</div>' +
+      '<div><strong>Organisation:</strong> '+esc(o.organisation||'—')+'</div>' +
+      '<div><strong>RLS scope:</strong> '+esc((s.scope||'own').toUpperCase())+'</div>' +
+      '<div><strong>Directorate:</strong> '+esc(o.directorate||'—')+'</div>' +
+    '</div>' +
+    '<button class="modal-btn" onclick="signOut()">Sign out</button>' +
+    '<button class="modal-btn secondary" style="margin-top:8px" onclick="closeModal()">Close</button>'
+  );
+}
+
+async function signOut(){
+  closeModal();
+  await sb.auth.signOut();
+  state.official=null; state.scope=null; state.decisions=[]; state.schoolStatus=[];
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('login-pin').value='';
+  setStage('email');
+  clearError();
+}
+
+/* ═══════════════════════ BOOTSTRAP ═══════════════════════ */
+(async ()=>{
+  // Restore session if one is persisted
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session && session.user && session.user.email){
+    await loadProfile(session.user.email);
+  } else {
+    document.getElementById('login-screen').classList.add('active');
+    setStage('email');
+  }
+})();
+</script>
+</body>
+</html>
