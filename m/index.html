@@ -534,6 +534,7 @@ const SUBJECT_GROUPS = [
   {label:"Arts",items:["Creative Arts","Visual Arts","Dramatic Arts","Dance Studies","Design","Music"]}
 ];
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
+const DISTRICTS = {"Eastern Cape":["Alfred Nzo East","Alfred Nzo West","Amathole East","Amathole West","Buffalo City","Chris Hani East","Chris Hani West","Joe Gqabi","Nelson Mandela","O R Tambo Coastal","O R Tambo Inland","Sarah Baartman"],"Free State":["Fezile Dabi","Lejweleputswa","Mangaung Metro","Thabo Mofutsanyana","Xhariep"],"Gauteng":["Ekurhuleni North","Ekurhuleni South","Gauteng East","Gauteng North","Gauteng West","Johannesburg Central","Johannesburg East","Johannesburg North","Johannesburg South","Johannesburg West","Sedibeng East","Sedibeng West","Tshwane North","Tshwane South","Tshwane West"],"KwaZulu-Natal":["Amajuba","Harry Gwala","Ilembe","King Cetshwayo","Pinetown","Ugu","Umgungundlovu","Umkhanyakude","Umlazi","Umzinyathi","Uthukela","Zululand"],"Limpopo":["Capricorn North","Capricorn South","Mogalakwena","Mopani East","Mopani West","Sekhukhune East","Sekhukhune South","Vhembe East","Vhembe West","Waterberg"],"Mpumalanga":["Bohlabela","Ehlanzeni","Gert Sibande","Nkangala"],"North West":["Ditsobotla","Greater Taung","Jb Marks","Kagisano Molopo","Madibeng","Mahikeng","Maquassi Hills","Matlosana","Moretele","Moses Kotane","Naledi","Ramotshere Moiloa","Ratlou","Rustenburg","Tswaing"],"Northern Cape":["Frances Baard","John Taolo Gaetsewe","Namakwa","Pixley-Ka-Seme","Zf Mgcawu"],"Western Cape":["Cape Winelands","Eden And Central Karoo","Metro Central","Metro East","Metro North","Metro South","Overberg","Partnership Schools","West Coast"]};
 const QUEUE_KEY = 'ddd_mobile_submit_queue';
 
 /* ID generator — mirrors web tracker exactly */
@@ -1036,6 +1037,18 @@ function openLogVisitForm(){
     return;
   }
   state.form = emptyForm();
+  // Pre-fill province/district from the official's profile when their scope is local
+  // (national-scope users like programme managers leave it empty so they can pick freely)
+  const sc = state.scope.scope;
+  if(sc !== 'national'){
+    if(state.official.province && DISTRICTS[state.official.province]){
+      state.form.province = state.official.province;
+    }
+    if(state.form.province && state.official.district &&
+       (DISTRICTS[state.form.province]||[]).indexOf(state.official.district) > -1){
+      state.form.district = state.official.district;
+    }
+  }
   renderLogVisitForm();
 }
 
@@ -1056,12 +1069,31 @@ function renderLogVisitForm(errMsg){
       '<div class="form-body">' +
         (errMsg ? '<div class="form-err">'+esc(errMsg)+'</div>' : '') +
 
-        // Date + School
+        // Date
         '<div class="form-field">' +
           '<label class="form-label">When did this happen<span class="req">*</span></label>' +
           '<input type="date" class="form-input" value="'+esc(f.activity_date)+'" max="'+new Date().toISOString().slice(0,10)+'" oninput="state.form.activity_date=this.value">' +
         '</div>' +
 
+        // Province + District (mirrors web tracker flow)
+        '<div class="form-field-row">' +
+          '<div>' +
+            '<label class="form-label">Province<span class="req">*</span></label>' +
+            '<select class="form-select" onchange="onProvinceChange(this.value)">' +
+              '<option value="">Select...</option>' +
+              Object.keys(DISTRICTS).map(p => '<option '+(f.province===p?'selected':'')+'>'+esc(p)+'</option>').join('') +
+            '</select>' +
+          '</div>' +
+          '<div>' +
+            '<label class="form-label">District<span class="req">*</span></label>' +
+            '<select class="form-select" '+(f.province?'':'disabled')+' onchange="onDistrictChange(this.value)">' +
+              '<option value="">'+(f.province?'Select...':'Pick province first')+'</option>' +
+              (f.province ? (DISTRICTS[f.province]||[]).map(d => '<option '+(f.district===d?'selected':'')+'>'+esc(d)+'</option>').join('') : '') +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+
+        // School
         '<div class="form-field">' +
           '<label class="form-label">School<span class="req">*</span></label>' +
           (schoolSelected
@@ -1069,13 +1101,13 @@ function renderLogVisitForm(errMsg){
                 '<div class="school-pick-icon">🏫</div>' +
                 '<div class="school-pick-body">' +
                   '<div class="school-pick-name">'+esc(f.schools)+'</div>' +
-                  '<div class="school-pick-meta">'+esc(f.province||'')+(f.district?' · '+esc(f.district):'')+(f.phase?' · '+esc(f.phase):'')+'</div>' +
+                  '<div class="school-pick-meta">'+esc(f.province||'')+(f.district?' · '+esc(f.district):'')+(f.phase?' · '+esc(f.phase):'')+(f.school_id?'':' · manual entry')+'</div>' +
                 '</div>' +
                 '<div class="school-pick-chev">›</div>' +
               '</button>'
-            : '<button class="school-pick-btn" onclick="openSchoolPicker()">' +
+            : '<button class="school-pick-btn" '+(f.district?'':'disabled style="opacity:.55"')+' onclick="'+(f.district?'openSchoolPicker()':'')+'">' +
                 '<div class="school-pick-icon">🏫</div>' +
-                '<div class="school-pick-body"><div class="school-pick-empty">Tap to select school</div></div>' +
+                '<div class="school-pick-body"><div class="school-pick-empty">'+(f.district?'Tap to select school':'Pick province &amp; district first')+'</div></div>' +
                 '<div class="school-pick-chev">›</div>' +
               '</button>'
           ) +
@@ -1197,37 +1229,89 @@ function toggleFollowup(){
   renderLogVisitForm();
 }
 
+/* ─── Province / District handlers ─── */
+function onProvinceChange(p){
+  if(!state.form) return;
+  state.form.province = p;
+  // Clear district + school when province changes
+  state.form.district = '';
+  state.form.school_id = '';
+  state.form.schools = '';
+  state.form.phase = '';
+  // Lejweleputswa special: theme valid only when district matches; clearing district clears that theme
+  if(state.form.intervention_theme === 'Lejweleputswa Underperforming Schools Support Programme'){
+    state.form.intervention_theme = '';
+  }
+  renderLogVisitForm();
+}
+function onDistrictChange(d){
+  if(!state.form) return;
+  state.form.district = d;
+  // Clear school when district changes (it may no longer be in the new district)
+  state.form.school_id = '';
+  state.form.schools = '';
+  state.form.phase = '';
+  if(state.form.intervention_theme === 'Lejweleputswa Underperforming Schools Support Programme' && d !== 'Lejweleputswa'){
+    state.form.intervention_theme = '';
+  }
+  renderLogVisitForm();
+}
+
 /* ─── School picker (swaps form body) ─── */
 function openSchoolPicker(){
+  if(!state.form || !state.form.district){
+    showToast('Pick province and district first');
+    return;
+  }
   state.pickerSearch = '';
   renderSchoolPicker();
 }
 function renderSchoolPicker(){
+  const f = state.form;
   const q = (state.pickerSearch||'').toLowerCase().trim();
-  let list = state.schoolStatus.slice();
-  if(q) list = list.filter(s =>
-    (s.school_name||'').toLowerCase().includes(q) ||
-    (s.district||'').toLowerCase().includes(q) ||
-    (s.province||'').toLowerCase().includes(q)
+  // Filter to schools in the form's province + district
+  let list = state.schoolStatus.filter(s =>
+    (s.province||'') === f.province &&
+    (s.district||'') === f.district
   );
+  if(q) list = list.filter(s => (s.school_name||'').toLowerCase().includes(q));
   list.sort((a,b)=>(a.school_name||'').localeCompare(b.school_name||''));
+
+  // Exact-match check — if user typed a name not in the list, offer to use it as-is
+  const exactMatch = q && list.some(s => (s.school_name||'').toLowerCase() === q);
+  const showManualEntry = q && !exactMatch && q.length >= 3;
 
   const body =
     '<div class="modal form-modal">' +
       '<div class="form-hdr">' +
         '<div>' +
           '<div class="form-hdr-title">Pick a school</div>' +
-          '<div class="form-hdr-sub">'+list.length+' '+(list.length===1?'school':'schools')+' in your scope</div>' +
+          '<div class="form-hdr-sub">'+esc(f.district)+' · '+esc(f.province)+' · '+list.length+' tracked</div>' +
         '</div>' +
         '<button class="form-close" onclick="renderLogVisitForm()" aria-label="Back">✕</button>' +
       '</div>' +
       '<div class="form-body">' +
         '<div class="picker-search">' +
-          '<input type="text" placeholder="Search school, district..." value="'+esc(state.pickerSearch)+'" oninput="state.pickerSearch=this.value;renderSchoolPicker()" autocapitalize="off" autocorrect="off">' +
+          '<input type="text" placeholder="Search or type school name..." value="'+esc(state.pickerSearch)+'" oninput="state.pickerSearch=this.value;renderSchoolPicker()" autocapitalize="words" autocorrect="off">' +
         '</div>' +
+        (showManualEntry
+          ? '<div onclick="useManualSchoolName()" style="display:flex;align-items:center;gap:11px;padding:12px;border:1.5px dashed var(--teal);border-radius:10px;background:var(--teal-lt);margin-bottom:12px;cursor:pointer">' +
+              '<div style="width:32px;height:32px;border-radius:8px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700">+</div>' +
+              '<div style="flex:1;min-width:0">' +
+                '<div style="font-size:13px;font-weight:700;color:var(--teal-dk)">Use "'+esc(state.pickerSearch)+'"</div>' +
+                '<div style="font-size:10.5px;color:var(--teal-dk);opacity:.8;margin-top:2px">Add as new school for this visit</div>' +
+              '</div>' +
+              '<div style="color:var(--teal-dk);font-size:18px">›</div>' +
+            '</div>'
+          : ''
+        ) +
         '<div class="picker-list">' +
-          (list.length===0
-            ? '<div class="picker-empty">No schools match "'+esc(state.pickerSearch)+'".<br><br>If your school isn\'t listed, the web tracker has the full school list.</div>'
+          (list.length===0 && !showManualEntry
+            ? '<div class="picker-empty">'+
+                (q
+                  ? 'No tracked schools match "'+esc(state.pickerSearch)+'" in '+esc(f.district)+'.<br><br>Type at least 3 letters to add a school name manually.'
+                  : 'No schools tracked in this district yet.<br><br>Type a school name above to log a visit anyway.')+
+              '</div>'
             : list.slice(0,200).map(s => {
                 const stage = STAGES.find(x=>x.key===(s.stage||'not_engaged')) || STAGES[0];
                 const color = colorFromString(s.school_name||'');
@@ -1236,7 +1320,7 @@ function renderSchoolPicker(){
                   '<div class="sc-avatar" style="background:'+color+'">'+esc(initials(s.school_name))+'</div>' +
                   '<div class="sc-body">' +
                     '<div class="sc-name">'+esc(s.school_name)+'</div>' +
-                    '<div class="sc-meta">'+esc(s.province||'')+'<span class="dot"></span>'+esc(s.district||'')+(s.phase?'<span class="dot"></span>'+esc(s.phase):'')+'</div>' +
+                    '<div class="sc-meta">'+(s.phase?esc(s.phase):'—')+'</div>' +
                     '<div class="sc-badges"><span class="badge badge-stage '+stage.cls+'">'+esc(stage.label)+'</span></div>' +
                   '</div>' +
                 '</div>';
@@ -1255,13 +1339,16 @@ function selectSchool(id){
   if(!s){ renderLogVisitForm(); return; }
   state.form.school_id = s.id;
   state.form.schools   = s.school_name;
-  state.form.province  = s.province || '';
-  state.form.district  = s.district || '';
+  // Province + district already set on the form; trust school_status values too
   state.form.phase     = s.phase || '';
-  // Lejweleputswa special: if user had picked the Lejweleputswa theme but district changed, clear it
-  if(state.form.intervention_theme === 'Lejweleputswa Underperforming Schools Support Programme' && state.form.district !== 'Lejweleputswa'){
-    state.form.intervention_theme = '';
-  }
+  renderLogVisitForm();
+}
+function useManualSchoolName(){
+  const name = (state.pickerSearch||'').trim();
+  if(name.length < 3){ showToast('Type at least 3 characters'); return; }
+  state.form.school_id = '';     // no school_status row — manual entry
+  state.form.schools   = name;
+  state.form.phase     = '';
   renderLogVisitForm();
 }
 
@@ -1269,6 +1356,8 @@ function selectSchool(id){
 function validateForm(){
   const f = state.form;
   if(!f.activity_date) return 'Please pick the visit date.';
+  if(!f.province) return 'Please pick a province.';
+  if(!f.district) return 'Please pick a district.';
   if(!f.schools) return 'Please pick a school.';
   if(!f.activity_type) return 'Please select an activity type.';
   if(f.activity_type==='Other' && !f.activity_type_other.trim()) return 'Please describe the "Other" activity type.';
