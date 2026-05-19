@@ -1,0 +1,35 @@
+{
+  "name": "DDD Interventions Tracker",
+  "short_name": "DDD Tracker",
+  "description": "Log school visits and learner improvement interventions for the DDD programme",
+  "id": "/ddd-tracker/m/",
+  "start_url": "/ddd-tracker/m/",
+  "scope": "/ddd-tracker/m/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3F2F1",
+  "theme_color": "#074445",
+  "lang": "en-ZA",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
