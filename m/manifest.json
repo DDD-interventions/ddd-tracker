@@ -1,7 +1,7 @@
 {
   "name": "DDD Interventions Tracker",
   "short_name": "DDD Tracker",
-  "description": "Log school visits and learner improvement interventions for the DDD programme",
+  "description": "Log your school visits and learner improvement interventions",
   "id": "/ddd-tracker/m/",
   "start_url": "/ddd-tracker/m/",
   "scope": "/ddd-tracker/m/",
