@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>DDD Tracker — Mobile (v0.3)</title>
+<title>DDD Tracker — Mobile (v0.3.1)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23074445'/%3E%3Ctext x='50' y='62' font-family='Segoe UI,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%237AB648'%3EDDD%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -252,7 +252,7 @@ input,textarea{font-family:inherit}
 .full-spinner .spinner{border-color:#E0E0E0;border-top-color:var(--teal);margin-right:10px}
 
 /* ─────────────────────── LOG-A-VISIT FORM ─────────────────────── */
-.form-modal{padding:0 !important;max-height:92% !important;overflow:hidden !important;display:flex;flex-direction:column}
+.form-modal{padding:0 !important;max-height:96% !important;overflow:hidden !important;display:flex;flex-direction:column}
 .form-hdr{padding:18px 18px 12px;border-bottom:1px solid #f3f2f1;position:sticky;top:0;background:#fff;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .form-hdr-title{font-size:16px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
 .form-hdr-sub{font-size:11px;color:var(--grey);margin-top:1px;font-weight:500}
@@ -262,8 +262,8 @@ input,textarea{font-family:inherit}
 .form-foot{padding:12px 18px calc(14px + var(--safe-bot));border-top:1px solid #f3f2f1;background:#fff;position:sticky;bottom:0;display:flex;gap:8px}
 .form-foot .form-btn{flex:1}
 
-.form-field{margin-bottom:16px}
-.form-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.form-field{margin-bottom:14px}
+.form-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .form-label{display:block;font-size:11px;font-weight:700;color:var(--grey-dk);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
 .form-label .req{color:var(--red);margin-left:2px}
 .form-label .opt{color:var(--grey-md);font-weight:600;text-transform:none;letter-spacing:0;margin-left:6px;font-size:10.5px}
@@ -282,11 +282,11 @@ input,textarea{font-family:inherit}
 .school-pick-meta{font-size:10.5px;color:var(--grey);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .school-pick-chev{color:var(--grey-md);font-size:18px;flex-shrink:0}
 
-.chip-multi{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.chip-multi .chip-pick{flex:0 0 auto;font-size:12px;font-weight:600;padding:7px 12px;border-radius:99px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);min-height:32px;transition:all .12s}
-.chip-multi .chip-pick:active{transform:scale(.95)}
+.chip-multi{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
+.chip-multi .chip-pick{flex:0 0 auto;font-size:13px;font-weight:600;padding:10px 14px;border-radius:99px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);min-height:40px;line-height:1.2;transition:all .12s}
+.chip-multi .chip-pick:active{transform:scale(.96);background:#F5F8FA}
 .chip-multi .chip-pick.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 6px rgba(11,142,141,.25)}
-.chip-grade{font-size:13px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);min-height:38px;text-align:center}
+.chip-grade{font-size:14px;font-weight:700;padding:11px 0;border-radius:10px;border:1.5px solid #E1DFDD;background:#fff;color:var(--grey-dk);min-height:44px;text-align:center}
 .chip-grade.active{background:var(--teal);color:#fff;border-color:var(--teal)}
 .grade-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:2px}
 
@@ -334,20 +334,19 @@ input,textarea{font-family:inherit}
 .success-icon::after{content:'✓'}
 
 /* ═══════════════════════ WIZARD (Session 3) ═══════════════════════ */
-.form-progress-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px 10px;background:#fff;border-bottom:1px solid #ECEFF1;flex-shrink:0;gap:6px}
-.form-prog-pill{flex:1;height:6px;border-radius:3px;background:#ECEFF1;cursor:pointer;transition:background .2s;position:relative}
-.form-prog-pill.done{background:var(--teal)}
-.form-prog-pill.active{background:var(--teal-dk)}
-.form-prog-pill.active::after{content:'';position:absolute;top:-3px;left:50%;width:12px;height:12px;border-radius:50%;background:var(--teal-dk);transform:translateX(-50%);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.form-progress-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 12px;background:#fff;border-bottom:1px solid #ECEFF1;flex-shrink:0;gap:8px}
+.form-prog-pill{flex:1;height:32px;border-radius:8px;background:#ECEFF1;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--grey)}
+.form-prog-pill.done{background:var(--teal);color:#fff}
+.form-prog-pill.active{background:var(--teal-dk);color:#fff;box-shadow:0 2px 6px rgba(7,68,69,.25)}
 .step-section{display:flex;flex-direction:column;gap:14px}
 .form-section-hdr{font-size:11px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 -4px;padding-bottom:6px;border-bottom:1px solid #ECEFF1}
 .hint-sm{font-size:10.5px;color:var(--grey);margin:-2px 0 6px;line-height:1.4}
-.radio-grp{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.radio-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #ECEFF1;border-radius:8px;cursor:pointer;background:#fff;transition:all .15s;font-size:13px;color:#323130;line-height:1.4}
+.radio-grp{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.radio-row{display:flex;align-items:flex-start;gap:12px;padding:14px 14px;border:1.5px solid #ECEFF1;border-radius:10px;cursor:pointer;background:#fff;transition:all .15s;font-size:14px;color:#323130;line-height:1.45;min-height:48px}
 .radio-row.active{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk)}
-.radio-row input{margin-top:2px;flex-shrink:0;accent-color:var(--teal)}
+.radio-row input{margin-top:2px;flex-shrink:0;accent-color:var(--teal);width:20px;height:20px}
 .radio-row span{flex:1;min-width:0}
-.info-card{padding:10px 13px;border-radius:8px;font-size:11.5px;line-height:1.5;margin-bottom:10px}
+.info-card{padding:11px 14px;border-radius:8px;font-size:12.5px;line-height:1.5;margin-bottom:10px}
 .info-blue{background:var(--blue-lt);color:#1565C0;border-left:3px solid var(--blue)}
 .info-grey{background:#f8f9fa;color:var(--grey-dk);border-left:3px solid var(--grey)}
 
@@ -362,28 +361,28 @@ input,textarea{font-family:inherit}
 .obs-grp-hdr{font-size:10.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid #E0EDED}
 .obs-grp-hdr:first-child{margin-top:0}
 .obs-grp{display:flex;flex-direction:column;gap:5px}
-.obs-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;background:#fff;border:1px solid #E0E0E0;transition:all .15s}
+.obs-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:7px;background:#fff;border:1px solid #E0E0E0;transition:all .15s;min-height:48px}
 .obs-row.obs-yes{background:#E8F5E9;border-color:#C8E6C9}
 .obs-row.obs-no{background:#FFEBEE;border-color:#FFCDD2}
-.obs-label{flex:1;font-size:11.5px;color:var(--navy);line-height:1.4}
-.obs-yn{display:flex;gap:5px;flex-shrink:0}
-.obs-btn{width:34px;height:28px;border-radius:5px;border:1.5px solid #C8C6C4;background:#fff;color:#999;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.obs-label{flex:1;font-size:12.5px;color:var(--navy);line-height:1.4}
+.obs-yn{display:flex;gap:6px;flex-shrink:0}
+.obs-btn{width:40px;height:36px;border-radius:6px;border:1.5px solid #C8C6C4;background:#fff;color:#999;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
 .obs-y.active{border-color:var(--green);background:var(--green);color:#fff}
 .obs-n.active{border-color:var(--red);background:var(--red);color:#fff}
 
 /* DDD task cards */
-.tq-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.tq-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #ECEFF1;border-radius:8px;background:#fff;cursor:pointer;transition:all .15s}
+.tq-list{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+.tq-card{display:flex;align-items:flex-start;gap:11px;padding:12px 13px;border:1.5px solid #ECEFF1;border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;min-height:56px}
 .tq-card.sel{border-color:var(--teal);background:var(--teal-lt)}
-.tq-chk{width:20px;height:20px;border-radius:5px;border:1.5px solid #C8C6C4;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+.tq-chk{width:22px;height:22px;border-radius:5px;border:1.5px solid #C8C6C4;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
 .tq-card.sel .tq-chk{background:var(--teal);border-color:var(--teal)}
-.tq-q{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.35}
-.tq-cat{font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;font-weight:700}
-.tq-expand{width:100%;margin-top:8px;padding:8px;background:#F5F8FA;border:1.5px dashed #C8D0D8;border-radius:8px;color:var(--teal-dk);font-size:11.5px;font-weight:600;font-family:inherit;cursor:pointer}
+.tq-q{font-size:13.5px;font-weight:600;color:var(--navy);line-height:1.4}
+.tq-cat{font-size:10.5px;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;margin-top:4px;font-weight:700}
+.tq-expand{width:100%;margin-top:10px;padding:11px;background:#F5F8FA;border:1.5px dashed #C8D0D8;border-radius:8px;color:var(--teal-dk);font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;min-height:44px}
 .tq-expand:active{background:#E8EEF2}
 
-/* Chip multi-select scroll container (for long lists) */
-.chip-scroll{max-height:230px;overflow-y:auto;border:1px solid #ECEFF1;border-radius:8px;padding:8px;background:#FAFBFC;-webkit-overflow-scrolling:touch}
+/* Chip multi-select — long lists flow naturally, no nested scroll on mobile */
+.chip-scroll{margin-top:2px}
 .chip-pick-orange{background:#fff;border-color:#F5D5A8;color:var(--orange-dk)}
 .chip-pick-orange.active{background:var(--orange-lt);border-color:var(--orange);color:var(--orange-dk)}
 
@@ -432,14 +431,14 @@ input,textarea{font-family:inherit}
   </div>
   <div class="login-foot">
     Need help? Email <a href="mailto:victor@newleaders.co.za">victor@newleaders.co.za</a><br>
-    <span style="opacity:.7">Mobile preview — v0.3 (Session 3)</span>
+    <span style="opacity:.7">Mobile preview — v0.3.1 (Session 3 · mobile polish)</span>
   </div>
 </div>
 
 <!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
 <div id="app" class="app">
 
-  <div id="dev-banner" class="dev-banner show">Preview build · v0.3 (Session 3) — Full 5-step wizard live</div>
+  <div id="dev-banner" class="dev-banner show">Preview build · v0.3.1 — scroll fix + bigger tap targets</div>
 
   <!-- Header (varies by tab) -->
   <header id="hdr-home" class="hdr" style="display:block">
@@ -1302,10 +1301,23 @@ function renderLogVisitForm(errMsg){
       '</div>' +
     '</div>';
 
+  // ── Preserve scroll position across re-renders ─────────────────────────
+  // Without this, every chip tap / select change rebuilds the DOM and the
+  // user is bounced back to the top of the form. _resetScroll is set by
+  // goStep() when the user moves between steps (we want top-of-step then).
+  const prevBody = document.querySelector('#modal-content .form-body');
+  const prevScroll = (prevBody && !state.form._resetScroll) ? prevBody.scrollTop : 0;
+  state.form._resetScroll = false;
+
   document.getElementById('modal-content').outerHTML = body;
   const newNode = document.querySelector('#modal-bg .modal');
   if(newNode) newNode.id = 'modal-content';
   document.getElementById('modal-bg').classList.add('show');
+
+  if(prevScroll > 0){
+    const newBody = document.querySelector('#modal-content .form-body');
+    if(newBody) newBody.scrollTop = prevScroll;
+  }
 }
 
 function goStep(target){
@@ -1317,9 +1329,8 @@ function goStep(target){
     if(err){ renderLogVisitForm(err); return; }
   }
   state.form.formStep = target;
+  state.form._resetScroll = true;        // moving steps → start at the top
   renderLogVisitForm();
-  // Scroll body to top
-  setTimeout(()=>{ const b = document.querySelector('#modal-content .form-body'); if(b) b.scrollTop = 0; }, 0);
 }
 
 function closeLogForm(){
