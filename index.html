@@ -639,6 +639,27 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .notif-empty{padding:40px 20px;text-align:center;color:var(--grey);font-size:13px;line-height:1.6}
 @media(max-width:480px){.notif-pane{max-width:100%}}
 
+/* LOCATION CAPTURE INDICATOR ─────────────────────────────────────────── */
+.loc-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;margin:14px 0 10px;border:1.5px solid #e1dfdd;background:#fafbfc;font-size:13px;line-height:1.45;transition:all .2s}
+.loc-card.success{border-color:var(--green);background:var(--green-lt)}
+.loc-card.requesting{border-color:var(--teal);background:var(--teal-lt)}
+.loc-card.denied,.loc-card.unavailable,.loc-card.timeout,.loc-card.unsupported{border-color:#FFD180;background:#FFF8E1}
+.loc-icon{font-size:20px;line-height:1;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.loc-text{flex:1;min-width:0}
+.loc-title{font-size:13px;font-weight:600;color:var(--navy);line-height:1.35}
+.loc-sub{font-size:11px;color:var(--grey);margin-top:2px;line-height:1.4;font-family:'SF Mono','Consolas',monospace}
+.loc-sub.warn{color:#B26500;font-family:inherit}
+.loc-actions{display:flex;gap:6px;flex-shrink:0}
+.loc-btn{padding:7px 12px;border-radius:6px;border:1px solid var(--teal);background:#fff;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;min-height:36px;white-space:nowrap}
+.loc-btn:hover{background:var(--teal);color:#fff}
+.loc-btn:active{transform:translateY(1px)}
+.loc-btn:disabled{opacity:.5;cursor:not-allowed}
+.loc-spinner{width:18px;height:18px;border:2.5px solid var(--teal-lt);border-top-color:var(--teal);border-radius:50%;animation:loc-spin .8s linear infinite}
+@keyframes loc-spin{to{transform:rotate(360deg)}}
+.loc-pin{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:10px;background:var(--green-lt);color:var(--green-dk);font-size:10px;font-weight:600;text-decoration:none}
+.loc-pin:hover{background:var(--green);color:#fff}
+@media(max-width:420px){.loc-card{flex-wrap:wrap}.loc-actions{width:100%;justify-content:flex-end;margin-top:4px}}
+
 /* APP FOOTER WITH VERSION ─────────────────────────────────────────────── */
 .app-footer{display:flex;justify-content:center;align-items:center;padding:20px 16px 28px;color:var(--grey);font-size:11px;line-height:1.5;text-align:center;border-top:1px solid #ebe9e7;margin-top:24px;background:#fafbfc}
 .app-footer-inner{max-width:640px}
@@ -952,7 +973,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.05.25.2';
+const APP_VERSION = '2026.05.25.3';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -974,6 +995,12 @@ function deriveTermFromDate(dateStr){
 const S = {
  loading:true, error:null, authState:'checking', gateError:'', gateLoading:false, _gateEmailValue:'', _otpValue:'', _otpEmail:'', _officialId:null,
  official:{full_name:'User',role:'',province:'',district:'',email:''},
+ // ── GPS / Location capture state ────────────────────────────────────────
+ // _gpsStatus: 'idle' | 'requesting' | 'success' | 'denied' | 'unavailable' | 'timeout' | 'unsupported'
+ // _gpsCoords: { latitude, longitude, accuracy_m } or null
+ // _gpsCapturedAt: ISO timestamp string or null
+ // _gpsRetryCount: number of times user has retried capture this session
+ _gpsStatus:'idle', _gpsCoords:null, _gpsCapturedAt:null, _gpsError:'', _gpsRetryCount:0, _gpsDenialCount:0,
  view:'log', decisions:[], actions:[], outcomes:[], interventions:[], outcomeModal:null, _trackerFilter:'all', _challExpanded:null, _supTimeFilter:'30d', _supExpanded:{}, _supResponses:[], _supReplyText:{}, _supReplyScope:{}, _supResolving:{}, _supResolveComment:{}, _actResponses:[], _actReplyText:{}, _actNoted:{}, _actThreadOpen:{}, _actCardOpen:{},
  saving:false, submitted:false, expandedSchool:null, _validationErrors:null, showWelcome:false, fbRating:null, fbChecks:[], fbComment:'', fbSubmitted:false, fbSkipped:false, _pendReply:null, _pendReplyData:{}, _pendReassign:null, _pendReassignData:{},
  tkTab:'navigator', selReport:null, selIntv:null, showPolicy:null, cycleGuideOpen:false, cyclePhase:null,
@@ -1120,14 +1147,35 @@ function generateInterventionPDF(dec, act, official) {
   const officialDisplay = (dec.made_by || (official && official.full_name) || '') +
     (det.official_role ? ' \u2014 ' + det.official_role : (official && official.role ? ' \u2014 ' + official.role : '')) +
     (det.official_specialisation ? ' (' + det.official_specialisation + ')' : '');
+
+  // Build location row — shown only if location was successfully captured
+  var locationRow = null;
+  if (dec.latitude != null && dec.longitude != null) {
+    var lat = Number(dec.latitude).toFixed(5);
+    var lng = Number(dec.longitude).toFixed(5);
+    var acc = dec.location_accuracy_m ? ' (\u00B1' + Math.round(dec.location_accuracy_m) + 'm accuracy)' : '';
+    locationRow = ['Location at submission', lat + ', ' + lng + acc + '\nhttps://www.google.com/maps?q=' + dec.latitude + ',' + dec.longitude];
+  } else if (det && det.location_status && det.location_status !== 'success' && det.location_status !== 'idle') {
+    var statusLabels = {
+      denied: 'Permission declined by official',
+      unavailable: 'GPS signal unavailable',
+      timeout: 'GPS capture timed out',
+      unsupported: 'Device does not support location'
+    };
+    locationRow = ['Location at submission', 'Not captured \u2014 ' + (statusLabels[det.location_status] || det.location_status)];
+  }
+
+  var bodyRows = [
+    ['Reference', 'Activity: ' + (act.id||'') + '\nDecision: ' + (dec.id||'')],
+    ['Submitted', submitted + ' SAST'],
+    ['Logged by', officialDisplay],
+    ['Email', dec.logged_by_email || (official && official.email) || '']
+  ];
+  if (locationRow) bodyRows.push(locationRow);
+
   doc.autoTable({
     startY: y, margin: { left: margin, right: margin },
-    body: [
-      ['Reference', 'Activity: ' + (act.id||'') + '\nDecision: ' + (dec.id||'')],
-      ['Submitted', submitted + ' SAST'],
-      ['Logged by', officialDisplay],
-      ['Email', dec.logged_by_email || (official && official.email) || '']
-    ],
+    body: bodyRows,
     theme:'plain',
     styles:{ font:'helvetica', fontSize:9, cellPadding:{top:3,bottom:3,left:0,right:6}, valign:'top' },
     columnStyles:{ 0:{ fontStyle:'bold', textColor:PDF_COLOR.greyLt, cellWidth:100 }, 1:{ textColor:PDF_COLOR.navy } }
@@ -3941,6 +3989,10 @@ function dddLbl(v){const m={'yes-direct':'Yes \u2014 directly triggered','yes-in
 function supLbl(v){const m={'light':'Light touch','regular':'Regular support','intensive':'Intensive support'};return m[v]||'\u2014'}
 function renderFormReview(){
   const f=S.f;
+  // Trigger GPS capture when user reaches the review step (idempotent — won't refire)
+  if (S._gpsStatus === 'idle') {
+    setTimeout(function(){ if (S._gpsStatus === 'idle') captureLocation(); }, 80);
+  }
   return`<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--navy)"><div><h2>5. Review & Submit</h2><p>Check your entry before submitting</p></div></div><div class="sec-body">
     <div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:#F57F17;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
@@ -3949,6 +4001,7 @@ function renderFormReview(){
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
+    ${renderLocationCard()}
     <div style="display:flex;justify-content:space-between;margin-top:12px"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
     ${_saveLaterBar()}
   </div></div>`;
@@ -4179,6 +4232,19 @@ async function submitForm() {
  ...meta
  };
 
+ // Fold location status into details JSON regardless of success (audit-friendly)
+ details.location_status = S._gpsStatus;
+
+ // Only attach location columns when GPS was successfully captured. This makes
+ // the rollout resilient: if the Supabase migration to add lat/lng columns
+ // hasn't run yet, submissions without location still succeed.
+ if (S._gpsCoords && S._gpsStatus === 'success') {
+   dec.latitude = S._gpsCoords.latitude;
+   dec.longitude = S._gpsCoords.longitude;
+   dec.location_accuracy_m = S._gpsCoords.accuracy_m;
+   dec.location_captured_at = S._gpsCapturedAt;
+ }
+
  const act = {
  id: actId,
  official_id: S._officialId,
@@ -4237,6 +4303,15 @@ async function submitForm() {
 
  S.submitted = true;
     clearFormDraft();
+
+    // Reset GPS state so the next submission captures a fresh location
+    S._gpsStatus = 'idle';
+    S._gpsCoords = null;
+    S._gpsCapturedAt = null;
+    S._gpsError = '';
+    S._gpsRetryCount = 0;
+    // Note: _gpsDenialCount intentionally persists across submissions in the
+    // same session so we don't re-prompt a user who has clearly declined.
 
  // Fire-and-forget: email a PDF audit copy to the official who logged it
  // Capture doc_file reference now since S.f may be reset before the async email send completes
@@ -6344,6 +6419,142 @@ function fmtDate(d) { if(!d)return'\u2014'; try{return parseLocalDate(d).toLocal
 function relTimeAgo(d){if(!d)return'';try{var dt=parseLocalDate(d);var ms=Date.now()-dt.getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
 function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// ═══════════════════════════════════
+// LOCATION CAPTURE (GPS at submission)
+// ═══════════════════════════════════
+//
+// Captures the official's phone GPS at the moment of submission as evidence
+// of the visit. Behaviour:
+//   - Triggered when the user reaches the Review step (formStep === 4)
+//   - Shows a status card above the confirm checkbox so the user sees what's
+//     being captured before they submit
+//   - If GPS fails or is denied: submission still proceeds with a flag noting
+//     location was unavailable (per design decision: optional, not mandatory)
+//   - After 3 denials in the same session, stops prompting silently
+//
+// Privacy note: only the official's coordinates are captured. No verification
+// against school coordinates is performed in this version.
+// ─────────────────────────────────────────────────────────────────────────
+
+function captureLocation(opts) {
+  opts = opts || {};
+  if (!('geolocation' in navigator)) {
+    S._gpsStatus = 'unsupported';
+    S._gpsError = 'This device does not support location services.';
+    render();
+    return;
+  }
+
+  // Don't keep prompting if user has repeatedly denied this session
+  if (S._gpsDenialCount >= 3 && !opts.force) {
+    S._gpsStatus = 'denied';
+    render();
+    return;
+  }
+
+  S._gpsStatus = 'requesting';
+  S._gpsError = '';
+  render();
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      S._gpsCoords = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy_m: Math.round(pos.coords.accuracy)
+      };
+      S._gpsCapturedAt = new Date().toISOString();
+      S._gpsStatus = 'success';
+      S._gpsError = '';
+      render();
+    },
+    function(err) {
+      // err.code: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
+      if (err.code === 1) {
+        S._gpsStatus = 'denied';
+        S._gpsDenialCount++;
+      } else if (err.code === 2) {
+        S._gpsStatus = 'unavailable';
+      } else if (err.code === 3) {
+        S._gpsStatus = 'timeout';
+      } else {
+        S._gpsStatus = 'unavailable';
+      }
+      S._gpsError = err.message || '';
+      render();
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 30000,      // 30 seconds — first GPS lock can be slow
+      maximumAge: 60000    // accept a cached fix from the last 60 seconds
+    }
+  );
+}
+
+function retryLocationCapture() {
+  S._gpsRetryCount++;
+  captureLocation({ force: true });
+}
+
+// Render the location status card. Used in the Review step.
+function renderLocationCard() {
+  var st = S._gpsStatus;
+  var c = S._gpsCoords;
+
+  // Status: requesting
+  if (st === 'requesting') {
+    return '<div class="loc-card requesting">' +
+      '<div class="loc-icon"><div class="loc-spinner"></div></div>' +
+      '<div class="loc-text">' +
+        '<div class="loc-title">Capturing your location\u2026</div>' +
+        '<div class="loc-sub">If your phone asks, tap <strong>Allow</strong>. This takes a few seconds.</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Status: success — show coords, accuracy, and a map link
+  if (st === 'success' && c) {
+    var mapUrl = 'https://www.google.com/maps?q=' + c.latitude + ',' + c.longitude;
+    var coordStr = c.latitude.toFixed(5) + ', ' + c.longitude.toFixed(5);
+    return '<div class="loc-card success">' +
+      '<div class="loc-icon">\uD83D\uDCCD</div>' +
+      '<div class="loc-text">' +
+        '<div class="loc-title">Location captured (\u00B1' + c.accuracy_m + 'm accuracy)</div>' +
+        '<div class="loc-sub">' + coordStr + ' \u00B7 <a href="' + mapUrl + '" target="_blank" rel="noopener" style="color:var(--teal-dk);font-weight:600">View on map</a></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Status: denied / unavailable / timeout / unsupported — show retry option
+  if (st === 'denied' || st === 'unavailable' || st === 'timeout' || st === 'unsupported') {
+    var titleMap = {
+      denied: 'Location permission was declined',
+      unavailable: 'Location is currently unavailable',
+      timeout: 'Location capture timed out',
+      unsupported: 'Location is not supported on this device'
+    };
+    var subMap = {
+      denied: 'Location helps verify this visit. You can enable it in your phone settings, or continue without it.',
+      unavailable: 'Move to an area with better GPS signal and try again, or continue without it.',
+      timeout: 'Your phone could not get a GPS fix in time. Try again or continue without location.',
+      unsupported: 'This submission will be recorded without location data.'
+    };
+    var canRetry = st !== 'unsupported' && S._gpsDenialCount < 3;
+    return '<div class="loc-card ' + st + '">' +
+      '<div class="loc-icon">\uD83D\uDCCD</div>' +
+      '<div class="loc-text">' +
+        '<div class="loc-title">' + titleMap[st] + '</div>' +
+        '<div class="loc-sub warn">' + subMap[st] + '</div>' +
+      '</div>' +
+      (canRetry ? '<div class="loc-actions"><button class="loc-btn" onclick="retryLocationCapture()">Try again</button></div>' : '') +
+    '</div>';
+  }
+
+  // Status: idle (shouldn't normally render — capture is triggered automatically on review step)
+  return '';
+}
+
 // ═══════════════════════════════════
 // AUTO-UPDATE SYSTEM
 // ═══════════════════════════════════
