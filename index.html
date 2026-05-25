@@ -638,6 +638,57 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .notif-time{font-size:11px;color:var(--grey);margin-top:3px}
 .notif-empty{padding:40px 20px;text-align:center;color:var(--grey);font-size:13px;line-height:1.6}
 @media(max-width:480px){.notif-pane{max-width:100%}}
+
+/* APP FOOTER WITH VERSION ─────────────────────────────────────────────── */
+.app-footer{display:flex;justify-content:center;align-items:center;padding:20px 16px 28px;color:var(--grey);font-size:11px;line-height:1.5;text-align:center;border-top:1px solid #ebe9e7;margin-top:24px;background:#fafbfc}
+.app-footer-inner{max-width:640px}
+.app-footer-version{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--grey);font-size:11px;font-family:inherit;cursor:pointer;padding:4px 8px;border-radius:4px;transition:.15s;font-weight:500}
+.app-footer-version:hover{background:#eef0f3;color:var(--teal-dk)}
+.app-footer-version::before{content:'•';margin-right:4px;color:#c8c6c4}
+
+/* VERSION INFO SHEET (tap version to open) ─────────────────────────────── */
+.ver-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
+.ver-sheet-overlay.visible{opacity:1;pointer-events:auto}
+.ver-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:16px 16px 0 0;z-index:10000;transform:translateY(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1);max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 -4px 24px rgba(0,0,0,.15)}
+.ver-sheet.visible{transform:translateY(0)}
+.ver-sheet-handle{width:40px;height:4px;background:#d4d4d4;border-radius:2px;margin:10px auto 0}
+.ver-sheet-body{padding:14px 22px 28px}
+.ver-sheet h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.ver-sheet-sub{font-size:12px;color:var(--grey);margin-bottom:18px;line-height:1.5}
+.ver-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f3f2f1;font-size:13px}
+.ver-row:last-child{border-bottom:none}
+.ver-row-label{color:var(--grey);font-weight:500}
+.ver-row-value{color:var(--navy);font-weight:600;font-family:'SF Mono','Consolas',monospace;font-size:12px}
+.ver-row-value .uptodate{color:var(--green-dk);font-weight:700;margin-left:6px}
+.ver-row-value .behind{color:var(--orange);font-weight:700;margin-left:6px}
+.ver-sheet-btn{width:100%;margin-top:18px;padding:13px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.ver-sheet-btn:hover{background:var(--teal-dk)}
+.ver-sheet-btn:disabled{background:#d0d4db;cursor:not-allowed}
+.ver-sheet-btn.secondary{background:#fff;border:1px solid #d0d7de;color:var(--navy);margin-top:8px}
+.ver-sheet-btn.secondary:hover{background:#f3f4f6}
+
+/* WHAT'S NEW MODAL (first open after update) ──────────────────────────── */
+.whatsnew-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;opacity:0;pointer-events:none;transition:opacity .25s;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.whatsnew-overlay.visible{opacity:1;pointer-events:auto}
+@media(min-width:600px){.whatsnew-overlay{align-items:center;padding:20px}}
+.whatsnew-card{background:#fff;border-radius:16px 16px 0 0;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 -8px 32px rgba(0,0,0,.2)}
+@media(min-width:600px){.whatsnew-card{border-radius:16px;transform:scale(.95);opacity:0;transition:transform .25s,opacity .25s}}
+.whatsnew-overlay.visible .whatsnew-card{transform:translateY(0)}
+@media(min-width:600px){.whatsnew-overlay.visible .whatsnew-card{transform:scale(1);opacity:1}}
+.whatsnew-hero{background:linear-gradient(135deg,var(--teal-dk) 0%,#0F7B7D 100%);color:#fff;padding:28px 24px 22px;text-align:center;border-radius:16px 16px 0 0}
+@media(min-width:600px){.whatsnew-hero{border-radius:16px 16px 0 0}}
+.whatsnew-emoji{font-size:36px;margin-bottom:8px;display:block}
+.whatsnew-hero h2{font-size:19px;font-weight:700;margin:0 0 4px}
+.whatsnew-hero-version{font-size:12px;opacity:.85;font-family:'SF Mono','Consolas',monospace}
+.whatsnew-body{padding:22px 24px 8px}
+.whatsnew-body h4{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.whatsnew-notes{list-style:none;padding:0;margin:0}
+.whatsnew-notes li{display:flex;gap:10px;padding:8px 0;font-size:13.5px;line-height:1.55;color:var(--navy)}
+.whatsnew-notes li::before{content:'✓';color:var(--green-dk);font-weight:700;flex-shrink:0;margin-top:1px}
+.whatsnew-footer{padding:6px 24px 22px}
+.whatsnew-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;box-shadow:0 2px 8px rgba(11,142,141,.25)}
+.whatsnew-btn:hover{background:var(--teal-dk)}
+.whatsnew-btn:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -901,7 +952,8 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.05.04.1';
+const APP_VERSION = '2026.05.25.1';
+const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
 
@@ -6481,6 +6533,164 @@ function dismissUpdateBanner() {
   _updateBannerShown = false;
 }
 
+// ─── VERSION FOOTER + INFO SHEET ─────────────────────────────────────────
+// Renders a small "v2026.05.25.1" pill in the page footer. Tapping it
+// opens a bottom sheet showing version info + update status + check button.
+function renderAppFooter() {
+  if (document.getElementById('app-footer')) return;
+  var footer = document.createElement('footer');
+  footer.id = 'app-footer';
+  footer.className = 'app-footer';
+  footer.innerHTML = '<div class="app-footer-inner">' +
+    'Data Driven Districts \u00B7 Learner Improvement Interventions Tracker<br>' +
+    '<button class="app-footer-version" onclick="openVersionSheet()" title="Tap for version details">v' + APP_VERSION + '</button>' +
+    '</div>';
+  document.body.appendChild(footer);
+}
+
+function openVersionSheet() {
+  closeVersionSheet(); // ensure no duplicate
+  var overlay = document.createElement('div');
+  overlay.id = 'ver-sheet-overlay';
+  overlay.className = 'ver-sheet-overlay';
+  overlay.onclick = function(e){ if (e.target === overlay) closeVersionSheet(); };
+
+  var serverVer = _lastRemoteVersion || '\u2014';
+  var statusHTML;
+  if (_lastRemoteVersion && _compareVersions(_lastRemoteVersion, APP_VERSION) > 0) {
+    statusHTML = '<span class="behind">Update available</span>';
+  } else if (_lastRemoteVersion) {
+    statusHTML = '<span class="uptodate">\u2713 Up to date</span>';
+  } else {
+    statusHTML = '';
+  }
+
+  var sheet = document.createElement('div');
+  sheet.id = 'ver-sheet';
+  sheet.className = 'ver-sheet';
+  sheet.innerHTML = '<div class="ver-sheet-handle"></div>' +
+    '<div class="ver-sheet-body">' +
+      '<h3>About this app</h3>' +
+      '<div class="ver-sheet-sub">DDD Learner Improvement Interventions Tracker</div>' +
+      '<div class="ver-row"><span class="ver-row-label">Installed version</span><span class="ver-row-value">v' + APP_VERSION + '</span></div>' +
+      '<div class="ver-row"><span class="ver-row-label">Latest available</span><span class="ver-row-value">v' + serverVer + ' ' + statusHTML + '</span></div>' +
+      '<div class="ver-row"><span class="ver-row-label">Connection</span><span class="ver-row-value">' + (navigator.onLine ? '\u2713 Online' : 'Offline') + '</span></div>' +
+      '<button class="ver-sheet-btn" onclick="manualUpdateCheck(this)">Check for updates</button>' +
+      '<button class="ver-sheet-btn secondary" onclick="showReleaseNotesFromSheet()">View what\'s new</button>' +
+      '<button class="ver-sheet-btn secondary" onclick="closeVersionSheet()">Close</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(sheet);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      overlay.classList.add('visible');
+      sheet.classList.add('visible');
+    });
+  });
+}
+
+function closeVersionSheet() {
+  var overlay = document.getElementById('ver-sheet-overlay');
+  var sheet = document.getElementById('ver-sheet');
+  if (sheet) sheet.classList.remove('visible');
+  if (overlay) overlay.classList.remove('visible');
+  setTimeout(function(){
+    if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }, 280);
+}
+
+async function manualUpdateCheck(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking\u2026'; }
+  await checkForUpdates();
+  if (btn) {
+    if (_lastRemoteVersion && _compareVersions(_lastRemoteVersion, APP_VERSION) > 0) {
+      btn.textContent = 'Update available \u2014 reload?';
+      btn.onclick = function(){ applyUpdate(); };
+      btn.disabled = false;
+    } else {
+      btn.textContent = '\u2713 You\'re up to date';
+      setTimeout(function(){ if (btn) { btn.textContent = 'Check for updates'; btn.disabled = false; } }, 1800);
+    }
+  }
+}
+
+function showReleaseNotesFromSheet() {
+  closeVersionSheet();
+  setTimeout(function(){ showWhatsNewModal(true); }, 300);
+}
+
+// ─── "WHAT'S NEW" MODAL ──────────────────────────────────────────────────
+// Shows once after a version update, OR on demand from the version sheet.
+// Notes come from release-notes.json: { "2026.05.25.1": { "highlights": [...] } }
+var _releaseNotesCache = null;
+
+async function loadReleaseNotes() {
+  if (_releaseNotesCache) return _releaseNotesCache;
+  try {
+    var resp = await fetch(RELEASE_NOTES_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) return null;
+    _releaseNotesCache = await resp.json();
+    return _releaseNotesCache;
+  } catch(e) { return null; }
+}
+
+async function showWhatsNewModal(force) {
+  var lastSeen = null;
+  try { lastSeen = localStorage.getItem('ddd_last_seen_version'); } catch(e) {}
+  // Skip auto-show if this version has already been seen (unless forced from sheet)
+  if (!force && lastSeen === APP_VERSION) return;
+
+  var notes = await loadReleaseNotes();
+  var entry = notes && notes[APP_VERSION];
+  // If there's nothing to show and this is an auto-trigger, just mark seen and exit
+  if (!entry || !entry.highlights || !entry.highlights.length) {
+    try { localStorage.setItem('ddd_last_seen_version', APP_VERSION); } catch(e) {}
+    if (force) showToast('No release notes available for this version');
+    return;
+  }
+
+  var existing = document.getElementById('whatsnew-overlay');
+  if (existing) existing.parentNode.removeChild(existing);
+
+  var overlay = document.createElement('div');
+  overlay.id = 'whatsnew-overlay';
+  overlay.className = 'whatsnew-overlay';
+  overlay.onclick = function(e){ if (e.target === overlay) closeWhatsNewModal(); };
+
+  var dateStr = entry.released ? new Date(entry.released).toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' }) : '';
+  var listHTML = entry.highlights.map(function(h){ return '<li>' + esc(h) + '</li>'; }).join('');
+
+  overlay.innerHTML = '<div class="whatsnew-card">' +
+    '<div class="whatsnew-hero">' +
+      '<span class="whatsnew-emoji">\u2728</span>' +
+      '<h2>' + esc(entry.title || 'What\'s new') + '</h2>' +
+      '<div class="whatsnew-hero-version">v' + APP_VERSION + (dateStr ? ' \u00B7 ' + dateStr : '') + '</div>' +
+    '</div>' +
+    '<div class="whatsnew-body">' +
+      '<h4>In this update</h4>' +
+      '<ul class="whatsnew-notes">' + listHTML + '</ul>' +
+    '</div>' +
+    '<div class="whatsnew-footer"><button class="whatsnew-btn" onclick="closeWhatsNewModal()">Got it</button></div>' +
+  '</div>';
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ overlay.classList.add('visible'); });
+  });
+
+  // Mark this version as seen so we don't show again on next open
+  try { localStorage.setItem('ddd_last_seen_version', APP_VERSION); } catch(e) {}
+}
+
+function closeWhatsNewModal() {
+  var overlay = document.getElementById('whatsnew-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('visible');
+  setTimeout(function(){ if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 320);
+}
+
 // INIT 
 window.addEventListener('online', function(){ showToast('Back online \u2014 syncing\u2026'); flushSubmitQueue(); });
 checkAuth();
@@ -6489,6 +6699,8 @@ setTimeout(() => {
   checkForUpdates();
   setInterval(checkForUpdates, VERSION_CHECK_INTERVAL);
 }, 10000);
+// Render version footer + show "What's new" if this is a fresh version
+setTimeout(function(){ renderAppFooter(); showWhatsNewModal(false); }, 1500);
 </script>
 <script>
 /* PWA: Service worker registration. Enables installability + offline app shell. */
