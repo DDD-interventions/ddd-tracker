@@ -952,7 +952,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.05.25.1';
+const APP_VERSION = '2026.05.25.2';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2128,12 +2128,42 @@ async function checkAuth() {
  try {
    const { data: { session } } = await sb.auth.getSession();
    if (session) {
+     // ── SECURITY FIX ────────────────────────────────────────────────
+     // Filter by the authenticated user's email so we ONLY load that
+     // official's record. Previously this query had no filter and would
+     // return whatever official happened to be first in the table,
+     // causing cross-account session leakage (a user could be auto-
+     // logged-in as a different official after a period of inactivity).
+     // ────────────────────────────────────────────────────────────────
+     const sessionEmail = (session.user && session.user.email || '').toLowerCase();
+     if (!sessionEmail) {
+       // Defensive: session somehow has no email. Sign out and force re-auth.
+       console.warn('Session has no email — signing out');
+       await sb.auth.signOut();
+       S.authState = 'gate';
+       S.loading = false;
+       render();
+       return;
+     }
+
      const { data, error } = await sb.from('officials')
        .select('id,full_name,role,province,district,email,is_active,details')
+       .eq('email', sessionEmail)
        .limit(1);
 
      if (!error && data && data.length > 0) {
        const official = data[0];
+       // Extra defensive check: ensure the row we got actually matches
+       // the session email. Prevents data integrity issues from
+       // surfacing as silent identity swaps.
+       if ((official.email || '').toLowerCase() !== sessionEmail) {
+         console.warn('Official row email does not match session email — signing out');
+         await sb.auth.signOut();
+         S.authState = 'gate';
+         S.loading = false;
+         render();
+         return;
+       }
        S._officialId = official.id;
        S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', email: official.email || '', notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled) };
        S.f.official_name = official.full_name || '';
@@ -2150,6 +2180,12 @@ async function checkAuth() {
        window.scrollTo({top:0,behavior:'instant'});
        await loadAll();
        return;
+     }
+     // Session exists but no matching official record found — sign out
+     // so the user goes back to the gate to authenticate cleanly.
+     if (!error) {
+       console.warn('No official record matches session email — signing out');
+       await sb.auth.signOut();
      }
    }
  } catch(e) { console.warn('Session check failed:', e); }
