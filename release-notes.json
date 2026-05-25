@@ -1,0 +1,21 @@
+{
+  "2026.05.25.2": {
+    "title": "Security & reliability fix",
+    "released": "2026-05-25",
+    "highlights": [
+      "Fixed an issue where the app could occasionally display the wrong official's profile after a long period of inactivity",
+      "Improved session handling so your account information is always loaded correctly",
+      "If you've been using the app today, please sign out and sign in again to refresh your session"
+    ]
+  },
+  "2026.05.25.1": {
+    "title": "Now installable as an app!",
+    "released": "2026-05-25",
+    "highlights": [
+      "The Tracker is now installable as a mobile app on Android (home screen) and as a desktop app on Windows/Mac",
+      "Faster loading and works offline for the app shell — your form drafts still save automatically when you're offline",
+      "New version notifications: you'll be prompted to update whenever a new version is published",
+      "Version information is now visible in the footer — tap the version number to see update status"
+    ]
+  }
+}
