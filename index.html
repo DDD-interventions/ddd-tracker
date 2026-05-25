@@ -1,5 +1,16 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DDD Learner Improvement Interventions Tracker</title>
+<!-- PWA: installable on Android home screen and via Play Store (TWA) -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#074445">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Learner Interventions Tracker">
+<meta name="description" content="Track learner improvement interventions across South African districts and schools.">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;--green:#7AB648;--green-dk:#5FAD56;--green-lt:#E8F5E9;--orange:#E8952E;--orange-lt:#FFF3E0;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#607D8B;--grey-lt:#ECEFF1;--grey-dk:#37474F;--red:#E53935;--red-lt:#FFEBEE;--blue:#1565C0;--blue-lt:#E3F2FD}
@@ -6478,5 +6489,15 @@ setTimeout(() => {
   checkForUpdates();
   setInterval(checkForUpdates, VERSION_CHECK_INTERVAL);
 }, 10000);
+</script>
+<script>
+/* PWA: Service worker registration. Enables installability + offline app shell. */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function (reg) { console.log('[PWA] Service worker registered:', reg.scope); })
+      .catch(function (err) { console.warn('[PWA] Service worker registration failed:', err); });
+  });
+}
 </script>
 </body></html>
