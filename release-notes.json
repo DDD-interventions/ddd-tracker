@@ -1,4 +1,15 @@
 {
+  "2026.05.25.3": {
+    "title": "Location capture on submissions",
+    "released": "2026-05-25",
+    "highlights": [
+      "Submissions now capture your phone GPS location as evidence of the visit",
+      "Location appears on the audit PDF with a Google Maps link reviewers can click",
+      "Location capture happens automatically when you reach the review step — no extra taps",
+      "If location is unavailable or you decline, your submission still goes through normally",
+      "You'll see a confirmation card showing your captured location before you submit"
+    ]
+  },
   "2026.05.25.2": {
     "title": "Security & reliability fix",
     "released": "2026-05-25",
@@ -13,9 +24,9 @@
     "released": "2026-05-25",
     "highlights": [
       "The Tracker is now installable as a mobile app on Android (home screen) and as a desktop app on Windows/Mac",
-      "Faster loading and works offline for the app shell — your form drafts still save automatically when you're offline",
-      "New version notifications: you'll be prompted to update whenever a new version is published",
-      "Version information is now visible in the footer — tap the version number to see update status"
+      "Faster loading and works offline for the app shell",
+      "New version notifications when updates are published",
+      "Version information is now visible in the footer"
     ]
   }
 }
