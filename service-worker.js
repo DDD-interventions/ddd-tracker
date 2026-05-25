@@ -18,7 +18,7 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.0.1';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
@@ -85,6 +85,12 @@ self.addEventListener('fetch', event => {
   // Never cache backend / data endpoints — these MUST be live
   const isNeverCache = NEVER_CACHE_HOST_PARTS.some(h => url.hostname.includes(h));
   if (isNeverCache) return;
+
+  // Never cache version polling files — they must always be live for update detection
+  if (url.pathname.endsWith('/version.txt') ||
+      url.pathname.endsWith('/release-notes.json')) {
+    return;
+  }
 
   // Decide whether this is something we can cache
   const isSameOrigin = url.origin === self.location.origin;
