@@ -1,4 +1,13 @@
 {
+  "2026.06.13.1": {
+    "title": "Easier tapping on your phone",
+    "released": "2026-06-13",
+    "highlights": [
+      "Tag chips, toolkit tabs, and time-period buttons are now bigger and easier to tap",
+      "Fewer accidental and missed taps when logging a visit on a phone",
+      "Nothing changes in how the app works — just larger, more comfortable touch targets"
+    ]
+  },
   "2026.05.25.3": {
     "title": "Location capture on submissions",
     "released": "2026-05-25",
