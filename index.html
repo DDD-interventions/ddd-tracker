@@ -246,7 +246,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   /* Review table values: allow wrapping */
   .review-value{max-width:55%;word-break:break-word}
   /* Ensure min tap targets */
-  .tag{min-height:40px;padding:8px 12px;font-size:13px}
+  .tag{min-height:44px;padding:8px 12px;font-size:13px}
   .school-dd-item{min-height:48px;padding:12px}
   .radio-grp label{min-height:44px;padding:10px 12px}
   .checkbox-grp label{min-height:44px;padding:10px 12px}
@@ -416,7 +416,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 /* TOOLKIT */
 .tk-wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
 .tk-tabs{display:flex;gap:6px;background:#fff;padding:10px 12px;border-radius:8px;margin-bottom:0;overflow-x:auto;justify-content:center;flex-wrap:wrap}
-.tk-tab{padding:10px 16px;border:2px solid #e1dfdd;background:#fff;color:var(--grey-dk);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.tk-tab{padding:10px 16px;border:2px solid #e1dfdd;background:#fff;color:var(--grey-dk);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;min-height:44px;gap:4px}
 .tk-tab.on{color:#fff;background:var(--teal);border-color:var(--teal);box-shadow:0 2px 8px rgba(11,142,141,.25)}
 .tk-tab:hover:not(.on){color:var(--teal);border-color:var(--teal);background:var(--teal-lt);transform:translateY(-1px)}
 .tk-card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden;border:2px solid transparent;transition:all .2s;cursor:pointer}
@@ -461,7 +461,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* ─── SUPPORT CARDS + THREADS (teal theme — matches Activity Tracker) ─── */
 .sup-time-tabs{display:flex;gap:0;padding:0 0 10px}
-.sup-time-tab{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;border:1.5px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;transition:all .15s;font-family:inherit;min-height:36px}
+.sup-time-tab{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;border:1.5px solid var(--grey-lt);background:#fff;color:var(--grey);cursor:pointer;transition:all .15s;font-family:inherit;min-height:44px}
 .sup-time-tab:hover{border-color:#ccc}
 .sup-time-tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
 .sup-card{border-radius:12px;border:1px solid #e8e6e4;overflow:hidden;transition:all .2s;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -650,7 +650,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .loc-sub{font-size:11px;color:var(--grey);margin-top:2px;line-height:1.4;font-family:'SF Mono','Consolas',monospace}
 .loc-sub.warn{color:#B26500;font-family:inherit}
 .loc-actions{display:flex;gap:6px;flex-shrink:0}
-.loc-btn{padding:7px 12px;border-radius:6px;border:1px solid var(--teal);background:#fff;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;min-height:36px;white-space:nowrap}
+.loc-btn{padding:7px 12px;border-radius:6px;border:1px solid var(--teal);background:#fff;color:var(--teal);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;min-height:44px;white-space:nowrap}
 .loc-btn:hover{background:var(--teal);color:#fff}
 .loc-btn:active{transform:translateY(1px)}
 .loc-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -973,7 +973,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.05.25.3';
+const APP_VERSION = '2026.06.13.1';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
