@@ -1,4 +1,13 @@
 {
+  "2026.06.13.2": {
+    "title": "Bigger, bolder home screen buttons",
+    "released": "2026-06-13",
+    "highlights": [
+      "The main home screen buttons (Record, Dashboard, Toolkit) are now larger, card-style buttons",
+      "They have a soft shadow and a subtle press animation, so they feel more responsive when tapped",
+      "Easier to find and tap, especially on a phone"
+    ]
+  },
   "2026.06.13.1": {
     "title": "Easier tapping on your phone",
     "released": "2026-06-13",
