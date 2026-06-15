@@ -1,4 +1,13 @@
 {
+  "2026.06.13.3": {
+    "title": "New bottom navigation bar on phones",
+    "released": "2026-06-13",
+    "highlights": [
+      "On phones, there's now a fixed bar at the bottom with Record, Dashboard, and Toolkit",
+      "Tap to jump between the main sections without scrolling back to the top",
+      "The bar tucks away while you're filling in a visit, so it stays out of your way"
+    ]
+  },
   "2026.06.13.2": {
     "title": "Bigger, bolder home screen buttons",
     "released": "2026-06-13",
