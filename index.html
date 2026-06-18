@@ -319,7 +319,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .spinner{width:32px;height:32px;border:3px solid var(--grey-lt);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
-.toast.show{opacity:1}
+.toast.show{opacity:1;pointer-events:auto;cursor:pointer}
 
 /* Update banner */
 .update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#074445;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
@@ -726,7 +726,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 </head>
 <body>
 <div id="app"></div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
@@ -985,7 +985,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.4';
+const APP_VERSION = '2026.06.18.5';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6444,7 +6444,8 @@ function parseLocalDate(d){if(!d)return null;if(d instanceof Date)return d;var s
 function fmtDate(d) { if(!d)return'\u2014'; try{return parseLocalDate(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
 function relTimeAgo(d){if(!d)return'';try{var dt=parseLocalDate(d);var ms=Date.now()-dt.getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
 function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+var _toastTimer=null;
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_toastTimer); var d=Math.min(10000,Math.max(4000,3000+msg.length*60)); _toastTimer=setTimeout(function(){t.classList.remove('show')},d); t.onclick=function(){clearTimeout(_toastTimer);t.classList.remove('show')}; }
 // Tactile feedback (2026.06.18.2). Local browser API — works offline; silently no-ops on iOS or where vibration is unsupported/disabled.
 function haptic(pattern){ try { if (window.navigator && navigator.vibrate) navigator.vibrate(pattern); } catch(e){} }
 var HAPTIC_OK=[35,40,35];   // soft double-tap — a successful save (online OR saved-offline)
