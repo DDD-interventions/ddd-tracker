@@ -50,7 +50,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .nav-compact-btn.tk.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
 @media(max-width:420px){.nav-landing-grid{flex-direction:column;gap:10px}.nav-landing-btn{min-width:0;padding:18px 20px}.nav-landing-btn .nav-btn-label{font-size:15px}.nav-landing-full{max-width:none}.nav-landing-full .nav-btn-label{font-size:14px}.nav-compact-btn{font-size:11px;padding:7px 8px}}
 .btm-nav{display:none}
-@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#8a9499;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:11px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:84px}.update-banner{bottom:84px}}
+@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#8a9499;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:11px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
@@ -318,7 +318,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:12px;color:var(--grey)}
 .spinner{width:32px;height:32px;border:3px solid var(--grey-lt);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 
 /* Update banner */
@@ -977,7 +977,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.13.3';
+const APP_VERSION = '2026.06.13.4';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
