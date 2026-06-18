@@ -1,4 +1,13 @@
 {
+  "2026.06.18.3": {
+    "title": "Clearer, easier-to-read text",
+    "released": "2026-06-18",
+    "highlights": [
+      "Smaller grey text (hints, labels and captions) is now darker and easier to read",
+      "The labels on the bottom navigation bar are clearer too",
+      "Nothing changes in how the app works — the same screens, just more comfortable to read"
+    ]
+  },
   "2026.06.18.2": {
     "title": "Your phone now gives a gentle buzz to confirm a save",
     "released": "2026-06-18",
