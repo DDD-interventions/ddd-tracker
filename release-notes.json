@@ -1,4 +1,12 @@
 {
+  "2026.06.18.4": {
+    "title": "Larger text in more places",
+    "released": "2026-06-18",
+    "highlights": [
+      "The smallest captions and labels (like comment times, summaries and filter labels) are now larger and easier to read",
+      "Nothing moves or changes — the same screens, with more readable text"
+    ]
+  },
   "2026.06.18.3": {
     "title": "Clearer, easier-to-read text",
     "released": "2026-06-18",
