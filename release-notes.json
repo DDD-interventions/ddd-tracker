@@ -1,4 +1,13 @@
 {
+  "2026.06.18.1": {
+    "title": "Next and Back buttons stay in reach while you fill in a visit",
+    "released": "2026-06-18",
+    "highlights": [
+      "On phones, the Next and Back buttons now stay fixed at the bottom of the screen while you work through a visit",
+      "No more scrolling to the end of a step to move forward or back — they're always within thumb's reach",
+      "Nothing changes on desktop, and your information is unaffected"
+    ]
+  },
   "2026.06.13.4": {
     "title": "Fix for the bottom bar Dashboard button",
     "released": "2026-06-13",
