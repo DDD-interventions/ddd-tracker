@@ -1,4 +1,13 @@
 {
+  "2026.06.18.5": {
+    "title": "Confirmation messages stay long enough to read",
+    "released": "2026-06-18",
+    "highlights": [
+      "Pop-up messages now stay on screen longer, and longer messages stay up longer still",
+      "Tap a message to dismiss it once you've read it",
+      "Messages are now read aloud by screen readers for users who rely on them"
+    ]
+  },
   "2026.06.18.4": {
     "title": "Larger text in more places",
     "released": "2026-06-18",
