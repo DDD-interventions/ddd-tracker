@@ -985,7 +985,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.1';
+const APP_VERSION = '2026.06.18.2';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4169,6 +4169,7 @@ function validateAndNext(currentStep, nextStep) {
  if (errors.length > 0) {
    const names = errors.map(e => e.label).join(', ');
    showToast('Please complete: ' + names);
+   haptic(HAPTIC_ERR);
    S._validationErrors = getValidationErrors();
    render();
    // Highlight first missing field
@@ -4192,6 +4193,7 @@ async function submitForm() {
    render();
    window.scrollTo({top:0,behavior:'smooth'});
    showToast(errors.length + ' required field' + (errors.length>1?'s':'') + ' still missing — tap any item to fix it');
+   haptic(HAPTIC_ERR);
    return;
  }
  S._validationErrors = null;
@@ -4325,6 +4327,7 @@ async function submitForm() {
 
  S.submitted = true;
     clearFormDraft();
+    haptic(HAPTIC_OK);
 
     // Reset GPS state so the next submission captures a fresh location
     S._gpsStatus = 'idle';
@@ -4361,6 +4364,7 @@ async function submitForm() {
  S.submitted = true;
  S._auditEmailQueued = false;
  clearFormDraft();
+ haptic(HAPTIC_OK);
  showToast('Saved offline — your activity will be submitted when your connection improves');
  }
  S.saving = false; render();
@@ -6441,6 +6445,10 @@ function fmtDate(d) { if(!d)return'\u2014'; try{return parseLocalDate(d).toLocal
 function relTimeAgo(d){if(!d)return'';try{var dt=parseLocalDate(d);var ms=Date.now()-dt.getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
 function avatarColor(name){var colors=['#1565C0','#0B8E8D','#7B1FA2','#E8952E','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+// Tactile feedback (2026.06.18.2). Local browser API — works offline; silently no-ops on iOS or where vibration is unsupported/disabled.
+function haptic(pattern){ try { if (window.navigator && navigator.vibrate) navigator.vibrate(pattern); } catch(e){} }
+var HAPTIC_OK=[35,40,35];   // soft double-tap — a successful save (online OR saved-offline)
+var HAPTIC_ERR=[70,50,70];  // firmer double — validation blocked you
 
 // ═══════════════════════════════════
 // LOCATION CAPTURE (GPS at submission)
