@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;--green:#7AB648;--green-dk:#5FAD56;--green-lt:#E8F5E9;--orange:#E8952E;--orange-lt:#FFF3E0;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#607D8B;--grey-lt:#ECEFF1;--grey-dk:#37474F;--red:#E53935;--red-lt:#FFEBEE;--blue:#1565C0;--blue-lt:#E3F2FD}
+:root{--teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;--green:#7AB648;--green-dk:#5FAD56;--green-lt:#E8F5E9;--orange:#E8952E;--orange-lt:#FFF3E0;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#546E7A;--grey-lt:#ECEFF1;--grey-dk:#37474F;--red:#E53935;--red-lt:#FFEBEE;--blue:#1565C0;--blue-lt:#E3F2FD}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#323130;min-height:100vh}
 
 /* HEADER */
@@ -39,7 +39,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:16px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#074445;max-width:280px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(232,149,46,.12)}
 .nav-landing-full:active{background:#FFF8F0}
 .nav-landing-full .nav-btn-label{font-size:15px;font-weight:700;display:block}
-.nav-landing-full .nav-btn-desc{font-size:11px;color:#607D8B;display:block;margin-top:2px}
+.nav-landing-full .nav-btn-desc{font-size:11px;color:#546E7A;display:block;margin-top:2px}
 @media(hover:hover){.nav-landing-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(7,68,69,.16)}.nav-landing-full:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,149,46,.18)}}
 .nav-landing-btn:active,.nav-landing-full:active{transform:scale(.97)}
 .nav-compact{display:flex;gap:6px;align-items:center}
@@ -50,7 +50,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .nav-compact-btn.tk.active{background:rgba(122,182,72,.25);border:1.5px solid #7AB648;color:white}
 @media(max-width:420px){.nav-landing-grid{flex-direction:column;gap:10px}.nav-landing-btn{min-width:0;padding:18px 20px}.nav-landing-btn .nav-btn-label{font-size:15px}.nav-landing-full{max-width:none}.nav-landing-full .nav-btn-label{font-size:14px}.nav-compact-btn{font-size:11px;padding:7px 8px}}
 .btm-nav{display:none}
-@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#8a9499;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:11px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
+@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#646f75;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:11px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
@@ -985,7 +985,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.2';
+const APP_VERSION = '2026.06.18.3';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1429,7 +1429,7 @@ async function sendInterventionAuditEmail(dec, act, official, docFile) {
         '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Reference</td><td style="padding:6px 0;color:#1A2332;font-family:monospace;font-size:11px">' + esc(act.id || '') + '</td></tr>' +
         (supportingDocAttached ? '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Attached</td><td style="padding:6px 0;color:#1A2332">Audit PDF + ' + esc(supportingDocName) + '</td></tr>' : '') +
         '</table>' +
-        '<p style="font-size:11px;color:#607D8B;line-height:1.6;margin:14px 0 0;padding-top:14px;border-top:1px solid #f0f0f0">Keep this email for your audit trail. The attached PDF is a complete record of your submission.</p>' +
+        '<p style="font-size:11px;color:#546E7A;line-height:1.6;margin:14px 0 0;padding-top:14px;border-top:1px solid #f0f0f0">Keep this email for your audit trail. The attached PDF is a complete record of your submission.</p>' +
         '<div style="text-align:center;margin:18px 0 4px"><a href="' + safeHref + '" style="display:inline-block;background:#0B8E8D;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Open the Tracker</a></div>' +
       '</div></div>';
 
@@ -3054,7 +3054,7 @@ function renderEmailGate() {
          If you don\u2019t have access, contact the DDD Interventions Manager on <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">victor@newleaders.co.za</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
-         <div style="font-size:11px;color:#607D8B;line-height:1.6">By signing in, you agree that information you enter, including activity logs, school visits, and outcomes, will be used by the DDD Programme and yourself to track and improve learner interventions. Your data is stored securely and will only be shared with authorised programme staff for programme improvement purposes.</div>
+         <div style="font-size:11px;color:#546E7A;line-height:1.6">By signing in, you agree that information you enter, including activity logs, school visits, and outcomes, will be used by the DDD Programme and yourself to track and improve learner interventions. Your data is stored securely and will only be shared with authorised programme staff for programme improvement purposes.</div>
        </div>
      </div>
    </div>
@@ -3103,7 +3103,7 @@ function renderOtpGate() {
          <a href="#" onclick="event.preventDefault();S.authState='gate';S.gateError='';S.gateLoading=false;render()" style="color:var(--teal);font-weight:600">Use a different email</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
-         <div style="font-size:11px;color:#607D8B;line-height:1.6">By signing in, you agree that information you enter, including activity logs, school visits, and outcomes, will be used by the DDD Programme and yourself to track and improve learner interventions. Your data is stored securely and will only be shared with authorised programme staff for programme improvement purposes.</div>
+         <div style="font-size:11px;color:#546E7A;line-height:1.6">By signing in, you agree that information you enter, including activity logs, school visits, and outcomes, will be used by the DDD Programme and yourself to track and improve learner interventions. Your data is stored securely and will only be shared with authorised programme staff for programme improvement purposes.</div>
        </div>
      </div>
    </div>
@@ -3380,7 +3380,7 @@ function _updateSchoolPickerInPlace(){
   if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
   else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
   _spItems=phaseFiltered;
-  var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+  var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#546E7A'};
   var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
   var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
   var html='';
@@ -3598,7 +3598,7 @@ function schoolFilterInput(val){
     if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
     else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
     _spItems=phaseFiltered;
-    var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+    var tBColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#546E7A'};
     var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
     var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
     let html='';
@@ -3701,7 +3701,7 @@ function schoolPickerHTML(){
     if(phaseFiltered.length===0){
       dd+='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
     }else{
-      var typeBadgeColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#607D8B'};
+      var typeBadgeColors={S:'#0B8E8D',P:'#E8952E',C:'#7B1FA2',I:'#546E7A'};
       var typeBadgeLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
       var phaseLabelsForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
       // Build visit history lookup for dropdown badges
@@ -5007,7 +5007,7 @@ function renderDashboard() {
    var _mxA = actTypes[0][1];
    _ovActChart = '<div style="display:grid;gap:10px">';
    for (var _ai=0; _ai<Math.min(actTypes.length,8); _ai++) {
-     var _t=actTypes[_ai][0], _c=actTypes[_ai][1], _p=Math.max(Math.round((_c/_mxA)*100),6), _cl=_actColors[_t]||'#607D8B';
+     var _t=actTypes[_ai][0], _c=actTypes[_ai][1], _p=Math.max(Math.round((_c/_mxA)*100),6), _cl=_actColors[_t]||'#546E7A';
      _ovActChart += '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-size:11px;color:var(--navy);font-weight:500">'+esc(_t)+'</span><span style="font-size:11px;font-weight:700;color:var(--navy)">'+_c+'</span></div><div style="height:14px;background:#F0F2F5;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+_p+'%;background:'+_cl+';border-radius:3px"></div></div></div>';
    }
    _ovActChart += '</div>';
@@ -5023,14 +5023,14 @@ function renderDashboard() {
    for (var _ti2=0; _ti2<topThemes.length; _ti2++) {
      var _thN=topThemes[_ti2][0], _thC=topThemes[_ti2][1];
      var _thPct = _totalTh ? (_thC/_totalTh)*100 : 0;
-     var _thCol = _themeColors[_thN] || '#607D8B';
+     var _thCol = _themeColors[_thN] || '#546E7A';
      _ovThemeChart += '<circle cx="18" cy="18" r="15.5" fill="none" stroke="'+_thCol+'" stroke-width="3.5" stroke-dasharray="'+_thPct+' '+(100-_thPct)+'" stroke-dashoffset="-'+_thOff+'" style="transform:rotate(-90deg);transform-origin:center"/>';
      _thOff += _thPct;
    }
    _ovThemeChart += '</svg></div><div style="flex:1;display:grid;gap:6px">';
    for (var _ti3=0; _ti3<topThemes.length; _ti3++) {
      var _thN2=topThemes[_ti3][0], _thC2=topThemes[_ti3][1];
-     var _thCol2 = _themeColors[_thN2] || '#607D8B';
+     var _thCol2 = _themeColors[_thN2] || '#546E7A';
      var _thPct2 = _totalTh ? Math.round((_thC2/_totalTh)*100) : 0;
      _ovThemeChart += '<div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:'+_thCol2+';flex-shrink:0"></span><span style="font-size:11px;color:var(--navy);flex:1">'+esc(_thN2)+'</span><span style="font-size:12px;font-weight:700;color:'+_thCol2+'">'+_thC2+' ('+_thPct2+'%)</span></div>';
    }
@@ -5632,7 +5632,7 @@ ${tab==='trends'?`
          html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
          catSummary.forEach(function(cs){
            var pct = totalBarrierHits ? Math.round((cs.count/totalBarrierHits)*100) : 0;
-           var col = catColors[cs.cat]||'#607D8B';
+           var col = catColors[cs.cat]||'#546E7A';
            html += '<div style="flex:1;min-width:90px;background:#fff;border:2px solid '+col+';border-radius:10px;padding:10px 12px;text-align:center">'
              + '<div style="font-size:22px;font-weight:800;color:'+col+';line-height:1.2">'+cs.count+'</div>'
              + '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">'+cs.cat+'</div>'
@@ -5647,8 +5647,8 @@ ${tab==='trends'?`
        barriers.slice(0,12).forEach(function(bArr){
          var b = bArr[0], count = bArr[1];
          var maxB = barriers[0][1];
-         var bColors = {'Vacant post(s)':'#E53935','Teaching outside specialisation':'#E8952E','High educator absenteeism':'#FF7043','Textbook shortage':'#1565C0','Infrastructure issues':'#607D8B','No devices/connectivity':'#7B1FA2','Overcrowded classrooms':'#FF9800','High absenteeism':'#E53935','LTSM not delivered':'#795548','Language barriers':'#0097A7','Acting principal/Departmental Head':'#F44336','Welfare concerns':'#607D8B'};
-         var c = bColors[b] || '#607D8B';
+         var bColors = {'Vacant post(s)':'#E53935','Teaching outside specialisation':'#E8952E','High educator absenteeism':'#FF7043','Textbook shortage':'#1565C0','Infrastructure issues':'#546E7A','No devices/connectivity':'#7B1FA2','Overcrowded classrooms':'#FF9800','High absenteeism':'#E53935','LTSM not delivered':'#795548','Language barriers':'#0097A7','Acting principal/Departmental Head':'#F44336','Welfare concerns':'#546E7A'};
+         var c = bColors[b] || '#546E7A';
          var barrierDists = new Set();
          decs.forEach(function(d){var det=d.details||{};var allB=[].concat(det.ctx_staffing||[]).concat(det.ctx_resources||[]).concat(det.ctx_learners||[]);if(allB.includes(b)&&det.district)barrierDists.add(det.district)});
          var isOpen = S._challExpanded===b;
@@ -6172,7 +6172,7 @@ function tkCycleGuide() {
    overviewItems += '<div onclick="S.cyclePhase=' + (isActive ? 'null' : op.id) + ';render()" style="flex:1;text-align:center;padding:10px 6px;cursor:pointer;border-radius:8px;background:' + (isActive ? op.color + '15' : '#f8f9fa') + ';border:1.5px solid ' + (isActive ? op.color : 'transparent') + ';transition:.2s;min-width:70px">' +
     '<div style="font-size:18px;font-weight:800;color:' + op.color + '">' + op.num + '</div>' +
     '<div style="font-size:10px;font-weight:700;color:' + op.color + ';letter-spacing:.5px">' + op.name + '</div>' +
-    '<div style="font-size:9px;color:#607D8B;margin-top:2px">' + op.duration + '</div>' +
+    '<div style="font-size:9px;color:#546E7A;margin-top:2px">' + op.duration + '</div>' +
    '</div>';
   }
   // Phase detail
@@ -6187,7 +6187,7 @@ function tkCycleGuide() {
       '<div style="min-width:22px;height:22px;border-radius:50%;border:2px solid ' + ph.color + '40;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:' + ph.color + ';margin-top:1px">' + (ci + 1) + '</div>' +
       '<div style="flex:1">' +
        '<div style="font-size:13px;font-weight:700;color:#1A2332;line-height:1.4">' + item.action + '</div>' +
-       '<div style="font-size:11px;color:#607D8B;line-height:1.5;margin-top:4px">' + item.detail + '</div>' +
+       '<div style="font-size:11px;color:#546E7A;line-height:1.5;margin-top:4px">' + item.detail + '</div>' +
        '<div style="margin-top:8px;padding:8px 10px;background:' + ph.color + '08;border-radius:6px;border-left:3px solid ' + ph.color + '40">' +
         '<div style="font-size:10px;font-weight:700;color:' + ph.color + ';text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">PM Role</div>' +
         '<div style="font-size:11px;color:#37474F;line-height:1.5">' + item.role + '</div>' +
@@ -6203,9 +6203,9 @@ function tkCycleGuide() {
       '<span style="font-size:14px;font-weight:700;color:#1A2332">' + ph.title + '</span>' +
      '</div>' +
      '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 12px">' +
-      '<span style="font-size:10px;color:#607D8B">' + ph.duration + '</span>' +
-      '<span style="font-size:10px;color:#607D8B">' + ph.timing + '</span>' +
-      '<span style="font-size:10px;color:#607D8B">' + ph.lead + '</span>' +
+      '<span style="font-size:10px;color:#546E7A">' + ph.duration + '</span>' +
+      '<span style="font-size:10px;color:#546E7A">' + ph.timing + '</span>' +
+      '<span style="font-size:10px;color:#546E7A">' + ph.lead + '</span>' +
      '</div>' +
      '<div style="font-size:12px;color:#37474F;line-height:1.6;margin-bottom:12px">' + ph.intro + '</div>' +
      '<div style="background:#FFF8E1;border-radius:8px;padding:10px 12px;border-left:3px solid ' + ph.color + ';margin-bottom:4px">' +
@@ -6231,7 +6231,7 @@ function tkCycleGuide() {
       '<span style="font-size:12px;font-weight:700;color:#1A2332">' + qItem.criterion + '</span>' +
       '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (isMust ? '#FFEBEE' : '#FFF3E0') + ';color:' + (isMust ? '#E53935' : '#E8952E') + ';font-weight:700">' + qItem.level + '</span>' +
      '</div>' +
-     '<div style="font-size:11px;color:#607D8B;line-height:1.4;margin-top:2px">' + qItem.check + '</div>' +
+     '<div style="font-size:11px;color:#546E7A;line-height:1.4;margin-top:2px">' + qItem.check + '</div>' +
     '</div>' +
    '</div>';
   }
@@ -6242,7 +6242,7 @@ function tkCycleGuide() {
    '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:16px;border-top:3px solid #0B8E8D">' +
     '<div style="padding:14px 16px">' +
      '<div style="font-size:13px;font-weight:700;color:#074445;margin-bottom:10px">Intervention Quality Checklist</div>' +
-     '<div style="font-size:11px;color:#607D8B;line-height:1.5;margin-bottom:10px">Before you consider an intervention fully set up, check it against these six criteria. The first three are non-negotiable.</div>' +
+     '<div style="font-size:11px;color:#546E7A;line-height:1.5;margin-bottom:10px">Before you consider an intervention fully set up, check it against these six criteria. The first three are non-negotiable.</div>' +
      qualityRows +
     '</div>' +
    '</div>' +
@@ -6255,7 +6255,7 @@ function tkCycleGuide() {
   '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#074445,#0F7B7D)' : '#f8f9fa') + '">' +
    '<div style="flex:1">' +
     '<div style="font-size:14px;font-weight:700;color:' + (open ? '#fff' : '#1A2332') + '">DDD Intervention Cycle Guide</div>' +
-    '<div style="font-size:11px;color:' + (open ? '#B8DCDC' : '#607D8B') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
+    '<div style="font-size:11px;color:' + (open ? '#B8DCDC' : '#546E7A') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
    '</div>' +
    '<div style="display:flex;align-items:center;gap:6px">' +
     '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (open ? 'rgba(255,255,255,.15)' : '#E0F4F4') + ';color:' + (open ? '#fff' : '#0B8E8D') + ';font-weight:600">NLF Team</span>' +
@@ -6277,8 +6277,8 @@ function renderToolkit() {
 
 // NAVIGATOR 
 function tkNavigator() {
- return `<div style="background:linear-gradient(135deg,#074445,#0F7B7D);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:11px;color:#B8DCDC;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:10px;color:#B8DCDC;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#B8DCDC;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:12px;color:#607D8B;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
- <div class="tk-card${sel?' sel':''}" style="${sel?'border-color:'+r.color:''}"> <div class="tk-card-h" onclick="S.selReport=S.selReport==='${r.id}'?null:'${r.id}';render()"> <div class="tk-ic" style="background:${r.color}15;color:${r.color};font-size:11px;font-weight:800">${r.icon}</div> <div style="flex:1"><div style="font-weight:700;font-size:14px;color:#1A2332">${r.name}</div><div style="font-size:11px;color:#607D8B;margin-top:2px">${r.desc}</div>${!sel?'<div class="tap-hint">Tap to see how to use this report</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${sel?'180':'0'}deg)">${sel?'&#9650;':'&#9660;'}</span> </div> ${sel?`<div class="tk-card-b"> <div class="tk-path"><span style="font-family:monospace">${r.path}</span></div> <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Best for</div><div class="tk-chips">${r.bestFor.map(b=>`<span class="tk-chip" style="background:#f3f2f1;color:#37474F;font-weight:500">${b}</span>`).join('')}</div></div> <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What you will see</div><div class="tk-chips">${r.dataPoints.map(dp=>`<span class="tk-chip" style="background:${r.color}10;color:${r.color};font-weight:500;border:1px solid ${r.color}30">${dp}</span>`).join('')}</div></div> <div class="tk-tip" style="background:#FFF8E1;border-color:${r.color}"><div style="font-size:10px;font-weight:700;color:${r.color};margin-bottom:4px">EXAMPLE \u2014 What to look for</div><div style="font-size:12px;color:#37474F;line-height:1.5">${r.realInsight}</div></div> ${r.policyLink?`<div style="margin-top:8px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${r.policyLink}';render()">${r.policyLink} \u2014 View Policy</button></div>`:''} </div>`:''}
+ return `<div style="background:linear-gradient(135deg,#074445,#0F7B7D);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:11px;color:#B8DCDC;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:10px;color:#B8DCDC;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#B8DCDC;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:12px;color:#546E7A;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
+ <div class="tk-card${sel?' sel':''}" style="${sel?'border-color:'+r.color:''}"> <div class="tk-card-h" onclick="S.selReport=S.selReport==='${r.id}'?null:'${r.id}';render()"> <div class="tk-ic" style="background:${r.color}15;color:${r.color};font-size:11px;font-weight:800">${r.icon}</div> <div style="flex:1"><div style="font-weight:700;font-size:14px;color:#1A2332">${r.name}</div><div style="font-size:11px;color:#546E7A;margin-top:2px">${r.desc}</div>${!sel?'<div class="tap-hint">Tap to see how to use this report</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${sel?'180':'0'}deg)">${sel?'&#9650;':'&#9660;'}</span> </div> ${sel?`<div class="tk-card-b"> <div class="tk-path"><span style="font-family:monospace">${r.path}</span></div> <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Best for</div><div class="tk-chips">${r.bestFor.map(b=>`<span class="tk-chip" style="background:#f3f2f1;color:#37474F;font-weight:500">${b}</span>`).join('')}</div></div> <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What you will see</div><div class="tk-chips">${r.dataPoints.map(dp=>`<span class="tk-chip" style="background:${r.color}10;color:${r.color};font-weight:500;border:1px solid ${r.color}30">${dp}</span>`).join('')}</div></div> <div class="tk-tip" style="background:#FFF8E1;border-color:${r.color}"><div style="font-size:10px;font-weight:700;color:${r.color};margin-bottom:4px">EXAMPLE \u2014 What to look for</div><div style="font-size:12px;color:#37474F;line-height:1.5">${r.realInsight}</div></div> ${r.policyLink?`<div style="margin-top:8px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${r.policyLink}';render()">${r.policyLink} \u2014 View Policy</button></div>`:''} </div>`:''}
  </div>`}).join('')}`;
 }
 
@@ -6297,10 +6297,10 @@ function tkLibrary(){
    });
  });
  const filtered=TK_INTERVENTIONS.filter(i=>S.filterCat==='All'||i.category===S.filterCat);
- return`<p style="font-size:12px;color:#607D8B;margin-bottom:12px;line-height:1.6">A collection of <strong>intervention ideas</strong> that officials across the programme have found useful when working with DDD data. Each includes suggested steps, which DDD reports to reference, and relevant policy context.<br><br><span style="font-size:11px;color:#999;font-style:italic">These are suggestions, not prescriptions — results will depend on your local context and how you adapt them to your schools.</span></p>
+ return`<p style="font-size:12px;color:#546E7A;margin-bottom:12px;line-height:1.6">A collection of <strong>intervention ideas</strong> that officials across the programme have found useful when working with DDD data. Each includes suggested steps, which DDD reports to reference, and relevant policy context.<br><br><span style="font-size:11px;color:#999;font-style:italic">These are suggestions, not prescriptions — results will depend on your local context and how you adapt them to your schools.</span></p>
  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${cats.map(c=>`<button class="tk-filt${S.filterCat===c?' on':''}" onclick="S.filterCat='${c}';render()">${c}</button>`).join('')}</div>
  ${filtered.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);const myCount=usageCounts[iv.id]||0;return`
- <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E8F5E9':iv.difficulty==='Standard'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#E8952E'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:11px;color:#607D8B">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:10px;color:#607D8B">${iv.timeToImpact}</span><span style="font-size:10px;color:#607D8B">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
+ <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E8F5E9':iv.difficulty==='Standard'?'#E3F2FD':'#FFF3E0'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#E8952E'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:11px;color:#546E7A">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:10px;color:#546E7A">${iv.timeToImpact}</span><span style="font-size:10px;color:#546E7A">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:11px;font-weight:700;color:#0B8E8D;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
  <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:10px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:12px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:11px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:10px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E0F4F4;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#074445">Want to try this approach?</div><div style="font-size:11px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
  </div>`}).join('')}`; 
 }
@@ -6311,10 +6311,10 @@ function tkPeers(){
  <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:32px 20px;text-align:center;margin-bottom:16px">
    <div style="font-size:40px;margin-bottom:12px">&#128101;</div>
    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Coming Soon</div>
-   <div style="font-size:12px;color:#607D8B;line-height:1.7;max-width:400px;margin:0 auto">As more officials across the programme log their activities and record outcomes, this section will show anonymised insights into what interventions others are using, what results they are seeing, and what is working across districts and provinces.</div>
+   <div style="font-size:12px;color:#546E7A;line-height:1.7;max-width:400px;margin:0 auto">As more officials across the programme log their activities and record outcomes, this section will show anonymised insights into what interventions others are using, what results they are seeing, and what is working across districts and provinces.</div>
    <div style="margin-top:16px;padding:12px 16px;background:#F5F6FA;border-radius:8px;max-width:360px;margin-left:auto;margin-right:auto">
      <div style="font-size:11px;font-weight:600;color:var(--teal);margin-bottom:4px">What to expect</div>
-     <div style="font-size:11px;color:#607D8B;line-height:1.6;text-align:left">
+     <div style="font-size:11px;color:#546E7A;line-height:1.6;text-align:left">
        &#8226; Most-used intervention types across the programme<br>
        &#8226; Anonymised results reported by other officials<br>
        &#8226; Strategies gaining traction in similar districts
