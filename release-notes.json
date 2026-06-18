@@ -1,4 +1,12 @@
 {
+  "2026.06.13.4": {
+    "title": "Fix for the bottom bar Dashboard button",
+    "released": "2026-06-13",
+    "highlights": [
+      "Fixed the Dashboard button on the new bottom bar, which wasn't responding to taps",
+      "Pop-up confirmation messages now sit clear of the bottom bar"
+    ]
+  },
   "2026.06.13.3": {
     "title": "New bottom navigation bar on phones",
     "released": "2026-06-13",
