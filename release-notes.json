@@ -1,4 +1,13 @@
 {
+  "2026.06.18.2": {
+    "title": "Your phone now gives a gentle buzz to confirm a save",
+    "released": "2026-06-18",
+    "highlights": [
+      "When you submit a visit, your phone gives a soft confirming buzz — including when it's saved offline to send later",
+      "If a required field is still missing, you'll feel a firmer buzz so a blocked Submit is hard to miss",
+      "Works on Android phones; iPhones and phones with vibration switched off simply feel nothing, and everything else works exactly the same"
+    ]
+  },
   "2026.06.18.1": {
     "title": "Next and Back buttons stay in reach while you fill in a visit",
     "released": "2026-06-18",
