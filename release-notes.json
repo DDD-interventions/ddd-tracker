@@ -1,4 +1,13 @@
 {
+  "2026.06.18.6": {
+    "title": "Get back to My Dashboard while recording an intervention",
+    "released": "2026-06-18",
+    "highlights": [
+      "While filling in an intervention on a phone, you can now jump to My Dashboard or the Toolkit from the buttons at the top — no need to sign out",
+      "If you leave a half-finished intervention, it's saved as a draft automatically so you can pick up where you left off",
+      "Nothing changes on desktop"
+    ]
+  },
   "2026.06.18.5": {
     "title": "Confirmation messages stay long enough to read",
     "released": "2026-06-18",
