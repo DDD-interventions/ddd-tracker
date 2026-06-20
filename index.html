@@ -722,6 +722,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .form-nav .btn{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;margin:0}
   .form-nav--end .btn{flex:0 1 auto;min-width:150px}
 }
+/* ── 2026.06.18.6: in-form nav back to Dashboard/Toolkit on mobile ── */
+@media(max-width:760px){.nav-compact.nav-compact--in-form{display:flex}}
 </style>
 </head>
 <body>
@@ -985,7 +987,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.5';
+const APP_VERSION = '2026.06.18.6';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3002,7 +3004,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navToLog()">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="S.view='toolkit';render()">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact ${(S.view==='log'&&S.f.formStep>=0&&!S.submitted)?'nav-compact--in-form':''}"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navFromForm('log')">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> ${renderBottomNav()} `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -3220,6 +3222,14 @@ function navToLog() {
   if (S.f.formStep === -1) S.f.formStep = 0;
   render();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Navigate away from the form without losing work: silently saves a draft if mid-entry, then goes to the chosen section.
+function navFromForm(dest) {
+  if (S.view === 'log' && S.f.formStep >= 0 && !S.submitted && isFormDirty()) { saveFormDraft(); }
+  if (dest === 'dashboard') { S.view = 'dashboard'; S.dashTab = S.dashTab || 'overview'; render(); }
+  else if (dest === 'toolkit') { S.view = 'toolkit'; render(); }
+  else { navToLog(); }
 }
 
 function renderNotifyToggle() {
