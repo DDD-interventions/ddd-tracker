@@ -1,4 +1,12 @@
 {
+  "2026.06.18.7": {
+    "title": "Clearer text on the green action buttons",
+    "released": "2026-06-18",
+    "highlights": [
+      "The label on the green “Record new intervention” button (and the update button) is now dark instead of white, making it much easier to read",
+      "The buttons keep their familiar green colour"
+    ]
+  },
   "2026.06.18.6": {
     "title": "Get back to My Dashboard while recording an intervention",
     "released": "2026-06-18",
