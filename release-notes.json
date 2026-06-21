@@ -1,4 +1,13 @@
 {
+  "2026.06.18.8": {
+    "title": "The bottom menu now stays put everywhere",
+    "released": "2026-06-18",
+    "highlights": [
+      "Record, Dashboard and Toolkit now stay at the bottom of the screen at all times — including while you fill in an intervention",
+      "No more jumping to the top: the menu is always in the same place and always within thumb's reach",
+      "While recording, the Next/Back buttons sit just above the menu; leaving a half-finished intervention still saves a draft"
+    ]
+  },
   "2026.06.18.7": {
     "title": "Clearer text on the green action buttons",
     "released": "2026-06-18",
