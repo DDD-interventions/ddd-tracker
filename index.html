@@ -734,7 +734,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 <body>
 <div id="app"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <script>
@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.11';
+const APP_VERSION = '2026.06.18.13';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1053,7 +1053,7 @@ const S = {
 
 // SUPABASE 
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
- auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+ auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, experimental: { passkey: true } }
 });
 
 async function notifyLogin(official) {
@@ -3244,6 +3244,78 @@ function renderNotifyToggle() {
     '<div style="width:40px;height:22px;border-radius:11px;background:' + (isOn ? '#7AB648' : '#c8c6c4') + ';position:relative;transition:.2s;flex-shrink:0"><div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;' + (isOn ? 'left:20px' : 'left:2px') + ';transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)"></div></div>' +
   '</div>';
 }
+// ─── BIOMETRIC SIGN-IN (passkeys, beta) ──────────────────────────────
+// Settings-only enrolment for now. Sign-in button on the gate comes later.
+function renderBiometricSetting() {
+  if (!S._bio) S._bio = { checked:false, checking:false, supported:null, count:0, busy:false };
+  if (!S._bio.checked && !S._bio.checking) { S._bio.checking = true; setTimeout(checkBiometricState, 0); }
+  function card(title, sub, right) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f7f9fc;border-radius:8px;min-height:44px;border:1px solid #e8e6e4;margin-top:10px">' +
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + title + '</div>' +
+      '<div style="font-size:11px;color:var(--grey);margin-top:2px">' + sub + '</div></div>' + (right || '') + '</div>';
+  }
+  if (!S._bio.checked) return card('Biometric sign-in', 'Checking if your device supports it\u2026', '');
+  if (S._bio.busy) return card('Biometric sign-in', 'Follow the prompt on your device\u2026', '');
+  if (S._bio.supported === false) return card('Biometric sign-in', 'Not available on this device', '');
+  if (S._bio.count > 0) {
+    var rm = '<button onclick="removeBiometric()" style="flex-shrink:0;background:#fff;border:1.5px solid #c0202a;color:#c0202a;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;min-height:40px;cursor:pointer">Remove</button>';
+    return card('Biometric sign-in is on', 'You can sign in with your fingerprint or face', rm);
+  }
+  var setup = '<button onclick="enrolBiometric()" style="flex-shrink:0;background:var(--green);border:none;color:#1A2332;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;min-height:40px;cursor:pointer">Set up</button>';
+  return card('Set up biometric sign-in', 'Use your fingerprint or face to sign in next time', setup);
+}
+
+async function checkBiometricState() {
+  var st = S._bio || (S._bio = { checked:false, checking:true, supported:null, count:0, busy:false });
+  try {
+    var hasApi = !!(sb && sb.auth && typeof sb.auth.registerPasskey === 'function' && sb.auth.passkey);
+    var hasWebauthn = (typeof window.PublicKeyCredential !== 'undefined');
+    var platform = false;
+    if (hasApi && hasWebauthn && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+      try { platform = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); } catch (e) { platform = false; }
+    }
+    st.supported = !!(hasApi && hasWebauthn && platform);
+    st.count = 0;
+    if (st.supported) {
+      try { var res = await sb.auth.passkey.list(); st.count = (res && res.data && res.data.length) ? res.data.length : 0; } catch (e) { st.count = 0; }
+    }
+  } catch (e) { st.supported = false; }
+  st.checked = true; st.checking = false; render();
+}
+
+async function enrolBiometric() {
+  var st = S._bio; if (!st) return;
+  st.busy = true; render();
+  try {
+    var out = await sb.auth.registerPasskey();
+    if (out && out.error) {
+      var m = (out.error.message || '').toLowerCase();
+      if (m.indexOf('not allowed') >= 0 || m.indexOf('cancel') >= 0 || m.indexOf('abort') >= 0) { /* user cancelled — quiet */ }
+      else if (m.indexOf('confirm') >= 0) { showToast('Your account email is not confirmed yet'); haptic(HAPTIC_ERR); }
+      else { showToast('Could not set up biometric sign-in'); haptic(HAPTIC_ERR); }
+    } else {
+      showToast('Biometric sign-in is set up'); haptic(HAPTIC_OK);
+    }
+  } catch (e) {
+    var em = ((e && (e.name || e.message)) || '').toString().toLowerCase();
+    if (em.indexOf('notallowed') >= 0 || em.indexOf('abort') >= 0) { /* cancelled — quiet */ }
+    else { showToast('Could not set up biometric sign-in'); haptic(HAPTIC_ERR); }
+  }
+  st.busy = false; st.checked = false; st.checking = false; render();
+}
+
+async function removeBiometric() {
+  var st = S._bio; if (!st) return;
+  st.busy = true; render();
+  try {
+    var res = await sb.auth.passkey.list();
+    var list = (res && res.data) ? res.data : [];
+    for (var i = 0; i < list.length; i++) { try { await sb.auth.passkey.delete({ passkeyId: list[i].id }); } catch (e) {} }
+    showToast('Biometric sign-in removed');
+  } catch (e) { showToast('Could not remove biometric sign-in'); }
+  st.busy = false; st.checked = false; st.checking = false; render();
+}
+
 function renderWelcome() {
   var firstName = 'there';
   if (S.official.full_name && S.official.full_name !== 'Official') {
@@ -6079,6 +6151,7 @@ ${tab==='tracker'?`
 <div style="max-width:640px;margin:20px auto 0;padding:0 16px">
   <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
   ${renderNotifyToggle()}
+  ${renderBiometricSetting()}
 </div>
 
 </div>`;
