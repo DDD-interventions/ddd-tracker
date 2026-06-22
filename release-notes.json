@@ -1,4 +1,12 @@
 {
+  "2026.06.18.9": {
+    "title": "Green and orange text is easier to read",
+    "released": "2026-06-18",
+    "highlights": [
+      "Green and orange text (status labels, numbers and headings) is now a darker shade so it reads clearly on white",
+      "Coloured buttons, borders and highlights keep their familiar bright colours"
+    ]
+  },
   "2026.06.18.8": {
     "title": "The bottom menu now stays put everywhere",
     "released": "2026-06-18",
