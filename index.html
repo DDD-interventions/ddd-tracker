@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;--green:#7AB648;--green-dk:#5FAD56;--green-lt:#E8F5E9;--orange:#E8952E;--orange-lt:#FFF3E0;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#546E7A;--grey-lt:#ECEFF1;--grey-dk:#37474F;--red:#E53935;--red-lt:#FFEBEE;--blue:#1565C0;--blue-lt:#E3F2FD}
+:root{--teal:#0B8E8D;--teal-dk:#074445;--teal-lt:#E0F4F4;--teal-md:#4DB6AC;--green:#7AB648;--green-text:#467019;--green-dk:#5FAD56;--green-lt:#E8F5E9;--orange:#E8952E;--orange-text:#9E5800;--orange-lt:#FFF3E0;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#546E7A;--grey-lt:#ECEFF1;--grey-dk:#37474F;--red:#E53935;--red-lt:#FFEBEE;--blue:#1565C0;--blue-lt:#E3F2FD}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#323130;min-height:100vh}
 
 /* HEADER */
@@ -283,7 +283,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .stat-card .st-desc{font-size:11px;color:var(--grey);line-height:1.4;margin-bottom:16px}
 .stat-card .st-num{font-size:36px;font-weight:300;line-height:1;color:var(--teal)}
 .stat-card.green .st-num{color:var(--green-dk)}
-.stat-card.orange .st-num{color:var(--orange)}
+.stat-card.orange .st-num{color:var(--orange-text)}
 .stat-card .st-foot{font-size:11px;color:var(--grey);margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0}
 
 .dash-section{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
@@ -369,7 +369,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .form-live-progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
 .form-live-progress-label{font-size:11px;font-weight:600;color:var(--grey-dk)}
 .form-live-progress-pct{font-size:13px;font-weight:700;color:var(--teal)}
-.form-live-progress-pct.complete{color:var(--green)}
+.form-live-progress-pct.complete{color:var(--green-text)}
 .form-live-bar{height:6px;background:#e8e6e4;border-radius:3px;overflow:hidden}
 .form-live-bar-fill{height:100%;border-radius:3px;transition:width .4s ease,background .4s ease}
 .form-live-progress-hint{font-size:10px;color:var(--grey);margin-top:5px;line-height:1.4;min-height:14px}
@@ -540,7 +540,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .streak-dots{display:flex;gap:4px;margin-top:6px}
 .streak-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
 .streak-dot.sd-done{background:var(--green);color:#fff}
-.streak-dot.sd-now{background:#FFF3E0;color:var(--orange);border:2px solid var(--orange)}
+.streak-dot.sd-now{background:#FFF3E0;color:var(--orange-text);border:2px solid var(--orange)}
 .streak-dot.sd-future{background:#f0f0f0;color:var(--grey-lt)}
 .act-summary-bar{display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid var(--grey-lt);overflow:hidden;margin-bottom:12px}
 .act-summary-item{flex:1;text-align:center;padding:12px 6px;cursor:pointer;transition:background .15s;position:relative;font-family:inherit;border:none;background:none}
@@ -554,7 +554,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-summary-item.active.s-done::after{background:var(--green)}
 .act-summary-item.active.s-followup::after{background:#F57F17}
 .act-summary-num{font-size:20px;font-weight:800;line-height:1}
-.act-summary-num.c-teal{color:var(--teal)}.act-summary-num.c-orange{color:var(--orange)}.act-summary-num.c-blue{color:var(--blue)}.act-summary-num.c-green{color:var(--green)}
+.act-summary-num.c-teal{color:var(--teal)}.act-summary-num.c-orange{color:var(--orange-text)}.act-summary-num.c-blue{color:var(--blue)}.act-summary-num.c-green{color:var(--green-text)}
 .act-summary-label{font-size:11px;color:var(--grey);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
 .act-stack-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#ECEFF1;margin-bottom:14px}
 .act-stack-seg{height:100%;transition:width .4s}
@@ -573,9 +573,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-post-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .act-meta-tag{font-size:11px;padding:3px 8px;border-radius:12px;background:#f0f2f5;color:#606770}
 .act-status-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;letter-spacing:.3px}
-.act-status-tag.st-ip{background:#FFF3E0;color:var(--orange)}
+.act-status-tag.st-ip{background:#FFF3E0;color:var(--orange-text)}
 .act-status-tag.st-pl{background:#E3F2FD;color:var(--blue)}
-.act-status-tag.st-c{background:var(--green-lt);color:var(--green)}
+.act-status-tag.st-c{background:var(--green-lt);color:var(--green-text)}
 .act-action-bar{display:flex;border-top:1px solid #f0f0f0;margin:0 14px}
 .act-action-btn{flex:1;text-align:center;padding:10px 6px;font-size:12px;font-weight:600;color:#65676b;cursor:pointer;background:none;border:none;font-family:inherit;min-height:44px;transition:background .15s}
 .act-action-btn:hover{background:#f0f2f5;border-radius:6px}
@@ -614,9 +614,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .pt-send:hover{background:var(--teal-dk)}
 /* Owner action buttons */
 .poa-btn{font-family:inherit;font-size:11px;font-weight:700;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .15s;flex:1;text-align:center}
-.poa-start{border:1.5px solid var(--orange);background:#fff;color:var(--orange)}
+.poa-start{border:1.5px solid var(--orange);background:#fff;color:var(--orange-text)}
 .poa-start:hover{background:var(--orange);color:#fff}
-.poa-done{border:1.5px solid var(--green);background:#fff;color:var(--green)}
+.poa-done{border:1.5px solid var(--green);background:#fff;color:var(--green-text)}
 .poa-done:hover{background:var(--green);color:#fff}
 /* Notification bell & pane */
 .notif-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);cursor:pointer;font-size:18px;transition:.15s;flex-shrink:0;font-family:inherit;padding:0}
@@ -685,7 +685,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .ver-row-label{color:var(--grey);font-weight:500}
 .ver-row-value{color:var(--navy);font-weight:600;font-family:'SF Mono','Consolas',monospace;font-size:12px}
 .ver-row-value .uptodate{color:var(--green-dk);font-weight:700;margin-left:6px}
-.ver-row-value .behind{color:var(--orange);font-weight:700;margin-left:6px}
+.ver-row-value .behind{color:var(--orange-text);font-weight:700;margin-left:6px}
 .ver-sheet-btn{width:100%;margin-top:18px;padding:13px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
 .ver-sheet-btn:hover{background:var(--teal-dk)}
 .ver-sheet-btn:disabled{background:#d0d4db;cursor:not-allowed}
@@ -990,7 +990,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.8';
+const APP_VERSION = '2026.06.18.9';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1508,7 +1508,7 @@ function renderOffSearchResultsInner(need) {
   } else if (results.length > 0) {
     var names = {}; results.forEach(function(o){names[o.name]=(names[o.name]||0)+1;});
     var hasDupes = Object.values(names).some(function(c){return c > 1;});
-    if (hasDupes) html += '<div style="font-size:10px;color:var(--orange);padding:4px 0;font-weight:600">More than one person shares this name \u2014 check the circuit and email.</div>';
+    if (hasDupes) html += '<div style="font-size:10px;color:var(--orange-text);padding:4px 0;font-weight:600">More than one person shares this name \u2014 check the circuit and email.</div>';
     html += '<div style="max-height:180px;overflow-y:auto;border:1px solid #e8e6e4;border-radius:4px;margin-top:4px">';
     results.forEach(function(o) {
       var alreadyTagged = tagged.some(function(t){return t.id === o.id;});
@@ -4009,7 +4009,7 @@ function renderFormStep4(){
       ${S.f.doc_files.length<5?`<div class="upload-area" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleFileDrop(event)">
         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)" multiple>
         <div class="upload-label">Tap to upload from your device</div><div class="upload-hint">PDF, Word, Excel, images \u2014 max 6MB per file \u2014 ${5-S.f.doc_files.length} slot${5-S.f.doc_files.length!==1?'s':''} remaining</div>
-      </div>`:'<div style="text-align:center;font-size:12px;color:var(--orange);padding:10px;background:var(--orange-lt);border-radius:6px;margin-bottom:6px">Maximum 5 files reached</div>'}
+      </div>`:'<div style="text-align:center;font-size:12px;color:var(--orange-text);padding:10px;background:var(--orange-lt);border-radius:6px;margin-bottom:6px">Maximum 5 files reached</div>'}
       ${S.f.doc_files.length?S.f.doc_files.map((file,idx)=>`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_names[idx]||file.name)}</span><span style="font-size:10px;color:var(--grey)">${(file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="removeDocFile(${idx})" title="Remove">&times;</button></div>`).join(''):''}
       ${S.f.doc_file&&!S.f.doc_files.length?`<div class="file-preview"><span class="file-name">${esc(S.f.doc_file_name)}</span><span style="font-size:10px;color:var(--grey)">${(S.f.doc_file.size/1024).toFixed(0)}KB</span><button class="file-remove" onclick="S.f.doc_file=null;S.f.doc_file_name='';render()" title="Remove">&times;</button></div>`:''}
       <div style="text-align:center;font-size:11px;color:var(--grey);margin:8px 0">\u2014 or paste a link \u2014</div>
@@ -4032,9 +4032,9 @@ function renderFormReview(){
     <div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:#F57F17;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--green)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:10px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:12px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:12px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
     ${renderLocationCard()}
     <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
@@ -5306,7 +5306,7 @@ function renderDashboard() {
        _pendRequested.forEach(function(it){ _supHTML += _renderPendCard(it); });
      }
      if (_pendRoleMatch.length) {
-       _supHTML += '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:' + (_pendRequested.length?'12px':'0') + ' 0 6px">Based on your role (' + _pendRoleMatch.length + ')</div>';
+       _supHTML += '<div style="font-size:11px;font-weight:700;color:var(--orange-text);text-transform:uppercase;letter-spacing:.5px;margin:' + (_pendRequested.length?'12px':'0') + ' 0 6px">Based on your role (' + _pendRoleMatch.length + ')</div>';
        _pendRoleMatch.forEach(function(it){ _supHTML += _renderPendCard(it); });
      }
      _supHTML += '</div>';
@@ -5314,7 +5314,7 @@ function renderDashboard() {
 
    // ── COMPLETED PENDING REQUESTS ──
    if (_pendCompleted.length) {
-     _supHTML += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px">\u2713 Completed support requests ('+_pendCompleted.length+')</div>';
+     _supHTML += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--green-text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px">\u2713 Completed support requests ('+_pendCompleted.length+')</div>';
      _pendCompleted.forEach(function(it){
        var ago = '';
        if (it.date) { var d=parseLocalDate(it.date); var diff=Math.floor((new Date()-d)/(1000*60*60*24)); ago=diff===0?'Today':diff===1?'1 day ago':diff+' days ago'; }
@@ -5559,11 +5559,11 @@ ${tab==='overview'?`
              </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5">
                <span style="font-size:11px;color:var(--grey-dk)">DDD helped decide</span>
-               <span style="font-size:13px;font-weight:700;color:var(--green)">${dddUsageCounts.informed}</span>
+               <span style="font-size:13px;font-weight:700;color:var(--green-text)">${dddUsageCounts.informed}</span>
              </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5">
                <span style="font-size:11px;color:var(--grey-dk)">Partially used DDD</span>
-               <span style="font-size:13px;font-weight:700;color:var(--orange)">${dddUsageCounts.partial}</span>
+               <span style="font-size:13px;font-weight:700;color:var(--orange-text)">${dddUsageCounts.partial}</span>
              </div>
              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
                <span style="font-size:11px;color:var(--grey-dk)">Other data source</span>
@@ -5709,7 +5709,7 @@ ${tab==='trends'?`
    if(issueCount || inPlaceCount) {
      obsHtml += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
      if(issueCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--red);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red);line-height:1.2">'+issueCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Needs attention</div></div>';
-     if(inPlaceCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--green);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2">'+inPlaceCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Working well</div></div>';
+     if(inPlaceCount) obsHtml += '<div style="flex:1;min-width:120px;background:#fff;border:2px solid var(--green);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green-text);line-height:1.2">'+inPlaceCount+'</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:2px">Working well</div></div>';
      obsHtml += '</div>';
    }
    /* Issue cards */
@@ -5746,16 +5746,16 @@ ${tab==='trends'?`
    }
    /* Working well cards */
    if(inPlace.length) {
-     obsHtml += '<div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px">Working well</div>';
+     obsHtml += '<div style="font-size:13px;font-weight:700;color:var(--green-text);margin-bottom:10px">Working well</div>';
      obsHtml += '<div style="display:grid;gap:10px">';
      inPlace.forEach(function(o){
        var n = obsYes[o.key]||0;
        var _rawSchools=obsYesSchools[o.key]||[];var _uniqSchools=[].concat(_rawSchools).filter(function(v,i,a){return a.indexOf(v)===i});var schools=_uniqSchools.slice(0,3).join(', ')+(_uniqSchools.length>3?' and '+(_uniqSchools.length-3)+' more':'');
        obsHtml += '<div style="border-radius:10px;background:#fff;border:1.5px solid #C8E6C9;padding:14px">'
          + '<div style="display:flex;align-items:center;gap:10px">'
-           + '<div style="min-width:42px;height:42px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--green)">'+n+'</span></div>'
+           + '<div style="min-width:42px;height:42px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:18px;font-weight:800;color:var(--green-text)">'+n+'</span></div>'
            + '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div>'
-             + (schools ? '<div style="font-size:12px;color:var(--grey);margin-top:4px;line-height:1.5">At: '+esc(schools)+'</div>' : '<div style="font-size:12px;font-weight:600;color:var(--green);margin-top:2px">Found at '+n+' school'+(n!==1?'s':'')+'</div>')
+             + (schools ? '<div style="font-size:12px;color:var(--grey);margin-top:4px;line-height:1.5">At: '+esc(schools)+'</div>' : '<div style="font-size:12px;font-weight:600;color:var(--green-text);margin-top:2px">Found at '+n+' school'+(n!==1?'s':'')+'</div>')
            + '</div>'
          + '</div>'
        + '</div>';
@@ -5852,7 +5852,7 @@ ${tab==='tracker'?`
          if (wh.current) return '<div class="streak-dot sd-now">'+wh.num+'</div>';
          return wh.hit ? '<div class="streak-dot sd-done">'+wh.num+'</div>' : '<div class="streak-dot sd-future">'+wh.num+'</div>';
        }).join('');
-       return '<div class="streak-bar"><div style="font-size:24px;font-weight:800;color:var(--orange);line-height:1">'+streak+'</div><div class="streak-info"><div class="streak-title">'+streak+'-week logging streak</div><div class="streak-sub">You\u2019ve logged activities '+(streak>=3?'every':'most')+' week'+(streak>1?'s':'')+' this term</div><div class="streak-dots">'+dots+'</div></div></div>';
+       return '<div class="streak-bar"><div style="font-size:24px;font-weight:800;color:var(--orange-text);line-height:1">'+streak+'</div><div class="streak-info"><div class="streak-title">'+streak+'-week logging streak</div><div class="streak-sub">You\u2019ve logged activities '+(streak>=3?'every':'most')+' week'+(streak>1?'s':'')+' this term</div><div class="streak-dots">'+dots+'</div></div></div>';
      })()}
 
      <div class="act-summary-bar">
@@ -6004,9 +6004,9 @@ ${tab==='tracker'?`
              html += '<div style="font-size:11px;font-weight:700;color:#F57F17;margin-bottom:4px">Follow-up due</div>';
              html += '<div style="font-size:12px;color:var(--navy);line-height:1.5">'+esc(c.det.follow_up_desc)+'</div>';
              if (c.det.follow_up_completed) {
-               html += '<div style="font-size:10px;color:var(--green);font-weight:600;margin-top:6px">Completed'+(c.det.follow_up_completed_date?' on '+c.det.follow_up_completed_date:'')+'</div>';
+               html += '<div style="font-size:10px;color:var(--green-text);font-weight:600;margin-top:6px">Completed'+(c.det.follow_up_completed_date?' on '+c.det.follow_up_completed_date:'')+'</div>';
              } else if (isMine) {
-               html += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="event.stopPropagation();markFollowUpDone(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Done</button><button onclick="event.stopPropagation();logFollowUpVisit(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Log Follow-up Visit</button></div>';
+               html += '<div style="display:flex;gap:6px;margin-top:8px"><button onclick="event.stopPropagation();markFollowUpDone(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--green);background:#fff;color:var(--green-text);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Done</button><button onclick="event.stopPropagation();logFollowUpVisit(\''+decIdEsc+'\')" style="flex:1;padding:8px;font-size:11px;font-weight:600;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:6px;cursor:pointer;font-family:inherit;min-height:44px">Log Follow-up Visit</button></div>';
              }
              html += '</div>';
            }
