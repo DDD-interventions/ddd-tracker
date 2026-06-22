@@ -1,1 +1,153 @@
-2026.06.18.10
+{
+  "2026.06.18.10": {
+    "title": "Larger reading text on forms and the review screen",
+    "released": "2026-06-18",
+    "highlights": [
+      "Helper text, section subtitles, the review screen and similar reading text are now slightly larger and easier to read",
+      "Menus, tabs and labels are unchanged so nothing shifts position"
+    ]
+  },
+  "2026.06.18.9": {
+    "title": "Green and orange text is easier to read",
+    "released": "2026-06-18",
+    "highlights": [
+      "Green and orange text (status labels, numbers and headings) is now a darker shade so it reads clearly on white",
+      "Coloured buttons, borders and highlights keep their familiar bright colours"
+    ]
+  },
+  "2026.06.18.8": {
+    "title": "The bottom menu now stays put everywhere",
+    "released": "2026-06-18",
+    "highlights": [
+      "Record, Dashboard and Toolkit now stay at the bottom of the screen at all times — including while you fill in an intervention",
+      "No more jumping to the top: the menu is always in the same place and always within thumb's reach",
+      "While recording, the Next/Back buttons sit just above the menu; leaving a half-finished intervention still saves a draft"
+    ]
+  },
+  "2026.06.18.7": {
+    "title": "Clearer text on the green action buttons",
+    "released": "2026-06-18",
+    "highlights": [
+      "The label on the green “Record new intervention” button (and the update button) is now dark instead of white, making it much easier to read",
+      "The buttons keep their familiar green colour"
+    ]
+  },
+  "2026.06.18.6": {
+    "title": "Get back to My Dashboard while recording an intervention",
+    "released": "2026-06-18",
+    "highlights": [
+      "While filling in an intervention on a phone, you can now jump to My Dashboard or the Toolkit from the buttons at the top — no need to sign out",
+      "If you leave a half-finished intervention, it's saved as a draft automatically so you can pick up where you left off",
+      "Nothing changes on desktop"
+    ]
+  },
+  "2026.06.18.5": {
+    "title": "Confirmation messages stay long enough to read",
+    "released": "2026-06-18",
+    "highlights": [
+      "Pop-up messages now stay on screen longer, and longer messages stay up longer still",
+      "Tap a message to dismiss it once you've read it",
+      "Messages are now read aloud by screen readers for users who rely on them"
+    ]
+  },
+  "2026.06.18.4": {
+    "title": "Larger text in more places",
+    "released": "2026-06-18",
+    "highlights": [
+      "The smallest captions and labels (like comment times, summaries and filter labels) are now larger and easier to read",
+      "Nothing moves or changes — the same screens, with more readable text"
+    ]
+  },
+  "2026.06.18.3": {
+    "title": "Clearer, easier-to-read text",
+    "released": "2026-06-18",
+    "highlights": [
+      "Smaller grey text (hints, labels and captions) is now darker and easier to read",
+      "The labels on the bottom navigation bar are clearer too",
+      "Nothing changes in how the app works — the same screens, just more comfortable to read"
+    ]
+  },
+  "2026.06.18.2": {
+    "title": "Your phone now gives a gentle buzz to confirm a save",
+    "released": "2026-06-18",
+    "highlights": [
+      "When you submit a visit, your phone gives a soft confirming buzz — including when it's saved offline to send later",
+      "If a required field is still missing, you'll feel a firmer buzz so a blocked Submit is hard to miss",
+      "Works on Android phones; iPhones and phones with vibration switched off simply feel nothing, and everything else works exactly the same"
+    ]
+  },
+  "2026.06.18.1": {
+    "title": "Next and Back buttons stay in reach while you fill in a visit",
+    "released": "2026-06-18",
+    "highlights": [
+      "On phones, the Next and Back buttons now stay fixed at the bottom of the screen while you work through a visit",
+      "No more scrolling to the end of a step to move forward or back — they're always within thumb's reach",
+      "Nothing changes on desktop, and your information is unaffected"
+    ]
+  },
+  "2026.06.13.4": {
+    "title": "Fix for the bottom bar Dashboard button",
+    "released": "2026-06-13",
+    "highlights": [
+      "Fixed the Dashboard button on the new bottom bar, which wasn't responding to taps",
+      "Pop-up confirmation messages now sit clear of the bottom bar"
+    ]
+  },
+  "2026.06.13.3": {
+    "title": "New bottom navigation bar on phones",
+    "released": "2026-06-13",
+    "highlights": [
+      "On phones, there's now a fixed bar at the bottom with Record, Dashboard, and Toolkit",
+      "Tap to jump between the main sections without scrolling back to the top",
+      "The bar tucks away while you're filling in a visit, so it stays out of your way"
+    ]
+  },
+  "2026.06.13.2": {
+    "title": "Bigger, bolder home screen buttons",
+    "released": "2026-06-13",
+    "highlights": [
+      "The main home screen buttons (Record, Dashboard, Toolkit) are now larger, card-style buttons",
+      "They have a soft shadow and a subtle press animation, so they feel more responsive when tapped",
+      "Easier to find and tap, especially on a phone"
+    ]
+  },
+  "2026.06.13.1": {
+    "title": "Easier tapping on your phone",
+    "released": "2026-06-13",
+    "highlights": [
+      "Tag chips, toolkit tabs, and time-period buttons are now bigger and easier to tap",
+      "Fewer accidental and missed taps when logging a visit on a phone",
+      "Nothing changes in how the app works — just larger, more comfortable touch targets"
+    ]
+  },
+  "2026.05.25.3": {
+    "title": "Location capture on submissions",
+    "released": "2026-05-25",
+    "highlights": [
+      "Submissions now capture your phone GPS location as evidence of the visit",
+      "Location appears on the audit PDF with a Google Maps link reviewers can click",
+      "Location capture happens automatically when you reach the review step — no extra taps",
+      "If location is unavailable or you decline, your submission still goes through normally",
+      "You'll see a confirmation card showing your captured location before you submit"
+    ]
+  },
+  "2026.05.25.2": {
+    "title": "Security & reliability fix",
+    "released": "2026-05-25",
+    "highlights": [
+      "Fixed an issue where the app could occasionally display the wrong official's profile after a long period of inactivity",
+      "Improved session handling so your account information is always loaded correctly",
+      "If you've been using the app today, please sign out and sign in again to refresh your session"
+    ]
+  },
+  "2026.05.25.1": {
+    "title": "Now installable as an app!",
+    "released": "2026-05-25",
+    "highlights": [
+      "The Tracker is now installable as a mobile app on Android (home screen) and as a desktop app on Windows/Mac",
+      "Faster loading and works offline for the app shell",
+      "New version notifications when updates are published",
+      "Version information is now visible in the footer"
+    ]
+  }
+}
