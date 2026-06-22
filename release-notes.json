@@ -1,4 +1,11 @@
 {
+  "2026.06.18.11": {
+    "title": "You can now reach the version number at the bottom",
+    "released": "2026-06-18",
+    "highlights": [
+      "On phones, the footer and version button were hidden behind the bottom menu — they now sit clear of it so you can tap the version for details"
+    ]
+  },
   "2026.06.18.10": {
     "title": "Larger reading text on forms and the review screen",
     "released": "2026-06-18",
