@@ -1,4 +1,21 @@
 {
+  "2026.06.18.13": {
+    "title": "Biometric sign-in — early access",
+    "released": "2026-06-18",
+    "highlights": [
+      "You can now set up fingerprint or face sign-in from the Settings section",
+      "We're rolling this out gradually — email and PIN sign-in stays exactly the same",
+      "Find it under Settings, tap ‘Set up’, and follow your phone's prompt"
+    ]
+  },
+  "2026.06.18.12": {
+    "title": "Groundwork for biometric sign-in",
+    "released": "2026-06-18",
+    "highlights": [
+      "Behind-the-scenes preparation for an upcoming option to sign in with your fingerprint or face",
+      "Nothing changes for now — you still sign in with your email and PIN as usual"
+    ]
+  },
   "2026.06.18.11": {
     "title": "You can now reach the version number at the bottom",
     "released": "2026-06-18",
