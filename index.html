@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.13';
+const APP_VERSION = '2026.06.18.14';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3056,6 +3056,7 @@ function renderEmailGate() {
        <button class="gate-btn" onclick="handleGateSubmit()" ${S.gateLoading?'disabled':''}>
          ${S.gateLoading?'<span class="gate-spinner"></span>Verifying...':'Continue'}
        </button>
+       ${bioEnrolledLocally() ? '<div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:#8a9499;font-size:12px"><span style="flex:1;height:1px;background:#e1dfdd"></span>or<span style="flex:1;height:1px;background:#e1dfdd"></span></div><button class="gate-btn" onclick="signInWithBiometric()" ' + (S.gateLoading?'disabled':'') + ' style="background:#fff;color:var(--teal-dk);border:1.5px solid var(--teal)">Sign in with fingerprint or face</button>' : ''}
        <div class="gate-note">
          Only pre-registered officials can access this tool.<br>
          If you don\u2019t have access, contact the DDD Interventions Manager on <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">victor@newleaders.co.za</a>
@@ -3294,7 +3295,7 @@ async function enrolBiometric() {
       else if (m.indexOf('confirm') >= 0) { showToast('Your account email is not confirmed yet'); haptic(HAPTIC_ERR); }
       else { showToast('Could not set up biometric sign-in'); haptic(HAPTIC_ERR); }
     } else {
-      showToast('Biometric sign-in is set up'); haptic(HAPTIC_OK);
+      try{localStorage.setItem('ddd_bio_enrolled','1')}catch(e){} showToast('Biometric sign-in is set up'); haptic(HAPTIC_OK);
     }
   } catch (e) {
     var em = ((e && (e.name || e.message)) || '').toString().toLowerCase();
@@ -3311,9 +3312,33 @@ async function removeBiometric() {
     var res = await sb.auth.passkey.list();
     var list = (res && res.data) ? res.data : [];
     for (var i = 0; i < list.length; i++) { try { await sb.auth.passkey.delete({ passkeyId: list[i].id }); } catch (e) {} }
-    showToast('Biometric sign-in removed');
+    try{localStorage.removeItem('ddd_bio_enrolled')}catch(e){} showToast('Biometric sign-in removed');
   } catch (e) { showToast('Could not remove biometric sign-in'); }
   st.busy = false; st.checked = false; st.checking = false; render();
+}
+
+// Local per-device hint: only show the biometric button where a passkey was enrolled here.
+function bioEnrolledLocally() { try { return localStorage.getItem('ddd_bio_enrolled') === '1'; } catch (e) { return false; } }
+
+async function signInWithBiometric() {
+  S.gateLoading = true; S.gateError = ''; render();
+  try {
+    const { data, error } = await sb.auth.signInWithPasskey();
+    if (error || !data || !data.session) {
+      var m = ((error && error.message) || '').toLowerCase();
+      S.gateLoading = false;
+      var cancelled = (m.indexOf('not allowed') >= 0 || m.indexOf('cancel') >= 0 || m.indexOf('abort') >= 0 || m === '');
+      if (!cancelled) S.gateError = 'Could not sign in with biometrics. Please use your email and PIN below.';
+      render(); return;
+    }
+    haptic(HAPTIC_OK);
+    await checkAuth(); // session is set -> loads the official and enters the app
+  } catch (e) {
+    var em = ((e && (e.name || e.message)) || '').toString().toLowerCase();
+    S.gateLoading = false;
+    if (em.indexOf('notallowed') < 0 && em.indexOf('abort') < 0) S.gateError = 'Could not sign in with biometrics. Please use your email and PIN below.';
+    render();
+  }
 }
 
 function renderWelcome() {
