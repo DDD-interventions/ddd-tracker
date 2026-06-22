@@ -727,6 +727,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .form-wrap{padding-bottom:64px}
   body.app-in-form .toast,body.app-in-form .update-banner{bottom:calc(124px + env(safe-area-inset-bottom))}
 }
+/* ── 2026.06.18.11: footer + version button must clear the fixed bottom nav on mobile ── */
+@media(max-width:760px){.app-footer{padding-bottom:calc(72px + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body>
@@ -990,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.10';
+const APP_VERSION = '2026.06.18.11';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
