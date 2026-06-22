@@ -1,4 +1,12 @@
 {
+  "2026.06.18.10": {
+    "title": "Larger reading text on forms and the review screen",
+    "released": "2026-06-18",
+    "highlights": [
+      "Helper text, section subtitles, the review screen and similar reading text are now slightly larger and easier to read",
+      "Menus, tabs and labels are unchanged so nothing shifts position"
+    ]
+  },
   "2026.06.18.9": {
     "title": "Green and orange text is easier to read",
     "released": "2026-06-18",
