@@ -1,4 +1,13 @@
 {
+  "2026.06.18.15": {
+    "title": "Sign-in update",
+    "released": "2026-06-18",
+    "highlights": [
+      "We've temporarily removed the biometric (fingerprint/face) sign-in option while we improve it",
+      "Email and PIN sign-in is unchanged and works exactly as before",
+      "Nothing else changes — you don't need to do anything"
+    ]
+  },
   "2026.06.18.14": {
     "title": "Sign in with your fingerprint or face",
     "released": "2026-06-18",
