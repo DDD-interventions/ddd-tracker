@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.14';
+const APP_VERSION = '2026.06.18.15';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3056,7 +3056,6 @@ function renderEmailGate() {
        <button class="gate-btn" onclick="handleGateSubmit()" ${S.gateLoading?'disabled':''}>
          ${S.gateLoading?'<span class="gate-spinner"></span>Verifying...':'Continue'}
        </button>
-       ${bioEnrolledLocally() ? '<div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:#8a9499;font-size:12px"><span style="flex:1;height:1px;background:#e1dfdd"></span>or<span style="flex:1;height:1px;background:#e1dfdd"></span></div><button class="gate-btn" onclick="signInWithBiometric()" ' + (S.gateLoading?'disabled':'') + ' style="background:#fff;color:var(--teal-dk);border:1.5px solid var(--teal)">Sign in with fingerprint or face</button>' : ''}
        <div class="gate-note">
          Only pre-registered officials can access this tool.<br>
          If you don\u2019t have access, contact the DDD Interventions Manager on <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">victor@newleaders.co.za</a>
@@ -6176,7 +6175,6 @@ ${tab==='tracker'?`
 <div style="max-width:640px;margin:20px auto 0;padding:0 16px">
   <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
   ${renderNotifyToggle()}
-  ${renderBiometricSetting()}
 </div>
 
 </div>`;
