@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.15';
+const APP_VERSION = '2026.06.18.16';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3338,6 +3338,94 @@ async function signInWithBiometric() {
     if (em.indexOf('notallowed') < 0 && em.indexOf('abort') < 0) S.gateError = 'Could not sign in with biometrics. Please use your email and PIN below.';
     render();
   }
+}
+
+// ─── PHONE PUSH NOTIFICATIONS (Web Push) ─────────────────────────────────────
+const VAPID_PUBLIC_KEY = 'BDSnFr-jWF6HWIQQxfKEOt2CY5gzsQscheKR1sDrFHhi4goguAtJKeRQhCOhRbms12951kDEsP88zwqtdXQEq44';
+
+function urlB64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+function renderPushSetting() {
+  if (!S._push) S._push = { checked:false, checking:false, supported:null, on:false, busy:false };
+  if (!S._push.checked && !S._push.checking) { S._push.checking = true; setTimeout(checkPushState, 0); }
+  function card(title, sub, right) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f7f9fc;border-radius:8px;min-height:44px;border:1px solid #e8e6e4;margin-top:10px">' +
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--navy)">' + title + '</div>' +
+      '<div style="font-size:11px;color:var(--grey);margin-top:2px">' + sub + '</div></div>' + (right || '') + '</div>';
+  }
+  if (!S._push.checked) return card('Phone notifications', 'Checking this device\u2026', '');
+  if (S._push.busy) return card('Phone notifications', 'One moment\u2026', '');
+  if (S._push.supported === false) return card('Phone notifications', 'Not available on this device', '');
+  if (S._push.on) {
+    var off = '<button onclick="disablePushNotifications()" style="flex-shrink:0;background:#fff;border:1.5px solid #c0202a;color:#c0202a;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;min-height:40px;cursor:pointer">Turn off</button>';
+    return card('Phone notifications are on', 'You\u2019ll be notified on this phone', off);
+  }
+  var on = '<button onclick="enablePushNotifications()" style="flex-shrink:0;background:var(--green);border:none;color:#1A2332;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;min-height:40px;cursor:pointer">Enable</button>';
+  return card('Get notifications on this phone', 'Be notified to log in, even when the app is closed', on);
+}
+
+async function checkPushState() {
+  var st = S._push || (S._push = { checked:false, checking:true, supported:null, on:false, busy:false });
+  try {
+    var supported = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
+    st.supported = supported; st.on = false;
+    if (supported && Notification.permission === 'granted') {
+      try { var reg = await navigator.serviceWorker.ready; var sub = await reg.pushManager.getSubscription(); st.on = !!sub; }
+      catch (e) { st.on = false; }
+    }
+  } catch (e) { st.supported = false; }
+  st.checked = true; st.checking = false; render();
+}
+
+async function enablePushNotifications() {
+  var st = S._push; if (!st) return;
+  st.busy = true; render();
+  try {
+    if (!(('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window))) {
+      st.busy = false; showToast('Push notifications are not supported on this device'); render(); return;
+    }
+    var perm = await Notification.requestPermission();
+    if (perm !== 'granted') { st.busy = false; showToast('Notifications were not allowed'); render(); return; }
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (!sub) { sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY) }); }
+    var j = sub.toJSON();
+    var sess = await sb.auth.getSession();
+    var email = (sess && sess.data && sess.data.session && sess.data.session.user && sess.data.session.user.email) || (S.official && S.official.email) || null;
+    var row = {
+      official_id: (S.official && S.official.id) || null,
+      email: email,
+      endpoint: j.endpoint,
+      p256dh: j.keys.p256dh,
+      auth: j.keys.auth,
+      user_agent: navigator.userAgent,
+      last_seen: new Date().toISOString()
+    };
+    var res = await sb.from('push_subscriptions').upsert(row, { onConflict: 'endpoint' });
+    if (res && res.error) { st.busy = false; showToast('Could not save your notification settings'); render(); return; }
+    st.on = true; st.busy = false; haptic(HAPTIC_OK); showToast('Notifications are on for this phone'); render();
+  } catch (e) { st.busy = false; showToast('Could not enable notifications'); render(); }
+}
+
+async function disablePushNotifications() {
+  var st = S._push; if (!st) return;
+  st.busy = true; render();
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      try { await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint); } catch (e) {}
+      try { await sub.unsubscribe(); } catch (e) {}
+    }
+    st.on = false; st.busy = false; showToast('Notifications turned off for this phone'); render();
+  } catch (e) { st.busy = false; showToast('Could not turn off notifications'); render(); }
 }
 
 function renderWelcome() {
@@ -6175,6 +6263,7 @@ ${tab==='tracker'?`
 <div style="max-width:640px;margin:20px auto 0;padding:0 16px">
   <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
   ${renderNotifyToggle()}
+  ${renderPushSetting()}
 </div>
 
 </div>`;
