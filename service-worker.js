@@ -126,3 +126,35 @@ self.addEventListener('message', event => {
     self.skipWaiting();
   }
 });
+
+// ── PUSH: show a notification when the server sends one ──────────────────────
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; }
+  catch (e) { try { data = { body: event.data && event.data.text() }; } catch (_) { data = {}; } }
+  const title = data.title || 'DDD Tracker';
+  const options = {
+    body: data.body || '',
+    icon: 'icons/icon-192.png',
+    badge: 'icons/icon-192.png',
+    tag: data.tag || 'ddd-tracker',
+    renotify: !!data.renotify,
+    data: { url: data.url || self.registration.scope },
+    requireInteraction: false
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// ── NOTIFICATIONCLICK: focus or open the app at the login screen ─────────────
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || self.registration.scope;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) {
+        if ('focus' in c) { try { c.navigate(target); } catch (e) {} return c.focus(); }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+    })
+  );
+});
