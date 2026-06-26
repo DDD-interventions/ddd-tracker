@@ -1,4 +1,13 @@
 {
+  "2026.06.18.16": {
+    "title": "Phone notifications — early access",
+    "released": "2026-06-18",
+    "highlights": [
+      "You can now turn on phone notifications from the Settings section",
+      "Once on, you can be notified to log in even when the app is closed",
+      "We're rolling this out gradually — nothing else changes"
+    ]
+  },
   "2026.06.18.15": {
     "title": "Sign-in update",
     "released": "2026-06-18",
