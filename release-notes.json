@@ -1,4 +1,22 @@
 {
+  "2026.06.18.18": {
+    "title": "Turn on phone notifications in one tap",
+    "released": "2026-06-26",
+    "highlights": [
+      "After signing in, you'll see a quick option to turn on phone notifications",
+      "Once on, you can be reminded to log in even when the app is closed",
+      "Don't want it? Tap “Not now” — you can always turn it on later in Settings"
+    ]
+  },
+  "2026.06.18.17": {
+    "title": "Notifications — behind-the-scenes improvements",
+    "released": "2026-06-26",
+    "highlights": [
+      "Improvements to how phone notifications are delivered",
+      "A small fix so your notification settings link correctly to your profile",
+      "No action needed — email and PIN sign-in are unchanged"
+    ]
+  },
   "2026.06.18.16": {
     "title": "Phone notifications — early access",
     "released": "2026-06-18",
