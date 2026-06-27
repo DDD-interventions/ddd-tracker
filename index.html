@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.18';
+const APP_VERSION = '2026.06.18.19';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3445,7 +3445,7 @@ function renderPushPrompt() {
       '<div style="display:flex;align-items:flex-start;gap:10px">' +
         '<div style="font-size:20px;line-height:1">\uD83D\uDD14</div>' +
         '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:13px;font-weight:700;color:var(--teal-dk)">Get notified when there\u2019s something for your circuit</div>' +
+          '<div style="font-size:13px;font-weight:700;color:var(--teal-dk)">Get notified when there\u2019s something for you</div>' +
           '<div style="font-size:11px;color:var(--grey);margin-top:2px">We\u2019ll remind you to log in \u2014 even when the app is closed. You can turn this off anytime in Settings.</div>' +
           '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
             '<button onclick="pushPromptTurnOn()" style="background:var(--green);border:none;color:#1A2332;font-size:12px;font-weight:700;padding:9px 16px;border-radius:8px;min-height:40px;cursor:pointer">Turn on</button>' +
@@ -3568,7 +3568,13 @@ function bcRenderSelected() {
   }
   el.innerHTML = html;
 }
-function bcAdd(i) { var o = (S._bc.results || [])[i]; if (!o || !o.email) return; S._bc.sel[o.email] = o; bcRenderResults(); bcRenderSelected(); }
+function bcAdd(i) {
+  var o = (S._bc.results || [])[i]; if (!o || !o.email) return;
+  S._bc.sel[o.email] = o;
+  S._bc.q = ''; S._bc.results = [];
+  var si = document.getElementById('bcSearch'); if (si) si.value = '';
+  bcRenderResults(); bcRenderSelected();
+}
 function bcRemove(em) { if (S._bc && S._bc.sel) delete S._bc.sel[em]; bcRenderResults(); bcRenderSelected(); }
 async function sendBroadcast() {
   if (!isAdminUser()) return;
