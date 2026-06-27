@@ -1,4 +1,12 @@
 {
+  "2026.06.18.19": {
+    "title": "Notification wording + sending tweaks",
+    "released": "2026-06-26",
+    "highlights": [
+      "Clearer wording on the notifications prompt",
+      "Admins can now add several people to one notification more easily"
+    ]
+  },
   "2026.06.18.18": {
     "title": "Turn on phone notifications in one tap",
     "released": "2026-06-26",
