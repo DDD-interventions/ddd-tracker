@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.16';
+const APP_VERSION = '2026.06.18.18';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3009,7 +3009,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navFromForm('log')">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();window.scrollTo({top:0,behavior:'smooth'})" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${S.view==='log'&&S.f.formStep===-1&&!S.submitted ? `<div class="nav-landing"><div class="nav-landing-prompt">What would you like to do?</div><div class="nav-landing-grid"><button class="nav-landing-btn primary" onclick="navToLog()"><div class="nav-btn-label">Record new intervention</div><div class="nav-btn-desc">A school visit or support activity</div></button><button class="nav-landing-btn secondary" onclick="S.view='dashboard';S.dashTab=S.dashTab||'overview';render()"><div class="nav-btn-label">My dashboard</div><div class="nav-btn-desc">Follow-ups, progress, support needs</div></button><button class="nav-landing-full" onclick="S.view='toolkit';render()"><span class="nav-btn-label">Interventions toolkit</span><span class="nav-btn-desc">Reports, ideas, peer activity</span></button></div></div>` : `<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navFromForm('log')">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : renderForm()) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> ${renderBottomNav()} `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -3400,7 +3400,7 @@ async function enablePushNotifications() {
     var sess = await sb.auth.getSession();
     var email = (sess && sess.data && sess.data.session && sess.data.session.user && sess.data.session.user.email) || (S.official && S.official.email) || null;
     var row = {
-      official_id: (S.official && S.official.id) || null,
+      official_id: (S._officialId || null),
       email: email,
       endpoint: j.endpoint,
       p256dh: j.keys.p256dh,
@@ -3426,6 +3426,196 @@ async function disablePushNotifications() {
     }
     st.on = false; st.busy = false; showToast('Notifications turned off for this phone'); render();
   } catch (e) { st.busy = false; showToast('Could not turn off notifications'); render(); }
+}
+
+// ── Push soft pre-prompt (post-login opt-in nudge) ───────────────────────────
+function pushOptinState() {
+  try { var r = localStorage.getItem('ddd_push_optin'); return r ? JSON.parse(r) : { dismissed:0, done:false }; }
+  catch (e) { return { dismissed:0, done:false }; }
+}
+function savePushOptin(st) { try { localStorage.setItem('ddd_push_optin', JSON.stringify(st)); } catch (e) {} }
+function renderPushPrompt() {
+  try {
+    if (!(('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window))) return '';
+    if (Notification.permission !== 'default') return '';        // already granted or blocked → nothing to ask
+    if (S._pushPromptHide) return '';                            // dismissed/acted this session
+    var st = pushOptinState();
+    if (st.done || (st.dismissed || 0) >= 2) return '';          // already opted in, or dismissed twice
+    return '<div style="background:linear-gradient(180deg,#E6F3F3,#ffffff);border:1px solid var(--teal-md);border-radius:10px;padding:12px 14px;margin-bottom:12px">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px">' +
+        '<div style="font-size:20px;line-height:1">\uD83D\uDD14</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--teal-dk)">Get notified when there\u2019s something for your circuit</div>' +
+          '<div style="font-size:11px;color:var(--grey);margin-top:2px">We\u2019ll remind you to log in \u2014 even when the app is closed. You can turn this off anytime in Settings.</div>' +
+          '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+            '<button onclick="pushPromptTurnOn()" style="background:var(--green);border:none;color:#1A2332;font-size:12px;font-weight:700;padding:9px 16px;border-radius:8px;min-height:40px;cursor:pointer">Turn on</button>' +
+            '<button onclick="pushPromptDismiss()" style="background:#fff;border:1px solid #d8dde3;color:var(--grey);font-size:12px;font-weight:600;padding:9px 16px;border-radius:8px;min-height:40px;cursor:pointer">Not now</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  } catch (e) { return ''; }
+}
+function pushPromptTurnOn() {
+  var st = pushOptinState(); st.done = true; savePushOptin(st);
+  S._pushPromptHide = true;
+  if (!S._push) S._push = { checked:false, checking:false, supported:null, on:false, busy:false };
+  if (typeof enablePushNotifications === 'function') enablePushNotifications();  // fires the OS permission prompt + subscribes
+  render();
+}
+function pushPromptDismiss() {
+  var st = pushOptinState(); st.dismissed = (st.dismissed || 0) + 1; savePushOptin(st);
+  S._pushPromptHide = true;
+  render();
+}
+
+// ── Admin broadcast (send a push to chosen officials) ────────────────────────
+const ADMIN_EMAILS = ['victorhuni@gmail.com', 'victor@newleaders.co.za'];
+function isAdminUser() {
+  return !!(S.official && S.official.email && ADMIN_EMAILS.indexOf(String(S.official.email).toLowerCase()) !== -1);
+}
+function renderBroadcastAdmin() {
+  if (!isAdminUser()) return '';
+  if (!S._bc) S._bc = { sel:{}, q:'', results:[], loading:false };
+  var provOpts = '<option value="">Choose a province\u2026</option>';
+  var distOpts = '<option value="">Choose a district\u2026</option>';
+  Object.keys(DISTRICTS).forEach(function(prov) {
+    provOpts += '<option value="' + esc(prov) + '">' + esc(prov) + '</option>';
+    (DISTRICTS[prov] || []).forEach(function(d) {
+      if (d) distOpts += '<option value="' + esc(d) + '">' + esc(prov) + ' \u2014 ' + esc(d) + '</option>';
+    });
+  });
+  var ipt = 'width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d8dde3;border-radius:8px;font-size:13px;color:var(--navy);background:#fff;margin-top:8px';
+  return '' +
+  '<div style="margin-top:14px;padding:14px;background:#fff;border:1px solid #e8e6e4;border-left:4px solid var(--orange);border-radius:10px">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--navy)">Send a notification</div>' +
+    '<div style="font-size:11px;color:var(--grey);margin-top:2px;margin-bottom:6px">Admin only \u00b7 pushes to officials with notifications on</div>' +
+    '<select id="bcAudience" onchange="bcAudienceChange()" style="' + ipt + '">' +
+      '<option value="everyone">Everyone</option>' +
+      '<option value="province">By province</option>' +
+      '<option value="district">By district</option>' +
+      '<option value="people">Specific people</option>' +
+    '</select>' +
+    '<select id="bcProvince" style="' + ipt + ';display:none">' + provOpts + '</select>' +
+    '<select id="bcDistrict" style="' + ipt + ';display:none">' + distOpts + '</select>' +
+    '<div id="bcPickWrap" style="display:none">' +
+      '<input id="bcSearch" type="text" placeholder="Search officials by name or email\u2026" oninput="bcSearchInput()" style="' + ipt + '">' +
+      '<div id="bcResults"></div>' +
+      '<div id="bcSelected" style="margin-top:6px"></div>' +
+    '</div>' +
+    '<input id="bcTitle" type="text" placeholder="Title (optional, defaults to \u201cDDD Tracker\u201d)" style="' + ipt + '">' +
+    '<textarea id="bcBody" rows="3" placeholder="Your message\u2026" style="' + ipt + ';resize:vertical"></textarea>' +
+    '<button onclick="sendBroadcast()" style="margin-top:10px;width:100%;background:var(--teal);border:none;color:#fff;font-size:13px;font-weight:700;padding:11px;border-radius:8px;min-height:44px;cursor:pointer">Send notification</button>' +
+    '<div id="bcResult" style="font-size:12px;color:var(--grey);margin-top:8px;min-height:16px"></div>' +
+  '</div>';
+}
+function bcAudienceChange() {
+  var kind = (document.getElementById('bcAudience') || {}).value;
+  var p = document.getElementById('bcProvince'), d = document.getElementById('bcDistrict'), w = document.getElementById('bcPickWrap');
+  if (p) p.style.display = (kind === 'province') ? 'block' : 'none';
+  if (d) d.style.display = (kind === 'district') ? 'block' : 'none';
+  if (w) { w.style.display = (kind === 'people') ? 'block' : 'none'; if (kind === 'people') { bcRenderResults(); bcRenderSelected(); } }
+}
+var _bcTimer = null;
+function bcSearchInput() {
+  S._bc.q = (document.getElementById('bcSearch') || {}).value || '';
+  clearTimeout(_bcTimer); _bcTimer = setTimeout(bcSearch, 300);
+}
+async function bcSearch() {
+  var q = S._bc.q || '';
+  if (q.length < 2) { S._bc.results = []; S._bc.loading = false; bcRenderResults(); return; }
+  S._bc.loading = true; bcRenderResults();
+  try {
+    var { data } = await sb.rpc('search_officials', { search_query: q, filter_district: null });
+    var seen = {}, res = [];
+    (data || []).forEach(function(o) {
+      if (o.email && !seen[o.email]) { seen[o.email] = true; res.push({ id:o.id, name:o.full_name||'', role:o.role||'', email:o.email||'', district:o.district||'', circuit:o.circuit||'' }); }
+    });
+    S._bc.results = res;
+  } catch (e) { S._bc.results = []; }
+  S._bc.loading = false; bcRenderResults();
+}
+function bcRenderResults() {
+  var el = document.getElementById('bcResults'); if (!el) return;
+  var q = S._bc.q || '', res = S._bc.results || [], html = '';
+  if (S._bc.loading) { html = '<div style="font-size:11px;color:var(--grey);padding:6px 0">Searching\u2026</div>'; }
+  else if (q.length >= 2 && res.length === 0) { html = '<div style="font-size:11px;color:var(--grey);padding:6px 0">No official found matching \u201c' + esc(q) + '\u201d.</div>'; }
+  else if (res.length > 0) {
+    html = '<div style="max-height:180px;overflow-y:auto;border:1px solid #e8e6e4;border-radius:8px;margin-top:6px">';
+    res.forEach(function(o, i) {
+      var added = !!S._bc.sel[o.email];
+      html += '<div onclick="' + (added ? '' : 'bcAdd(' + i + ')') + '" style="padding:10px;border-bottom:1px solid #f3f2f1;cursor:' + (added ? 'default' : 'pointer') + ';min-height:44px;display:flex;align-items:center;gap:8px' + (added ? ';opacity:.5' : '') + '">';
+      html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12px;color:var(--navy)">' + esc(o.name) + '</div>';
+      html += '<div style="font-size:10px;color:var(--grey);margin-top:1px">' + esc(o.role) + (o.district ? ' \u00b7 ' + esc(o.district) : '') + '</div></div>';
+      html += added ? '<span style="font-size:10px;color:var(--teal);font-weight:600">Added</span>' : '<span style="font-size:18px;color:var(--teal);font-weight:700;line-height:1">+</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+function bcRenderSelected() {
+  var el = document.getElementById('bcSelected'); if (!el) return;
+  var keys = Object.keys((S._bc && S._bc.sel) || {}), html = '';
+  if (keys.length) {
+    html = '<div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:4px">' + keys.length + ' selected</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    keys.forEach(function(em) {
+      var o = S._bc.sel[em];
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-md);border-radius:16px;padding:4px 10px;font-size:11px;font-weight:600">' + esc((o && o.name) || em) + '<button onclick="bcRemove(\'' + em + '\')" style="background:none;border:none;color:var(--grey);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1">&times;</button></span>';
+    });
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+function bcAdd(i) { var o = (S._bc.results || [])[i]; if (!o || !o.email) return; S._bc.sel[o.email] = o; bcRenderResults(); bcRenderSelected(); }
+function bcRemove(em) { if (S._bc && S._bc.sel) delete S._bc.sel[em]; bcRenderResults(); bcRenderSelected(); }
+async function sendBroadcast() {
+  if (!isAdminUser()) return;
+  var kind = (document.getElementById('bcAudience') || {}).value || 'everyone';
+  var title = (document.getElementById('bcTitle') || {}).value || '';
+  var msg = ((document.getElementById('bcBody') || {}).value || '').trim();
+  var resEl = document.getElementById('bcResult');
+  if (!msg) { showToast('Type a message first'); return; }
+  var audience = { kind: kind }, label = 'everyone';
+  if (kind === 'province') {
+    audience.value = (document.getElementById('bcProvince') || {}).value || '';
+    if (!audience.value) { showToast('Choose a province'); return; }
+    label = audience.value;
+  } else if (kind === 'district') {
+    audience.value = (document.getElementById('bcDistrict') || {}).value || '';
+    if (!audience.value) { showToast('Choose a district'); return; }
+    label = audience.value;
+  } else if (kind === 'people') {
+    var emails = Object.keys((S._bc && S._bc.sel) || {});
+    if (!emails.length) { showToast('Add at least one person'); return; }
+    audience = { kind: 'people', value: emails };
+    label = emails.length + (emails.length === 1 ? ' person' : ' people');
+  }
+  if (!window.confirm('Send this notification to ' + label + '?')) return;
+  if (resEl) resEl.textContent = 'Sending\u2026';
+  try {
+    var sess = await sb.auth.getSession();
+    var token = sess && sess.data && sess.data.session && sess.data.session.access_token;
+    if (!token) { if (resEl) resEl.textContent = 'Could not confirm your sign-in \u2014 try again.'; return; }
+    var r = await fetch(NOTIFY_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'broadcast', token: token, audience: audience, title: title, body: msg })
+    });
+    var out = await r.json();
+    if (!r.ok || (out && out.error)) {
+      var em = (out && out.error === 'not_authorised') ? 'Not authorised to send.' : 'Send failed' + (out && out.error ? ' (' + out.error + ')' : '') + '.';
+      if (resEl) resEl.textContent = em; return;
+    }
+    var sent = out.sent || 0, removed = out.removed || 0, failed = out.failed || 0;
+    var summary = 'Sent to ' + sent + ' device' + (sent === 1 ? '' : 's') +
+      (failed ? ' \u00b7 ' + failed + ' failed' : '') + (removed ? ' \u00b7 ' + removed + ' stale removed' : '') +
+      (out.note ? ' \u00b7 ' + out.note : '');
+    if (resEl) resEl.textContent = summary;
+    haptic(HAPTIC_OK); showToast('Notification sent');
+    var b = document.getElementById('bcBody'); if (b) b.value = '';
+    if (kind === 'people' && S._bc) { S._bc.sel = {}; S._bc.q = ''; S._bc.results = []; var sb_ = document.getElementById('bcSearch'); if (sb_) sb_.value = ''; bcRenderResults(); bcRenderSelected(); }
+  } catch (e) { if (resEl) resEl.textContent = 'Send failed \u2014 check your connection.'; }
 }
 
 function renderWelcome() {
@@ -6264,6 +6454,7 @@ ${tab==='tracker'?`
   <div style="font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
   ${renderNotifyToggle()}
   ${renderPushSetting()}
+  ${renderBroadcastAdmin()}
 </div>
 
 </div>`;
