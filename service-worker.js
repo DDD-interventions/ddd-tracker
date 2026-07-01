@@ -113,7 +113,7 @@ async function sendPush(env, {to, title, body, url}){
       const enc=await encryptPayload(s.p256dh, s.auth, payload);
       const res=await fetch(s.endpoint, {method:'POST', headers:{
         'Authorization':'vapid t='+jwtByOrigin[origin]+', k='+VAPID_PUBLIC,
-        'Content-Encoding':'aes128gcm', 'Content-Type':'application/octet-stream', 'TTL':'86400'
+        'Content-Encoding':'aes128gcm', 'Content-Type':'application/octet-stream', 'TTL':'86400', 'Urgency':'high'
       }, body:enc});
       if(res.status===201||res.status===200){ sent++; }
       else if(res.status===404||res.status===410){ await deleteSub(env, s.endpoint); removed++; }
