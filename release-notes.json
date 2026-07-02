@@ -1,4 +1,13 @@
 {
+  "2026.06.18.20": {
+    "title": "Clearer timing, and groundwork for auto-filled reports",
+    "released": "2026-07-02",
+    "highlights": [
+      "Per-entry time estimate updated to 6–10 minutes",
+      "Each logged visit now links to its school's official record behind the scenes — no action needed",
+      "This paves the way for reports that fill in school data automatically"
+    ]
+  },
   "2026.06.18.19": {
     "title": "Notification wording + sending tweaks",
     "released": "2026-06-26",
