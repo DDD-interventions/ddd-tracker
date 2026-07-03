@@ -1,4 +1,12 @@
 {
+  "2026.06.18.21": {
+    "title": "Emailed copies now send reliably",
+    "released": "2026-07-02",
+    "highlights": [
+      "Your PDF copy is now generated more reliably, even on a shaky connection",
+      "Groundwork for automatic emailed visit reports"
+    ]
+  },
   "2026.06.18.20": {
     "title": "Clearer timing, and groundwork for auto-filled reports",
     "released": "2026-07-02",
