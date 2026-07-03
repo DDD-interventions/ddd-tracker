@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.20';
+const APP_VERSION = '2026.06.18.21';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1128,6 +1128,26 @@ function _arrJoin(a,sep){return Array.isArray(a)?a.filter(Boolean).join(sep||', 
 
 // Generate a branded PDF audit report for a submitted intervention.
 // Returns a jsPDF doc instance, or null if jsPDF didn't load.
+var _jspdfLoad=null;
+function _loadScriptOnce(src){return new Promise(function(res,rej){var el=document.createElement('script');el.src=src;el.onload=function(){res(true);};el.onerror=function(){rej(new Error('load fail '+src));};document.head.appendChild(el);});}
+function _hasAutoTable(){try{return !!(window.jspdf&&window.jspdf.jsPDF)&&typeof (new window.jspdf.jsPDF()).autoTable==='function';}catch(e){return false;}}
+// Guarantees jsPDF + autoTable are available before we build a PDF. Fast path if already loaded; otherwise loads on demand with a fallback CDN.
+function ensureJsPDF(){
+  if(_hasAutoTable()) return Promise.resolve(true);
+  if(_jspdfLoad) return _jspdfLoad;
+  _jspdfLoad=(async function(){
+    if(!(window.jspdf&&window.jspdf.jsPDF)){
+      try{await _loadScriptOnce('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js');}
+      catch(e){try{await _loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js');}catch(e2){return false;}}
+    }
+    if(!_hasAutoTable()){
+      try{await _loadScriptOnce('https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js');}
+      catch(e){try{await _loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js');}catch(e2){}}
+    }
+    return _hasAutoTable();
+  })();
+  return _jspdfLoad;
+}
 function generateInterventionPDF(dec, act, official) {
   if (!window.jspdf || !window.jspdf.jsPDF) { console.warn('jsPDF not loaded'); return null; }
   const { jsPDF } = window.jspdf;
@@ -4739,10 +4759,14 @@ async function submitForm() {
  // Fire-and-forget: email a PDF audit copy to the official who logged it
  // Capture doc_file reference now since S.f may be reset before the async email send completes
  var _auditDocFile = S.f.doc_file || null;
- S._auditEmailQueued = !!((dec.logged_by_email || (S.official && S.official.email)) && window.jspdf && window.jspdf.jsPDF);
- if (S._auditEmailQueued) {
-   sendInterventionAuditEmail(dec, act, S.official, _auditDocFile).then(function(ok){
-     if (!ok) { S._auditEmailQueued = false; if (S.submitted) render(); }
+ var _hasEmail = !!(dec.logged_by_email || (S.official && S.official.email));
+ if (_hasEmail) {
+   S._auditEmailQueued = true;
+   ensureJsPDF().then(function(ready){
+     if (!ready) { S._auditEmailQueued = false; if (S.submitted) render(); return; }
+     sendInterventionAuditEmail(dec, act, S.official, _auditDocFile).then(function(ok){
+       if (!ok) { S._auditEmailQueued = false; if (S.submitted) render(); }
+     });
    });
  }
 
