@@ -959,7 +959,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.24';
+const APP_VERSION = '2026.06.18.25';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5252,9 +5252,10 @@ function renderDashboard() {
    } else if (det.ddd_reports && det.ddd_reports.length) {
      // Fallback reverse-mapping for old entries without stored tasks
      DDD_TASKS.forEach(function(task) {
-       if (task.reports.some(function(r){ return det.ddd_reports.includes(r); })) {
+       var hit = det.ddd_reports.includes(task.q) || (task.reports||[]).some(function(r){ return det.ddd_reports.includes(r); });
+       if (hit) {
          dddTaskCountsDirect[task.q] = (dddTaskCountsDirect[task.q]||0)+1;
-         dddCatCountsDirect[task.cat] = (dddCatCountsDirect[task.cat]||0)+1;
+         if (task.cat) dddCatCountsDirect[task.cat] = (dddCatCountsDirect[task.cat]||0)+1;
        }
      });
    }
@@ -6295,7 +6296,7 @@ ${tab==='tracker'?`
            if (c.det.insight_types && c.det.insight_types.length) return c.det.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join(', ');
            // Fallback: reverse-map reports to categories
            var cats = {};
-           DDD_TASKS.forEach(function(task){ if(task.reports.some(function(r){return rptArr.includes(r)})) cats[task.cat]=true; });
+           DDD_TASKS.forEach(function(task){ var hit=rptArr.includes(task.q)||(task.reports||[]).some(function(r){return rptArr.includes(r)}); if(hit&&task.cat) cats[task.cat]=true; });
            var catArr = Object.keys(cats);
            return catArr.length ? catArr.join(', ') : rptArr.join(', ');
          })();
