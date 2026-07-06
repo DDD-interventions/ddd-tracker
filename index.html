@@ -992,7 +992,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.22';
+const APP_VERSION = '2026.06.18.23';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4514,11 +4514,11 @@ function renderSuccess() {
  const showAudit = !!(S._auditEmailQueued && auditEmail);
  const _hadDocFile = !!(S.f && S.f.doc_file);
  const auditMsg = _hadDocFile
-   ? '<strong>A detailed PDF report and your supporting document have been emailed to ' + esc(auditEmail) + '</strong> \u2014 a complete audit copy of your submission.'
-   : '<strong>A detailed PDF report has been emailed to ' + esc(auditEmail) + '</strong> \u2014 everything you submitted plus a link to any supporting document you uploaded.';
+   ? '<strong>Your School Visit Report is on its way to ' + esc(auditEmail) + '</strong> \u2014 school details and performance data filled in automatically from DDD data, plus your supporting document link.'
+   : '<strong>Your School Visit Report is on its way to ' + esc(auditEmail) + '</strong> \u2014 everything you submitted, with school details and performance data filled in automatically from DDD data.';
  return `<div class="form-wrap"><div class="section"><div class="success fade-in"> <h2>Thank you!</h2> <p>Your activity has been recorded. You now have a record of the support you provided — and your dashboard will show the difference your work is making.</p>
  ${showAudit?`<div style="margin-top:16px;padding:12px 14px;background:var(--teal-lt);border-radius:8px;text-align:left;border-left:3px solid var(--teal)">
-   <div style="font-size:10px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Audit copy sent</div>
+   <div style="font-size:10px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">School Visit Report</div>
    <div style="font-size:12px;color:var(--navy);line-height:1.5">${auditMsg}</div>
  </div>`:''}
  ${insight?`<div style="margin-top:16px;padding:14px;background:var(--green-lt);border-radius:8px;text-align:left;border-left:3px solid var(--green)">
@@ -4760,27 +4760,11 @@ async function submitForm() {
 
  // Fire-and-forget: email a PDF audit copy to the official who logged it
  // Capture doc_file reference now since S.f may be reset before the async email send completes
- var _auditDocFile = S.f.doc_file || null;
- var _hasEmail = !!(dec.logged_by_email || (S.official && S.official.email));
- if (_hasEmail) {
-   S._auditEmailQueued = true;
-   ensureJsPDF().then(function(ready){
-     if (!ready) { S._auditEmailQueued = false; if (S.submitted) render(); return; }
-     sendInterventionAuditEmail(dec, act, S.official, _auditDocFile).then(function(ok){
-       if (!ok) { S._auditEmailQueued = false; if (S.submitted) render(); }
-     });
-   });
- }
+ // School Visit Report is generated and emailed server-side (Supabase webhook -> Worker).
+ // No client-side sending: reliable on every device, and no duplicate emails.
+ S._auditEmailQueued = !!(dec.logged_by_email || (S.official && S.official.email));
 
- // Fire-and-forget: notify tagged officials
- try {
-   var _taggedAll = S.f.tagged_officials || {};
-   Object.keys(_taggedAll).forEach(function(need) {
-     (_taggedAll[need]||[]).forEach(function(o) {
-       notifyTagged({ toEmail:o.email, toName:o.name, fromName:S.f.official_name||S.official.full_name, fromRole:S.f.official_role||S.official.role, schools:S.f.schools, supportNeed:need, subjects:S.f.subjects, moment:'requested' });
-     });
-   });
- } catch(e) { console.warn('notifyTagged batch failed:', e); }
+ // Tagged-official notifications are sent server-side by the Worker on insert (no client duplicates).
 
  await loadAll();
  } catch(e) {
