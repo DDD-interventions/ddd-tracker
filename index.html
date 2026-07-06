@@ -959,7 +959,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.25';
+const APP_VERSION = '2026.06.18.26';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -7159,12 +7159,27 @@ function showUpdateBanner() {
   requestAnimationFrame(() => requestAnimationFrame(() => banner.classList.add('visible')));
 }
 
-function applyUpdate() {
+async function applyUpdate() {
   saveFormDraft();
   // User chose to update — clear any prior dismissal so the next genuinely
   // newer version can prompt them again.
   try { localStorage.removeItem('ddd_dismissed_update'); } catch(e) {}
-  try { localStorage.setItem('ddd_auto_restore_once', '1'); } catch(e) {}
+  // Refresh the cached app FIRST, so a single reload lands on the new version
+  // (the service worker serves cache-first; without this, the first reload
+  // shows the old version and users had to tap update two or three times).
+  try {
+    var fresh = await fetch('./index.html', { cache: 'reload' });
+    if (fresh && fresh.ok) {
+      var keys = await caches.keys();
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i].indexOf('ddd-tracker-') === 0) {
+          var c = await caches.open(keys[i]);
+          await c.put('./index.html', fresh.clone());
+          await c.put('./', fresh.clone());
+        }
+      }
+    }
+  } catch (e) { /* offline or cache error — plain reload below still works */ }
   _intentionalReload = true;
   window.location.reload();
 }
