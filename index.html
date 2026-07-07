@@ -745,9 +745,16 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* ── Home feed (Stage 4A) ── */
 .feed-wrap{max-width:560px;margin:0 auto;padding:4px 4px 28px}
-.feed-hello{color:#fff;padding:2px 4px 14px}
-.feed-hello h2{font-size:19px;font-weight:800;margin:0}
-.feed-chip{display:inline-block;background:rgba(122,182,72,.16);border:1px solid rgba(122,182,72,.5);color:#EAF6DC;font-size:12px;font-weight:700;padding:5px 12px;border-radius:16px;margin-top:8px}
+.feed-hello{background:linear-gradient(150deg,#074445,#0B8E8D);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(7,68,69,.25)}
+.feed-hello h2{font-size:19px;font-weight:800;margin:0;color:#fff}
+.feed-chip{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(122,182,72,.85);color:#EAF6DC;font-size:12px;font-weight:700;padding:5px 12px;border-radius:16px;margin-top:9px}
+.fcard.data .fcard-kicker{color:#B5720F}
+.fcard.data .fgo{background:#FBEBD6;color:#8A5310}
+.fcard.win{background:linear-gradient(135deg,#0B8E8D,#074445)}
+.fcard.win h3{color:#fff}
+.fcard.win p{color:#C7E0DF}
+.fcard.win .fcard-kicker{color:#9FD5D4}
+.fcard.win .fcard-when{color:#9FD5D4}
 .fcard{background:#fff;border-radius:14px;padding:14px 15px;box-shadow:0 2px 10px rgba(10,30,30,.08);margin-bottom:12px}
 .fcard-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px}
 .fcard-kicker{font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
@@ -992,7 +999,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.31';
+const APP_VERSION = '2026.06.18.33';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2332,47 +2339,148 @@ function renderHomeFeed() {
   var greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   var term = currentTermWindow();
   var own = feedOwnDecisions();
+  var em = (o.email || '').toLowerCase();
   var termCount = own.filter(function(d){ try { return new Date(d.created_at) >= term.start; } catch(e){ return false; } }).length;
+  loadFeedSpotlight();
 
-  // follow-ups: same rule the dashboard uses
+  var cards = [];
+
+  // 1) You were tagged (last 14 days, by someone else)
+  var wk14 = Date.now() - 14*86400000;
+  var taggedOnMe = (S.decisions || []).filter(function(d){
+    try { if (new Date(d.created_at).getTime() < wk14) return false; } catch(e){ return false; }
+    if ((d.logged_by_email || '').toLowerCase() === em) return false;
+    var tg = (d.details || {}).tagged_officials || {};
+    for (var need in tg) { for (var i=0;i<(tg[need]||[]).length;i++) {
+      if (String((tg[need][i]||{}).email || '').toLowerCase() === em) return true; } }
+    return false;
+  }).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
+  if (taggedOnMe.length) {
+    var t = taggedOnMe[0], td = t.details || {};
+    cards.push('<div class="fcard due">'
+      + '<div class="fcard-top"><span class="fcard-kicker">You were tagged'+(taggedOnMe.length>1?' \u00b7 1 of '+taggedOnMe.length:'')+'</span>'
+      + '<span class="fcard-when">' + esc(feedDaysAgo(t.created_at)) + '</span></div>'
+      + '<h3>' + esc((t.logged_by||'A colleague')) + ' asked for your support</h3>'
+      + '<p>' + esc(((td.schools||'').split(',')[0]||'').trim()) + '</p>'
+      + '<button class="fgo" onclick="navFromForm(\'dashboard\')">View and respond</button>'
+      + '</div>');
+  }
+
+  // 2) Follow-up outstanding
   var fups = own.filter(function(d){ var dt = d.details || {}; return dt.follow_up && dt.follow_up_desc && !dt.follow_up_completed; });
   fups.sort(function(a,b){ return new Date(a.date || a.created_at) - new Date(b.date || b.created_at); });
-
-  var h = '<div class="feed-wrap">';
-  h += '<div class="feed-hello"><h2>' + greet + ', ' + esc(first) + '</h2>';
-  if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' logged this term</span>';
-  h += '</div>';
-
   if (fups.length) {
     var f = fups[0], fd = f.details || {};
     var school = (fd.schools || '').split(',')[0].trim() || 'A school you visited';
     var snippet = String(fd.follow_up_desc || '').slice(0, 110);
-    h += '<div class="fcard due">'
+    cards.push('<div class="fcard due">'
       + '<div class="fcard-top"><span class="fcard-kicker">Follow-up outstanding' + (fups.length > 1 ? ' \u00b7 1 of ' + fups.length : '') + '</span>'
       + '<span class="fcard-when">Visit logged ' + esc(feedDaysAgo(f.date || f.created_at)) + '</span></div>'
       + '<h3>' + esc(school) + '</h3>'
       + '<p>' + esc(snippet) + (String(fd.follow_up_desc||'').length > 110 ? '\u2026' : '') + '</p>'
       + '<button class="fgo" onclick="navToLog()">Start the visit log</button>'
       + '<button class="flink" onclick="navFromForm(\'dashboard\')">See all in My dashboard</button>'
-      + '</div>';
-  } else {
-    h += '<div class="fcard due">'
-      + '<div class="fcard-top"><span class="fcard-kicker">Follow-ups</span><span class="fcard-when">As of today</span></div>'
-      + '<h3>You are up to date</h3><p>No outstanding follow-ups on your logged visits.</p>'
-      + '</div>';
+      + '</div>');
   }
 
-  h += '<div class="fcard tk">'
-    + '<div class="fcard-top"><span class="fcard-kicker">Interventions toolkit</span></div>'
-    + '<h3>Ideas, reports and what others are doing</h3>'
-    + '<p>Suggested interventions and recent peer activity across the programme.</p>'
-    + '<button class="fgo" onclick="navFromForm(\'toolkit\')">Open the toolkit</button>'
-    + '</div>';
+  // 3) Your last submission acknowledged (within 3 days)
+  if (own.length) {
+    var last = own[0];
+    try {
+      var ageD = (Date.now() - new Date(last.created_at).getTime()) / 86400000;
+      if (ageD <= 3) {
+        var ls = ((last.details||{}).schools || '').split(',')[0].trim();
+        cards.push('<div class="fcard tk">'
+          + '<div class="fcard-top"><span class="fcard-kicker">Logged and reported</span><span class="fcard-when">' + esc(feedDaysAgo(last.created_at)) + '</span></div>'
+          + '<h3>' + esc(ls || 'Your visit') + ' is on the record</h3>'
+          + '<p>Your School Visit Report was emailed to you. Thank you \u2014 every logged visit strengthens the evidence base.</p>'
+          + '</div>');
+      }
+    } catch(e){}
+  }
 
+  // 4) Daily data spotlight (own patch; rotates every day)
+  if (S._spotlight && S._spotlight.day === feedDayKey()) {
+    var sp = S._spotlight.row;
+    if (sp) {
+      cards.push('<div class="fcard data">'
+        + '<div class="fcard-top"><span class="fcard-kicker">Today\u2019s data spotlight</span><span class="fcard-when">' + esc(sp.term_label || '') + '</span></div>'
+        + '<h3>' + esc(sp.school_name || '') + '</h3>'
+        + '<p>Grade ' + esc(String(sp.grade)) + ' ' + esc(sp.subject || '') + ' averaged ' + Math.round(sp.average) + '% \u2014 worth a closer look on the DDD Dashboard.</p>'
+        + '<button class="fgo" onclick="window.open(\'https://www.dbedashboard.co.za/\',\'_blank\')">Open the DDD Dashboard</button>'
+        + '</div>');
+    }
+  }
+
+  // 5) Peers: today / yesterday granularity
+  var dayMs = 86400000, now = Date.now();
+  var recent7 = (S.decisions || []).filter(function(d){ try { return now - new Date(d.created_at).getTime() <= 7*dayMs; } catch(e){ return false; } });
+  if (recent7.length) {
+    var today = recent7.filter(function(d){ return now - new Date(d.created_at).getTime() <= dayMs; }).length;
+    var byDist = {};
+    recent7.forEach(function(d){ var k=(d.district||'').trim(); if(k) byDist[k]=(byDist[k]||0)+1; });
+    var top = Object.keys(byDist).sort(function(a,b){ return byDist[b]-byDist[a]; })[0];
+    cards.push('<div class="fcard tk">'
+      + '<div class="fcard-top"><span class="fcard-kicker">Your peers</span><span class="fcard-when">' + (today ? 'Active today' : 'Last 7 days') + '</span></div>'
+      + '<h3>' + recent7.length + ' visit' + (recent7.length===1?'':'s') + ' this week' + (today ? ' \u00b7 ' + today + ' today' : '') + '</h3>'
+      + '<p>' + (top ? 'Most active district: ' + esc(top) + ' (' + byDist[top] + ').' : 'Officials are logging across the provinces.') + '</p>'
+      + '<button class="fgo" onclick="navFromForm(\'toolkit\')">See what others are doing</button>'
+      + '</div>');
+  }
+
+  // 6) Milestone (monthly, district or programme)
+  var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
+  var monthLabel = mStart.toLocaleString('en-ZA', { month: 'long', year: 'numeric' });
+  var distName = (o.district || '').trim();
+  var scopeDecs = (S.decisions || []).filter(function(d){
+    try { if (new Date(d.created_at) < mStart) return false; } catch(e){ return false; }
+    return distName ? ((d.district||'').trim() === distName) : true;
+  });
+  if (scopeDecs.length >= 3) {
+    cards.push('<div class="fcard win">'
+      + '<div class="fcard-top"><span class="fcard-kicker">Milestone</span><span class="fcard-when">' + esc(monthLabel) + '</span></div>'
+      + '<h3>' + esc(distName || 'The programme') + ': ' + scopeDecs.length + ' interventions this month</h3>'
+      + '<p>Logged by officials ' + (distName ? 'across the district' : 'across all provinces') + '. Keep it going.</p>'
+      + '</div>');
+  }
+
+  var h = '<div class="feed-wrap">';
+  h += '<div class="feed-hello"><h2>' + greet + ', ' + esc(first) + '</h2>';
+  if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' logged this term</span>';
+  h += '</div>';
+  h += cards.slice(0, 6).join('');
+  if (!cards.length) {
+    h += '<div class="fcard tk"><div class="fcard-top"><span class="fcard-kicker">Welcome</span><span class="fcard-when">Today</span></div>'
+      + '<h3>Your feed builds as the programme moves</h3><p>Log your first visit and it will appear here.</p></div>';
+  }
   h += '<button class="feed-record" onclick="navToLog()">Record a school visit or intervention</button>';
   h += '</div>';
   return h;
 }
+
+function feedDayKey() { var d = new Date(); return d.getFullYear()*1000 + Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000); }
+// One spotlight per day, drawn from the official's own patch; deterministic daily rotation.
+async function loadFeedSpotlight() {
+  try {
+    if (S._spotlight && S._spotlight.day === feedDayKey()) return;
+    if (S._spotlightLoading) return;
+    S._spotlightLoading = true;
+    var q = sb.from('school_performance')
+      .select('school_name,grade,subject,average,term_label')
+      .not('average','is',null).gt('average',0).lt('average',55)
+      .order('average', { ascending: true }).limit(300);
+    var dist = (S.official && S.official.district || '').trim();
+    if (dist) q = q.eq('district', dist);
+    var { data } = await q;
+    S._spotlightLoading = false;
+    if (!data || !data.length) { S._spotlight = { day: feedDayKey(), row: null }; return; }
+    var em = (S.official && S.official.email) || '';
+    var seed = feedDayKey(); for (var i=0;i<em.length;i++) seed = (seed*31 + em.charCodeAt(i)) % 1000003;
+    S._spotlight = { day: feedDayKey(), row: data[seed % data.length] };
+    if (S.view === 'log' && S.f.formStep === -1 && !S.submitted) render();
+  } catch(e) { S._spotlightLoading = false; }
+}
+
 
 // ── Funnel events: fire-and-forget, never blocks or breaks the app ─────────
 function logEvent(event, step) {
@@ -7291,7 +7399,9 @@ async function applyUpdate() {
   // (the service worker serves cache-first; without this, the first reload
   // shows the old version and users had to tap update two or three times).
   try {
-    var fresh = await fetch('./index.html', { cache: 'reload' });
+    // Cache-busting query: the service worker matches caches by URL, so a
+    // unique URL guarantees this fetch reaches the network (not the old cache).
+    var fresh = await fetch('./index.html?upd=' + Date.now(), { cache: 'reload' });
     if (fresh && fresh.ok) {
       var keys = await caches.keys();
       for (var i = 0; i < keys.length; i++) {
