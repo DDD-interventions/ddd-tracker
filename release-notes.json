@@ -1,4 +1,11 @@
 {
+  "2026.06.18.30": {
+    "title": "Behind-the-scenes improvements",
+    "released": "2026-07-07",
+    "highlights": [
+      "Small internal improvements to help us understand and improve the app — no change to how you use it"
+    ]
+  },
   "2026.06.18.29": {
     "title": "Submission safety",
     "released": "2026-07-07",
