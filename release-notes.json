@@ -1,4 +1,12 @@
 {
+  "2026.06.18.29": {
+    "title": "Submission safety",
+    "released": "2026-07-07",
+    "highlights": [
+      "Tapping Submit twice on a slow connection can no longer create a duplicate record",
+      "Small data-quality fix behind the scenes"
+    ]
+  },
   "2026.06.18.28": {
     "title": "Smoother on your phone",
     "released": "2026-07-06",
