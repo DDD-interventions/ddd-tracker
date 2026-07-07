@@ -1,4 +1,22 @@
 {
+  "2026.06.18.33": {
+    "title": "A feed that changes every day",
+    "released": "2026-07-07",
+    "highlights": [
+      "A daily data spotlight from your own district — different every day, linking to the DDD Dashboard",
+      "The feed now tells you when a colleague tags you, and confirms when your report has been emailed",
+      "Peer activity now shows today's movement, not just the week"
+    ]
+  },
+  "2026.06.18.32": {
+    "title": "A richer home feed",
+    "released": "2026-07-07",
+    "highlights": [
+      "Your home feed now also shows new school data, this week's programme activity, and district milestones",
+      "Clearer colours — the greeting is now easy to read on any screen",
+      "Updates now apply in a single tap"
+    ]
+  },
   "2026.06.18.31": {
     "title": "Your new home screen",
     "released": "2026-07-07",
