@@ -1,4 +1,13 @@
 {
+  "2026.06.18.34": {
+    "title": "Home button and feed refresh",
+    "released": "2026-07-07",
+    "highlights": [
+      "A Home tab now takes you back to your feed from anywhere",
+      "Tap Refresh on the feed to pull the latest activity — it also refreshes itself when you return to the app",
+      "If you have a saved draft, it now appears at the top of your feed"
+    ]
+  },
   "2026.06.18.33": {
     "title": "A feed that changes every day",
     "released": "2026-07-07",
