@@ -972,7 +972,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.28';
+const APP_VERSION = '2026.06.18.29';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4582,6 +4582,7 @@ function validateAndNext(currentStep, nextStep) {
 }
 
 async function submitForm() {
+ if (S.saving) return;   // guard: ignore repeat taps while a submission is in flight
  const errors = getValidationErrors();
  if (errors.length > 0) {
    S._validationErrors = errors;
@@ -4602,7 +4603,7 @@ async function submitForm() {
  activity_type:S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type,
  intervention_theme:S.f.intervention_theme==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:S.f.intervention_theme,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
- ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
+ ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return !!v && a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
  insight_types:S.f.insight_types,
  insight_detail:S.f.insight_detail,
