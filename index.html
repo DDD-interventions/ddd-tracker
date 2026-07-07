@@ -730,6 +730,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 /* ── 2026.06.18.11: footer + version button must clear the fixed bottom nav on mobile ── */
 @media(max-width:760px){.app-footer{padding-bottom:calc(72px + env(safe-area-inset-bottom))}}
 
+.feed-sect{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A94A0;margin:12px 4px 8px}
+.feed-more{display:block;width:100%;background:#fff;border:1px solid #E2E7E5;border-radius:10px;color:var(--teal-dk);font-size:13px;font-weight:700;padding:13px;cursor:pointer;margin-bottom:8px;min-height:46px}
 /* ── Mobile input & touch floor (trailing block: wins the cascade) ── */
 @media (max-width: 820px){
   .field input[type=text],.field input[type=date],.field input[type=number],
@@ -1038,7 +1040,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.35';
+const APP_VERSION = '2026.06.18.37';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2425,7 +2427,8 @@ function renderHomeFeed() {
   function rel(ts){ try{ var m=(Date.now()-new Date(ts).getTime())/60000;
     if(m<60)return Math.max(1,Math.floor(m))+' min ago';
     if(m<60*24)return Math.floor(m/60)+' h ago';
-    var d=Math.floor(m/1440); return d===1?'yesterday':d+' d ago'; }catch(e){ return ''; } }
+    var d=Math.floor(m/1440); if(d===1)return 'yesterday'; if(d<=13)return d+' d ago';
+    var dt=new Date(ts); return dt.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]; }catch(e){ return ''; } }
 
   var items = [];
   try { var rz = renderResumeDraftCard(); if (rz) items.push(rz); } catch(e){}
@@ -2479,31 +2482,66 @@ function renderHomeFeed() {
     } catch(e){}
   }
 
-  // Daily spotlight
-  if (S._spotlight && S._spotlight.day === feedDayKey() && S._spotlight.row) {
-    var sp = S._spotlight.row;
-    items.push(item({
-      avatar: av('DDD',2,true),
-      name: 'Today\u2019s data spotlight',
-      meta: esc(sp.term_label||'') + ' \u00b7 your area',
-      body: '<b>' + esc(sp.school_name||'') + '</b> \u2014 Grade ' + esc(String(sp.grade)) + ' ' + esc(sp.subject||'') + ' averaged ' + Math.round(sp.average) + '%. Worth a closer look.',
-      actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+  // New data on the DDD Dashboard (term-tagged from real data)
+  var termLbl = (S._spotlight && ((S._spotlight.low||{}).term_label || (S._spotlight.high||{}).term_label)) || '2026 Term 1';
+  items.push(item({
+    avatar: av('DDD',0,true),
+    name: 'New on the DDD Dashboard',
+    meta: esc(termLbl) + ' \u00b7 all provinces',
+    body: 'Subject results for ' + esc(termLbl) + ' are loaded for schools across the country \u2014 including yours.',
+    actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+
+  // Daily data items: one needs-attention, one bright spot (rotate every day)
+  if (S._spotlight && S._spotlight.day === feedDayKey()) {
+    var lo = S._spotlight.low, hi = S._spotlight.high;
+    if (lo) {
+      items.push(item({
+        avatar: av(ini(lo.school_name||'S'),2),
+        name: esc(lo.school_name||''),
+        meta: 'Needs attention \u00b7 ' + esc(lo.term_label||'') + ' \u00b7 your area',
+        body: 'Grade ' + esc(String(lo.grade)) + ' ' + esc(lo.subject||'') + ' averaged <b>' + Math.round(lo.average) + '%</b>. Worth a closer look before Term 3 planning.',
+        actions: [{label:'See details on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+    }
+    if (hi) {
+      items.push(item({
+        avatar: av(ini(hi.school_name||'S'),1),
+        name: esc(hi.school_name||''),
+        meta: 'Bright spot \u00b7 ' + esc(hi.term_label||'') + ' \u00b7 your area',
+        body: 'Grade ' + esc(String(hi.grade)) + ' ' + esc(hi.subject||'') + ' averaged <b>' + Math.round(hi.average) + '%</b>. Something is working here \u2014 a visit could surface lessons for other schools.' }));
+    }
   }
 
-  // Individual peer items (role + district; no names — matches current programme posture)
-  var peers = (S.decisions || []).filter(function(d){ return (d.logged_by_email||'').toLowerCase() !== em; })
-    .sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 3);
-  peers.forEach(function(d, ix){
+  // Activity timeline: every logged visit in the past 2 months, newest first
+  var d60 = Date.now() - 60*86400000;
+  var stream = (S.decisions || []).filter(function(d){
+    try { return new Date(d.created_at).getTime() >= d60; } catch(e){ return false; }
+  }).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).map(function(d, ix){
     var det = d.details || {};
+    var mine = (d.logged_by_email||'').toLowerCase() === em;
     var role = (det.official_role || 'An official').replace(/^Other: /,'');
+    var who = mine ? 'You' : role;
     var sch = (det.schools || '').split(',').map(function(x){return x.trim();}).filter(Boolean);
     var where = [d.district, d.province].filter(Boolean).join(', ');
-    items.push(item({
-      avatar: av(ini(role),(ix+4)),
-      name: esc(role),
+    return item({
+      avatar: av(mine ? ini(o.full_name||'Me') : ini(role), mine ? 0 : (ix % 4) + 1),
+      name: esc(who),
       meta: esc(where || 'In the programme') + ' \u00b7 ' + rel(d.created_at),
-      body: 'Logged a visit' + (sch.length ? ' to <b>' + esc(sch[0]) + '</b>' + (sch.length>1?' and '+(sch.length-1)+' more':'') : '') + (d.activity_type ? ' \u2014 ' + esc(d.activity_type) : '') + '.' }));
+      body: 'Logged a visit' + (sch.length ? ' to <b>' + esc(sch[0]) + '</b>' + (sch.length>1?' and '+(sch.length-1)+' more':'') : '') + (d.activity_type ? ' \u2014 ' + esc(d.activity_type) : '') + '.' });
   });
+
+  // Programme pulse: the year so far
+  var yStart = new Date(new Date().getFullYear(), 0, 1);
+  var yearDecs = (S.decisions || []).filter(function(d){ try { return new Date(d.created_at) >= yStart; } catch(e){ return false; } });
+  if (yearDecs.length >= 5) {
+    var schoolSet = {};
+    yearDecs.forEach(function(d){ ((d.details||{}).schools||'').split(',').forEach(function(x){ x=x.trim(); if(x) schoolSet[x]=1; }); });
+    var nSchools = Object.keys(schoolSet).length;
+    items.push(item({
+      avatar: av('DDD',3,true),
+      name: 'The programme, so far this year',
+      meta: 'Programme pulse \u00b7 ' + yStart.getFullYear(),
+      body: '<b>' + yearDecs.length + '</b> interventions logged across <b>' + nSchools + '</b> schools. Every entry builds the evidence base.' }));
+  }
 
   // Milestone
   var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
@@ -2525,7 +2563,15 @@ function renderHomeFeed() {
   h += '<div class="feed-hello"><h2>' + greet + ', ' + esc(first) + '</h2>';
   if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' this term</span>';
   h += '<span class="feed-refresh">' + esc(feedAgoLabel()) + (S._feedRefreshing ? ' \u00b7 Refreshing\u2026' : ' \u00b7 <button onclick="refreshFeed()">Refresh</button>') + '</span></div>';
-  h += items.slice(0, 8).join('');
+  h += items.join('');
+  if (stream.length) {
+    var nShow = S._feedStreamN || 6;
+    h += '<div class="feed-sect">Activity · last 2 months</div>';
+    h += stream.slice(0, nShow).join('');
+    if (stream.length > nShow) {
+      h += '<button class="feed-more" onclick="S._feedStreamN=(S._feedStreamN||6)+10;render()">Show earlier activity (' + (stream.length - nShow) + ' more)</button>';
+    }
+  }
   if (!items.length) {
     h += item({ avatar: av('DDD',0,true), name:'Welcome', meta:'Today', body:'Your feed builds as the programme moves. Log your first visit and it will appear here.' });
   }
@@ -2541,18 +2587,20 @@ async function loadFeedSpotlight() {
     if (S._spotlight && S._spotlight.day === feedDayKey()) return;
     if (S._spotlightLoading) return;
     S._spotlightLoading = true;
-    var q = sb.from('school_performance')
-      .select('school_name,grade,subject,average,term_label')
-      .not('average','is',null).gt('average',0).lt('average',55)
-      .order('average', { ascending: true }).limit(300);
     var dist = (S.official && S.official.district || '').trim();
-    if (dist) q = q.eq('district', dist);
-    var { data } = await q;
-    S._spotlightLoading = false;
-    if (!data || !data.length) { S._spotlight = { day: feedDayKey(), row: null }; return; }
+    function base(){ var q = sb.from('school_performance').select('school_name,grade,subject,average,term_label').not('average','is',null); if (dist) q = q.eq('district', dist); return q; }
+    var rs = await Promise.allSettled([
+      base().gt('average',0).lt('average',50).order('average',{ascending:true}).limit(250),
+      base().gte('average',70).lte('average',96).order('average',{ascending:false}).limit(250)
+    ]);
+    var low  = (rs[0].status==='fulfilled' && rs[0].value && rs[0].value.data) || [];
+    var high = (rs[1].status==='fulfilled' && rs[1].value && rs[1].value.data) || [];
     var em = (S.official && S.official.email) || '';
     var seed = feedDayKey(); for (var i=0;i<em.length;i++) seed = (seed*31 + em.charCodeAt(i)) % 1000003;
-    S._spotlight = { day: feedDayKey(), row: data[seed % data.length] };
+    S._spotlight = { day: feedDayKey(),
+      low:  low.length  ? low[seed % low.length] : null,
+      high: high.length ? high[(seed*7+13) % high.length] : null };
+    S._spotlightLoading = false;
     if (S.view === 'log' && S.f.formStep === -1 && !S.submitted) render();
   } catch(e) { S._spotlightLoading = false; }
 }
