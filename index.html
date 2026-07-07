@@ -972,7 +972,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.29';
+const APP_VERSION = '2026.06.18.30';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2233,6 +2233,7 @@ async function checkAuth() {
        }
        S._officialId = official.id;
        S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', email: official.email || '', notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled) };
+       logEvent(S._freshLogin ? 'login' : 'app_open'); S._freshLogin = false;
        S.f.official_name = official.full_name || '';
        S.f.official_role = official.role || '';
        S.f.official_email = official.email || '';
@@ -2289,6 +2290,20 @@ async function verifyEmail(email) {
  }
 }
 
+// ── Funnel events: fire-and-forget, never blocks or breaks the app ─────────
+function logEvent(event, step) {
+  try {
+    var em = (S.official && S.official.email) || S._otpEmail || '';
+    sb.from('app_events').insert({
+      email: em || null,
+      official_id: S._officialId || null,
+      event: event,
+      step: (step === undefined || step === null) ? null : step,
+      app_version: APP_VERSION
+    }).then(function(){}, function(){});
+  } catch (e) { /* analytics must never interfere */ }
+}
+
 async function handleOtpSubmit() {
  const pin = (S._otpValue || '').trim();
  if (!pin || pin.length !== 4) {
@@ -2311,6 +2326,7 @@ async function handleOtpSubmit() {
      S.gateLoading = false; render(); return;
    }
 
+   S._freshLogin = true;
    // Session is now set - JWT attached to all future requests
    const { data: officials } = await sb.from('officials')
      .select('id,full_name,role,province,district,email,details')
@@ -3221,7 +3237,7 @@ function navToLog() {
   }
   S.view = 'log';
   S.submitted = false;
-  if (S.f.formStep === -1) S.f.formStep = 0;
+  if (S.f.formStep === -1) { S.f.formStep = 0; logEvent('form_started', 0); }
   render();
   (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}));
 }
@@ -4577,6 +4593,7 @@ function validateAndNext(currentStep, nextStep) {
  }
  S._validationErrors = null;
  S.f.formStep = nextStep;
+ logEvent('step_advanced', nextStep);
  render();
  (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'auto'}));
 }
@@ -4726,7 +4743,7 @@ async function submitForm() {
  var qIdx = q.findIndex(function(item){return item.dec.id === decId});
  if (qIdx > -1) removeFromSubmitQueue(qIdx);
 
- S.submitted = true;
+ S.submitted = true; logEvent('submitted', 5);
     clearFormDraft();
     haptic(HAPTIC_OK);
 
@@ -4750,7 +4767,7 @@ async function submitForm() {
  await loadAll();
  } catch(e) {
  // Network failed — but data is already saved locally
- S.submitted = true;
+ S.submitted = true; logEvent('submitted_offline', 5);
  S._auditEmailQueued = false;
  clearFormDraft();
  haptic(HAPTIC_OK);
