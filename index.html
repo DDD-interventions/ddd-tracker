@@ -743,6 +743,42 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
   .nav-compact-btn{min-height:44px}
 }
 
+/* ── Home feed: social-stream styling ── */
+.feed-wrap{max-width:600px;margin:0 auto;padding:0 0 30px}
+.feed-canvas{background:#EEF1F0;border-radius:12px;padding:10px 8px 14px}
+.feed-hello{background:#fff;border:1px solid #E2E7E5;border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.feed-hello h2{font-size:15px;font-weight:800;margin:0;color:var(--navy)}
+.feed-chip{font-size:11.5px;font-weight:700;color:#4E7B27;background:#EFF6E6;border:1px solid #D6E8C2;padding:3px 10px;border-radius:12px}
+.feed-refresh{font-size:11px;color:#8A94A0;margin-left:auto}
+.feed-refresh button{background:none;border:none;color:var(--teal-dk);font-size:11px;font-weight:700;cursor:pointer;padding:6px 2px;min-height:0;text-decoration:underline}
+.fi{background:#fff;border:1px solid #E2E7E5;border-radius:10px;padding:11px 13px 9px;margin-bottom:8px}
+.fi-head{display:flex;gap:10px;align-items:flex-start}
+.fi-av{width:40px;height:40px;border-radius:50%;flex:0 0 40px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.fi-av.sq{border-radius:9px}
+.fi-who{flex:1;min-width:0}
+.fi-name{font-size:13.5px;font-weight:800;color:var(--navy);line-height:1.25}
+.fi-meta{font-size:11.5px;color:#8A94A0;margin-top:1px}
+.fi-body{font-size:13px;color:#2B3648;line-height:1.45;margin:8px 0 2px}
+.fi-body b{color:var(--navy)}
+.fi-actions{display:flex;gap:4px;border-top:1px solid #EDF0EF;margin-top:9px;padding-top:3px}
+.fi-actions button{flex:1;background:none;border:none;font-size:12px;font-weight:700;color:var(--teal-dk);padding:10px 4px;min-height:42px;cursor:pointer;border-radius:7px}
+.fi-actions button:active{background:#F0F5F4}
+.fi-actions button.strong{color:#3E6B18}
+.fi.pin{border-left:none;border-color:#CBE3AE;background:#FCFEF9}
+.feed-record{display:block;width:100%;background:var(--green);color:var(--navy);font-weight:800;font-size:14.5px;text-align:center;padding:15px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(122,182,72,.3);margin-top:4px;min-height:52px}
+/* ── Mobile input & touch floor (trailing block: wins the cascade) ── */
+@media (max-width: 820px){
+  .field input[type=text],.field input[type=date],.field input[type=number],
+  .field input[type=url],.field input[type=email],.field textarea,
+  input[type=text],input[type=email],input[type=number],input[type=date],
+  input[type=url],input[type=search],select,textarea{font-size:16px !important;min-height:44px}
+  textarea{min-height:72px}
+  .radio-grp label,.tag-grp label{min-height:44px;align-items:center}
+  .tq-card{min-height:48px}
+  button,.btn{min-height:44px}
+  .nav-compact-btn{min-height:44px}
+}
+
 /* ── Home feed (Stage 4A) ── */
 .feed-wrap{max-width:560px;margin:0 auto;padding:4px 4px 28px}
 .feed-hello{background:linear-gradient(150deg,#074445,#0B8E8D);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(7,68,69,.25)}
@@ -1002,7 +1038,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.34';
+const APP_VERSION = '2026.06.18.35';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2374,10 +2410,27 @@ function renderHomeFeed() {
   var termCount = own.filter(function(d){ try { return new Date(d.created_at) >= term.start; } catch(e){ return false; } }).length;
   loadFeedSpotlight();
 
-  var cards = [];
-  try { var rz = renderResumeDraftCard(); if (rz) cards.push(rz); } catch(e){}
+  var AVC = ['#0B8E8D','#5D9331','#B5720F','#1A2332','#0A6162'];
+  function av(txt, idx, sq){ return '<div class="fi-av'+(sq?' sq':'')+'" style="background:'+AVC[idx%AVC.length]+'">'+esc(txt)+'</div>'; }
+  function ini(str){ var p=String(str||'').trim().split(/\s+/); return ((p[0]||' ')[0]+(p[1]?p[1][0]:'')).toUpperCase(); }
+  function item(opt){
+    var h='<div class="fi'+(opt.pin?' pin':'')+'">'
+      + '<div class="fi-head">'+opt.avatar
+      + '<div class="fi-who"><div class="fi-name">'+opt.name+'</div>'
+      + '<div class="fi-meta">'+opt.meta+'</div></div></div>';
+    if(opt.body) h+='<div class="fi-body">'+opt.body+'</div>';
+    if(opt.actions&&opt.actions.length){ h+='<div class="fi-actions">'+opt.actions.map(function(a){return '<button class="'+(a.strong?'strong':'')+'" onclick="'+a.on+'">'+a.label+'</button>';}).join('')+'</div>'; }
+    return h+'</div>';
+  }
+  function rel(ts){ try{ var m=(Date.now()-new Date(ts).getTime())/60000;
+    if(m<60)return Math.max(1,Math.floor(m))+' min ago';
+    if(m<60*24)return Math.floor(m/60)+' h ago';
+    var d=Math.floor(m/1440); return d===1?'yesterday':d+' d ago'; }catch(e){ return ''; } }
 
-  // 1) You were tagged (last 14 days, by someone else)
+  var items = [];
+  try { var rz = renderResumeDraftCard(); if (rz) items.push(rz); } catch(e){}
+
+  // Tagged on you
   var wk14 = Date.now() - 14*86400000;
   var taggedOnMe = (S.decisions || []).filter(function(d){
     try { if (new Date(d.created_at).getTime() < wk14) return false; } catch(e){ return false; }
@@ -2389,78 +2442,70 @@ function renderHomeFeed() {
   }).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
   if (taggedOnMe.length) {
     var t = taggedOnMe[0], td = t.details || {};
-    cards.push('<div class="fcard due">'
-      + '<div class="fcard-top"><span class="fcard-kicker">You were tagged'+(taggedOnMe.length>1?' \u00b7 1 of '+taggedOnMe.length:'')+'</span>'
-      + '<span class="fcard-when">' + esc(feedDaysAgo(t.created_at)) + '</span></div>'
-      + '<h3>' + esc((t.logged_by||'A colleague')) + ' asked for your support</h3>'
-      + '<p>' + esc(((td.schools||'').split(',')[0]||'').trim()) + '</p>'
-      + '<button class="fgo" onclick="navFromForm(\'dashboard\')">View and respond</button>'
-      + '</div>');
+    items.push(item({ pin:true,
+      avatar: av(ini(t.logged_by||'C'),3),
+      name: esc(t.logged_by || 'A colleague') + ' tagged you',
+      meta: esc(((td.schools||'').split(',')[0]||'').trim()) + ' \u00b7 ' + rel(t.created_at),
+      body: 'You were asked to support on this visit' + (taggedOnMe.length>1 ? ' \u2014 and ' + (taggedOnMe.length-1) + ' more' : '') + '.',
+      actions: [{label:'View and respond', on:"navFromForm('dashboard')", strong:true}] }));
   }
 
-  // 2) Follow-up outstanding
+  // Follow-up outstanding
   var fups = own.filter(function(d){ var dt = d.details || {}; return dt.follow_up && dt.follow_up_desc && !dt.follow_up_completed; });
   fups.sort(function(a,b){ return new Date(a.date || a.created_at) - new Date(b.date || b.created_at); });
   if (fups.length) {
     var f = fups[0], fd = f.details || {};
     var school = (fd.schools || '').split(',')[0].trim() || 'A school you visited';
-    var snippet = String(fd.follow_up_desc || '').slice(0, 110);
-    cards.push('<div class="fcard due">'
-      + '<div class="fcard-top"><span class="fcard-kicker">Follow-up outstanding' + (fups.length > 1 ? ' \u00b7 1 of ' + fups.length : '') + '</span>'
-      + '<span class="fcard-when">Visit logged ' + esc(feedDaysAgo(f.date || f.created_at)) + '</span></div>'
-      + '<h3>' + esc(school) + '</h3>'
-      + '<p>' + esc(snippet) + (String(fd.follow_up_desc||'').length > 110 ? '\u2026' : '') + '</p>'
-      + '<button class="fgo" onclick="navToLog()">Start the visit log</button>'
-      + '<button class="flink" onclick="navFromForm(\'dashboard\')">See all in My dashboard</button>'
-      + '</div>');
+    items.push(item({ pin:true,
+      avatar: av(ini(school),1),
+      name: esc(school),
+      meta: 'Follow-up outstanding' + (fups.length>1?' \u00b7 1 of '+fups.length:'') + ' \u00b7 visit logged ' + rel(f.date || f.created_at),
+      body: esc(String(fd.follow_up_desc||'').slice(0,120)) + (String(fd.follow_up_desc||'').length>120?'\u2026':''),
+      actions: [{label:'Start the visit log', on:'navToLog()', strong:true},{label:'See all', on:"navFromForm('dashboard')"}] }));
   }
 
-  // 3) Your last submission acknowledged (within 3 days)
+  // Your submission acknowledged
   if (own.length) {
     var last = own[0];
     try {
-      var ageD = (Date.now() - new Date(last.created_at).getTime()) / 86400000;
-      if (ageD <= 3) {
+      if ((Date.now() - new Date(last.created_at).getTime())/86400000 <= 3) {
         var ls = ((last.details||{}).schools || '').split(',')[0].trim();
-        cards.push('<div class="fcard tk">'
-          + '<div class="fcard-top"><span class="fcard-kicker">Logged and reported</span><span class="fcard-when">' + esc(feedDaysAgo(last.created_at)) + '</span></div>'
-          + '<h3>' + esc(ls || 'Your visit') + ' is on the record</h3>'
-          + '<p>Your School Visit Report was emailed to you. Thank you \u2014 every logged visit strengthens the evidence base.</p>'
-          + '</div>');
+        items.push(item({
+          avatar: av('DDD',0,true),
+          name: 'Your visit is on the record',
+          meta: esc(ls||'') + ' \u00b7 ' + rel(last.created_at),
+          body: 'Your School Visit Report was emailed to you. Every logged visit strengthens the evidence base.' }));
       }
     } catch(e){}
   }
 
-  // 4) Daily data spotlight (own patch; rotates every day)
-  if (S._spotlight && S._spotlight.day === feedDayKey()) {
+  // Daily spotlight
+  if (S._spotlight && S._spotlight.day === feedDayKey() && S._spotlight.row) {
     var sp = S._spotlight.row;
-    if (sp) {
-      cards.push('<div class="fcard data">'
-        + '<div class="fcard-top"><span class="fcard-kicker">Today\u2019s data spotlight</span><span class="fcard-when">' + esc(sp.term_label || '') + '</span></div>'
-        + '<h3>' + esc(sp.school_name || '') + '</h3>'
-        + '<p>Grade ' + esc(String(sp.grade)) + ' ' + esc(sp.subject || '') + ' averaged ' + Math.round(sp.average) + '% \u2014 worth a closer look on the DDD Dashboard.</p>'
-        + '<button class="fgo" onclick="window.open(\'https://www.dbedashboard.co.za/\',\'_blank\')">Open the DDD Dashboard</button>'
-        + '</div>');
-    }
+    items.push(item({
+      avatar: av('DDD',2,true),
+      name: 'Today\u2019s data spotlight',
+      meta: esc(sp.term_label||'') + ' \u00b7 your area',
+      body: '<b>' + esc(sp.school_name||'') + '</b> \u2014 Grade ' + esc(String(sp.grade)) + ' ' + esc(sp.subject||'') + ' averaged ' + Math.round(sp.average) + '%. Worth a closer look.',
+      actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
   }
 
-  // 5) Peers: today / yesterday granularity
-  var dayMs = 86400000, now = Date.now();
-  var recent7 = (S.decisions || []).filter(function(d){ try { return now - new Date(d.created_at).getTime() <= 7*dayMs; } catch(e){ return false; } });
-  if (recent7.length) {
-    var today = recent7.filter(function(d){ return now - new Date(d.created_at).getTime() <= dayMs; }).length;
-    var byDist = {};
-    recent7.forEach(function(d){ var k=(d.district||'').trim(); if(k) byDist[k]=(byDist[k]||0)+1; });
-    var top = Object.keys(byDist).sort(function(a,b){ return byDist[b]-byDist[a]; })[0];
-    cards.push('<div class="fcard tk">'
-      + '<div class="fcard-top"><span class="fcard-kicker">Your peers</span><span class="fcard-when">' + (today ? 'Active today' : 'Last 7 days') + '</span></div>'
-      + '<h3>' + recent7.length + ' visit' + (recent7.length===1?'':'s') + ' this week' + (today ? ' \u00b7 ' + today + ' today' : '') + '</h3>'
-      + '<p>' + (top ? 'Most active district: ' + esc(top) + ' (' + byDist[top] + ').' : 'Officials are logging across the provinces.') + '</p>'
-      + '<button class="fgo" onclick="navFromForm(\'toolkit\')">See what others are doing</button>'
-      + '</div>');
-  }
+  // Individual peer items (role + district; no names — matches current programme posture)
+  var peers = (S.decisions || []).filter(function(d){ return (d.logged_by_email||'').toLowerCase() !== em; })
+    .sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 3);
+  peers.forEach(function(d, ix){
+    var det = d.details || {};
+    var role = (det.official_role || 'An official').replace(/^Other: /,'');
+    var sch = (det.schools || '').split(',').map(function(x){return x.trim();}).filter(Boolean);
+    var where = [d.district, d.province].filter(Boolean).join(', ');
+    items.push(item({
+      avatar: av(ini(role),(ix+4)),
+      name: esc(role),
+      meta: esc(where || 'In the programme') + ' \u00b7 ' + rel(d.created_at),
+      body: 'Logged a visit' + (sch.length ? ' to <b>' + esc(sch[0]) + '</b>' + (sch.length>1?' and '+(sch.length-1)+' more':'') : '') + (d.activity_type ? ' \u2014 ' + esc(d.activity_type) : '') + '.' }));
+  });
 
-  // 6) Milestone (monthly, district or programme)
+  // Milestone
   var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
   var monthLabel = mStart.toLocaleString('en-ZA', { month: 'long', year: 'numeric' });
   var distName = (o.district || '').trim();
@@ -2469,27 +2514,23 @@ function renderHomeFeed() {
     return distName ? ((d.district||'').trim() === distName) : true;
   });
   if (scopeDecs.length >= 3) {
-    cards.push('<div class="fcard win">'
-      + '<div class="fcard-top"><span class="fcard-kicker">Milestone</span><span class="fcard-when">' + esc(monthLabel) + '</span></div>'
-      + '<h3>' + esc(distName || 'The programme') + ': ' + scopeDecs.length + ' interventions this month</h3>'
-      + '<p>Logged by officials ' + (distName ? 'across the district' : 'across all provinces') + '. Keep it going.</p>'
-      + '</div>');
+    items.push(item({
+      avatar: av(ini(distName||'DDD'),4,!distName),
+      name: esc(distName || 'The programme') + ': ' + scopeDecs.length + ' interventions this month',
+      meta: esc(monthLabel),
+      body: 'Logged by officials ' + (distName ? 'across the district' : 'across all provinces') + '. Keep it going.' }));
   }
 
-  var h = '<div class="feed-wrap">';
+  var h = '<div class="feed-wrap"><div class="feed-canvas">';
   h += '<div class="feed-hello"><h2>' + greet + ', ' + esc(first) + '</h2>';
-  if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' logged this term</span>';
-  h += '<div class="feed-refresh">' + esc(feedAgoLabel()) + (S._feedRefreshing
-    ? ' \u00b7 Refreshing\u2026'
-    : ' \u00b7 <button onclick="refreshFeed()">Refresh</button>') + '</div>';
-  h += '</div>';
-  h += cards.slice(0, 6).join('');
-  if (!cards.length) {
-    h += '<div class="fcard tk"><div class="fcard-top"><span class="fcard-kicker">Welcome</span><span class="fcard-when">Today</span></div>'
-      + '<h3>Your feed builds as the programme moves</h3><p>Log your first visit and it will appear here.</p></div>';
+  if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' this term</span>';
+  h += '<span class="feed-refresh">' + esc(feedAgoLabel()) + (S._feedRefreshing ? ' \u00b7 Refreshing\u2026' : ' \u00b7 <button onclick="refreshFeed()">Refresh</button>') + '</span></div>';
+  h += items.slice(0, 8).join('');
+  if (!items.length) {
+    h += item({ avatar: av('DDD',0,true), name:'Welcome', meta:'Today', body:'Your feed builds as the programme moves. Log your first visit and it will appear here.' });
   }
   h += '<button class="feed-record" onclick="navToLog()">Record a school visit or intervention</button>';
-  h += '</div>';
+  h += '</div></div>';
   return h;
 }
 
