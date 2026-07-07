@@ -769,6 +769,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .fcard.tk .fgo{background:#DCEEEE;color:var(--teal-dk)}
 .feed-record{display:block;width:100%;background:var(--green);color:var(--navy);font-weight:800;font-size:15px;text-align:center;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(122,182,72,.35);margin-top:4px;min-height:52px}
 @media (max-width:820px){ .feed-hello h2{font-size:18px} }
+
+.feed-refresh{font-size:11px;color:#CFE3E2;margin-top:9px}
+.feed-refresh button{background:none;border:none;color:#EAF6DC;font-size:11px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 4px;min-height:0}
 </style>
 </head>
 <body>
@@ -999,7 +1002,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.33';
+const APP_VERSION = '2026.06.18.34';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2332,6 +2335,34 @@ function feedDaysAgo(dateStr) {
   try { var d = new Date(dateStr); var n = Math.floor((Date.now() - d.getTime()) / 86400000);
     return n <= 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'; } catch(e){ return ''; }
 }
+function navHome() {
+  // Draft-safe: leaving a half-filled form saves it; the feed shows a Resume card.
+  if (S.view === 'log' && S.f.formStep >= 0 && !S.submitted && typeof isFormDirty === 'function' && isFormDirty()) { try { saveFormDraft(); } catch(e){} }
+  S.view = 'log'; S.submitted = false; S.f.formStep = -1;
+  render();
+  (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'auto'}));
+}
+async function refreshFeed() {
+  if (S._feedRefreshing) return;
+  S._feedRefreshing = true; render();
+  try { await loadAll(); } catch(e){}
+  S._feedRefreshing = false;
+  if (S.view === 'log' && S.f.formStep === -1 && !S.submitted) render();
+}
+// Auto-refresh: coming back to the app after 5+ minutes refreshes the feed silently
+document.addEventListener('visibilitychange', function(){
+  try {
+    if (document.visibilityState !== 'visible') return;
+    if (!(S.view === 'log' && S.f.formStep === -1 && !S.submitted)) return;
+    if (S._lastLoadAll && (Date.now() - S._lastLoadAll) > 5*60*1000) refreshFeed();
+  } catch(e){}
+});
+function feedAgoLabel() {
+  if (!S._lastLoadAll) return '';
+  var m = Math.floor((Date.now() - S._lastLoadAll) / 60000);
+  return m <= 0 ? 'Updated just now' : m === 1 ? 'Updated 1 minute ago' : m < 60 ? 'Updated ' + m + ' minutes ago' : 'Updated over an hour ago';
+}
+
 function renderHomeFeed() {
   var o = S.official || {};
   var first = String(o.full_name || 'there').split(' ')[0];
@@ -2344,6 +2375,7 @@ function renderHomeFeed() {
   loadFeedSpotlight();
 
   var cards = [];
+  try { var rz = renderResumeDraftCard(); if (rz) cards.push(rz); } catch(e){}
 
   // 1) You were tagged (last 14 days, by someone else)
   var wk14 = Date.now() - 14*86400000;
@@ -2447,6 +2479,9 @@ function renderHomeFeed() {
   var h = '<div class="feed-wrap">';
   h += '<div class="feed-hello"><h2>' + greet + ', ' + esc(first) + '</h2>';
   if (termCount > 0) h += '<span class="feed-chip">' + termCount + ' visit' + (termCount === 1 ? '' : 's') + ' logged this term</span>';
+  h += '<div class="feed-refresh">' + esc(feedAgoLabel()) + (S._feedRefreshing
+    ? ' \u00b7 Refreshing\u2026'
+    : ' \u00b7 <button onclick="refreshFeed()">Refresh</button>') + '</div>';
   h += '</div>';
   h += cards.slice(0, 6).join('');
   if (!cards.length) {
@@ -3164,6 +3199,7 @@ async function loadAll() {
  sb.from('interventions').select('*').order('entity_name'),
  sb.rpc('get_programme_stats')
  ]);
+ S._lastLoadAll = Date.now();
  const val = function(r) { return r.status==='fulfilled' && r.value && !r.value.error ? r.value.data : null; };
  S.decisions = val(results[0]) || S.decisions || [];
  S.actions = val(results[1]) || S.actions || [];
@@ -3214,7 +3250,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();(S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}))" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${`<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'?'active':''}" onclick="navFromForm('log')">Record intervention</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : (S.f.formStep===-1 ? renderHomeFeed() : renderForm())) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();(S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}))" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Notifications">${(()=>{var c=getNotifCount();return '&#128276;'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${`<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" onclick="navHome()">Home</button><button class="nav-compact-btn ${S.view==='log'&&(S.f.formStep>-1||S.submitted)?'active':''}" onclick="navFromForm('log')">Record</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : (S.f.formStep===-1 ? renderHomeFeed() : renderForm())) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> </div> ${renderBottomNav()} `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
