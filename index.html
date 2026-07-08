@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.41';
+const APP_VERSION = '2026.06.18.42';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1110,8 +1110,84 @@ const S = {
 
 // SUPABASE 
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
- auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, experimental: { passkey: true } }
+ auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, experimental: { passkey: true } }
 });
+
+// ── PIN self-recovery ───────────────────────────────────────────────────────
+sb.auth.onAuthStateChange(function(event){
+  if (event === 'PASSWORD_RECOVERY') {
+    S._recoveryMode = true;
+    try { history.replaceState(null,'',location.pathname); } catch(e){}
+    render();
+  }
+});
+async function sendPinReset() {
+  var em = String(S._forgotEmail || '').trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { S._forgotMsg = 'Please enter your work email address.'; render(); return; }
+  S._forgotBusy = true; S._forgotMsg = ''; render();
+  try {
+    var r = await sb.auth.resetPasswordForEmail(em, { redirectTo: 'https://ddd-interventions.github.io/ddd-tracker/' });
+    S._forgotBusy = false;
+    S._forgotMsg = r && r.error ? ('Could not send the reset email: ' + r.error.message)
+      : 'Done — check your email for a link to set a new PIN. It can take a minute or two.';
+  } catch(e) { S._forgotBusy = false; S._forgotMsg = 'Could not send the reset email. Please try again.'; }
+  render();
+}
+async function saveNewPin() {
+  var p1 = String(S._newPin1||'').trim(), p2 = String(S._newPin2||'').trim();
+  if (!/^[0-9]{4}$/.test(p1)) { S._pinMsg = 'Your PIN must be exactly 4 digits.'; render(); return; }
+  if (p1 !== p2) { S._pinMsg = 'The two PINs do not match.'; render(); return; }
+  S._pinBusy = true; S._pinMsg=''; render();
+  try {
+    var r = await sb.auth.updateUser({ password: p1 });
+    S._pinBusy = false;
+    if (r && r.error) { S._pinMsg = 'Could not save the new PIN: ' + r.error.message; render(); return; }
+    S._recoveryMode = false; S._newPin1=''; S._newPin2='';
+    showToast('Your new PIN is saved — welcome back');
+    checkAuth();
+  } catch(e) { S._pinBusy = false; S._pinMsg = 'Could not save the new PIN. Please try again.'; render(); }
+}
+function renderRecoveryScreen() {
+  return `
+  <div style="max-width:420px;margin:48px auto;padding:0 18px">
+    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(7,68,69,.12)">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:6px">DDD Interventions Tracker</div>
+      <div style="font-size:21px;font-weight:800;color:var(--navy);margin-bottom:6px">Set a new PIN</div>
+      <div style="font-size:14px;color:var(--grey);margin-bottom:18px">Choose a new 4-digit PIN for signing in.</div>
+      <label style="font-size:14px;font-weight:700;color:var(--navy)">New 4-digit PIN</label>
+      <input type="tel" inputmode="numeric" maxlength="4" value="${esc(S._newPin1||'')}" oninput="S._newPin1=this.value"
+        style="width:100%;font-size:22px;letter-spacing:10px;text-align:center;padding:12px;border:1.5px solid #C9D2D0;border-radius:10px;margin:6px 0 14px">
+      <label style="font-size:14px;font-weight:700;color:var(--navy)">Type it again</label>
+      <input type="tel" inputmode="numeric" maxlength="4" value="${esc(S._newPin2||'')}" oninput="S._newPin2=this.value"
+        style="width:100%;font-size:22px;letter-spacing:10px;text-align:center;padding:12px;border:1.5px solid #C9D2D0;border-radius:10px;margin:6px 0 6px">
+      <div style="font-size:13px;color:#B3402A;min-height:18px;margin-bottom:8px">${esc(S._pinMsg||'')}</div>
+      <button onclick="saveNewPin()" ${S._pinBusy?'disabled':''}
+        style="width:100%;background:var(--green);color:var(--navy);font-weight:800;font-size:16px;padding:15px;border:none;border-radius:12px;cursor:pointer;min-height:52px">
+        ${S._pinBusy?'Saving…':'Save my new PIN'}</button>
+    </div>
+  </div>`;
+}
+
+function renderForgotGate() {
+  return `
+  <div style="max-width:420px;margin:48px auto;padding:0 18px">
+    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(7,68,69,.12)">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:6px">DDD Interventions Tracker</div>
+      <div style="font-size:21px;font-weight:800;color:var(--navy);margin-bottom:6px">Reset your PIN</div>
+      <div style="font-size:14px;color:var(--grey);margin-bottom:18px">Enter your work email and we will send you a link to choose a new PIN.</div>
+      <label style="font-size:14px;font-weight:700;color:var(--navy)">Your email address</label>
+      <input type="email" inputmode="email" autocomplete="email" value="${esc(S._forgotEmail||'')}" oninput="S._forgotEmail=this.value"
+        style="width:100%;font-size:16px;padding:13px;border:1.5px solid #C9D2D0;border-radius:10px;margin:6px 0 10px">
+      <div style="font-size:13.5px;color:${(S._forgotMsg||'').indexOf('Done')===0?'#3E6B18':'#B3402A'};min-height:20px;margin-bottom:8px">${esc(S._forgotMsg||'')}</div>
+      <button onclick="sendPinReset()" ${S._forgotBusy?'disabled':''}
+        style="width:100%;background:var(--green);color:var(--navy);font-weight:800;font-size:16px;padding:15px;border:none;border-radius:12px;cursor:pointer;min-height:52px">
+        ${S._forgotBusy?'Sending\u2026':'Email me a reset link'}</button>
+      <div style="text-align:center;margin-top:14px">
+        <a href="#" onclick="event.preventDefault();S.authState='gate';render()" style="font-size:14px;color:var(--teal-dk);font-weight:700">Back to sign in</a>
+      </div>
+    </div>
+  </div>`;
+}
 
 async function notifyLogin(official) {
  try {
@@ -3387,10 +3463,12 @@ function render() {
  // navigations call window.scrollTo AFTER render(), which overrides this.
  const _keepY = window.scrollY;
  requestAnimationFrame(function(){ if (S._suppressScrollRestore) { S._suppressScrollRestore = false; return; } if (Math.abs(window.scrollY - _keepY) > 4) window.scrollTo(0, _keepY); });
+ if (S._recoveryMode) { app.innerHTML = renderRecoveryScreen(); return; }
  document.body.classList.toggle('app-in-form', S.view==='log' && S.f && S.f.formStep>=0 && !S.submitted);
  if (S.loading) { app.innerHTML = `<div class="loading"><div class="spinner"></div><div>Loading tracker...</div></div>`; return; }
  if (S.authState === 'gate') { app.innerHTML = renderEmailGate(); return; }
  if (S.authState === 'otp') { app.innerHTML = renderOtpGate(); return; }
+ if (S.authState === 'forgot') { app.innerHTML = renderForgotGate(); return; }
  if (S.error) { app.innerHTML = `<div class="loading"><div style="font-size:48px"></div><div style="color:var(--red)">${esc(S.error)}</div><button class="btn btn-teal btn-sm" onclick="S.loading=true;render();loadAll()">Retry</button></div>`; return; }
 
  const o = S.official;
@@ -3502,7 +3580,7 @@ function renderOtpGate() {
          ${S.gateLoading?'<span class="gate-spinner"></span>Verifying...':'Sign In'}
        </button>
        <div class="gate-note">
-         Forgot your PIN? Contact the DDD Interventions Manager on <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">victor@newleaders.co.za</a><br>
+         Forgot your PIN? <a href="#" onclick="event.preventDefault();S._forgotEmail=S._otpEmail||'';S._forgotMsg='';S.authState='forgot';render()" style="color:var(--teal);font-weight:700">Reset it by email</a> · or contact <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">the Interventions Manager</a><br>
          <a href="#" onclick="event.preventDefault();S.authState='gate';S.gateError='';S.gateLoading=false;render()" style="color:var(--teal);font-weight:600">Use a different email</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
