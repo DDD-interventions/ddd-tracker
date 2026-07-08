@@ -1,4 +1,18 @@
 {
+  "2026.06.18.46": {
+    "title": "Email notifications restored",
+    "released": "2026-07-08",
+    "highlights": [
+      "Fixed the connection fault that stopped sign-in notifications and PIN reset emails from being sent"
+    ]
+  },
+  "2026.06.18.45": {
+    "title": "Clearer reset feedback",
+    "released": "2026-07-08",
+    "highlights": [
+      "The PIN reset screen now tells you exactly what happened instead of always saying Done"
+    ]
+  },
   "2026.06.18.44": {
     "title": "Faster PIN reset",
     "released": "2026-07-08",
