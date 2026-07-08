@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.42';
+const APP_VERSION = '2026.06.18.43';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1126,11 +1126,13 @@ async function sendPinReset() {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { S._forgotMsg = 'Please enter your work email address.'; render(); return; }
   S._forgotBusy = true; S._forgotMsg = ''; render();
   try {
-    var r = await sb.auth.resetPasswordForEmail(em, { redirectTo: 'https://ddd-interventions.github.io/ddd-tracker/' });
+    var r = await fetch(NOTIFY_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ type:'pin_reset', email: em }) });
     S._forgotBusy = false;
-    S._forgotMsg = r && r.error ? ('Could not send the reset email: ' + r.error.message)
-      : 'Done — check your email for a link to set a new PIN. It can take a minute or two.';
-  } catch(e) { S._forgotBusy = false; S._forgotMsg = 'Could not send the reset email. Please try again.'; }
+    S._forgotMsg = r.ok
+      ? 'Done \u2014 check your email for a link to set a new PIN. It can take a minute or two.'
+      : 'Could not send the reset email right now. Please try again shortly.';
+  } catch(e) { S._forgotBusy = false; S._forgotMsg = 'Could not send the reset email \u2014 please check your connection and try again.'; }
   render();
 }
 async function saveNewPin() {
@@ -1178,13 +1180,12 @@ function renderForgotGate() {
       <label style="font-size:14px;font-weight:700;color:var(--navy)">Your email address</label>
       <input type="email" inputmode="email" autocomplete="email" value="${esc(S._forgotEmail||'')}" oninput="S._forgotEmail=this.value"
         style="width:100%;font-size:16px;padding:13px;border:1.5px solid #C9D2D0;border-radius:10px;margin:6px 0 10px">
-      <div style="font-size:13.5px;color:${(S._forgotMsg||'').indexOf('Done')===0?'#3E6B18':'#B3402A'};min-height:20px;margin-bottom:8px">${esc(S._forgotMsg||'')}</div>
+      <div style="font-size:15px;line-height:1.5;color:${(S._forgotMsg||'').indexOf('Done')===0?'#3E6B18':'#B3402A'};min-height:22px;margin:4px 0 12px">${esc(S._forgotMsg||'')}</div>
       <button onclick="sendPinReset()" ${S._forgotBusy?'disabled':''}
         style="width:100%;background:var(--green);color:var(--navy);font-weight:800;font-size:16px;padding:15px;border:none;border-radius:12px;cursor:pointer;min-height:52px">
         ${S._forgotBusy?'Sending\u2026':'Email me a reset link'}</button>
-      <div style="text-align:center;margin-top:14px">
-        <a href="#" onclick="event.preventDefault();S.authState='gate';render()" style="font-size:14px;color:var(--teal-dk);font-weight:700">Back to sign in</a>
-      </div>
+      <button onclick="S.authState='gate';render()"
+        style="width:100%;margin-top:14px;background:#fff;border:1.5px solid #C9D2D0;color:var(--teal-dk);font-weight:800;font-size:16px;padding:14px;border-radius:12px;cursor:pointer;min-height:52px">Back to sign in</button>
     </div>
   </div>`;
 }
@@ -3580,7 +3581,9 @@ function renderOtpGate() {
          ${S.gateLoading?'<span class="gate-spinner"></span>Verifying...':'Sign In'}
        </button>
        <div class="gate-note">
-         Forgot your PIN? <a href="#" onclick="event.preventDefault();S._forgotEmail=S._otpEmail||'';S._forgotMsg='';S.authState='forgot';render()" style="color:var(--teal);font-weight:700">Reset it by email</a> · or contact <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">the Interventions Manager</a><br>
+         <a href="#" onclick="event.preventDefault();S._forgotEmail=S._otpEmail||'';S._forgotMsg='';S.authState='forgot';render()"
+           style="display:block;text-align:center;color:var(--teal-dk);font-weight:800;font-size:16px;padding:14px 10px;margin:10px 0 6px;border:1.5px solid #C9D2D0;border-radius:12px;text-decoration:none">Forgot your PIN? Reset it by email</a>
+         <span style="display:block;text-align:center;font-size:13px;color:var(--grey);margin-bottom:6px">or contact <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">the Interventions Manager</a></span><br>
          <a href="#" onclick="event.preventDefault();S.authState='gate';S.gateError='';S.gateLoading=false;render()" style="color:var(--teal);font-weight:600">Use a different email</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
