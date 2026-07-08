@@ -1,4 +1,11 @@
 {
+  "2026.06.18.44": {
+    "title": "Faster PIN reset",
+    "released": "2026-07-08",
+    "highlights": [
+      "The reset request now responds immediately — your email is on its way while the screen confirms"
+    ]
+  },
   "2026.06.18.43": {
     "title": "PIN reset, bigger and better",
     "released": "2026-07-08",
