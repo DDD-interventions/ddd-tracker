@@ -1,4 +1,12 @@
 {
+  "2026.06.18.43": {
+    "title": "PIN reset, bigger and better",
+    "released": "2026-07-08",
+    "highlights": [
+      "The PIN reset email now arrives reliably, from the Tracker's own address",
+      "Bigger, easier reset and back buttons on the sign-in screens"
+    ]
+  },
   "2026.06.18.42": {
     "title": "Reset your own PIN",
     "released": "2026-07-07",
