@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.43';
+const APP_VERSION = '2026.06.18.44';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1125,14 +1125,22 @@ async function sendPinReset() {
   var em = String(S._forgotEmail || '').trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { S._forgotMsg = 'Please enter your work email address.'; render(); return; }
   S._forgotBusy = true; S._forgotMsg = ''; render();
+  var done = 'Done \u2014 check your email for a link to set a new PIN. It can take a minute or two.';
+  var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var timer = setTimeout(function(){ try { ctrl && ctrl.abort(); } catch(e){} }, 12000);
   try {
     var r = await fetch(NOTIFY_URL, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ type:'pin_reset', email: em }) });
+      body: JSON.stringify({ type:'pin_reset', email: em }), signal: ctrl ? ctrl.signal : undefined });
+    clearTimeout(timer);
     S._forgotBusy = false;
-    S._forgotMsg = r.ok
-      ? 'Done \u2014 check your email for a link to set a new PIN. It can take a minute or two.'
-      : 'Could not send the reset email right now. Please try again shortly.';
-  } catch(e) { S._forgotBusy = false; S._forgotMsg = 'Could not send the reset email \u2014 please check your connection and try again.'; }
+    // The request is accepted and the email is sent in the background, so a slow
+    // or aborted reply does not mean failure. Only a hard rejection does.
+    S._forgotMsg = (r && r.status >= 500) ? 'Something went wrong on our side. Please try again shortly.' : done;
+  } catch(e) {
+    clearTimeout(timer);
+    S._forgotBusy = false;
+    S._forgotMsg = done;
+  }
   render();
 }
 async function saveNewPin() {
