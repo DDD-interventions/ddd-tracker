@@ -1,4 +1,20 @@
 {
+  "2026.06.18.40": {
+    "title": "Bigger text everywhere",
+    "released": "2026-07-07",
+    "highlights": [
+      "Larger, clearer text across the whole app — the form, your dashboard, and the toolkit now match the feed",
+      "Field labels and options are noticeably easier to read"
+    ]
+  },
+  "2026.06.18.39": {
+    "title": "Easier on the eyes",
+    "released": "2026-07-07",
+    "highlights": [
+      "Bigger, clearer text across the whole home feed — headings, stories, badges and buttons",
+      "Slightly larger profile circles and touch-friendly spacing"
+    ]
+  },
   "2026.06.18.38": {
     "title": "Every visit tells its story",
     "released": "2026-07-07",
