@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.47';
+const APP_VERSION = '2026.06.18.48';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -7472,7 +7472,7 @@ function renderLocationCard() {
 // Check if the form has unsaved user data (not just defaults)
 function isFormDirty() {
   const f = S.f;
-  if (S.view !== 'log' || f.formStep < 0 || S.submitted) return false;
+  if (S.view !== 'log' || f.formStep < 1 || S.submitted) return false;
   // Check if user has entered meaningful data beyond defaults (including Step 1 fields)
   return !!(f.intervention_theme || f.term || f.activity_type || f.description
     || f.action_types.length || f.decision_types.length || f.action_type || f.decision_type || f.ddd_used
