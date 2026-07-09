@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.46';
+const APP_VERSION = '2026.06.18.47';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1145,7 +1145,7 @@ async function saveNewPin() {
   if (p1 !== p2) { S._pinMsg = 'The two PINs do not match.'; render(); return; }
   S._pinBusy = true; S._pinMsg=''; render();
   try {
-    var r = await sb.auth.updateUser({ password: p1 });
+    var r = await sb.auth.updateUser({ password: 'DD' + p1 });
     S._pinBusy = false;
     if (r && r.error) { S._pinMsg = 'Could not save the new PIN: ' + r.error.message; render(); return; }
     S._recoveryMode = false; S._newPin1=''; S._newPin2='';
