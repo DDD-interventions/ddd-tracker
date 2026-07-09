@@ -1,4 +1,11 @@
 {
+  "2026.06.18.48": {
+    "title": "No draft saved on Step 1",
+    "released": "2026-07-09",
+    "highlights": [
+      "A draft is now only kept once you move past Step 1, so tapping into the form and leaving no longer creates a saved intervention to resume"
+    ]
+  },
   "2026.06.18.47": {
     "title": "PIN reset fixed end to end",
     "released": "2026-07-09",
