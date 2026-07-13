@@ -1054,7 +1054,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.53';
+const APP_VERSION = '2026.06.18.54';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3177,6 +3177,51 @@ function toggleSupSchoolDetail(need){
 }
 
 // ─── NOTIFICATION SYSTEM ───
+// ─── INBOX (persistent messages: tags, replies, broadcasts) ───
+async function loadInbox(){
+  try{
+    var me=(S.official&&S.official.email||'').toLowerCase(); if(!me)return;
+    var {data,error}=await sb.from('inbox_messages').select('*').order('created_at',{ascending:false}).limit(50);
+    if(!error&&data)S._inbox=data;
+  }catch(e){}
+}
+function inboxUnreadCount(){
+  var me=(S.official&&S.official.email||'').toLowerCase();
+  return (S._inbox||[]).filter(function(m){return !m.read_at && (m.recipient_email||'').toLowerCase()===me;}).length;
+}
+async function markInboxRead(){
+  try{
+    var me=(S.official&&S.official.email||'').toLowerCase();
+    var ids=(S._inbox||[]).filter(function(m){return !m.read_at && (m.recipient_email||'').toLowerCase()===me;}).map(function(m){return m.id;});
+    if(!ids.length)return;
+    var now=new Date().toISOString();
+    await sb.from('inbox_messages').update({read_at:now}).in('id',ids);
+    (S._inbox||[]).forEach(function(m){ if(ids.indexOf(m.id)>-1)m.read_at=now; });
+  }catch(e){}
+}
+function setInboxReply(id,val){ S._inboxReply=S._inboxReply||{}; S._inboxReply[id]=val; }
+async function sendInboxReply(id){
+  S._inboxReply=S._inboxReply||{};
+  var txt=(S._inboxReply[id]||'').trim(); if(!txt)return;
+  var orig=(S._inbox||[]).find(function(m){return m.id===id;}); if(!orig)return;
+  var me=S.official||{};
+  var btn=document.getElementById('ibx-send-'+id); if(btn){btn.disabled=true;btn.textContent='Sending\u2026';}
+  try{
+    var row={ recipient_email:orig.sender_email, sender_email:me.email, sender_name:me.full_name||me.email,
+      kind:'reply', subject:'Re: '+(orig.subject||'your message'), body:txt, ref_decision_id:orig.ref_decision_id||null };
+    var {error}=await sb.from('inbox_messages').insert(row);
+    if(error)throw error;
+    // Parallel email during the transition so nobody misses replies
+    try{ fetch(NOTIFY_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({
+      from:'DDD Interventions Tracker <tracker@ddd-interventions-tracker.com>', to:[orig.sender_email],
+      subject:'[DDD Tracker] '+(me.full_name||'A colleague')+' replied to you',
+      html:'<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto"><p><strong>'+esc(me.full_name||me.email)+'</strong> replied in the DDD Tracker:</p><p style="background:#F5F5F5;padding:12px;border-radius:8px">'+esc(txt)+'</p><p><a href="https://ddd-interventions.github.io/ddd-tracker/" style="color:#0B8E8D;font-weight:600">Open the Tracker</a> to respond.</p></div>'
+    })}); }catch(e){}
+    S._inboxReply[id]='';
+    await loadInbox(); render();
+  }catch(e){ if(btn){btn.disabled=false;btn.textContent='Send';} alert('Could not send your reply. Please try again.'); }
+}
+
 function getNotifications() {
   var notifs = [];
   var myId = S._officialId;
@@ -3279,17 +3324,19 @@ function getNotifications() {
 
 function getNotifCount() {
   var lastSeen = S._notifLastSeen || '';
-  return getNotifications().filter(function(n) { return n.time && n.time > lastSeen; }).length;
+  return getNotifications().filter(function(n) { return n.time && n.time > lastSeen; }).length + inboxUnreadCount();
 }
 
 function toggleNotifPane() {
   S._notifOpen = !S._notifOpen;
   if (S._notifOpen) {
+    loadInbox().then(function(){ if(S._notifOpen) render(); });
     // Mark as seen after a short delay so the user sees the unread styling first
     setTimeout(function() {
       var now = new Date().toISOString();
       S._notifLastSeen = now;
       try { localStorage.setItem('ddd_notif_last_seen', now); } catch(e) {}
+      markInboxRead().then(function(){ if(S._notifOpen) render(); });
     }, 1500);
   }
   render();
@@ -3341,8 +3388,33 @@ function renderNotifPane() {
   html += '<div class="notif-pane">';
   html += '<div class="notif-pane-hdr"><div class="notif-pane-title">Notifications</div><button class="notif-pane-close" onclick="closeNotifPane()" title="Close">\xd7</button></div>';
   html += '<div class="notif-list">';
-  if (!notifs.length) {
-    html += '<div class="notif-empty">No notifications yet.<br>When colleagues respond to your support requests or comment on your activities, they will appear here.</div>';
+  var me=(S.official&&S.official.email||'').toLowerCase();
+  var msgs=(S._inbox||[]);
+  if(msgs.length){
+    html += '<div style="padding:10px 14px 4px;font-size:12px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:.5px">Messages</div>';
+    msgs.forEach(function(m){
+      var mine=(m.sender_email||'').toLowerCase()===me;
+      var unread=!m.read_at && !mine;
+      var canReply=!mine && (m.kind==='tag'||m.kind==='reply');
+      S._inboxReply=S._inboxReply||{};
+      html += '<div class="notif-item'+(unread?' unread':'')+'" style="cursor:default">';
+      html += '<div class="notif-dot" style="background:'+(m.kind==='tag'?'var(--orange)':m.kind==='broadcast'?'var(--teal)':'var(--green)')+(unread?'':';opacity:.3')+'"></div>';
+      html += '<div class="notif-body">';
+      html += '<div class="notif-title">'+(mine?'You \u2192 '+esc(m.recipient_email||''):esc(m.sender_name||m.sender_email||''))+'</div>';
+      html += '<div class="notif-desc"><strong>'+esc(m.subject||'')+'</strong>'+(m.body?' \u2014 '+esc(m.body):'')+'</div>';
+      html += '<div class="notif-time">'+fmtWhen(m.created_at)+'</div>';
+      if(canReply){
+        html += '<div style="display:flex;gap:6px;margin-top:7px">';
+        html += '<input type="text" placeholder="Write a reply\u2026" value="'+esc(S._inboxReply[m.id]||'')+'" oninput="setInboxReply(\''+m.id+'\',this.value)" onclick="event.stopPropagation()" style="flex:1;padding:8px 10px;border:1px solid #D5DBD9;border-radius:8px;font-size:13px;font-family:inherit">';
+        html += '<button id="ibx-send-'+m.id+'" onclick="event.stopPropagation();sendInboxReply(\''+m.id+'\')" style="padding:8px 14px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Send</button>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    });
+    html += '<div style="padding:8px 14px 2px;font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px">Activity</div>';
+  }
+  if (!notifs.length && !msgs.length) {
+    html += '<div class="notif-empty">No messages yet.<br>When colleagues tag you, reply to you, or respond to your support requests, they will appear here.</div>';
   } else {
     notifs.forEach(function(n, i) {
       var isUnread = n.time && n.time > lastSeen;
@@ -3393,6 +3465,7 @@ async function submitActResponse(decId){
     delete S._commentAttach[decId];
     if (S._actTagged) S._actTagged[decId] = [];
     await loadActResponses();
+    loadInbox().then(function(){render();});
     render();
     showToast('Comment posted');
   }catch(e){console.warn('Failed to post comment:',e);showToast('Could not post comment \u2014 try again');}
@@ -3485,6 +3558,7 @@ async function loadAll() {
  S.loading = false; S.error = null;
  await loadSupResponses();
  await loadActResponses();
+ loadInbox().then(function(){render();});
  // Saved drafts are surfaced via the Resume card on landing (never auto-restored).
  flushSubmitQueue();
  } catch(e) { S.error = e.message; S.loading = false; }
