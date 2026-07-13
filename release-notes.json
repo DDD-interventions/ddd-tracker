@@ -1,475 +1,160 @@
-{
-  "2026.06.18.48": {
-    "title": "No draft saved on Step 1",
-    "released": "2026-07-09",
-    "highlights": [
-      "A draft is now only kept once you move past Step 1, so tapping into the form and leaving no longer creates a saved intervention to resume"
-    ]
-  },
-  "2026.06.18.47": {
-    "title": "PIN reset fixed end to end",
-    "released": "2026-07-09",
-    "highlights": [
-      "Setting a new PIN after a reset now saves correctly and lets you sign straight back in",
-      "Every device now refreshes to the latest version automatically on next open"
-    ]
-  },
-  "2026.06.18.46": {
-    "title": "Email notifications restored",
-    "released": "2026-07-08",
-    "highlights": [
-      "Fixed the connection fault that stopped sign-in notifications and PIN reset emails from being sent"
-    ]
-  },
-  "2026.06.18.45": {
-    "title": "Clearer reset feedback",
-    "released": "2026-07-08",
-    "highlights": [
-      "The PIN reset screen now tells you exactly what happened instead of always saying Done"
-    ]
-  },
-  "2026.06.18.44": {
-    "title": "Faster PIN reset",
-    "released": "2026-07-08",
-    "highlights": [
-      "The reset request now responds immediately — your email is on its way while the screen confirms"
-    ]
-  },
-  "2026.06.18.43": {
-    "title": "PIN reset, bigger and better",
-    "released": "2026-07-08",
-    "highlights": [
-      "The PIN reset email now arrives reliably, from the Tracker's own address",
-      "Bigger, easier reset and back buttons on the sign-in screens"
-    ]
-  },
-  "2026.06.18.42": {
-    "title": "Reset your own PIN",
-    "released": "2026-07-07",
-    "highlights": [
-      "Forgot your PIN? Tap ‘Reset it by email’ on the sign-in screen — a link arrives to set a new one yourself",
-      "No need to wait for the Interventions Manager"
-    ]
-  },
-  "2026.06.18.41": {
-    "title": "Record button up top",
-    "released": "2026-07-07",
-    "highlights": [
-      "The Record a school visit or intervention button now sits at the top of your feed — no scrolling needed"
-    ]
-  },
-  "2026.06.18.40": {
-    "title": "Bigger text everywhere",
-    "released": "2026-07-07",
-    "highlights": [
-      "Larger, clearer text across the whole app — the form, your dashboard, and the toolkit now match the feed",
-      "Field labels and options are noticeably easier to read"
-    ]
-  },
-  "2026.06.18.39": {
-    "title": "Easier on the eyes",
-    "released": "2026-07-07",
-    "highlights": [
-      "Bigger, clearer text across the whole home feed — headings, stories, badges and buttons",
-      "Slightly larger profile circles and touch-friendly spacing"
-    ]
-  },
-  "2026.06.18.38": {
-    "title": "Every visit tells its story",
-    "released": "2026-07-07",
-    "highlights": [
-      "Timeline items now show what was found, what support was given, and what was committed — tap ‘see more’ for the full story",
-      "Quiet recognition badges: location verified, informed by DDD data, colleagues brought in, repeat visits",
-      "A weekly pulse tops the timeline with visits and schools reached since Monday",
-      "Home is now the first tab on your phone — one tap back to your feed from anywhere",
-      "Reopening or refreshing the app takes you straight to your feed"
-    ]
-  },
-  "2026.06.18.37": {
-    "title": "The full two-month timeline",
-    "released": "2026-07-07",
-    "highlights": [
-      "Below your daily items, the feed now carries every visit logged across the programme in the past two months",
-      "Your own visits appear as You; older items show their actual date",
-      "Tap Show earlier activity to go further back"
-    ]
-  },
-  "2026.06.18.36": {
-    "title": "A feed worth checking daily",
-    "released": "2026-07-07",
-    "highlights": [
-      "New data announcements: when term results land on the DDD Dashboard, your feed says so",
-      "Two fresh data stories from your area every day — a school needing attention and a bright spot worth learning from",
-      "Programme pulse: interventions and schools reached this year",
-      "Peer updates now only appear when they are recent"
-    ]
-  },
-  "2026.06.18.35": {
-    "title": "A true timeline",
-    "released": "2026-07-07",
-    "highlights": [
-      "Your home feed is now a flowing timeline — who did what, where, and when across the programme",
-      "Recent visits by fellow officials now appear as individual updates",
-      "Cleaner, lighter look throughout the feed"
-    ]
-  },
-  "2026.06.18.34": {
-    "title": "Home button and feed refresh",
-    "released": "2026-07-07",
-    "highlights": [
-      "A Home tab now takes you back to your feed from anywhere",
-      "Tap Refresh on the feed to pull the latest activity — it also refreshes itself when you return to the app",
-      "If you have a saved draft, it now appears at the top of your feed"
-    ]
-  },
-  "2026.06.18.33": {
-    "title": "A feed that changes every day",
-    "released": "2026-07-07",
-    "highlights": [
-      "A daily data spotlight from your own district — different every day, linking to the DDD Dashboard",
-      "The feed now tells you when a colleague tags you, and confirms when your report has been emailed",
-      "Peer activity now shows today's movement, not just the week"
-    ]
-  },
-  "2026.06.18.32": {
-    "title": "A richer home feed",
-    "released": "2026-07-07",
-    "highlights": [
-      "Your home feed now also shows new school data, this week's programme activity, and district milestones",
-      "Clearer colours — the greeting is now easy to read on any screen",
-      "Updates now apply in a single tap"
-    ]
-  },
-  "2026.06.18.31": {
-    "title": "Your new home screen",
-    "released": "2026-07-07",
-    "highlights": [
-      "The app now opens on a personal home feed: your term progress, any follow-up that needs you, and one clear button to record a visit",
-      "Your follow-up card links straight into My dashboard — nothing has moved or been removed",
-      "More feed cards (new school data, peer activity) arrive in the next update"
-    ]
-  },
-  "2026.06.18.30": {
-    "title": "Behind-the-scenes improvements",
-    "released": "2026-07-07",
-    "highlights": [
-      "Small internal improvements to help us understand and improve the app — no change to how you use it"
-    ]
-  },
-  "2026.06.18.29": {
-    "title": "Submission safety",
-    "released": "2026-07-07",
-    "highlights": [
-      "Tapping Submit twice on a slow connection can no longer create a duplicate record",
-      "Small data-quality fix behind the scenes"
-    ]
-  },
-  "2026.06.18.28": {
-    "title": "Smoother on your phone",
-    "released": "2026-07-06",
-    "highlights": [
-      "The screen no longer jumps when you tap options or open dropdowns",
-      "Text boxes no longer zoom the page when you tap them",
-      "Bigger, easier touch targets throughout",
-      "Each step now starts at the top of the screen"
-    ]
-  },
-  "2026.06.18.27": {
-    "title": "A simpler Step 4",
-    "released": "2026-07-06",
-    "highlights": [
-      "Step 4 now shows just the essentials: support needed, support level, and follow-up",
-      "Everything else — school context, what is in place, numbers, documents — sits behind one “Add more detail” button",
-      "Nothing was removed: every field is still there when you need it"
-    ]
-  },
-  "2026.06.18.26": {
-    "title": "One-tap updates",
-    "released": "2026-07-06",
-    "highlights": [
-      "Tapping Update now applies the new version in a single tap — no more repeat taps",
-      "Your emailed School Visit Report no longer includes internal DDD usage fields"
-    ]
-  },
-  "2026.06.18.25": {
-    "title": "Dashboard fix",
-    "released": "2026-07-06",
-    "highlights": [
-      "Fixed: My dashboard would not open after submitting an intervention",
-      "Your emailed report now shows subject results in a clear table"
-    ]
-  },
-  "2026.06.18.24": {
-    "title": "Cleaner start, clearer wording",
-    "released": "2026-07-06",
-    "highlights": [
-      "Record new intervention now always starts blank — use the Resume card to continue a saved draft",
-      "Step 3 now simply asks what you wanted to know from DDD — six quick questions, tap all that apply",
-      "Colleagues you tag now receive their notification reliably",
-      "Plain, full wording throughout your emailed School Visit Report"
-    ]
-  },
-  "2026.06.18.23": {
-    "title": "One clean emailed School Visit Report",
-    "released": "2026-07-06",
-    "highlights": [
-      "After you submit, one School Visit Report PDF is emailed to you — school details and performance data filled in automatically",
-      "No more duplicate emails",
-      "Cleaner report layout with proper page flow"
-    ]
-  },
-  "2026.06.18.22": {
-    "title": "Quick school-practices check",
-    "released": "2026-07-04",
-    "highlights": [
-      "New optional one-tap questions in Step 4: curriculum plans, improvement plan (APIP), and time management",
-      "Feeds your emailed School Visit Report — coming next",
-      "Skip them entirely if they don't apply to your visit"
-    ]
-  },
-  "2026.06.18.21": {
-    "title": "Emailed copies now send reliably",
-    "released": "2026-07-02",
-    "highlights": [
-      "Your PDF copy is now generated more reliably, even on a shaky connection",
-      "Groundwork for automatic emailed visit reports"
-    ]
-  },
-  "2026.06.18.20": {
-    "title": "Clearer timing, and groundwork for auto-filled reports",
-    "released": "2026-07-02",
-    "highlights": [
-      "Per-entry time estimate updated to 6–10 minutes",
-      "Each logged visit now links to its school's official record behind the scenes — no action needed",
-      "This paves the way for reports that fill in school data automatically"
-    ]
-  },
-  "2026.06.18.19": {
-    "title": "Notification wording + sending tweaks",
-    "released": "2026-06-26",
-    "highlights": [
-      "Clearer wording on the notifications prompt",
-      "Admins can now add several people to one notification more easily"
-    ]
-  },
-  "2026.06.18.18": {
-    "title": "Turn on phone notifications in one tap",
-    "released": "2026-06-26",
-    "highlights": [
-      "After signing in, you'll see a quick option to turn on phone notifications",
-      "Once on, you can be reminded to log in even when the app is closed",
-      "Don't want it? Tap “Not now” — you can always turn it on later in Settings"
-    ]
-  },
-  "2026.06.18.17": {
-    "title": "Notifications — behind-the-scenes improvements",
-    "released": "2026-06-26",
-    "highlights": [
-      "Improvements to how phone notifications are delivered",
-      "A small fix so your notification settings link correctly to your profile",
-      "No action needed — email and PIN sign-in are unchanged"
-    ]
-  },
-  "2026.06.18.16": {
-    "title": "Phone notifications — early access",
-    "released": "2026-06-18",
-    "highlights": [
-      "You can now turn on phone notifications from the Settings section",
-      "Once on, you can be notified to log in even when the app is closed",
-      "We're rolling this out gradually — nothing else changes"
-    ]
-  },
-  "2026.06.18.15": {
-    "title": "Sign-in update",
-    "released": "2026-06-18",
-    "highlights": [
-      "We've temporarily removed the biometric (fingerprint/face) sign-in option while we improve it",
-      "Email and PIN sign-in is unchanged and works exactly as before",
-      "Nothing else changes — you don't need to do anything"
-    ]
-  },
-  "2026.06.18.14": {
-    "title": "Sign in with your fingerprint or face",
-    "released": "2026-06-18",
-    "highlights": [
-      "On devices where you've set up biometric sign-in, a 'Sign in with fingerprint or face' button now appears on the login screen",
-      "Tap it to sign in without typing your email and PIN",
-      "Email and PIN still works exactly as before, on every device"
-    ]
-  },
-  "2026.06.18.13": {
-    "title": "Biometric sign-in — early access",
-    "released": "2026-06-18",
-    "highlights": [
-      "You can now set up fingerprint or face sign-in from the Settings section",
-      "We're rolling this out gradually — email and PIN sign-in stays exactly the same",
-      "Find it under Settings, tap ‘Set up’, and follow your phone's prompt"
-    ]
-  },
-  "2026.06.18.12": {
-    "title": "Groundwork for biometric sign-in",
-    "released": "2026-06-18",
-    "highlights": [
-      "Behind-the-scenes preparation for an upcoming option to sign in with your fingerprint or face",
-      "Nothing changes for now — you still sign in with your email and PIN as usual"
-    ]
-  },
-  "2026.06.18.11": {
-    "title": "You can now reach the version number at the bottom",
-    "released": "2026-06-18",
-    "highlights": [
-      "On phones, the footer and version button were hidden behind the bottom menu — they now sit clear of it so you can tap the version for details"
-    ]
-  },
-  "2026.06.18.10": {
-    "title": "Larger reading text on forms and the review screen",
-    "released": "2026-06-18",
-    "highlights": [
-      "Helper text, section subtitles, the review screen and similar reading text are now slightly larger and easier to read",
-      "Menus, tabs and labels are unchanged so nothing shifts position"
-    ]
-  },
-  "2026.06.18.9": {
-    "title": "Green and orange text is easier to read",
-    "released": "2026-06-18",
-    "highlights": [
-      "Green and orange text (status labels, numbers and headings) is now a darker shade so it reads clearly on white",
-      "Coloured buttons, borders and highlights keep their familiar bright colours"
-    ]
-  },
-  "2026.06.18.8": {
-    "title": "The bottom menu now stays put everywhere",
-    "released": "2026-06-18",
-    "highlights": [
-      "Record, Dashboard and Toolkit now stay at the bottom of the screen at all times — including while you fill in an intervention",
-      "No more jumping to the top: the menu is always in the same place and always within thumb's reach",
-      "While recording, the Next/Back buttons sit just above the menu; leaving a half-finished intervention still saves a draft"
-    ]
-  },
-  "2026.06.18.7": {
-    "title": "Clearer text on the green action buttons",
-    "released": "2026-06-18",
-    "highlights": [
-      "The label on the green “Record new intervention” button (and the update button) is now dark instead of white, making it much easier to read",
-      "The buttons keep their familiar green colour"
-    ]
-  },
-  "2026.06.18.6": {
-    "title": "Get back to My Dashboard while recording an intervention",
-    "released": "2026-06-18",
-    "highlights": [
-      "While filling in an intervention on a phone, you can now jump to My Dashboard or the Toolkit from the buttons at the top — no need to sign out",
-      "If you leave a half-finished intervention, it's saved as a draft automatically so you can pick up where you left off",
-      "Nothing changes on desktop"
-    ]
-  },
-  "2026.06.18.5": {
-    "title": "Confirmation messages stay long enough to read",
-    "released": "2026-06-18",
-    "highlights": [
-      "Pop-up messages now stay on screen longer, and longer messages stay up longer still",
-      "Tap a message to dismiss it once you've read it",
-      "Messages are now read aloud by screen readers for users who rely on them"
-    ]
-  },
-  "2026.06.18.4": {
-    "title": "Larger text in more places",
-    "released": "2026-06-18",
-    "highlights": [
-      "The smallest captions and labels (like comment times, summaries and filter labels) are now larger and easier to read",
-      "Nothing moves or changes — the same screens, with more readable text"
-    ]
-  },
-  "2026.06.18.3": {
-    "title": "Clearer, easier-to-read text",
-    "released": "2026-06-18",
-    "highlights": [
-      "Smaller grey text (hints, labels and captions) is now darker and easier to read",
-      "The labels on the bottom navigation bar are clearer too",
-      "Nothing changes in how the app works — the same screens, just more comfortable to read"
-    ]
-  },
-  "2026.06.18.2": {
-    "title": "Your phone now gives a gentle buzz to confirm a save",
-    "released": "2026-06-18",
-    "highlights": [
-      "When you submit a visit, your phone gives a soft confirming buzz — including when it's saved offline to send later",
-      "If a required field is still missing, you'll feel a firmer buzz so a blocked Submit is hard to miss",
-      "Works on Android phones; iPhones and phones with vibration switched off simply feel nothing, and everything else works exactly the same"
-    ]
-  },
-  "2026.06.18.1": {
-    "title": "Next and Back buttons stay in reach while you fill in a visit",
-    "released": "2026-06-18",
-    "highlights": [
-      "On phones, the Next and Back buttons now stay fixed at the bottom of the screen while you work through a visit",
-      "No more scrolling to the end of a step to move forward or back — they're always within thumb's reach",
-      "Nothing changes on desktop, and your information is unaffected"
-    ]
-  },
-  "2026.06.13.4": {
-    "title": "Fix for the bottom bar Dashboard button",
-    "released": "2026-06-13",
-    "highlights": [
-      "Fixed the Dashboard button on the new bottom bar, which wasn't responding to taps",
-      "Pop-up confirmation messages now sit clear of the bottom bar"
-    ]
-  },
-  "2026.06.13.3": {
-    "title": "New bottom navigation bar on phones",
-    "released": "2026-06-13",
-    "highlights": [
-      "On phones, there's now a fixed bar at the bottom with Record, Dashboard, and Toolkit",
-      "Tap to jump between the main sections without scrolling back to the top",
-      "The bar tucks away while you're filling in a visit, so it stays out of your way"
-    ]
-  },
-  "2026.06.13.2": {
-    "title": "Bigger, bolder home screen buttons",
-    "released": "2026-06-13",
-    "highlights": [
-      "The main home screen buttons (Record, Dashboard, Toolkit) are now larger, card-style buttons",
-      "They have a soft shadow and a subtle press animation, so they feel more responsive when tapped",
-      "Easier to find and tap, especially on a phone"
-    ]
-  },
-  "2026.06.13.1": {
-    "title": "Easier tapping on your phone",
-    "released": "2026-06-13",
-    "highlights": [
-      "Tag chips, toolkit tabs, and time-period buttons are now bigger and easier to tap",
-      "Fewer accidental and missed taps when logging a visit on a phone",
-      "Nothing changes in how the app works — just larger, more comfortable touch targets"
-    ]
-  },
-  "2026.05.25.3": {
-    "title": "Location capture on submissions",
-    "released": "2026-05-25",
-    "highlights": [
-      "Submissions now capture your phone GPS location as evidence of the visit",
-      "Location appears on the audit PDF with a Google Maps link reviewers can click",
-      "Location capture happens automatically when you reach the review step — no extra taps",
-      "If location is unavailable or you decline, your submission still goes through normally",
-      "You'll see a confirmation card showing your captured location before you submit"
-    ]
-  },
-  "2026.05.25.2": {
-    "title": "Security & reliability fix",
-    "released": "2026-05-25",
-    "highlights": [
-      "Fixed an issue where the app could occasionally display the wrong official's profile after a long period of inactivity",
-      "Improved session handling so your account information is always loaded correctly",
-      "If you've been using the app today, please sign out and sign in again to refresh your session"
-    ]
-  },
-  "2026.05.25.1": {
-    "title": "Now installable as an app!",
-    "released": "2026-05-25",
-    "highlights": [
-      "The Tracker is now installable as a mobile app on Android (home screen) and as a desktop app on Windows/Mac",
-      "Faster loading and works offline for the app shell",
-      "New version notifications when updates are published",
-      "Version information is now visible in the footer"
-    ]
+/**
+ * DDD Interventions Tracker — Service Worker
+ *
+ * Strategy:
+ *   - App shell (index.html, icons, manifest)  → cache-first, stale-while-revalidate
+ *   - CDN scripts (jsdelivr, cloudflare cdn)  → cache-first, stale-while-revalidate
+ *   - Supabase API + notify worker            → network-only (NEVER cached)
+ *   - All other GETs                          → stale-while-revalidate
+ *
+ * Why this matters:
+ *   Supabase calls MUST hit the network so data stays fresh. The app shell
+ *   is cached so the app opens instantly and works offline (read-only;
+ *   submissions queue via the existing localStorage queue when offline).
+ *
+ * Update strategy:
+ *   Bump VERSION below when you change index.html or any cached asset.
+ *   On next visit, the new SW installs, old caches are cleaned up, and
+ *   the user sees the updated app shell on the next reload.
+ */
+
+const VERSION = 'v1.0.4';
+const CACHE_NAME = `ddd-tracker-${VERSION}`;
+
+// Precached on install — minimum needed for the app to open offline
+const PRECACHE_URLS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
+
+// CDN hosts whose assets we cache opportunistically (libraries used by the app)
+const CACHEABLE_CDN_HOSTS = [
+  'cdn.jsdelivr.net',
+  'cdnjs.cloudflare.com',
+  'unpkg.com',
+  'fonts.googleapis.com',
+  'fonts.gstatic.com'
+];
+
+// Hosts we MUST NEVER cache — data must always be fresh
+const NEVER_CACHE_HOST_PARTS = [
+  'supabase.co',     // Supabase REST + storage
+  'supabase.in',
+  'workers.dev',     // Cloudflare Worker (ddd-notify)
+  'resend.com'       // Email delivery
+];
+
+// ── INSTALL: precache the app shell ─────────────────────────────────────────
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+      .catch(err => console.warn('[SW] Precache failed:', err))
+  );
+});
+
+// ── ACTIVATE: clean up old caches ───────────────────────────────────────────
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(k => k.startsWith('ddd-tracker-') && k !== CACHE_NAME)
+            .map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+// ── FETCH: route requests through the right strategy ────────────────────────
+self.addEventListener('fetch', event => {
+  const req = event.request;
+
+  // Only GET requests are cacheable; POSTs etc. always go to network
+  if (req.method !== 'GET') return;
+
+  let url;
+  try { url = new URL(req.url); } catch (e) { return; }
+
+  // Skip non-http(s) requests (e.g. chrome-extension://, data:)
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
+
+  // Never cache backend / data endpoints — these MUST be live
+  const isNeverCache = NEVER_CACHE_HOST_PARTS.some(h => url.hostname.includes(h));
+  if (isNeverCache) return;
+
+  // Never cache version polling files — they must always be live for update detection
+  if (url.pathname.endsWith('/version.txt') ||
+      url.pathname.endsWith('/release-notes.json')) {
+    return;
   }
-}
+
+  // Decide whether this is something we can cache
+  const isSameOrigin = url.origin === self.location.origin;
+  const isCacheableCdn = CACHEABLE_CDN_HOSTS.includes(url.hostname);
+  const shouldCache = isSameOrigin || isCacheableCdn;
+
+  if (!shouldCache) return;
+
+  // Stale-while-revalidate
+  event.respondWith(
+    caches.match(req).then(cached => {
+      const networkFetch = fetch(req)
+        .then(response => {
+          if (response && response.status === 200 && response.type !== 'opaqueredirect') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(req, clone))
+              .catch(() => { /* quota or other cache write error — ignore */ });
+          }
+          return response;
+        })
+        .catch(() => cached); // offline → return cached if we have it
+
+      // Return cached immediately if available; otherwise wait for network
+      return cached || networkFetch;
+    })
+  );
+});
+
+// ── MESSAGE: allow the page to trigger SW updates ───────────────────────────
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// ── PUSH: show a notification when the server sends one ──────────────────────
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; }
+  catch (e) { try { data = { body: event.data && event.data.text() }; } catch (_) { data = {}; } }
+  const title = data.title || 'DDD Tracker';
+  const options = {
+    body: data.body || '',
+    icon: 'icons/icon-192.png',
+    badge: 'icons/icon-192.png',
+    tag: data.tag || 'ddd-tracker',
+    renotify: !!data.renotify,
+    data: { url: data.url || self.registration.scope },
+    requireInteraction: false
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// ── NOTIFICATIONCLICK: focus or open the app at the login screen ─────────────
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || self.registration.scope;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) {
+        if ('focus' in c) { try { c.navigate(target); } catch (e) {} return c.focus(); }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+    })
+  );
+});
