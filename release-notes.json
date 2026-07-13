@@ -1,4 +1,12 @@
 {
+  "2026.06.18.53": {
+    "title": "Mobile layout fixes after the bigger text",
+    "released": "2026-07-13",
+    "highlights": [
+      "Fixed overlapping labels on small screens — including the Intervention Activity Tracker tab — by restoring the phone-specific layout rules that were being silently overridden",
+      "Buttons, tabs, and cards across the dashboard and toolkit now wrap and space correctly on phones"
+    ]
+  },
   "2026.06.18.52": {
     "title": "A fresher home feed with real dates and times",
     "released": "2026-07-13",
