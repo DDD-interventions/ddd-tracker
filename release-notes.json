@@ -1,4 +1,13 @@
 {
+  "2026.06.18.54": {
+    "title": "Your new in-app inbox",
+    "released": "2026-07-14",
+    "highlights": [
+      "The bell at the top now opens your inbox: when a colleague tags you on a support need or replies to you, the message stays here — no more hunting through email",
+      "You can reply to tags and messages directly inside the app, and your colleague is notified",
+      "Mobile layout fixes: overlapping labels on small screens (including the Intervention Activity Tracker tab) are resolved"
+    ]
+  },
   "2026.06.18.53": {
     "title": "Mobile layout fixes after the bigger text",
     "released": "2026-07-13",
