@@ -761,6 +761,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .feed-refresh{font-size:13.5px;color:#7C8792;margin-left:auto}
 .feed-refresh button{background:none;border:none;color:var(--teal-dk);font-size:13.5px;font-weight:700;cursor:pointer;padding:6px 2px;min-height:0;text-decoration:underline}
 .fi{background:#fff;border:1px solid #E2E7E5;border-radius:10px;padding:11px 13px 9px;margin-bottom:8px}
+.fi.acc-t{box-shadow:inset 3px 0 0 var(--teal)}
+.fi.acc-o{box-shadow:inset 3px 0 0 var(--orange)}
+.fi-when{margin-left:auto;flex:0 0 auto;font-size:12.5px;font-weight:700;color:var(--teal-dk);background:var(--teal-lt);padding:3px 10px;border-radius:10px;white-space:nowrap;line-height:1.6}
 .fi-head{display:flex;gap:10px;align-items:flex-start}
 .fi-av{width:44px;height:44px;border-radius:50%;flex:0 0 44px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
 .fi-av.sq{border-radius:9px}
@@ -1049,7 +1052,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.51';
+const APP_VERSION = '2026.06.18.52';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2524,10 +2527,12 @@ function renderHomeFeed() {
   function av(txt, idx, sq){ return '<div class="fi-av'+(sq?' sq':'')+'" style="background:'+AVC[idx%AVC.length]+'">'+esc(txt)+'</div>'; }
   function ini(str){ var p=String(str||'').trim().split(/\s+/); return ((p[0]||' ')[0]+(p[1]?p[1][0]:'')).toUpperCase(); }
   function item(opt){
-    var h='<div class="fi'+(opt.pin?' pin':'')+'">'
+    var h='<div class="fi'+(opt.pin?' pin':'')+(opt.accent?' acc-'+opt.accent:'')+'">'
       + '<div class="fi-head">'+opt.avatar
       + '<div class="fi-who"><div class="fi-name">'+opt.name+'</div>'
-      + '<div class="fi-meta">'+opt.meta+'</div></div></div>';
+      + '<div class="fi-meta">'+opt.meta+'</div></div>'
+      + (opt.when?'<span class="fi-when">'+opt.when+'</span>':'')
+      + '</div>';
     if(opt.body) h+='<div class="fi-body">'+opt.body+'</div>';
     if(opt.actions&&opt.actions.length){ h+='<div class="fi-actions">'+opt.actions.map(function(a){return '<button class="'+(a.strong?'strong':'')+'" onclick="'+a.on+'">'+a.label+'</button>';}).join('')+'</div>'; }
     return h+'</div>';
@@ -2537,6 +2542,18 @@ function renderHomeFeed() {
     if(m<60*24)return Math.floor(m/60)+' h ago';
     var d=Math.floor(m/1440); if(d===1)return 'yesterday'; if(d<=13)return d+' d ago';
     var dt=new Date(ts); return dt.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]; }catch(e){ return ''; } }
+  function fmtWhen(ts){ try{ var dt=new Date(ts); if(isNaN(dt))return '';
+    var now=new Date(); var hm=('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+    var d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var d1=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
+    var days=Math.round((d0-d1)/86400000);
+    if(days===0)return 'Today, '+hm;
+    if(days===1)return 'Yesterday, '+hm;
+    var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var s=DW[dt.getDay()]+' '+dt.getDate()+' '+MO[dt.getMonth()];
+    if(dt.getFullYear()!==now.getFullYear())s+=' '+dt.getFullYear();
+    return s+', '+hm; }catch(e){ return ''; } }
 
   var items = [];
   try { var rz = renderResumeDraftCard(); if (rz) items.push(rz); } catch(e){}
@@ -2556,7 +2573,8 @@ function renderHomeFeed() {
     items.push(item({ pin:true,
       avatar: av(ini(t.logged_by||'C'),3),
       name: esc(t.logged_by || 'A colleague') + ' tagged you',
-      meta: esc(((td.schools||'').split(',')[0]||'').trim()) + ' \u00b7 ' + rel(t.created_at),
+      meta: esc(((td.schools||'').split(',')[0]||'').trim()),
+      when: fmtWhen(t.created_at), accent:'o',
       body: 'You were asked to support on this visit' + (taggedOnMe.length>1 ? ' \u2014 and ' + (taggedOnMe.length-1) + ' more' : '') + '.',
       actions: [{label:'View and respond', on:"navFromForm('dashboard')", strong:true}] }));
   }
@@ -2570,7 +2588,8 @@ function renderHomeFeed() {
     items.push(item({ pin:true,
       avatar: av(ini(school),1),
       name: esc(school),
-      meta: 'Follow-up outstanding' + (fups.length>1?' \u00b7 1 of '+fups.length:'') + ' \u00b7 visit logged ' + rel(f.date || f.created_at),
+      meta: 'Follow-up outstanding' + (fups.length>1?' \u00b7 1 of '+fups.length:''),
+      when: fmtWhen(f.date || f.created_at), accent:'o',
       body: esc(String(fd.follow_up_desc||'').slice(0,120)) + (String(fd.follow_up_desc||'').length>120?'\u2026':''),
       actions: [{label:'Start the visit log', on:'navToLog()', strong:true},{label:'See all', on:"navFromForm('dashboard')"}] }));
   }
@@ -2584,7 +2603,8 @@ function renderHomeFeed() {
         items.push(item({
           avatar: av('DDD',0,true),
           name: 'Your visit is on the record',
-          meta: esc(ls||'') + ' \u00b7 ' + rel(last.created_at),
+          meta: esc(ls||''),
+          when: fmtWhen(last.created_at),
           body: 'Your School Visit Report was emailed to you. Every logged visit strengthens the evidence base.' }));
       }
     } catch(e){}
@@ -2673,7 +2693,8 @@ function renderHomeFeed() {
     return item({
       avatar: av(mine ? ini(o.full_name||'Me') : ini(role), mine ? 0 : (ix % 4) + 1),
       name: esc(who),
-      meta: esc(where || 'In the programme') + ' \u00b7 ' + rel(d.created_at),
+      meta: esc(where || 'In the programme'),
+      when: fmtWhen(d.created_at), accent:'t',
       body: body });
   });
 
