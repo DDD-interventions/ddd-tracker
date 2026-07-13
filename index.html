@@ -1049,7 +1049,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.49';
+const APP_VERSION = '2026.06.18.50';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1119,6 +1119,20 @@ sb.auth.onAuthStateChange(function(event){
     S._recoveryMode = true;
     try { history.replaceState(null,'',location.pathname); } catch(e){}
     render();
+  }
+  if (event === 'SIGNED_OUT') {
+    // Deliberate logout() sets the flag; defensive boot/login sign-outs never
+    // fire from 'ready'. Anything else here is a session that expired or was
+    // revoked mid-use — tell the person plainly instead of failing silently.
+    if (S._expectedSignout) { S._expectedSignout = false; return; }
+    if (S.authState === 'ready') {
+      S.authState = 'gate';
+      S.gateError = '';
+      S._sessionExpired = true;
+      S._gateEmailValue = (S.official && S.official.email) || S._gateEmailValue || '';
+      S.official = { full_name:'', role:'', province:'', district:'', email:'' };
+      render();
+    }
   }
 });
 async function sendPinReset() {
@@ -2401,6 +2415,7 @@ async function checkAuth() {
        if (official.district) S.f.district = official.district;
        initDashFilters();
        S.authState = 'ready';
+       S._sessionExpired = false;
        resetInactivityTimer();
        // Reloads and session restores land directly on the home feed.
        // (The welcome screen shows only after a fresh PIN sign-in.)
@@ -2823,6 +2838,7 @@ async function handleOtpSubmit() {
 
    S.authState = 'ready';
    S.gateError = '';
+   S._sessionExpired = false;
    S.gateLoading = false;
    resetInactivityTimer();
    // Show welcome screen on every login
@@ -2847,6 +2863,7 @@ async function handleGateSubmit() {
 
 async function logout() {
  if (_inactivityTimer) { clearTimeout(_inactivityTimer); _inactivityTimer = null; }
+ S._expectedSignout = true;
  await sb.auth.signOut();
  S.authState = 'gate';
  S.official = { full_name:'', role:'', province:'', district:'', email:'' };
@@ -3525,6 +3542,7 @@ function renderEmailGate() {
        <h1>Welcome to the Learner Improvement Interventions Tracker</h1>
        <p>Enter your registered email address to access the tracker</p>
      </div>
+     ${S._sessionExpired?`<div style="margin:0 22px 4px;padding:11px 14px;background:var(--teal-lt);border-left:3px solid var(--teal);border-radius:8px;font-size:14px;color:var(--navy);line-height:1.5">For your security, your session has ended after a period of inactivity. Please sign in again with your email and PIN \u2014 your work is safe.</div>`:''}
      <div class="gate-body">
        <label for="gate-email">Your email address</label>
        <input type="email" id="gate-email" placeholder="e.g. name@education.gov.za" autocomplete="email" autocapitalize="off" spellcheck="false"
