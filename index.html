@@ -238,46 +238,6 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 @media(max-width:600px){.dash-panels{grid-template-columns:1fr}}
 
 /* ═══ MOBILE RESPONSIVE OVERRIDES ═══ */
-@media(max-width:500px){
-  /* Sub-nav: 3×2 grid instead of horizontal scroll */
-  .dash-subnav{display:grid !important;grid-template-columns:1fr 1fr;gap:5px;overflow-x:visible;padding:8px 12px 6px}
-  .dash-subnav button{white-space:normal;font-size:13px;padding:8px 4px;line-height:1.25;text-align:center;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-  /* Monthly timeline: ensure labels fit */
-  .timeline-bar-label{font-size:7px !important}
-  /* Toolkit tabs */
-  .tk-tabs{gap:4px;padding:8px 8px}
-  .tk-tab{padding:8px 10px;font-size:13px}
-  /* Review table values: allow wrapping */
-  .review-value{max-width:55%;word-break:break-word}
-  /* Ensure min tap targets */
-  .tag{min-height:44px;padding:8px 12px;font-size:14px}
-  .school-dd-item{min-height:48px;padding:12px}
-  .radio-grp label{min-height:44px;padding:10px 12px}
-  .checkbox-grp label{min-height:44px;padding:10px 12px}
-  /* Support cards mobile */
-  .sup-header{padding:14px}
-  .sup-type{font-size:14px}
-  .reply-input{font-size:16px}
-  .reply-send{padding:12px 24px;font-size:14px}
-  /* Activity tracker mobile — more breathing room */
-  .act-card{margin-bottom:12px}
-  .act-post-hdr{padding:14px 14px 6px;gap:10px}
-  .act-avatar{width:36px;height:36px;font-size:14px}
-  .act-author-name{font-size:14px}
-  .act-author-role{font-size:14px}
-  .act-post-body{padding:8px 14px 12px}
-  .act-post-desc{font-size:14px;line-height:1.6}
-  .act-meta-tag{font-size:14px;padding:4px 10px}
-  .act-action-bar{margin:0 10px}
-  .act-action-btn{font-size:14px;padding:12px 6px;min-height:48px}
-  .act-status-tag{font-size:13px;padding:4px 12px}
-  .act-card-detail{padding:14px}
-  .acd-row{padding:6px 0;font-size:14px}
-  /* School picker phase filter - stack on very small screens */
-  .school-dd [style*="flex-wrap:wrap"]{gap:4px}
-  /* Scope selector mobile */
-  .sup-scope-select{font-size:14px;padding:10px 12px}
-}
 .stat-card{background:#fff;border-radius:10px;padding:20px 22px;text-align:left;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #ECEFF1}
 .stat-card .st-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .stat-card .st-desc{font-size:13px;color:var(--grey);line-height:1.4;margin-bottom:16px}
@@ -822,6 +782,48 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .feed-refresh button{background:none;border:none;color:#EAF6DC;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 4px;min-height:0}
 
 html,body{overscroll-behavior-y:none}
+
+/* ── Moved to trailing position (2026.06.18.53): this mobile block was defined BEFORE the base component rules, so equal-specificity base rules silently overrode it (cascade trap, hard-won learning #7). At the end of the stylesheet, every rule here now wins on small screens. ── */
+@media(max-width:500px){
+  /* Sub-nav: 3×2 grid instead of horizontal scroll */
+  .dash-subnav{display:grid !important;grid-template-columns:1fr 1fr;gap:5px;overflow-x:visible;padding:8px 12px 6px}
+  .dash-subnav button{white-space:normal;font-size:13px;padding:8px 4px;line-height:1.25;text-align:center;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  /* Monthly timeline: ensure labels fit */
+  .timeline-bar-label{font-size:7px !important}
+  /* Toolkit tabs */
+  .tk-tabs{gap:4px;padding:8px 8px}
+  .tk-tab{padding:8px 10px;font-size:13px}
+  /* Review table values: allow wrapping */
+  .review-value{max-width:55%;word-break:break-word}
+  /* Ensure min tap targets */
+  .tag{min-height:44px;padding:8px 12px;font-size:14px}
+  .school-dd-item{min-height:48px;padding:12px}
+  .radio-grp label{min-height:44px;padding:10px 12px}
+  .checkbox-grp label{min-height:44px;padding:10px 12px}
+  /* Support cards mobile */
+  .sup-header{padding:14px}
+  .sup-type{font-size:14px}
+  .reply-input{font-size:16px}
+  .reply-send{padding:12px 24px;font-size:14px}
+  /* Activity tracker mobile — more breathing room */
+  .act-card{margin-bottom:12px}
+  .act-post-hdr{padding:14px 14px 6px;gap:10px}
+  .act-avatar{width:36px;height:36px;font-size:14px}
+  .act-author-name{font-size:14px}
+  .act-author-role{font-size:14px}
+  .act-post-body{padding:8px 14px 12px}
+  .act-post-desc{font-size:14px;line-height:1.6}
+  .act-meta-tag{font-size:14px;padding:4px 10px}
+  .act-action-bar{margin:0 10px}
+  .act-action-btn{font-size:14px;padding:12px 6px;min-height:48px}
+  .act-status-tag{font-size:13px;padding:4px 12px}
+  .act-card-detail{padding:14px}
+  .acd-row{padding:6px 0;font-size:14px}
+  /* School picker phase filter - stack on very small screens */
+  .school-dd [style*="flex-wrap:wrap"]{gap:4px}
+  /* Scope selector mobile */
+  .sup-scope-select{font-size:14px;padding:10px 12px}
+}
 </style>
 </head>
 <body>
@@ -1052,7 +1054,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.52';
+const APP_VERSION = '2026.06.18.53';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
