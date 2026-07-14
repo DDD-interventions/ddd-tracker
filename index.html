@@ -109,6 +109,28 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-dd-foot{padding:6px 10px;border-top:1px solid #e8e6e4;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--grey)}
 .school-count{font-size:12.5px;color:var(--grey);margin-top:2px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ═══ MERGED DASHBOARD ═══ */
+.hl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 0}
+.hl{background:var(--off);border:1px solid var(--grey-lt);border-radius:14px;padding:14px;min-height:84px;display:flex;flex-direction:column;justify-content:center}
+.hl-n{font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--teal)}
+.hl-l{font-size:12.5px;font-weight:650;color:var(--grey-dk);margin-top:6px;line-height:1.25}
+.hl.hot{background:var(--orange);border-color:var(--orange)}
+.hl.hot .hl-n,.hl.hot .hl-l{color:#fff}
+.att{margin:16px 0 0;background:var(--teal-dk);border-radius:16px;overflow:hidden}
+.att-h{padding:13px 16px 11px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:8px}
+.att-sq{width:8px;height:8px;border-radius:2px;background:var(--orange-hi);flex:none}
+.att-r{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:14px 16px;min-height:56px;border:none;border-top:1px solid #1C5A5B;background:transparent;font-family:inherit;font-size:14.5px;line-height:1.4;color:#fff;font-weight:600;cursor:pointer}
+.att-r:active{background:rgba(255,255,255,.08)}
+.att-r b{color:#FFB27E;font-weight:800}
+.att-chev{font-size:19px;color:#8FB4B5;flex:none}
+.dash-more{margin:16px 0 0}
+.dash-more-sum{list-style:none;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;background:#fff;border:2px solid var(--teal-md);color:var(--teal);border-radius:14px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.dash-more-sum::-webkit-details-marker{display:none}
+.dash-more[open] .dash-more-ar{transform:rotate(180deg)}
+.dash-more-ar{display:inline-block;transition:transform .18s}
+.dash-more .dash-panels{margin-top:12px}
+
 @media(max-width:500px){.field-row{grid-template-columns:1fr}}
 
 /* Tags / Chips */
@@ -1076,7 +1098,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.66';
+const APP_VERSION = '2026.06.18.67';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6241,7 +6263,7 @@ function renderDashboard() {
    var activeCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return !res || res.type!=='resolution';}).length;
    var addressedCount = supEntries.filter(function(e){var res=supResolved[e[0]]; return res && res.type==='resolution';}).length;
 
-   _supHTML = '<div class="dash-section" style="border-left:4px solid var(--teal);margin-bottom:16px"><div class="dash-section-hdr"><h3>Recommended Support</h3><span style="font-size:12px;color:var(--grey)">'+activeCount+' active'+(addressedCount?' \xb7 '+addressedCount+' addressed':'')+(_hasPending?' \xb7 '+_pendingActive.length+' pending for you':'')+'</span></div><div class="dash-section-body">';
+   _supHTML = '<div class="dash-section" style="border-left:4px solid var(--teal);margin-bottom:16px"><div class="dash-section-hdr"><h3 id="dash-support">Recommended Support</h3><span style="font-size:12px;color:var(--grey)">'+activeCount+' active'+(addressedCount?' \xb7 '+addressedCount+' addressed':'')+(_hasPending?' \xb7 '+_pendingActive.length+' pending for you':'')+'</span></div><div class="dash-section-body">';
    _supHTML += '<div class="dash-section-desc">Support needs flagged by officials during school visits. Tap to see details, respond, or mark as addressed.</div>';
 
    // ── PENDING FOR YOU PANEL (merged inside Recommended Support) ──
@@ -6568,7 +6590,7 @@ function renderDashboard() {
 
 // ── TAB STATE ──
  const tab = S.dashTab || 'overview';
- if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'schools') { S.dashTab = 'overview'; return renderDashboard(); }
+ if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'schools' || tab === 'tracker') { S.dashTab = 'overview'; return renderDashboard(); }
 
  // ═══════════════════════════════════
  // RENDER
@@ -6578,10 +6600,9 @@ function renderDashboard() {
 
  ${renderFilterBar(decs)}
 
- <div class="dash-subnav-hint">Choose a view below</div>
+ 
  <div class="dash-subnav">
-   <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Overview</button>
-   <button class="${tab==='tracker'?'active':''}" onclick="S.dashTab='tracker';render()">Intervention Activity Tracker</button>
+   <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Dashboard</button>
    <button class="${tab==='trends'?'active':''}" onclick="S.dashTab='trends';render()">Trends</button>
  </div>
 
@@ -6595,29 +6616,52 @@ function renderDashboard() {
  </div>
 
 ${tab==='overview'?`
- <!-- ═══ STAT CARDS ═══ -->
- <div class="stats-row">
-   <div class="stat-card">
-     <div class="st-title">Activities Logged</div>
-     <div class="st-desc">The total number of school visits, workshops, and support activities ${_lYou} carried out and recorded</div>
-     <div class="st-num">${totalActivities.toLocaleString()}</div>
-     ${_latestDate?'<div class="st-foot">Latest activity on '+fmtDate(_latestDate)+'</div>':''}
+ <!-- ═══ FOUR HEADLINE NUMBERS ═══ -->
+ <div class="hl-grid">
+   <div class="hl">
+     <div class="hl-n">${totalActivities.toLocaleString()}</div>
+     <div class="hl-l">Visits logged</div>
    </div>
-   <div class="stat-card green">
-     <div class="st-title">Schools Supported</div>
-     <div class="st-desc">The number of unique schools where ${_lYou} conducted at least one intervention or support activity</div>
-     <div class="st-num">${schoolSet.size.toLocaleString()}</div>
-     ${districts.length?'<div class="st-foot">Across '+districts.length+' district'+(districts.length!==1?'s':'')+' in '+activeProvinces.length+' province'+(activeProvinces.length!==1?'s':'')+'</div>':''}
+   <div class="hl">
+     <div class="hl-n">${schoolSet.size.toLocaleString()}</div>
+     <div class="hl-l">Schools reached</div>
    </div>
-   <div class="stat-card orange">
-     <div class="st-title">Educators Supported</div>
-     <div class="st-desc">The estimated number of educators who benefited from ${_lYour} intervention activities, based on what was reported</div>
-     <div class="st-num">${totalEducators.toLocaleString()}</div>
-     ${totalEducators&&schoolSet.size&&Math.round(totalEducators/schoolSet.size)>=1?'<div class="st-foot">Average of ~'+Math.round(totalEducators/schoolSet.size)+' educators per school</div>':''}
+   <div class="hl">
+     <div class="hl-n">${totalEducators.toLocaleString()}</div>
+     <div class="hl-l">Educators supported</div>
+   </div>
+   <div class="hl${followUpCount?' hot':''}">
+     <div class="hl-n">${followUpCount.toLocaleString()}</div>
+     <div class="hl-l">Follow-ups open</div>
    </div>
  </div>
 
- <!-- ═══ CHART PANELS ═══ -->
+ <!-- ═══ NEEDS ATTENTION ═══ -->
+ ${(function(){
+   var rows = [];
+   if (followUpCount) {
+     var oldest = followUpsWithAge[0];
+     var age = (oldest && typeof oldest.daysSince === 'number' && oldest.daysSince >= 0) ? oldest.daysSince : null;
+     // NOTE: the app never captures a follow-up DUE date, so we cannot say
+     // "overdue". We say "still open", and age = days since the visit.
+     var txt = '<b>' + followUpCount + ' follow-up' + (followUpCount!==1?'s':'') + '</b> ' +
+               (followUpCount!==1?'are':'is') + ' still open';
+     if (age === 0) txt += ' \u2014 the oldest from a visit today';
+     else if (age !== null) txt += ' \u2014 the oldest from a visit ' + age + ' day' + (age!==1?'s':'') + ' ago';
+     txt += '.';
+     rows.push('<button class="att-r" onclick="S.dashTab=\'overview\';render();setTimeout(function(){var e=document.getElementById(\'dash-tracker\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'start\'});},60)"><span>' + txt + '</span><span class="att-chev">\u203A</span></button>');
+   }
+   if (supportRequests.length) {
+     var n = supportRequests.length;
+     rows.push('<button class="att-r" onclick="S.dashTab=\'overview\';render();setTimeout(function(){var e=document.getElementById(\'dash-support\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'start\'});},60)"><span><b>' + n + ' support request' + (n!==1?'s':'') + '</b> ' + (n!==1?'have':'has') + ' been logged by schools.</span><span class="att-chev">\u203A</span></button>');
+   }
+   if (!rows.length) return '';
+   return '<div class="att"><div class="att-h"><span class="att-sq"></span>Needs your attention</div>' + rows.join('') + '</div>';
+ })()}
+
+ <!-- ═══ CHART PANELS (collapsed) ═══ -->
+ <details class="dash-more">
+ <summary class="dash-more-sum"><span>📊 More detail</span><span class="dash-more-ar">▾</span></summary>
  <div class="dash-panels">
    <div class="dash-section" style="margin-bottom:0">
      <div class="dash-section-hdr"><h3>Overview of Interventions</h3></div>
@@ -6685,6 +6729,8 @@ ${tab==='overview'?`
  ${_supHTML}
 
  <!-- ═══ DDD DASHBOARD REFERENCE (removed to avoid confusion) ═══ -->
+ </details>
+
 `:''}
 
 ${tab==='trends'?`
@@ -6857,10 +6903,10 @@ ${tab==='trends'?`
 
 `:''}
 
-${tab==='tracker'?`
+${tab==='overview'?`
  <div class="dash-section" style="border-left:4px solid var(--teal)">
    <div class="dash-section-hdr">
-     <h3>Intervention Activity Tracker</h3>
+     <h3 id="dash-tracker">Intervention Activity Tracker</h3>
      <span style="font-size:12px;color:var(--grey)">${acts.length} action${acts.length!==1?'s':''} logged</span>
    </div>
    <div class="dash-section-body">
