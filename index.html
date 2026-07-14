@@ -590,6 +590,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 @keyframes notifSlide{from{transform:translateX(100%)}to{transform:translateX(0)}}
 .notif-pane-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e8e6e4;flex-shrink:0;background:#FAFBFC}
 .notif-pane-title{font-size:16px;font-weight:700;color:var(--navy)}
+.ibx-back{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--teal-dk);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;padding:6px 4px}
+.ibx-reply-bar{display:flex;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #E2E7E5;background:#fff}
 .notif-pane-close{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;transition:.15s}
 .notif-pane-close:hover{background:var(--teal-dk)}
 .notif-pane-close:hover{background:var(--grey-lt);color:var(--navy)}
@@ -1058,7 +1060,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.59';
+const APP_VERSION = '2026.06.18.60';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3225,7 +3227,8 @@ async function sendInboxReply(id){
       html:'<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto"><p><strong>'+esc(me.full_name||me.email)+'</strong> replied in the DDD Tracker:</p><p style="background:#F5F5F5;padding:12px;border-radius:8px">'+esc(txt)+'</p><p><a href="https://ddd-interventions.github.io/ddd-tracker/" style="color:#0B8E8D;font-weight:600">Open the Tracker</a> to respond.</p></div>'
     })}); }catch(e){}
     S._inboxReply[id]='';
-    await loadInbox(); renderNotifPaneOnly();
+    S._inboxView = null;
+    await loadInbox(); paintNotifPane();
   }catch(e){ if(btn){btn.disabled=false;btn.textContent='Send';} alert('Could not send your reply. Please try again.'); }
 }
 
@@ -3356,6 +3359,7 @@ function toggleNotifPane() {
 function closeNotifPane() {
   if (Date.now() - (S._notifOpenedAt||0) < 400) return;   // swallow the ghost tap that lands on the overlay as it appears
   S._notifOpen = false;
+  S._inboxView = null;
   paintNotifPane();
 }
 
@@ -3396,59 +3400,84 @@ function navigateToNotif(navTo, key) {
 function renderNotifPane() {
   var me=(S.official&&S.official.email||'').toLowerCase();
   var lastSeen = S._notifLastSeen || '';
-  S._inboxOpen = S._inboxOpen || {};
   S._inboxReply = S._inboxReply || {};
 
-  // Unify persistent messages and derived activity into one inbox-style list
   var items = [];
   (S._inbox||[]).forEach(function(m){
     var mine=(m.sender_email||'').toLowerCase()===me;
     items.push({
-      id:'m-'+m.id, msgId:m.id,
+      id:'m-'+m.id, msgId:m.id, msg:m,
       who: mine ? 'You \u2192 '+(m.recipient_email||'') : (m.sender_name||m.sender_email||''),
       subject: m.subject||'', body: m.body||'',
       time: m.created_at,
       unread: !m.read_at && !mine,
-      replyable: !mine && (m.kind==='tag'||m.kind==='reply'),
+      replyable: !mine && (m.kind==='tag'||m.kind==='reply'),   // announcements/system are read-only
+      kind: m.kind||'tag',
       color: m.kind==='tag' ? 'var(--orange)' : m.kind==='broadcast' ? 'var(--teal)' : 'var(--green)'
     });
   });
   getNotifications().forEach(function(n, i){
     items.push({
-      id:'n-'+i, msgId:null,
+      id:'n-'+i, msgId:null, msg:null,
       who: n.title||'', subject:'', body: n.desc||'',
       time: n.time, unread: n.time && n.time > lastSeen,
-      replyable:false, color: n.color||'var(--grey)'
+      replyable:false, kind:'activity', color: n.color||'var(--grey)'
     });
   });
   items.sort(function(a,b){ return String(b.time||'').localeCompare(String(a.time||'')); });
 
   var html = '<div class="notif-overlay" onclick="closeNotifPane()"></div>';
   html += '<div class="notif-pane">';
+
+  // ── Detail view (one message, on its own) ──
+  if (S._inboxView) {
+    var it = items.filter(function(x){ return x.id===S._inboxView; })[0];
+    if (it) {
+      html += '<div class="notif-pane-hdr">';
+      html += '<button class="ibx-back" onclick="closeInboxMessage()" title="Back to inbox">\u2190 Inbox</button>';
+      html += '<button class="notif-pane-close" onclick="closeNotifPane()" title="Close inbox">\u00d7 Close</button>';
+      html += '</div>';
+      html += '<div class="notif-list" style="padding:16px 16px 8px">';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
+      html += '<div style="width:42px;height:42px;border-radius:50%;background:'+it.color+';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex:0 0 42px">'+esc((it.who||'?').trim().charAt(0).toUpperCase())+'</div>';
+      html += '<div style="min-width:0"><div style="font-size:16px;font-weight:700;color:var(--navy)">'+esc(it.who)+'</div>';
+      html += '<div style="font-size:13px;color:var(--grey)">'+fmtWhen(it.time)+'</div></div></div>';
+      if(it.subject) html += '<div style="font-size:16px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:8px">'+esc(it.subject)+'</div>';
+      if(it.body) html += '<div style="font-size:15px;color:var(--navy);line-height:1.65;white-space:pre-wrap">'+esc(it.body)+'</div>';
+      if(!it.replyable) html += '<div style="margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--grey);line-height:1.5">This is an update from the DDD Programme. You do not need to reply.</div>';
+      html += '</div>';
+      if (it.replyable) {
+        html += '<div class="ibx-reply-bar">';
+        html += '<input type="text" id="ibx-input-'+it.msgId+'" placeholder="Write a reply\u2026" value="'+esc(S._inboxReply[it.msgId]||'')+'" oninput="setInboxReply(\''+it.msgId+'\',this.value)" style="flex:1;padding:12px 14px;border:1px solid #D5DBD9;border-radius:22px;font-size:15px;font-family:inherit">';
+        html += '<button id="ibx-send-'+it.msgId+'" onclick="sendInboxReply(\''+it.msgId+'\')" style="padding:12px 20px;border:none;border-radius:22px;background:var(--teal);color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">Send</button>';
+        html += '</div>';
+      } else {
+        html += '<div class="ibx-reply-bar"><button onclick="closeInboxMessage()" style="width:100%;padding:13px;border:none;border-radius:10px;background:var(--teal);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">Back to inbox</button></div>';
+      }
+      html += '</div>';
+      return html;
+    }
+    S._inboxView = null;   // stale id, fall through to the list
+  }
+
+  // ── List view ──
   html += '<div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()" title="Close inbox">\u00d7 Close</button></div>';
   html += '<div class="notif-list">';
   if (!items.length) {
     html += '<div class="notif-empty">Your inbox is empty.<br>When colleagues tag you, reply to you, or need your support, their messages will appear here.</div>';
   } else {
     items.forEach(function(it){
-      var open = !!S._inboxOpen[it.id];
-      var preview = it.body && it.body.length>90 && !open ? it.body.slice(0,90)+'\u2026' : it.body;
-      html += '<div class="notif-item'+(it.unread?' unread':'')+'" onclick="toggleInboxItem(\''+it.id+'\')" style="cursor:pointer">';
+      var preview = it.body && it.body.length>80 ? it.body.slice(0,80)+'\u2026' : it.body;
+      html += '<div class="notif-item'+(it.unread?' unread':'')+'" onclick="openInboxMessage(\''+it.id+'\')" style="cursor:pointer">';
       html += '<div class="notif-dot" style="background:'+it.color+(it.unread?'':';opacity:.3')+'"></div>';
       html += '<div class="notif-body">';
       html += '<div class="notif-title">'+esc(it.who)+'</div>';
       if(it.subject) html += '<div class="notif-desc" style="font-weight:600">'+esc(it.subject)+'</div>';
       if(preview) html += '<div class="notif-desc">'+esc(preview)+'</div>';
       html += '<div class="notif-time">'+fmtWhen(it.time)+'</div>';
-      if(it.replyable && open){
-        html += '<div style="display:flex;gap:6px;margin-top:8px">';
-        html += '<input type="text" placeholder="Write a reply\u2026" value="'+esc(S._inboxReply[it.msgId]||'')+'" oninput="setInboxReply(\''+it.msgId+'\',this.value)" onclick="event.stopPropagation()" style="flex:1;padding:9px 11px;border:1px solid #D5DBD9;border-radius:8px;font-size:14px;font-family:inherit">';
-        html += '<button id="ibx-send-'+it.msgId+'" onclick="event.stopPropagation();sendInboxReply(\''+it.msgId+'\')" style="padding:9px 15px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">Send</button>';
-        html += '</div>';
-      } else if(it.replyable){
-        html += '<div style="margin-top:5px;font-size:12.5px;font-weight:600;color:var(--teal)">Tap to reply</div>';
-      }
-      html += '</div></div>';
+      html += '</div>';
+      html += '<div style="align-self:center;color:#B9C2BF;font-size:20px;padding-left:4px">\u203a</div>';
+      html += '</div>';
     });
   }
   html += '</div>';
@@ -3456,7 +3485,9 @@ function renderNotifPane() {
   html += '</div>';
   return html;
 }
-function toggleInboxItem(id){ S._inboxOpen=S._inboxOpen||{}; S._inboxOpen[id]=!S._inboxOpen[id]; renderNotifPaneOnly(); }
+function openInboxMessage(id){ S._inboxView = id; paintNotifPane(); }
+function closeInboxMessage(){ S._inboxView = null; paintNotifPane(); }
+
 function paintNotifPane(){
   var el = document.getElementById('notif-pane-root');
   if (S._notifOpen) {
