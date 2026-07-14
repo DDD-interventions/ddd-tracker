@@ -131,6 +131,22 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-more-ar{display:inline-block;transition:transform .18s}
 .dash-more .dash-panels{margin-top:12px}
 
+
+/* ═══ INSIGHTS ═══ */
+.ins-hd{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin:4px 0 10px}
+.ins-c{background:#fff;border:1.5px solid var(--grey-lt);border-radius:16px;padding:16px;margin-bottom:11px}
+.ins-k{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.ins-sq{width:7px;height:7px;border-radius:2px;background:var(--teal-md);flex:none}
+.ins-c p{font-size:16.5px;line-height:1.45;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.ins-c p b{font-weight:850}
+.ins-s{font-size:13.5px;line-height:1.5;color:var(--grey-dk);margin-top:8px;font-weight:500}
+.ins-c.gap{border:2px solid var(--orange-hi);background:var(--orange-lt)}
+.ins-c.gap .ins-k{color:var(--orange)}
+.ins-c.gap .ins-sq{background:var(--orange-hi)}
+.ins-c.trj{border-left:6px solid var(--orange-hi)}
+.ins-c.trj .ins-k{color:var(--orange)}
+.ins-c.trj .ins-sq{background:var(--orange-hi)}
+
 @media(max-width:500px){.field-row{grid-template-columns:1fr}}
 
 /* Tags / Chips */
@@ -1098,7 +1114,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.67';
+const APP_VERSION = '2026.06.18.68';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1179,7 +1195,7 @@ sb.auth.onAuthStateChange(function(event){
       S.gateError = '';
       S._sessionExpired = true;
       S._gateEmailValue = (S.official && S.official.email) || S._gateEmailValue || '';
-      S.official = { full_name:'', role:'', province:'', district:'', email:'' };
+      S.official = { full_name:'', role:'', province:'', district:'', circuit:'', email:'' };
       render();
     }
   }
@@ -2455,7 +2471,7 @@ async function checkAuth() {
          return;
        }
        S._officialId = official.id;
-       S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', email: official.email || '', notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled) };
+       S.official = { full_name: official.full_name || 'Official', role: official.role || '', province: official.province || '', district: official.district || '', circuit: official.circuit || '', email: official.email || '', notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled) };
        logEvent(S._freshLogin ? 'login' : 'app_open'); S._freshLogin = false;
        S.f.official_name = official.full_name || '';
        S.f.official_role = official.role || '';
@@ -2895,6 +2911,7 @@ async function handleOtpSubmit() {
      role: official.role || '',
      province: official.province || '',
      district: official.district || '',
+     circuit: official.circuit || '',
      email: S._otpEmail,
      notify_tagged_disabled: !!(official.details && official.details.notify_tagged_disabled)
    };
@@ -2938,7 +2955,7 @@ async function logout() {
  S._expectedSignout = true;
  await sb.auth.signOut();
  S.authState = 'gate';
- S.official = { full_name:'', role:'', province:'', district:'', email:'' };
+ S.official = { full_name:'', role:'', province:'', district:'', circuit:'', email:'' };
  S._officialId = null;
  S.gateError = '';
  S.gateLoading = false;
@@ -6114,6 +6131,47 @@ function renderDashboard() {
 
  const activeProvinces = Object.keys(provinceCounts);
 
+ // ══════════ INSIGHTS ══════════
+ // Four card types only: Gap, Trajectory, Comparison, Concentration.
+ // A card that isn't one of those doesn't ship. Everything below is derived
+ // from data already in memory — nothing here triggers a fetch.
+
+ // GAP — schools in the circuits covered by the visible activity that have
+ // no logged visit at all. This is the only thing the app can say about what
+ // was NOT done, which is why it leads.
+ var _insCircuits = {};
+ decs.forEach(function(d){
+   var dt = d.details || {};
+   if (dt.district && dt.circuit) _insCircuits[dt.district + '|' + dt.circuit] = true;
+ });
+ var _gapSchools = [];
+ if (SCHOOLS_STATE === 'ready') {
+   Object.keys(_insCircuits).forEach(function(k){
+     var pr = k.split('|'), dd = pr[0], cc = pr[1];
+     var arr = (SCHOOLS_MAP[dd] && SCHOOLS_MAP[dd][cc]) ? SCHOOLS_MAP[dd][cc] : [];
+     arr.forEach(function(row){
+       var nm = row && row[0];
+       if (nm && !schoolSet.has(nm) && _gapSchools.indexOf(nm) < 0) _gapSchools.push(nm);
+     });
+   });
+ }
+ _gapSchools.sort();
+ var _gapCircuits = Object.keys(_insCircuits).length;
+
+ // TRAJECTORY — the oldest follow-up still open. NOTE: the app never captures
+ // a follow-up DUE date, so we report age since the visit, never "overdue".
+ var _oldest = followUpsWithAge.length ? followUpsWithAge[0] : null;
+ var _oldestAge = (_oldest && typeof _oldest.daysSince === 'number' && _oldest.daysSince >= 0) ? _oldest.daysSince : null;
+
+ // COMPARISON — the two most recent months that actually have activity.
+ var _mThis = months.length ? months[months.length-1] : null;
+ var _mPrev = months.length > 1 ? months[months.length-2] : null;
+
+ // CONCENTRATION — the dominant subject, and how much DDD data is being used.
+ var _topSubj = topSubjects.length ? topSubjects[0] : null;
+ var _dddUsed = dddUsageCounts.direct + dddUsageCounts.informed + dddUsageCounts.partial;
+
+
  // ── HELPER: month label ──
  function monthLabel(ym) {
    const [y,m] = ym.split('-');
@@ -6590,7 +6648,7 @@ function renderDashboard() {
 
 // ── TAB STATE ──
  const tab = S.dashTab || 'overview';
- if (tab === 'impact' || tab === 'insights' || tab === 'coverage' || tab === 'schools' || tab === 'tracker') { S.dashTab = 'overview'; return renderDashboard(); }
+ if (tab === 'impact' || tab === 'coverage' || tab === 'schools' || tab === 'tracker' || tab === 'trends') { S.dashTab = 'insights'; return renderDashboard(); }
 
  // ═══════════════════════════════════
  // RENDER
@@ -6603,7 +6661,7 @@ function renderDashboard() {
  
  <div class="dash-subnav">
    <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Dashboard</button>
-   <button class="${tab==='trends'?'active':''}" onclick="S.dashTab='trends';render()">Trends</button>
+   <button class="${tab==='insights'?'active':''}" onclick="S.dashTab='insights';render()">Insights</button>
  </div>
 
  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;flex-wrap:wrap">
@@ -6733,8 +6791,69 @@ ${tab==='overview'?`
 
 `:''}
 
-${tab==='trends'?`
- <!-- ═══ MONTHLY TIMELINE ═══ -->
+${tab==='insights'?`
+ <!-- ═══ INSIGHT CARDS ═══ -->
+ <div class="ins-hd">What to notice</div>
+ ${(function(){
+   var C = [];
+
+   // GAP
+   if (_gapSchools.length && _gapCircuits) {
+     var shown = _gapSchools.slice(0,4).join(', ');
+     var extra = _gapSchools.length > 4 ? ' and ' + (_gapSchools.length-4) + ' more' : '';
+     C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Gap</div>' +
+       '<p><b>' + _gapSchools.length + ' school' + (_gapSchools.length!==1?'s':'') + '</b> in the ' +
+       (_gapCircuits===1 ? 'circuit' : _gapCircuits + ' circuits') + ' shown ' +
+       (_gapSchools.length!==1?'have':'has') + ' no logged visit.</p>' +
+       '<div class="ins-s">' + esc(shown) + esc(extra) + '.</div></div>');
+   }
+
+   // TRAJECTORY
+   if (followUpCount && _oldestAge !== null) {
+     var sch = (_oldest && _oldest.schools) ? String(_oldest.schools).split(',')[0].trim() : '';
+     C.push('<div class="ins-c trj"><div class="ins-k"><span class="ins-sq"></span>Trajectory</div>' +
+       '<p>' + (_oldestAge===0
+         ? 'Your oldest open follow-up was logged <b>today</b>.'
+         : 'Your oldest open follow-up has been waiting <b>' + _oldestAge + ' day' + (_oldestAge!==1?'s':'') + '</b>.') + '</p>' +
+       '<div class="ins-s">' + (sch ? esc(sch) + '. ' : '') +
+       followUpCount + ' follow-up' + (followUpCount!==1?'s':'') + ' still open in total.</div></div>');
+   }
+
+   // COMPARISON
+   if (_mThis && _mPrev) {
+     var dv = _mThis[1] - _mPrev[1];
+     var word = dv > 0 ? (dv + ' more than') : dv < 0 ? (Math.abs(dv) + ' fewer than') : 'the same as';
+     C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Comparison</div>' +
+       '<p><b>' + _mThis[1] + ' visit' + (_mThis[1]!==1?'s':'') + '</b> logged in ' + monthLabel(_mThis[0]) +
+       ' \u2014 ' + word + ' ' + monthLabel(_mPrev[0]) + '.</p>' +
+       '<div class="ins-s">' + (dv>0?'The busier month of the two.':dv<0?'A quieter month than the one before.':'Activity held steady.') + '</div></div>');
+   } else if (_mThis) {
+     C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Comparison</div>' +
+       '<p><b>' + _mThis[1] + ' visit' + (_mThis[1]!==1?'s':'') + '</b> logged in ' + monthLabel(_mThis[0]) + '.</p>' +
+       '<div class="ins-s">There is no earlier month to compare against yet.</div></div>');
+   }
+
+   // CONCENTRATION — subject
+   if (_topSubj && totalActivities) {
+     C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Concentration</div>' +
+       '<p><b>' + esc(_topSubj[0]) + '</b> came up in ' + _topSubj[1] + ' of ' + totalActivities + ' visit' + (totalActivities!==1?'s':'') + '.</p>' +
+       '<div class="ins-s">' + (topSubjects.length > 1 ? 'More than any other subject in this view.' : 'The only subject recorded in this view.') + '</div></div>');
+   }
+
+   // CONCENTRATION — DDD data use
+   if (totalActivities) {
+     C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Concentration</div>' +
+       '<p>DDD data informed <b>' + _dddUsed + ' of ' + totalActivities + '</b> visit' + (totalActivities!==1?'s':'') + '.</p>' +
+       '<div class="ins-s">' + (dddSourceCounts.dashboard ? 'Most often by logging into the DDD Dashboard directly.' : 'Counted from what was recorded on each visit.') + '</div></div>');
+   }
+
+   if (!C.length) return '<div class="ins-c"><p>Nothing to show yet.</p><div class="ins-s">Log a visit and insights will appear here.</div></div>';
+   return C.join('');
+ })()}
+
+ <!-- ═══ TREND CHARTS (collapsed) ═══ -->
+ <details class="dash-more">
+ <summary class="dash-more-sum"><span>📊 More detail</span><span class="dash-more-ar">▾</span></summary>
  <div class="dash-section" style="border-left:4px solid var(--navy)">
    <div class="dash-section-hdr"><h3>When ${_lAre} Most Active?</h3></div>
    <div class="dash-section-body">
@@ -6900,6 +7019,8 @@ ${tab==='trends'?`
    obsHtml += '</div></div>';
    return obsHtml;
  })()}
+
+ </details>
 
 `:''}
 
