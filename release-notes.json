@@ -1,9 +1,10 @@
 {
-  "2026.06.18.75": {
-    "title": "Performance insights now load reliably",
+  "2026.06.18.76": {
+    "title": "Performance insights follow your filters",
     "released": "2026-07-15",
     "highlights": [
-      "Fixed the performance cards on the Insights tab sometimes never appearing — the app was checking for them before the school list had finished loading"
+      "The performance cards on Insights now follow the province, district and circuit filters at the top — change the filter and the cards update to match",
+      "Each card now says how many schools have results in the area you are viewing, so the comparison is always clear"
     ]
   },
   "2026.06.18.63": {
