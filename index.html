@@ -579,7 +579,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .poa-done{border:1.5px solid var(--green);background:#fff;color:var(--green-text)}
 .poa-done:hover{background:var(--green);color:#fff}
 /* Notification bell & pane */
-.notif-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;height:44px;border-radius:22px;border:none;background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);cursor:pointer;font-size:18px;transition:.15s;flex-shrink:0;font-family:inherit;padding:0 14px}
+.hdr-actions{display:flex;flex-direction:column;gap:6px;align-items:stretch;flex-shrink:0}
+.hdr-actions .hdr-logout{text-align:center;padding:6px 10px}
+.notif-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;height:38px;border-radius:19px;border:none;background:rgba(255,255,255,.16);color:rgba(255,255,255,.95);cursor:pointer;font-size:16px;transition:.15s;flex-shrink:0;font-family:inherit;padding:0 14px}
 .notif-bell-label{font-size:14px;font-weight:700;color:#fff;letter-spacing:.2px}
 .notif-bell:hover{background:rgba(255,255,255,.2);color:#fff}
 .notif-badge{position:absolute;top:4px;right:4px;min-width:18px;height:18px;border-radius:9px;background:#E53935;color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;pointer-events:none}
@@ -1055,7 +1057,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.56';
+const APP_VERSION = '2026.06.18.57';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3331,6 +3333,7 @@ function getNotifCount() {
 function toggleNotifPane() {
   S._notifOpen = !S._notifOpen;
   if (S._notifOpen) {
+    S._notifOpenedAt = Date.now();
     var before = (S._inbox||[]).map(function(m){return m.id;}).join(',');
     loadInbox().then(function(){
       var after = (S._inbox||[]).map(function(m){return m.id;}).join(',');
@@ -3347,6 +3350,7 @@ function toggleNotifPane() {
 }
 
 function closeNotifPane() {
+  if (Date.now() - (S._notifOpenedAt||0) < 400) return;   // swallow the ghost tap that lands on the overlay as it appears
   S._notifOpen = false;
   render();
 }
@@ -3620,7 +3624,7 @@ function render() {
  }
 
  app.innerHTML = `
- <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();(S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}))" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <button class="notif-bell" onclick="toggleNotifPane()" title="Inbox">${(()=>{var c=getNotifCount();return '&#128276;<span class="notif-bell-label">Inbox</span>'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button> <button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button> </div> <nav class="nav"> ${`<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" onclick="navHome()">Home</button><button class="nav-compact-btn ${S.view==='log'&&(S.f.formStep>-1||S.submitted)?'active':''}" onclick="navFromForm('log')">Record</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : (S.f.formStep===-1 ? renderHomeFeed() : renderForm())) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
+ <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();(S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}))" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <div class="hdr-actions"><button class="notif-bell" onclick="event.stopPropagation();toggleNotifPane()" title="Inbox">${(()=>{var c=getNotifCount();return '&#128276;<span class="notif-bell-label">Inbox</span>'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button><button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button></div> </div> <nav class="nav"> ${`<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" onclick="navHome()">Home</button><button class="nav-compact-btn ${S.view==='log'&&(S.f.formStep>-1||S.submitted)?'active':''}" onclick="navFromForm('log')">Record</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : (S.f.formStep===-1 ? renderHomeFeed() : renderForm())) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
  <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">victor@newleaders.co.za</a></span> </div> ${renderBottomNav()} `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
@@ -3630,7 +3634,8 @@ function render() {
  var notifEl = document.getElementById('notif-pane-root');
  if (S._notifOpen) {
    if (!notifEl) { notifEl = document.createElement('div'); notifEl.id = 'notif-pane-root'; document.body.appendChild(notifEl); }
-   notifEl.innerHTML = renderNotifPane();
+   try { notifEl.innerHTML = renderNotifPane(); }
+   catch(e) { notifEl.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#999">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
  } else if (notifEl) { notifEl.innerHTML = ''; }
 }
 
