@@ -2,7 +2,7 @@
 <title>DDD Learner Improvement Interventions Tracker</title>
 <!-- PWA: installable on Android home screen and via Play Store (TWA) -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#074445">
+<meta name="theme-color" content="#0087AC">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--teal:#00647F;--teal-dk:#074445;--teal-lt:#E6F3F7;--teal-md:#0087AC;--blue-hi:#0087AC;--green:#1E7F2C;--green-text:#1E7F2C;--green-dk:#155F22;--green-lt:#E7F6EA;--green-hi:#3AB54A;--orange:#B84A0C;--orange-text:#B84A0C;--orange-lt:#FFF6F1;--orange-hi:#E86820;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#5A6878;--grey-lt:#EDF1F4;--grey-dk:#3D4A5A;--red:#C62222;--red-lt:#FDECEC;--blue:#00647F;--blue-lt:#E6F3F7}
+:root{--teal:#00647F;--teal-dk:#1A2332;--teal-lt:#E6F3F7;--teal-md:#0087AC;--blue-hi:#0087AC;--green:#1E7F2C;--green-text:#1E7F2C;--green-dk:#155F22;--green-lt:#E7F6EA;--green-hi:#3AB54A;--orange:#B84A0C;--orange-text:#B84A0C;--orange-lt:#FFF6F1;--orange-hi:#E86820;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#5A6878;--grey-lt:#EDF1F4;--grey-dk:#3D4A5A;--red:#C62222;--red-lt:#FDECEC;--blue:#00647F;--blue-lt:#E6F3F7}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#323130;min-height:100vh}
 
 /* HEADER */
@@ -36,7 +36,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .nav-landing-btn.secondary:active{background:#E6F3F7}
 .nav-landing-btn .nav-btn-label{font-size:17px;font-weight:700;margin-bottom:4px}
 .nav-landing-btn .nav-btn-desc{font-size:14px;opacity:.7;line-height:1.3}
-.nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:16px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#074445;max-width:280px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(232,149,46,.12)}
+.nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:16px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#1A2332;max-width:280px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(232,149,46,.12)}
 .nav-landing-full:active{background:#FFF8F0}
 .nav-landing-full .nav-btn-label{font-size:15px;font-weight:700;display:block}
 .nav-landing-full .nav-btn-desc{font-size:14px;color:#546E7A;display:block;margin-top:2px}
@@ -50,7 +50,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .nav-compact-btn.tk.active{background:rgba(30,127,44,.25);border:1.5px solid #1E7F2C;color:white}
 @media(max-width:420px){.nav-landing-grid{flex-direction:column;gap:10px}.nav-landing-btn{min-width:0;padding:18px 20px}.nav-landing-btn .nav-btn-label{font-size:15px}.nav-landing-full{max-width:none}.nav-landing-full .nav-btn-label{font-size:14px}.nav-compact-btn{font-size:13px;padding:7px 8px}}
 .btm-nav{display:none}
-@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#646f75;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:13px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
+@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#646f75;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:13px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#1A2332}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
@@ -120,10 +120,10 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .att{margin:16px 0 0;background:var(--teal-dk);border-radius:16px;overflow:hidden}
 .att-h{padding:13px 16px 11px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:8px}
 .att-sq{width:8px;height:8px;border-radius:2px;background:var(--orange-hi);flex:none}
-.att-r{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:14px 16px;min-height:56px;border:none;border-top:1px solid #1C5A5B;background:transparent;font-family:inherit;font-size:14.5px;line-height:1.4;color:#fff;font-weight:600;cursor:pointer}
+.att-r{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:14px 16px;min-height:56px;border:none;border-top:1px solid #33415A;background:transparent;font-family:inherit;font-size:14.5px;line-height:1.4;color:#fff;font-weight:600;cursor:pointer}
 .att-r:active{background:rgba(255,255,255,.08)}
 .att-r b{color:#FFB27E;font-weight:800}
-.att-chev{font-size:19px;color:#8FB4B5;flex:none}
+.att-chev{font-size:19px;color:#96A4B8;flex:none}
 .dash-more{margin:16px 0 0}
 .dash-more-sum{list-style:none;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;background:#fff;border:2px solid var(--teal-md);color:var(--teal);border-radius:14px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
 .dash-more-sum::-webkit-details-marker{display:none}
@@ -320,7 +320,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .toast.show{opacity:1;pointer-events:auto;cursor:pointer}
 
 /* Update banner */
-.update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#074445;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
+.update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#1A2332;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
 .update-banner.visible{transform:translateY(0)}
 .update-banner-text{font-size:14px;line-height:1.5;text-align:left}
 .update-banner-text strong{color:var(--green)}
@@ -385,7 +385,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 /* Email Gate */
 .gate-wrap{max-width:440px;margin:0 auto;padding:40px 16px 60px}
 .gate-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden}
-.gate-top{background:linear-gradient(135deg,#074445 0%,#00647F 50%,#1E7F2C 100%);padding:28px 24px;text-align:center}
+.gate-top{background:linear-gradient(160deg,#0087AC 0%,#00647F 100%);padding:28px 24px;text-align:center}
 .gate-top img{height:56px;border-radius:8px;margin-bottom:10px}
 .gate-top h1{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
 .gate-top p{font-size:14px;color:#EAF6FA;line-height:1.5}
@@ -797,12 +797,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* ── Home feed (Stage 4A) ── */
 .feed-wrap{max-width:560px;margin:0 auto;padding:4px 4px 28px}
-.feed-hello{background:linear-gradient(150deg,#074445,#00647F);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(7,68,69,.25)}
+.feed-hello{background:linear-gradient(150deg,#1A2332,#00647F);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(7,68,69,.25)}
 .feed-hello h2{font-size:19px;font-weight:800;margin:0;color:#fff}
 .feed-chip{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(30,127,44,.85);color:#EAF6DC;font-size:14px;font-weight:700;padding:5px 12px;border-radius:16px;margin-top:9px}
 .fcard.data .fcard-kicker{color:#B5720F}
 .fcard.data .fgo{background:#FBEBD6;color:#8A5310}
-.fcard.win{background:linear-gradient(135deg,#00647F,#074445)}
+.fcard.win{background:linear-gradient(135deg,#00647F,#1A2332)}
 .fcard.win h3{color:#fff}
 .fcard.win p{color:#C7E0DF}
 .fcard.win .fcard-kicker{color:#9FD5D4}
@@ -1092,7 +1092,7 @@ const TK_REPORTS = [
  {id:"t4p",name:"Term 4 Promotion Predictions",icon:"T4P",color:"#1565C0",desc:"Early warning predictions showing which learners are likely to be promoted by year-end",bestFor:["Early warning identification","Predict year-end outcomes","Compare to previous year","Plan proactive interventions"],path:"DDD Dashboard → Select School → Term 4 Promotion Predictions",dataPoints:["Predicted promoted status (TRUE/FALSE)","Previous year comparison","Scatter plot by school"],realInsight:"919 learners at School A are predicted NOT to be promoted. Cross-referencing with FET Profiles shows 441 of these are 'one criteria away' — targeted support could shift outcomes for 16% of the school."},
  {id:"g6p",name:"Grade 6 Performance Insights",icon:"G6",color:"#1E7F2C",desc:"Identify primary schools at risk of underperformance per Circular D3 criteria",bestFor:["Circular D3 compliance","LOLT & Maths monitoring","Primary school early warning","Year-on-year comparison"],path:"DDD Dashboard → Select School → Grade 6 Performance Insights",dataPoints:["% achieving 50%+ in LOLT","% achieving 50%+ in Maths","True/False underperformance flag","4 terms prior comparison"],realInsight:"Circular D3 defines underperforming primary schools as those where <60% of Grade 6 learners achieve Level 4+ in both LOLT and Mathematics. This report flags schools meeting this criteria for targeted intervention.",policyLink:"Circular D3"},
  {id:"sar",name:"School Achievement Report",icon:"SAR",color:"#00647F",desc:"School-level achievement trends across subjects, grades, and terms",bestFor:["Subject trend analysis","SBA-Exam gap detection","Term-on-term comparison","Grade-level monitoring"],path:"DDD Dashboard → Select School → School Achievement Report",dataPoints:["Subject pass rates","Achievement level distribution","Term trends","SBA vs Exam alignment"],realInsight:"Use this to identify subjects with declining pass rates or large SBA-Exam gaps. A 20%+ gap often indicates assessment misalignment — a key intervention trigger."},
- {id:"ttd",name:"Term to Date",icon:"TTD",color:"#074445",desc:"Weekly tracking of school submissions, learner and educator attendance, and task marks captured",bestFor:["Weekly submission monitoring","Learner & educator attendance trends","Absent learner & educator drilldown","Task marks captured per grade & subject"],path:"DDD Dashboard → Term to Date tab → Select entity level",dataPoints:["School submission count vs total","Learner & educator attendance %","Learners absent 3+ consecutive days","Educators absent 4+ days","Weekly task marks captured %"],realInsight:"Term to Date shows week-by-week trends. A sudden drop in school counts or attendance flags an issue early — drill into the table to expand by district, then click a school name to access individual absent learner and educator details."}
+ {id:"ttd",name:"Term to Date",icon:"TTD",color:"#1A2332",desc:"Weekly tracking of school submissions, learner and educator attendance, and task marks captured",bestFor:["Weekly submission monitoring","Learner & educator attendance trends","Absent learner & educator drilldown","Task marks captured per grade & subject"],path:"DDD Dashboard → Term to Date tab → Select entity level",dataPoints:["School submission count vs total","Learner & educator attendance %","Learners absent 3+ consecutive days","Educators absent 4+ days","Weekly task marks captured %"],realInsight:"Term to Date shows week-by-week trends. A sudden drop in school counts or attendance flags an issue early — drill into the table to expand by district, then click a school name to access individual absent learner and educator details."}
 ];
 
 const TK_INTERVENTIONS = [
@@ -1114,7 +1114,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.68';
+const APP_VERSION = '2026.06.18.69';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1662,7 +1662,7 @@ async function sendInterventionAuditEmail(dec, act, official, docFile) {
 
     const bodyHTML =
       '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
-      '<div style="background:#074445;padding:20px 24px;border-radius:8px 8px 0 0">' +
+      '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0">' +
         '<div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div>' +
         '<div style="font-size:14px;color:#EAF6FA;margin-top:4px">Audit copy of your submitted intervention</div>' +
       '</div>' +
@@ -6183,7 +6183,7 @@ function renderDashboard() {
 
  // ── PRE-COMPUTED OVERVIEW HTML ──
  var _latestDate = decs.reduce(function(b,d){return(d.date||'')>(b||'')?d.date:b;},'');
- var _actColors = {'School support visit':'#00647F','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#1E7F2C','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#B84A0C','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
+ var _actColors = {'School support visit':'#00647F','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#1E7F2C','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#B84A0C','Monitoring / follow-up visit':'#1A2332','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
  var _ovActChart = '';
  if (actTypes.length) {
    var _mxA = actTypes[0][1];
@@ -6863,7 +6863,7 @@ ${tab==='insights'?`
          const h = Math.max(Math.round((count/maxMonthly)*95), 8);
          return `<div style="flex:1 0 36px;max-width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
            <div style="font-size:11.5px;font-weight:700;color:var(--navy)">${count}</div>
-           <div style="width:70%;max-width:40px;height:${h}px;background:linear-gradient(180deg,var(--teal),#074445);border-radius:4px 4px 0 0;transition:height .4s"></div>
+           <div style="width:70%;max-width:40px;height:${h}px;background:linear-gradient(180deg,var(--teal),#1A2332);border-radius:4px 4px 0 0;transition:height .4s"></div>
            <div class="timeline-bar-label" style="position:absolute;bottom:-22px;font-size:8px;color:var(--grey);white-space:nowrap;transform:rotate(-30deg);transform-origin:top center">${monthLabel(m)}</div>
          </div>`;
        }).join('')}
@@ -7507,18 +7507,18 @@ function tkCycleGuide() {
    phaseDetail +
    '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:16px;border-top:3px solid #00647F">' +
     '<div style="padding:14px 16px">' +
-     '<div style="font-size:14px;font-weight:700;color:#074445;margin-bottom:10px">Intervention Quality Checklist</div>' +
+     '<div style="font-size:14px;font-weight:700;color:#1A2332;margin-bottom:10px">Intervention Quality Checklist</div>' +
      '<div style="font-size:12px;color:#546E7A;line-height:1.5;margin-bottom:10px">Before you consider an intervention fully set up, check it against these six criteria. The first three are non-negotiable.</div>' +
      qualityRows +
     '</div>' +
    '</div>' +
    '<div style="margin-top:12px;padding:10px 14px;background:#E6F3F7;border-radius:8px;border-left:3px solid #00647F">' +
-    '<div style="font-size:12px;color:#074445;line-height:1.6"><strong>How this fits together:</strong> This guide is the process map. The Tracker is where you log what happens. The MERL Strategy explains why we measure what we measure. Together, they form the DDD Interventions Toolkit.</div>' +
+    '<div style="font-size:12px;color:#1A2332;line-height:1.6"><strong>How this fits together:</strong> This guide is the process map. The Tracker is where you log what happens. The MERL Strategy explains why we measure what we measure. Together, they form the DDD Interventions Toolkit.</div>' +
    '</div>' +
   '</div>';
  }
  return '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden;border:1.5px solid ' + (open ? '#00647F' : '#e0e0e0') + '">' +
-  '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#074445,#00647F)' : '#f8f9fa') + '">' +
+  '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#1A2332,#00647F)' : '#f8f9fa') + '">' +
    '<div style="flex:1">' +
     '<div style="font-size:14px;font-weight:700;color:' + (open ? '#fff' : '#1A2332') + '">DDD Intervention Cycle Guide</div>' +
     '<div style="font-size:12px;color:' + (open ? '#EAF6FA' : '#546E7A') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
@@ -7543,7 +7543,7 @@ function renderToolkit() {
 
 // NAVIGATOR 
 function tkNavigator() {
- return `<div style="background:linear-gradient(135deg,#074445,#00647F);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:12px;color:#EAF6FA;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:11.5px;color:#EAF6FA;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#EAF6FA;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
+ return `<div style="background:linear-gradient(135deg,#1A2332,#00647F);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:12px;color:#EAF6FA;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:11.5px;color:#EAF6FA;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#EAF6FA;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
  <div class="tk-card${sel?' sel':''}" style="${sel?'border-color:'+r.color:''}"> <div class="tk-card-h" onclick="S.selReport=S.selReport==='${r.id}'?null:'${r.id}';render()"> <div class="tk-ic" style="background:${r.color}15;color:${r.color};font-size:12px;font-weight:800">${r.icon}</div> <div style="flex:1"><div style="font-weight:700;font-size:14px;color:#1A2332">${r.name}</div><div style="font-size:12px;color:#546E7A;margin-top:2px">${r.desc}</div>${!sel?'<div class="tap-hint">Tap to see how to use this report</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${sel?'180':'0'}deg)">${sel?'&#9650;':'&#9660;'}</span> </div> ${sel?`<div class="tk-card-b"> <div class="tk-path"><span style="font-family:monospace">${r.path}</span></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Best for</div><div class="tk-chips">${r.bestFor.map(b=>`<span class="tk-chip" style="background:#f3f2f1;color:#37474F;font-weight:500">${b}</span>`).join('')}</div></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What you will see</div><div class="tk-chips">${r.dataPoints.map(dp=>`<span class="tk-chip" style="background:${r.color}10;color:${r.color};font-weight:500;border:1px solid ${r.color}30">${dp}</span>`).join('')}</div></div> <div class="tk-tip" style="background:#FFF8E1;border-color:${r.color}"><div style="font-size:11.5px;font-weight:700;color:${r.color};margin-bottom:4px">EXAMPLE \u2014 What to look for</div><div style="font-size:13px;color:#37474F;line-height:1.5">${r.realInsight}</div></div> ${r.policyLink?`<div style="margin-top:8px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${r.policyLink}';render()">${r.policyLink} \u2014 View Policy</button></div>`:''} </div>`:''}
  </div>`}).join('')}`;
 }
@@ -7567,7 +7567,7 @@ function tkLibrary(){
  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${cats.map(c=>`<button class="tk-filt${S.filterCat===c?' on':''}" onclick="S.filterCat='${c}';render()">${c}</button>`).join('')}</div>
  ${filtered.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);const myCount=usageCounts[iv.id]||0;return`
  <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E7F6EA':iv.difficulty==='Standard'?'#E3F2FD':'#FFF6F1'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#B84A0C'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:12px;color:#546E7A">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:11.5px;color:#546E7A">${iv.timeToImpact}</span><span style="font-size:11.5px;color:#546E7A">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
- <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:11.5px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:13px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:12px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:11.5px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E6F3F7;border-radius:8px"><div style="font-size:12px;font-weight:700;color:#074445">Want to try this approach?</div><div style="font-size:12px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
+ <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:11.5px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:13px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:12px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:11.5px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E6F3F7;border-radius:8px"><div style="font-size:12px;font-weight:700;color:#1A2332">Want to try this approach?</div><div style="font-size:12px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
  </div>`}).join('')}`; 
 }
 
@@ -7646,7 +7646,7 @@ function renderPolicyModal(){
  if(existing)existing.remove();
  const el=document.createElement('div');
  el.id='policy-modal-overlay';
- el.innerHTML=`<div class="modal-bg" onclick="closePolicyModal()"><div class="modal-box" onclick="event.stopPropagation()"> <div style="padding:16px 20px;background:#074445;color:#fff"><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#EAF6FA;margin-bottom:4px">POLICY REFERENCE</div><div style="font-size:16px;font-weight:700">${S.showPolicy}</div></div> <div style="padding:20px"><div style="font-size:14px;font-weight:600;color:#1A2332;margin-bottom:8px">${p.full}</div><div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">KEY CRITERIA</div>${p.criteria.map(c=>`<div style="display:flex;gap:6px;margin-bottom:4px;font-size:13px;color:#37474F"><span style="color:#00647F;font-weight:700">•</span> ${c}</div>`).join('')}
+ el.innerHTML=`<div class="modal-bg" onclick="closePolicyModal()"><div class="modal-box" onclick="event.stopPropagation()"> <div style="padding:16px 20px;background:#1A2332;color:#fff"><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#EAF6FA;margin-bottom:4px">POLICY REFERENCE</div><div style="font-size:16px;font-weight:700">${S.showPolicy}</div></div> <div style="padding:20px"><div style="font-size:14px;font-weight:600;color:#1A2332;margin-bottom:8px">${p.full}</div><div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">KEY CRITERIA</div>${p.criteria.map(c=>`<div style="display:flex;gap:6px;margin-bottom:4px;font-size:13px;color:#37474F"><span style="color:#00647F;font-weight:700">•</span> ${c}</div>`).join('')}
  <button class="btn btn-teal btn-sm" style="width:100%;margin-top:14px" onclick="closePolicyModal()">Close</button></div> </div></div>`;
  document.body.appendChild(el);
  document.addEventListener('keydown',policyEscHandler);
@@ -7661,7 +7661,7 @@ function renderOutcomeModal(){
  const el=document.createElement('div');
  el.id='outcome-modal-overlay';
  el.innerHTML=`<div class="modal-bg" onclick="closeOutcomeModal()"><div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px">
-   <div style="padding:16px 20px;background:linear-gradient(135deg,#074445,#00647F);color:#fff">
+   <div style="padding:16px 20px;background:linear-gradient(135deg,#1A2332,#00647F);color:#fff">
      <div style="font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:#EAF6FA;margin-bottom:4px">RECORD WHAT CHANGED</div>
      <div style="font-size:15px;font-weight:700">${esc(m.actionText)}</div>
      ${m.schools?'<div style="font-size:13px;color:#EAF6FA;margin-top:4px">'+esc(m.schools)+'</div>':''}
