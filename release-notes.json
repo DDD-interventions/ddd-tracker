@@ -1,13 +1,11 @@
 {
-  "2026.06.18.72": {
-    "title": "Bigger, clearer text — and three fixes",
+  "2026.06.18.73": {
+    "title": "Insights now flags where results are weakest",
     "released": "2026-07-15",
     "highlights": [
-      "Text across the app is noticeably larger and easier to read, especially on a phone in bright light",
-      "Insights now shows the themes in your work — the barrier that keeps coming up, what schools most often did not have in place, the support officials flagged most, and what usually prompts you to step in",
-      "Fixed text being cut off or overlapping in tick boxes, badges and headings",
-      "Fixed Inbox messages showing the same sentence twice",
-      "Fixed the app saving a draft before you had entered anything about the visit"
+      "Insights now draws your attention to the schools and subjects with the lowest results in your area — so you can see where support is most needed, based on the latest performance data",
+      "These sit alongside the patterns from your own visits, giving one place to decide where to go next",
+      "Trends has been simplified to the monthly activity view; the other breakdowns now live inside Insights as plain-language cards"
     ]
   },
   "2026.06.18.63": {
