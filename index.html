@@ -2,7 +2,7 @@
 <title>DDD Learner Improvement Interventions Tracker</title>
 <!-- PWA: installable on Android home screen and via Play Store (TWA) -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#074445">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,44 +13,44 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--teal:#000000;--teal-dk:#000000;--teal-lt:#F2F2F4;--teal-md:#E6E6E9;--green:#14722A;--green-text:#14722A;--green-dk:#0E5C20;--green-lt:#E7F6EA;--orange:#B84A0C;--orange-text:#B84A0C;--orange-lt:#FFF6F1;--orange-hi:#E86820;--navy:#000000;--white:#FFF;--off:#FAFAFB;--grey:#5A5A62;--grey-lt:#F2F2F4;--grey-dk:#3A3A40;--red:#C62222;--red-lt:#FDECEC;--blue:#000000;--blue-lt:#F2F2F4}
+:root{--teal:#00647F;--teal-dk:#074445;--teal-lt:#E6F3F7;--teal-md:#0087AC;--blue-hi:#0087AC;--green:#1E7F2C;--green-text:#1E7F2C;--green-dk:#155F22;--green-lt:#E7F6EA;--green-hi:#3AB54A;--orange:#B84A0C;--orange-text:#B84A0C;--orange-lt:#FFF6F1;--orange-hi:#E86820;--navy:#1A2332;--white:#FFF;--off:#F7F9FC;--grey:#5A6878;--grey-lt:#EDF1F4;--grey-dk:#3D4A5A;--red:#C62222;--red-lt:#FDECEC;--blue:#00647F;--blue-lt:#E6F3F7}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#323130;min-height:100vh}
 
 /* HEADER */
-.hdr{background:#000;position:sticky;top:0;z-index:100}
+.hdr{background:#0087AC;position:sticky;top:0;z-index:100}
 .hdr-bar{height:4px;background:var(--orange-hi)}
 .hdr-content{display:flex;align-items:center;gap:12px;padding:10px 16px;max-width:720px;margin:0 auto}
 .hdr-logo{height:48px;border-radius:6px}
-.hdr-brand{font-size:12.5px;font-weight:600;letter-spacing:2px;color:#C9C9CF;text-transform:uppercase;margin-bottom:2px}
+.hdr-brand{font-size:12.5px;font-weight:600;letter-spacing:2px;color:#EAF6FA;text-transform:uppercase;margin-bottom:2px}
 .hdr-title{font-size:16px;font-weight:700;color:white;line-height:1.2}
-.hdr-sub{font-size:13px;color:#C9C9CF;margin-top:2px}
+.hdr-sub{font-size:13px;color:#EAF6FA;margin-top:2px}
 .hdr-titles{flex:1}
 nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding:10px 16px 8px}
 .nav-landing{text-align:center;padding:6px 0}
 .nav-landing-prompt{font-size:18px;color:#fff;font-weight:700;margin-bottom:16px}
 .nav-landing-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:500px;margin:0 auto}
-.nav-landing-btn{border:none;border-radius:16px;text-align:center;cursor:pointer;font-family:inherit;padding:24px 30px;transition:all .2s;min-width:180px;flex:1;box-shadow:0 2px 8px rgba(0,0,0,.10)}
-.nav-landing-btn.primary{background:#000;color:#fff}
-.nav-landing-btn.primary:active{background:#2A2A30}
-.nav-landing-btn.secondary{background:#fff;border:2.5px solid #000;color:#000}
-.nav-landing-btn.secondary:active{background:#F2F2F4}
+.nav-landing-btn{border:none;border-radius:16px;text-align:center;cursor:pointer;font-family:inherit;padding:24px 30px;transition:all .2s;min-width:180px;flex:1;box-shadow:0 2px 8px rgba(7,68,69,.10)}
+.nav-landing-btn.primary{background:#1E7F2C;color:#fff}
+.nav-landing-btn.primary:active{background:#155F22}
+.nav-landing-btn.secondary{background:#fff;border:2.5px solid #0087AC;color:#00647F}
+.nav-landing-btn.secondary:active{background:#E6F3F7}
 .nav-landing-btn .nav-btn-label{font-size:17px;font-weight:700;margin-bottom:4px}
 .nav-landing-btn .nav-btn-desc{font-size:14px;opacity:.7;line-height:1.3}
-.nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:16px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#000000;max-width:280px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(232,149,46,.12)}
+.nav-landing-full{margin-top:4px;padding:14px 24px;border-radius:16px;background:#fff;border:3px solid var(--orange);text-align:center;cursor:pointer;font-family:inherit;transition:all .2s;color:#074445;max-width:280px;margin-left:auto;margin-right:auto;box-shadow:0 2px 8px rgba(232,149,46,.12)}
 .nav-landing-full:active{background:#FFF8F0}
 .nav-landing-full .nav-btn-label{font-size:15px;font-weight:700;display:block}
 .nav-landing-full .nav-btn-desc{font-size:14px;color:#546E7A;display:block;margin-top:2px}
-@media(hover:hover){.nav-landing-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.16)}.nav-landing-full:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,149,46,.18)}}
+@media(hover:hover){.nav-landing-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(7,68,69,.16)}.nav-landing-full:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,149,46,.18)}}
 .nav-landing-btn:active,.nav-landing-full:active{transform:scale(.97)}
 .nav-compact{display:flex;gap:6px;align-items:center}
 .nav-compact-btn{flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);text-align:center;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:rgba(255,255,255,.55);transition:all .2s}
 .nav-compact-btn:active{background:rgba(255,255,255,.15)}
-.nav-compact-btn.active{background:rgba(0,0,0,.25);border:1.5px solid #000000;color:white}
+.nav-compact-btn.active{background:rgba(30,127,44,.25);border:1.5px solid #1E7F2C;color:white}
 .nav-compact-btn.tk{flex:0 0 auto;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
-.nav-compact-btn.tk.active{background:rgba(0,0,0,.25);border:1.5px solid #000000;color:white}
+.nav-compact-btn.tk.active{background:rgba(30,127,44,.25);border:1.5px solid #1E7F2C;color:white}
 @media(max-width:420px){.nav-landing-grid{flex-direction:column;gap:10px}.nav-landing-btn{min-width:0;padding:18px 20px}.nav-landing-btn .nav-btn-label{font-size:15px}.nav-landing-full{max-width:none}.nav-landing-full .nav-btn-label{font-size:14px}.nav-compact-btn{font-size:13px;padding:7px 8px}}
 .btm-nav{display:none}
-@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(0,0,0,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#646f75;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(0,0,0,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:13px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#000000}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
+@media(max-width:760px){.nav-compact{display:none}#app{padding-bottom:calc(68px + env(safe-area-inset-bottom))}.btm-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:150;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding-bottom:env(safe-area-inset-bottom)}.btm-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;border:none;background:none;cursor:pointer;font-family:inherit;color:#646f75;padding:7px 4px;transition:color .15s}.btm-nav-btn:active{background:rgba(7,68,69,.05)}.btm-nav-ic{width:24px;height:24px}.btm-nav-lbl{font-size:13px;font-weight:700;letter-spacing:.2px}.btm-nav-btn.active{color:#074445}.toast{bottom:calc(72px + env(safe-area-inset-bottom))}.update-banner{bottom:calc(72px + env(safe-area-inset-bottom))}}
 
 /* FORM */
 .form-wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
@@ -75,7 +75,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .field:first-child{border-top:none}
 .field label{display:block;font-size:14.5px;font-weight:600;color:#323130;margin-bottom:5px}
 .field .hint{font-size:14px;color:#605e5c;margin-bottom:6px;font-weight:400}
-.sel-hint{font-size:14px;color:#000000;margin-top:5px;padding:5px 8px;background:#E8F6F5;border-radius:4px;line-height:1.4;font-style:italic}
+.sel-hint{font-size:14px;color:#00647F;margin-top:5px;padding:5px 8px;background:#E8F6F5;border-radius:4px;line-height:1.4;font-style:italic}
 .req{color:#a4262c;margin-left:2px}
 .field select,.field input[type=text],.field input[type=date],.field input[type=number],.field input[type=url],.field input[type=email],.field textarea{width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;background:#fff;color:#323130}
 .field select:focus,.field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
@@ -83,7 +83,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 .school-picker{position:relative}
 .school-tags{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-.school-tag{display:flex;align-items:center;gap:10px;background:#E7F6EA;color:var(--navy);border:1.5px solid #000000;border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;line-height:1.3}
+.school-tag{display:flex;align-items:center;gap:10px;background:#E7F6EA;color:var(--navy);border:1.5px solid #1E7F2C;border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;line-height:1.3}
 .school-tag .st-info{flex:1;min-width:0}
 .school-tag .st-name{font-size:14px;font-weight:700;color:var(--navy)}
 .school-tag .st-meta{font-size:12.5px;color:var(--grey);margin-top:2px}
@@ -92,9 +92,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-trigger{width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;background:#fff;color:#323130;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center}
 .school-trigger:hover{border-color:var(--teal)}
 .school-trigger.open{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal);border-radius:4px 4px 0 0}
-.school-trigger .arrow{font-size:12.5px;color:#6E6E76;transition:transform .2s}
+.school-trigger .arrow{font-size:12.5px;color:#5A6878;transition:transform .2s}
 .school-trigger.open .arrow{transform:rotate(180deg)}
-.school-trigger.disabled{background:#f3f2f1;color:#6E6E76;cursor:not-allowed}
+.school-trigger.disabled{background:#f3f2f1;color:#5A6878;cursor:not-allowed}
 .school-dd{position:absolute;top:100%;left:0;right:0;z-index:50;background:#fff;border:1px solid var(--teal);border-top:none;border-radius:0 0 6px 6px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
 .school-dd-filter{padding:8px 10px;border-bottom:1px solid #e8e6e4}
 .school-dd-filter input{width:100%;padding:10px 12px;border:2px solid var(--teal);border-radius:8px;font-size:14px;font-family:inherit}
@@ -105,7 +105,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .school-dd-item.checked{background:#f0faf9;font-weight:600}
 .school-dd-item .tick{width:20px;height:20px;border:2px solid #c8c6c4;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;flex-shrink:0}
 .school-dd-item.checked .tick{background:var(--teal);border-color:var(--teal)}
-.school-dd-hint{padding:8px 10px;font-size:14px;color:#6E6E76;font-style:italic;text-align:center}
+.school-dd-hint{padding:8px 10px;font-size:14px;color:#5A6878;font-style:italic;text-align:center}
 .school-dd-foot{padding:6px 10px;border-top:1px solid #e8e6e4;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--grey)}
 .school-count{font-size:12.5px;color:var(--grey);margin-top:2px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -167,7 +167,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .btn-save-later{background:transparent;border:none;color:var(--teal);font-size:14px;font-weight:600;cursor:pointer;padding:6px 10px;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
 .btn-save-later:active{color:var(--teal-dk)}
 .save-later-hint{display:block;font-size:12.5px;color:var(--grey);margin-top:2px;font-weight:400;text-decoration:none}
-.resume-card{background:#FFF9E6;border:1.5px solid #FFE082;border-left:4px solid var(--orange);border-radius:8px;padding:14px 16px;margin:0 0 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.resume-card{background:#FFF8E1;border:1.5px solid #FFE082;border-left:4px solid var(--orange);border-radius:8px;padding:14px 16px;margin:0 0 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .resume-card-body{min-width:0}
 .resume-card-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px}
 .resume-card-meta{font-size:14px;color:var(--grey-dk);margin-bottom:10px;line-height:1.4}
@@ -190,9 +190,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .wc-card .wc-desc{font-size:13.5px;color:var(--grey);line-height:1.55}
 
 .welcome-cta{padding:20px 18px 24px;text-align:center}
-.welcome-cta .btn-go{background:linear-gradient(135deg,var(--teal-dk),#000000);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(0,0,0,.35);transition:transform .15s,box-shadow .15s;min-width:220px;-webkit-tap-highlight-color:rgba(0,0,0,.2);touch-action:manipulation}
+.welcome-cta .btn-go{background:linear-gradient(135deg,var(--teal-dk),#00647F);color:#fff;border:none;border-radius:10px;padding:16px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(0,100,127,.35);transition:transform .15s,box-shadow .15s;min-width:220px;-webkit-tap-highlight-color:rgba(0,100,127,.2);touch-action:manipulation}
 .welcome-cta .btn-go:active{transform:scale(.97)}
-.welcome-cta .btn-go:hover{box-shadow:0 4px 16px rgba(0,0,0,.45)}
+.welcome-cta .btn-go:hover{box-shadow:0 4px 16px rgba(0,100,127,.45)}
 
 /* FEEDBACK FORM */
 .fb-section{margin:16px 0 0;padding:18px 16px;background:#fff;border-radius:10px;border:1px solid #e8e6e4;animation:fadeUp .4s ease .2s both}
@@ -206,7 +206,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .fb-rate-btn:hover{border-color:var(--teal-md)}
 .fb-rate-btn.sel{border-color:var(--teal);background:var(--teal-lt)}
 .fb-rate-btn .fb-emoji{font-size:22px}
-.fb-rate-btn .fb-label{font-size:13px;font-weight:600;color:#6E6E76;line-height:1.2}
+.fb-rate-btn .fb-label{font-size:13px;font-weight:600;color:#5A6878;line-height:1.2}
 .fb-rate-btn.sel .fb-label{color:var(--teal-dk)}
 .fb-checks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .fb-check{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:1.5px solid #e8e6e4;background:#fff;cursor:pointer;transition:all .15s;font-size:13.5px;color:var(--navy)}
@@ -254,7 +254,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-subnav{display:flex;flex-wrap:wrap;gap:6px;overflow-x:visible;padding:8px 16px 6px;position:sticky;top:0;z-index:50;background:#fff;margin:0 -16px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-bottom:1px solid #e0e0e0}
 .dash-subnav::-webkit-scrollbar{display:none}
 .dash-subnav button{flex:1 1 auto;min-width:0;font-size:14px;font-weight:700;padding:8px 12px;border-radius:8px;border:2px solid #d0d4db;background:#fff;color:var(--grey-dk);cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;text-align:center}
-.dash-subnav button.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.dash-subnav button.active{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 8px rgba(0,100,127,.3)}
 .dash-subnav button:not(.active):hover{border-color:var(--teal);color:var(--teal);background:var(--teal-lt);transform:translateY(-1px)}
 .dash-subnav-hint{text-align:center;font-size:12.5px;color:var(--grey);padding:6px 16px 0;margin:0 -16px;background:#fff}
 
@@ -264,13 +264,13 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .dash-filters-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
 .dash-filter-grp label{display:block;font-size:13px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 .dash-filter-grp select{width:100%;padding:7px 8px;border:1.5px solid rgba(255,255,255,.2);border-radius:6px;font-size:14px;font-weight:600;font-family:inherit;color:#fff;background:rgba(255,255,255,.1);cursor:pointer;appearance:auto;-webkit-appearance:auto}
-.dash-filter-grp select:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 2px rgba(0,0,0,.3)}
+.dash-filter-grp select:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 2px rgba(0,100,127,.3)}
 .dash-filter-grp select:disabled{opacity:.5;cursor:not-allowed;background:rgba(255,255,255,.05)}
 .dash-filter-grp select option{color:#1A2332;background:#fff}
 .dash-filters-info{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 .dash-filters-count{font-size:12.5px;color:rgba(255,255,255,.5)}
 .dash-filters-clear{font-size:12.5px;color:var(--teal);font-weight:700;background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 8px;border-radius:4px;transition:.15s}
-.dash-filters-clear:hover{background:rgba(0,0,0,.2)}
+.dash-filters-clear:hover{background:rgba(0,100,127,.2)}
 @media(max-width:500px){.dash-filters-row{grid-template-columns:1fr 1fr}}
 
 
@@ -282,7 +282,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .toast.show{opacity:1;pointer-events:auto;cursor:pointer}
 
 /* Update banner */
-.update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#000000;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
+.update-banner{position:fixed;bottom:16px;right:16px;z-index:200;background:#074445;color:#fff;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(calc(100% + 20px));transition:transform .4s ease;display:flex;flex-direction:column;gap:10px;border-radius:12px;max-width:340px}
 .update-banner.visible{transform:translateY(0)}
 .update-banner-text{font-size:14px;line-height:1.5;text-align:left}
 .update-banner-text strong{color:var(--green)}
@@ -347,16 +347,16 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 /* Email Gate */
 .gate-wrap{max-width:440px;margin:0 auto;padding:40px 16px 60px}
 .gate-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden}
-.gate-top{background:linear-gradient(135deg,#000000 0%,#000000 50%,#000000 100%);padding:28px 24px;text-align:center}
+.gate-top{background:linear-gradient(135deg,#074445 0%,#00647F 50%,#1E7F2C 100%);padding:28px 24px;text-align:center}
 .gate-top img{height:56px;border-radius:8px;margin-bottom:10px}
 .gate-top h1{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
-.gate-top p{font-size:14px;color:#C9C9CF;line-height:1.5}
+.gate-top p{font-size:14px;color:#EAF6FA;line-height:1.5}
 .gate-body{padding:28px 24px;box-sizing:border-box}
 .gate-body label{display:block;font-size:14px;font-weight:600;color:#323130;margin-bottom:6px}
 .gate-body input[type=email]{width:100%;padding:11px 14px;border:1.5px solid #c8c6c4;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s;box-sizing:border-box}
-.gate-body input[type=email]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.gate-body input[type=email]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,100,127,.15)}
 .gate-body input[type=password],.gate-body input[type=text]{width:100%;padding:11px 14px;border:1.5px solid #c8c6c4;border-radius:6px;font-family:inherit;transition:border-color .2s;box-sizing:border-box}
-.gate-body input[type=password]:focus,.gate-body input[type=text]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.gate-body input[type=password]:focus,.gate-body input[type=text]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,100,127,.15)}
 .gate-err{color:var(--red);font-size:14px;margin-top:6px;display:none}
 .gate-err.show{display:block}
 .gate-btn{width:100%;padding:12px;border:none;border-radius:6px;background:var(--teal);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px;transition:background .15s}
@@ -381,7 +381,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .tk-wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
 .tk-tabs{display:flex;gap:6px;background:#fff;padding:10px 12px;border-radius:8px;margin-bottom:0;overflow-x:auto;justify-content:center;flex-wrap:wrap}
 .tk-tab{padding:10px 16px;border:2px solid #e1dfdd;background:#fff;color:var(--grey-dk);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;min-height:44px;gap:4px}
-.tk-tab.on{color:#fff;background:var(--teal);border-color:var(--teal);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tk-tab.on{color:#fff;background:var(--teal);border-color:var(--teal);box-shadow:0 2px 8px rgba(0,100,127,.25)}
 .tk-tab:hover:not(.on){color:var(--teal);border-color:var(--teal);background:var(--teal-lt);transform:translateY(-1px)}
 .tk-card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden;border:2px solid transparent;transition:all .2s;cursor:pointer}
 .tk-card.sel{border-color:var(--teal)}
@@ -464,19 +464,19 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .scope-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:4px}
 .scope-badge.sb-all{background:var(--teal-lt);color:var(--teal)}
 .scope-badge.sb-district{background:#E3F2FD;color:#1565C0}
-.scope-badge.sb-school{background:#E7F6EA;color:#14722A}
+.scope-badge.sb-school{background:#E7F6EA;color:#1E7F2C}
 /* Resolution UI */
 .sup-resolved-banner{background:#E7F6EA;border:1px solid #C8E6C9;border-radius:8px;padding:10px 12px;margin-bottom:10px}
 .sup-resolved-title{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:4px}
 .sup-resolved-by{font-size:12.5px;color:#558B2F;line-height:1.5}
-.sup-resolved-comment{font-size:13px;color:var(--navy);line-height:1.5;margin-top:6px;padding:6px 8px;background:#fff;border-radius:6px;border-left:3px solid #14722A}
+.sup-resolved-comment{font-size:13px;color:var(--navy);line-height:1.5;margin-top:6px;padding:6px 8px;background:#fff;border-radius:6px;border-left:3px solid #1E7F2C}
 .sup-resolve-flow{border-top:1px solid #e8e6e4;padding:10px 14px;background:#FAFFFE}
 .sup-resolve-form{margin-top:8px}
 .sup-resolve-textarea{width:100%;box-sizing:border-box;font-size:14px;font-family:inherit;border:1.5px solid #C8E6C9;border-radius:12px;padding:10px 14px;resize:none;min-height:60px;line-height:1.4;outline:none;transition:border-color .15s}
-.sup-resolve-textarea:focus{border-color:#14722A}
+.sup-resolve-textarea:focus{border-color:#1E7F2C}
 .sup-resolve-textarea.resolve-error{border-color:var(--red)}
 .sup-resolve-actions{display:flex;gap:8px;margin-top:10px}
-.sup-resolve-confirm{flex:1;padding:10px 12px;font-size:14px;font-weight:700;border:none;background:#14722A;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s;min-height:44px}
+.sup-resolve-confirm{flex:1;padding:10px 12px;font-size:14px;font-weight:700;border:none;background:#1E7F2C;color:#fff;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s;min-height:44px}
 .sup-resolve-confirm:hover{background:#2E7D32}
 .sup-resolve-cancel{flex:0;padding:10px 14px;font-size:14px;font-weight:600;border:1px solid var(--grey-lt);background:#fff;color:var(--grey);border-radius:10px;cursor:pointer;font-family:inherit;min-height:44px}
 .sup-schools-detail{display:none;margin-top:6px}
@@ -543,14 +543,14 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .act-card-detail{display:none;border-top:1px solid #f0f0f0;padding:12px 14px;background:#FAFBFC}
 .act-card-detail.show{display:block}
 .acd-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid #f5f5f5}
-.acd-label{color:#6E6E76}
+.acd-label{color:#5A6878}
 .acd-value{color:var(--navy);font-weight:600;text-align:right;max-width:60%}
 .acd-chain{margin:10px 0 6px}
-.acd-chain-title{font-size:13px;font-weight:700;color:#6E6E76;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.acd-chain-title{font-size:13px;font-weight:700;color:#5A6878;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
 .acd-chain-step{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
 .acd-chain-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
 .acd-chain-dot.cd-d{background:#1565C0}.acd-chain-dot.cd-de{background:var(--orange)}.acd-chain-dot.cd-a{background:var(--green)}
-.acd-chain-lbl{font-size:13px;font-weight:700;color:#6E6E76;text-transform:uppercase;letter-spacing:.3px}
+.acd-chain-lbl{font-size:13px;font-weight:700;color:#5A6878;text-transform:uppercase;letter-spacing:.3px}
 .acd-chain-text{font-size:13px;color:var(--navy);line-height:1.4}
 .acd-owner-btns{padding:8px 0 0;display:flex;gap:8px;border-top:1px solid #f0f0f0;margin-top:8px}
 /* Thread */
@@ -599,7 +599,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .notif-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:60px;transition:background .1s}
 .notif-item:hover{background:#f8f9fc}
 .notif-item:active{background:#f0f2f5}
-.notif-item.unread{background:#FFF9E6}
+.notif-item.unread{background:#FFF8E1}
 .notif-item.unread:hover{background:#FFF3CD}
 .notif-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
 .notif-body{flex:1;min-width:0}
@@ -613,7 +613,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .loc-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;margin:14px 0 10px;border:1.5px solid #e1dfdd;background:#fafbfc;font-size:14px;line-height:1.45;transition:all .2s}
 .loc-card.success{border-color:var(--green);background:var(--green-lt)}
 .loc-card.requesting{border-color:var(--teal);background:var(--teal-lt)}
-.loc-card.denied,.loc-card.unavailable,.loc-card.timeout,.loc-card.unsupported{border-color:#FFD180;background:#FFF9E6}
+.loc-card.denied,.loc-card.unavailable,.loc-card.timeout,.loc-card.unsupported{border-color:#FFD180;background:#FFF8E1}
 .loc-icon{font-size:20px;line-height:1;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
 .loc-text{flex:1;min-width:0}
 .loc-title{font-size:14px;font-weight:600;color:var(--navy);line-height:1.35}
@@ -666,7 +666,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 @media(min-width:600px){.whatsnew-card{border-radius:16px;transform:scale(.95);opacity:0;transition:transform .25s,opacity .25s}}
 .whatsnew-overlay.visible .whatsnew-card{transform:translateY(0)}
 @media(min-width:600px){.whatsnew-overlay.visible .whatsnew-card{transform:scale(1);opacity:1}}
-.whatsnew-hero{background:linear-gradient(135deg,var(--teal-dk) 0%,#000000 100%);color:#fff;padding:28px 24px 22px;text-align:center;border-radius:16px 16px 0 0}
+.whatsnew-hero{background:linear-gradient(135deg,var(--teal-dk) 0%,#00647F 100%);color:#fff;padding:28px 24px 22px;text-align:center;border-radius:16px 16px 0 0}
 @media(min-width:600px){.whatsnew-hero{border-radius:16px 16px 0 0}}
 .whatsnew-emoji{font-size:36px;margin-bottom:8px;display:block}
 .whatsnew-hero h2{font-size:19px;font-weight:700;margin:0 0 4px}
@@ -677,14 +677,14 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .whatsnew-notes li{display:flex;gap:10px;padding:8px 0;font-size:14px;line-height:1.55;color:var(--navy)}
 .whatsnew-notes li::before{content:'✓';color:var(--green-dk);font-weight:700;flex-shrink:0;margin-top:1px}
 .whatsnew-footer{padding:6px 24px 22px}
-.whatsnew-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.whatsnew-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--teal);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;box-shadow:0 2px 8px rgba(0,100,127,.25)}
 .whatsnew-btn:hover{background:var(--teal-dk)}
 .whatsnew-btn:active{transform:translateY(1px)}
 /* ── Change #4 (2026.06.18.1): sticky form Next/Back ── */
 .form-nav{display:flex;justify-content:space-between;gap:12px;margin-top:12px}
 .form-nav--end{justify-content:flex-end}
 @media(max-width:760px){
-  .form-nav{position:fixed;left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom));z-index:140;margin:0;gap:12px;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(0,0,0,.07);padding:8px 14px 8px}
+  .form-nav{position:fixed;left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom));z-index:140;margin:0;gap:12px;background:#fff;border-top:1px solid #e1dfdd;box-shadow:0 -2px 12px rgba(7,68,69,.07);padding:8px 14px 8px}
   .form-nav .btn{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;margin:0}
   .form-nav--end .btn{flex:0 1 auto;min-width:150px}
 }
@@ -743,7 +743,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .fi-actions button:active{background:#F0F5F4}
 .fi-actions button.strong{color:#3E6B18}
 .fi.pin{border-left:none;border-color:#CBE3AE;background:#FCFEF9}
-.feed-record{display:block;width:100%;background:var(--green);color:#fff;font-weight:800;font-size:16px;text-align:center;padding:15px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.3);margin:2px 0 10px;min-height:52px}
+.feed-record{display:block;width:100%;background:var(--green);color:#fff;font-weight:800;font-size:16px;text-align:center;padding:15px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(30,127,44,.3);margin:2px 0 10px;min-height:52px}
 /* ── Mobile input & touch floor (trailing block: wins the cascade) ── */
 @media (max-width: 820px){
   .field input[type=text],.field input[type=date],.field input[type=number],
@@ -759,12 +759,12 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 
 /* ── Home feed (Stage 4A) ── */
 .feed-wrap{max-width:560px;margin:0 auto;padding:4px 4px 28px}
-.feed-hello{background:linear-gradient(150deg,#000000,#000000);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.feed-hello{background:linear-gradient(150deg,#074445,#00647F);color:#fff;padding:16px 16px 15px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(7,68,69,.25)}
 .feed-hello h2{font-size:19px;font-weight:800;margin:0;color:#fff}
-.feed-chip{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(0,0,0,.85);color:#EAF6DC;font-size:14px;font-weight:700;padding:5px 12px;border-radius:16px;margin-top:9px}
+.feed-chip{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(30,127,44,.85);color:#EAF6DC;font-size:14px;font-weight:700;padding:5px 12px;border-radius:16px;margin-top:9px}
 .fcard.data .fcard-kicker{color:#B5720F}
 .fcard.data .fgo{background:#FBEBD6;color:#8A5310}
-.fcard.win{background:linear-gradient(135deg,#000000,#000000)}
+.fcard.win{background:linear-gradient(135deg,#00647F,#074445)}
 .fcard.win h3{color:#fff}
 .fcard.win p{color:#C7E0DF}
 .fcard.win .fcard-kicker{color:#9FD5D4}
@@ -781,7 +781,7 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .fcard.due .fgo{background:var(--green);color:#fff}
 .fcard.tk .fcard-kicker{color:var(--teal)}
 .fcard.tk .fgo{background:#DCEEEE;color:var(--teal-dk)}
-.feed-record{display:block;width:100%;background:var(--green);color:#fff;font-weight:800;font-size:15px;text-align:center;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);margin-top:4px;min-height:52px}
+.feed-record{display:block;width:100%;background:var(--green);color:#fff;font-weight:800;font-size:15px;text-align:center;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(30,127,44,.35);margin-top:4px;min-height:52px}
 @media (max-width:820px){ .feed-hello h2{font-size:18px} }
 
 .feed-refresh{font-size:13.5px;color:#CFE3E2;margin-top:9px}
@@ -1049,12 +1049,12 @@ const DDD_DASHBOARD_URL = 'https://www.dbedashboard.co.za/';
 
 // TOOLKIT DATA 
 const TK_REPORTS = [
- {id:"lcr",name:"Learner Chart Report",icon:"LCR",color:"#000000",desc:"See every learner's attendance, marks, promotion status, over-age status, and subject-level achievement — with downloadable learner-level data",bestFor:["Identify at-risk learners by name","Attendance and absence tracking","Over-age learner tracking","Subject-level distinctions, near-distinctions, and near-failures","Filtering by promotion status, colour-coded marks, or performance bands"],path:"DDD Dashboard → Reports tab → Select Phase, Grade & Subject → Click 'Learner Chart'",dataPoints:["Summary: Gender split, Term Promotion %, Over-Age %, Failing 2+ Subjects %","Circuit/school breakdown table: Learner Count, %Female, %Male, Term Promotion, Over-Age, Failing 2+ per sub-entity","Learners Not Promoted: % not achieving in Home Language, FAL, Numeracy, and 2+ subjects","Subject Achievement Insights: Distinctions (80-100%), Near Distinctions (75-79%), Near Failures (less than 5% from pass) per subject","Downloadable learner-level data: Days Absent, Avg Report Mark, Failures, Distinctions, colour-coded subject marks (green/yellow/red)"],realInsight:"At School A, 704 learners (26%) score below 40%. Downloading the Learner Chart and sorting by 'Days Absent' reveals 30 learners with 16+ days absent AND below 40% — the highest-priority group for intervention. Filtering by colour on subject columns instantly shows which subjects are pulling learners down.",policyLink:"SA Schools Act"},
+ {id:"lcr",name:"Learner Chart Report",icon:"LCR",color:"#00647F",desc:"See every learner's attendance, marks, promotion status, over-age status, and subject-level achievement — with downloadable learner-level data",bestFor:["Identify at-risk learners by name","Attendance and absence tracking","Over-age learner tracking","Subject-level distinctions, near-distinctions, and near-failures","Filtering by promotion status, colour-coded marks, or performance bands"],path:"DDD Dashboard → Reports tab → Select Phase, Grade & Subject → Click 'Learner Chart'",dataPoints:["Summary: Gender split, Term Promotion %, Over-Age %, Failing 2+ Subjects %","Circuit/school breakdown table: Learner Count, %Female, %Male, Term Promotion, Over-Age, Failing 2+ per sub-entity","Learners Not Promoted: % not achieving in Home Language, FAL, Numeracy, and 2+ subjects","Subject Achievement Insights: Distinctions (80-100%), Near Distinctions (75-79%), Near Failures (less than 5% from pass) per subject","Downloadable learner-level data: Days Absent, Avg Report Mark, Failures, Distinctions, colour-coded subject marks (green/yellow/red)"],realInsight:"At School A, 704 learners (26%) score below 40%. Downloading the Learner Chart and sorting by 'Days Absent' reveals 30 learners with 16+ days absent AND below 40% — the highest-priority group for intervention. Filtering by colour on subject columns instantly shows which subjects are pulling learners down.",policyLink:"SA Schools Act"},
  {id:"fpc",name:"FET Promotion Criteria Profiles",icon:"FPC",color:"#B84A0C",desc:"See exactly which promotion criteria learners are meeting or missing",bestFor:["Profile at-risk FET learners","Identify 'one criteria away' learners","Subject-specific gap analysis"],path:"DDD Dashboard → Select School → FET Promotion Criteria Profiles",dataPoints:["Achievement category","Criteria profile","2nd & 5th highest subject","Home Language level"],realInsight:"441 learners at School A (16%) missed just ONE promotion criteria. Of these, 333 need just 30%+ in one more subject — the easiest group to help pass."},
  {id:"t4p",name:"Term 4 Promotion Predictions",icon:"T4P",color:"#1565C0",desc:"Early warning predictions showing which learners are likely to be promoted by year-end",bestFor:["Early warning identification","Predict year-end outcomes","Compare to previous year","Plan proactive interventions"],path:"DDD Dashboard → Select School → Term 4 Promotion Predictions",dataPoints:["Predicted promoted status (TRUE/FALSE)","Previous year comparison","Scatter plot by school"],realInsight:"919 learners at School A are predicted NOT to be promoted. Cross-referencing with FET Profiles shows 441 of these are 'one criteria away' — targeted support could shift outcomes for 16% of the school."},
- {id:"g6p",name:"Grade 6 Performance Insights",icon:"G6",color:"#000000",desc:"Identify primary schools at risk of underperformance per Circular D3 criteria",bestFor:["Circular D3 compliance","LOLT & Maths monitoring","Primary school early warning","Year-on-year comparison"],path:"DDD Dashboard → Select School → Grade 6 Performance Insights",dataPoints:["% achieving 50%+ in LOLT","% achieving 50%+ in Maths","True/False underperformance flag","4 terms prior comparison"],realInsight:"Circular D3 defines underperforming primary schools as those where <60% of Grade 6 learners achieve Level 4+ in both LOLT and Mathematics. This report flags schools meeting this criteria for targeted intervention.",policyLink:"Circular D3"},
- {id:"sar",name:"School Achievement Report",icon:"SAR",color:"#000000",desc:"School-level achievement trends across subjects, grades, and terms",bestFor:["Subject trend analysis","SBA-Exam gap detection","Term-on-term comparison","Grade-level monitoring"],path:"DDD Dashboard → Select School → School Achievement Report",dataPoints:["Subject pass rates","Achievement level distribution","Term trends","SBA vs Exam alignment"],realInsight:"Use this to identify subjects with declining pass rates or large SBA-Exam gaps. A 20%+ gap often indicates assessment misalignment — a key intervention trigger."},
- {id:"ttd",name:"Term to Date",icon:"TTD",color:"#000000",desc:"Weekly tracking of school submissions, learner and educator attendance, and task marks captured",bestFor:["Weekly submission monitoring","Learner & educator attendance trends","Absent learner & educator drilldown","Task marks captured per grade & subject"],path:"DDD Dashboard → Term to Date tab → Select entity level",dataPoints:["School submission count vs total","Learner & educator attendance %","Learners absent 3+ consecutive days","Educators absent 4+ days","Weekly task marks captured %"],realInsight:"Term to Date shows week-by-week trends. A sudden drop in school counts or attendance flags an issue early — drill into the table to expand by district, then click a school name to access individual absent learner and educator details."}
+ {id:"g6p",name:"Grade 6 Performance Insights",icon:"G6",color:"#1E7F2C",desc:"Identify primary schools at risk of underperformance per Circular D3 criteria",bestFor:["Circular D3 compliance","LOLT & Maths monitoring","Primary school early warning","Year-on-year comparison"],path:"DDD Dashboard → Select School → Grade 6 Performance Insights",dataPoints:["% achieving 50%+ in LOLT","% achieving 50%+ in Maths","True/False underperformance flag","4 terms prior comparison"],realInsight:"Circular D3 defines underperforming primary schools as those where <60% of Grade 6 learners achieve Level 4+ in both LOLT and Mathematics. This report flags schools meeting this criteria for targeted intervention.",policyLink:"Circular D3"},
+ {id:"sar",name:"School Achievement Report",icon:"SAR",color:"#00647F",desc:"School-level achievement trends across subjects, grades, and terms",bestFor:["Subject trend analysis","SBA-Exam gap detection","Term-on-term comparison","Grade-level monitoring"],path:"DDD Dashboard → Select School → School Achievement Report",dataPoints:["Subject pass rates","Achievement level distribution","Term trends","SBA vs Exam alignment"],realInsight:"Use this to identify subjects with declining pass rates or large SBA-Exam gaps. A 20%+ gap often indicates assessment misalignment — a key intervention trigger."},
+ {id:"ttd",name:"Term to Date",icon:"TTD",color:"#074445",desc:"Weekly tracking of school submissions, learner and educator attendance, and task marks captured",bestFor:["Weekly submission monitoring","Learner & educator attendance trends","Absent learner & educator drilldown","Task marks captured per grade & subject"],path:"DDD Dashboard → Term to Date tab → Select entity level",dataPoints:["School submission count vs total","Learner & educator attendance %","Learners absent 3+ consecutive days","Educators absent 4+ days","Weekly task marks captured %"],realInsight:"Term to Date shows week-by-week trends. A sudden drop in school counts or attendance flags an issue early — drill into the table to expand by district, then click a school name to access individual absent learner and educator details."}
 ];
 
 const TK_INTERVENTIONS = [
@@ -1076,7 +1076,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.65';
+const APP_VERSION = '2026.06.18.66';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1197,7 +1197,7 @@ async function saveNewPin() {
 function renderRecoveryScreen() {
   return `
   <div style="max-width:420px;margin:48px auto;padding:0 18px">
-    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(7,68,69,.12)">
       <div style="font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:6px">DDD Interventions Tracker</div>
       <div style="font-size:21px;font-weight:800;color:var(--navy);margin-bottom:6px">Set a new PIN</div>
       <div style="font-size:14px;color:var(--grey);margin-bottom:18px">Choose a new 4-digit PIN for signing in.</div>
@@ -1218,7 +1218,7 @@ function renderRecoveryScreen() {
 function renderForgotGate() {
   return `
   <div style="max-width:420px;margin:48px auto;padding:0 18px">
-    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(0,0,0,.12)">
+    <div style="background:#fff;border:1px solid #E2E7E5;border-radius:14px;padding:26px 22px;box-shadow:0 8px 28px rgba(7,68,69,.12)">
       <div style="font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;margin-bottom:6px">DDD Interventions Tracker</div>
       <div style="font-size:21px;font-weight:800;color:var(--navy);margin-bottom:6px">Reset your PIN</div>
       <div style="font-size:14px;color:var(--grey);margin-bottom:18px">Enter your work email and we will send you a link to choose a new PIN.</div>
@@ -1278,7 +1278,7 @@ async function notifyTagged(ctx) {
    var subjList = esc((ctx.subjects&&ctx.subjects.length)?ctx.subjects.join(', '):'Not specified');
    var safeHref = esc(window.location.href);
    var bodyHTML = '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
-     '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0"><div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div><div style="font-size:14px;color:#C9C9CF;margin-top:4px">' + esc(momentLabels[ctx.moment]||'Notification') + '</div></div>' +
+     '<div style="background:#1A2332;padding:20px 24px;border-radius:8px 8px 0 0"><div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div><div style="font-size:14px;color:#EAF6FA;margin-top:4px">' + esc(momentLabels[ctx.moment]||'Notification') + '</div></div>' +
      '<div style="background:#fff;padding:20px 24px;border:1px solid #e8e6e4;border-top:none">' +
      '<table style="border-collapse:collapse;width:100%;font-size:14px">' +
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">School</td><td style="padding:8px 0">' + schoolsStr + '</td></tr>' +
@@ -1286,7 +1286,7 @@ async function notifyTagged(ctx) {
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Subject(s)</td><td style="padding:8px 0">' + subjList + '</td></tr>' +
      '<tr><td style="padding:8px 12px 8px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Logged by</td><td style="padding:8px 0">' + esc(ctx.fromName||'') + (ctx.fromRole?' (' + esc(ctx.fromRole) + ')':'') + '</td></tr>' +
      '</table>' +
-     '<div style="text-align:center;margin:20px 0 8px"><a href="' + safeHref + '" style="display:inline-block;background:#000000;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Learner Improvement Interventions Tracker</a></div>' +
+     '<div style="text-align:center;margin:20px 0 8px"><a href="' + safeHref + '" style="display:inline-block;background:#00647F;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open Learner Improvement Interventions Tracker</a></div>' +
      '</div></div>';
    await fetch(NOTIFY_URL, {
      method:'POST', headers:{'Content-Type':'application/json'},
@@ -1624,9 +1624,9 @@ async function sendInterventionAuditEmail(dec, act, official, docFile) {
 
     const bodyHTML =
       '<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto">' +
-      '<div style="background:#000000;padding:20px 24px;border-radius:8px 8px 0 0">' +
+      '<div style="background:#074445;padding:20px 24px;border-radius:8px 8px 0 0">' +
         '<div style="font-size:18px;font-weight:700;color:#fff">DDD Learner Improvement Interventions Tracker</div>' +
-        '<div style="font-size:14px;color:#C9C9CF;margin-top:4px">Audit copy of your submitted intervention</div>' +
+        '<div style="font-size:14px;color:#EAF6FA;margin-top:4px">Audit copy of your submitted intervention</div>' +
       '</div>' +
       '<div style="background:#fff;padding:20px 24px;border:1px solid #e8e6e4;border-top:none">' +
         '<p style="font-size:14px;color:#1A2332;line-height:1.6;margin:0 0 14px">Hi ' + esc((dec.made_by||'').split(' ')[0] || '') + ',</p>' +
@@ -1638,7 +1638,7 @@ async function sendInterventionAuditEmail(dec, act, official, docFile) {
         (supportingDocAttached ? '<tr><td style="padding:6px 12px 6px 0;color:#666;font-weight:600;white-space:nowrap;vertical-align:top">Attached</td><td style="padding:6px 0;color:#1A2332">Audit PDF + ' + esc(supportingDocName) + '</td></tr>' : '') +
         '</table>' +
         '<p style="font-size:12px;color:#546E7A;line-height:1.6;margin:14px 0 0;padding-top:14px;border-top:1px solid #f0f0f0">Keep this email for your audit trail. The attached PDF is a complete record of your submission.</p>' +
-        '<div style="text-align:center;margin:18px 0 4px"><a href="' + safeHref + '" style="display:inline-block;background:#000000;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open the Tracker</a></div>' +
+        '<div style="text-align:center;margin:18px 0 4px"><a href="' + safeHref + '" style="display:inline-block;background:#00647F;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Open the Tracker</a></div>' +
       '</div></div>';
 
     const r = await fetch(NOTIFY_URL, {
@@ -2562,7 +2562,7 @@ function renderHomeFeed() {
   var termCount = own.filter(function(d){ try { return new Date(d.created_at) >= term.start; } catch(e){ return false; } }).length;
   loadFeedSpotlight();
 
-  var AVC = ['#000000','#5D9331','#B5720F','#1A2332','#0A6162'];
+  var AVC = ['#00647F','#5D9331','#B5720F','#1A2332','#0A6162'];
   function av(txt, idx, sq){ return '<div class="fi-av'+(sq?' sq':'')+'" style="background:'+AVC[idx%AVC.length]+'">'+esc(txt)+'</div>'; }
   function ini(str){ var p=String(str||'').trim().split(/\s+/); return ((p[0]||' ')[0]+(p[1]?p[1][0]:'')).toUpperCase(); }
   function item(opt){
@@ -3242,7 +3242,7 @@ async function sendInboxReply(id){
     try{ fetch(NOTIFY_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({
       from:'DDD Interventions Tracker <tracker@ddd-interventions-tracker.com>', to:[orig.sender_email],
       subject:'[DDD Tracker] '+(me.full_name||'A colleague')+' replied to you',
-      html:'<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto"><p><strong>'+esc(me.full_name||me.email)+'</strong> replied in the DDD Tracker:</p><p style="background:#F5F5F5;padding:12px;border-radius:8px">'+esc(txt)+'</p><p><a href="https://ddd-interventions.github.io/ddd-tracker/" style="color:#000000;font-weight:600">Open the Tracker</a> to respond.</p></div>'
+      html:'<div style="font-family:Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto"><p><strong>'+esc(me.full_name||me.email)+'</strong> replied in the DDD Tracker:</p><p style="background:#F5F5F5;padding:12px;border-radius:8px">'+esc(txt)+'</p><p><a href="https://ddd-interventions.github.io/ddd-tracker/" style="color:#00647F;font-weight:600">Open the Tracker</a> to respond.</p></div>'
     })}); }catch(e){}
     S._inboxReply[id]='';
     S._inboxView = null;
@@ -3391,7 +3391,7 @@ function navigateToNotif(navTo, key) {
     render();
     // Scroll to the section after render
     setTimeout(function() {
-      var target = navTo === 'pending' ? document.querySelector('[style*="background:#FFF9E6"]') : null;
+      var target = navTo === 'pending' ? document.querySelector('[style*="background:#FFF8E1"]') : null;
       if (!target && key) {
         var safeKey = key.replace(/[^a-zA-Z0-9]/g, '');
         target = document.getElementById('sup-card-' + safeKey);
@@ -3511,7 +3511,7 @@ function paintNotifPane(){
   if (S._notifOpen) {
     if (!el) { el = document.createElement('div'); el.id = 'notif-pane-root'; document.body.appendChild(el); }
     try { el.innerHTML = renderNotifPane(); }
-    catch(e) { el.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#6E6E76">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
+    catch(e) { el.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#5A6878">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
   } else if (el) { el.innerHTML = ''; }
   refreshInboxBadge();
 }
@@ -3707,7 +3707,7 @@ function render() {
  if (S._notifOpen) {
    if (!notifEl) { notifEl = document.createElement('div'); notifEl.id = 'notif-pane-root'; document.body.appendChild(notifEl); }
    try { notifEl.innerHTML = renderNotifPane(); }
-   catch(e) { notifEl.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#6E6E76">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
+   catch(e) { notifEl.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#5A6878">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
  } else if (notifEl) { notifEl.innerHTML = ''; }
 }
 
@@ -3934,7 +3934,7 @@ function renderNotifyToggle() {
   var isOn = !S.official.notify_tagged_disabled;
   return '<div onclick="toggleNotifyOptOut()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f7f9fc;border-radius:8px;cursor:pointer;min-height:44px;border:1px solid #e8e6e4">' +
     '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--navy)">Email me when someone tags me for support</div><div style="font-size:12px;color:var(--grey);margin-top:2px">' + (isOn ? 'You will receive an email when a colleague requests your help' : 'Email notifications are turned off') + '</div></div>' +
-    '<div style="width:40px;height:22px;border-radius:11px;background:' + (isOn ? '#000000' : '#c8c6c4') + ';position:relative;transition:.2s;flex-shrink:0"><div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;' + (isOn ? 'left:20px' : 'left:2px') + ';transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)"></div></div>' +
+    '<div style="width:40px;height:22px;border-radius:11px;background:' + (isOn ? '#1E7F2C' : '#c8c6c4') + ';position:relative;transition:.2s;flex-shrink:0"><div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;' + (isOn ? 'left:20px' : 'left:2px') + ';transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)"></div></div>' +
   '</div>';
 }
 // ─── BIOMETRIC SIGN-IN (passkeys, beta) ──────────────────────────────
@@ -4469,7 +4469,7 @@ function _updateSchoolPickerInPlace(){
   if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
   else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
   _spItems=phaseFiltered;
-  var tBColors={S:'#000000',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
+  var tBColors={S:'#00647F',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
   var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
   var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
   var html='';
@@ -4488,7 +4488,7 @@ function _updateSchoolPickerInPlace(){
       var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
       var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
       var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB+'</div>'+(mP?'<div style="font-size:11.5px;color:#6E6E76;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
+      html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB+'</div>'+(mP?'<div style="font-size:11.5px;color:#5A6878;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
     }
     if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
   }
@@ -4658,7 +4658,7 @@ function d3BadgeHTML(d3){
 function d3AlertsInnerHTML(selected){
   var d3Alerts=selected.map(function(sn){return getSchoolD3Info(sn);}).filter(Boolean);
   if(!d3Alerts.length)return '';
-  var tierMap={C:['Critical','#C62828','#FFF5F5'],S:['Severe','#B84A0C','#FFF9E6'],M:['Moderate','#8A5A00','#FFFDE7']};
+  var tierMap={C:['Critical','#C62828','#FFF5F5'],S:['Severe','#B84A0C','#FFF8E1'],M:['Moderate','#8A5A00','#FFFDE7']};
   var html='';
   for(var ai=0;ai<d3Alerts.length;ai++){
     var da=d3Alerts[ai];var dt=tierMap[da.t]||['','#999','#f5f5f5'];
@@ -4687,7 +4687,7 @@ function schoolFilterInput(val){
     if(phaseFilter==='UP'){var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});}
     else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){var at=phaseTypeMap[phaseFilter];phaseFiltered=filtered.filter(function(s){return s[1]&&at.includes(s[1]);});}
     _spItems=phaseFiltered;
-    var tBColors={S:'#000000',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
+    var tBColors={S:'#00647F',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
     var tBLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
     var pLForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
     let html='';
@@ -4706,7 +4706,7 @@ function schoolFilterInput(val){
         var pSub=s[1]&&pLForType[s[1]]?pLForType[s[1]]:'';
         var mP=[circLbl,pSub].filter(Boolean).join(' \xb7 ');
         var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB2+'</div>'+(mP?'<div style="font-size:11.5px;color:#6E6E76;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
+        html+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'\u2713':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhB2+'</div>'+(mP?'<div style="font-size:11.5px;color:#5A6878;margin-top:1px">'+esc(mP)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)html+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
@@ -4800,7 +4800,7 @@ function schoolPickerHTML(){
     if(phaseFiltered.length===0){
       dd+='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
     }else{
-      var typeBadgeColors={S:'#000000',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
+      var typeBadgeColors={S:'#00647F',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
       var typeBadgeLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
       var phaseLabelsForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
       // Build visit history lookup for dropdown badges
@@ -4820,7 +4820,7 @@ function schoolPickerHTML(){
         var phaseSub=s[1]&&phaseLabelsForType[s[1]]?phaseLabelsForType[s[1]]:'';
         var metaParts=[circLbl,phaseSub].filter(Boolean).join(' \xb7 ');
         var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:11.5px;color:#6E6E76;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
+        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:11.5px;color:#5A6878;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
       }
       if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
@@ -5059,7 +5059,7 @@ function renderFormStep3(){
       <div class="field"><label>When did you access this report?</label><input type="date" value="${S.f.ddd_access_date||''}" max="${today()}" onchange="S.f.ddd_access_date=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px"></div>
       <div class="field"><label>How did you access the DDD data?<span class="req">*</span></label><div class="hint">Select how you received or viewed the data</div><div class="radio-grp"><label><input type="radio" name="dddSource" value="dashboard" ${S.f.ddd_data_source==='dashboard'?'checked':''} onchange="S.f.ddd_data_source='dashboard';S.f.ddd_dashboard_confirmed='yes';S.f.ddd_data_source_person='';render()"><span>Logged into the DDD Dashboard myself</span></label><label><input type="radio" name="dddSource" value="presentation" ${S.f.ddd_data_source==='presentation'?'checked':''} onchange="S.f.ddd_data_source='presentation';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a presentation (e.g. PowerPoint) with DDD data</span></label><label><input type="radio" name="dddSource" value="spreadsheet" ${S.f.ddd_data_source==='spreadsheet'?'checked':''} onchange="S.f.ddd_data_source='spreadsheet';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a spreadsheet (e.g. Excel) with DDD data</span></label><label><input type="radio" name="dddSource" value="shared" ${S.f.ddd_data_source==='shared'?'checked':''} onchange="S.f.ddd_data_source='shared';S.f.ddd_dashboard_confirmed='no';render()"><span>Someone showed or presented the data to me</span></label></div></div>
       ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div class="field"><label>Who prepared or shared this data?</label><div class="hint">e.g. Programme Manager, Subject Advisor, Provincial Official</div><input type="text" placeholder="e.g. John Mokoena (Programme Manager)" value="${esc(S.f.ddd_data_source_person)}" oninput="S.f.ddd_data_source_person=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>`:''}
-      ${S.f.ddd_data_source==='dashboard'?`<div style="background:#E7F6EA;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:3px solid #14722A"><div style="font-size:12px;color:#2E7D32;line-height:1.5">Great \u2014 logging in directly gives you the most current data and lets you explore further.</div></div>`:''}
+      ${S.f.ddd_data_source==='dashboard'?`<div style="background:#E7F6EA;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:3px solid #1E7F2C"><div style="font-size:12px;color:#2E7D32;line-height:1.5">Great \u2014 logging in directly gives you the most current data and lets you explore further.</div></div>`:''}
       ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div style="background:#E3F2FD;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:3px solid var(--blue)"><div style="font-size:12px;color:#1565C0;line-height:1.5">Good \u2014 using DDD data in any form strengthens your support.</div></div>`:''}
       <div style="background:var(--off);border-radius:8px;padding:14px;margin:8px 0">
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">What did you see in the data?</div>
@@ -5118,7 +5118,7 @@ function renderFormReview(){
     setTimeout(function(){ if (S._gpsStatus === 'idle') captureLocation(); }, 80);
   }
   return`<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--navy)"><div><h2>5. Review & Submit</h2><p>Check your entry before submitting</p></div></div><div class="sec-body">
-    <div style="background:#FFF9E6;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:14px;font-weight:600;color:#8A5A00;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
+    <div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:14px;font-weight:600;color:#8A5A00;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
@@ -5996,9 +5996,9 @@ function renderDashboard() {
    else if (det.ddd_used==='other-data') dddUsageCounts.otherData++;
    else dddUsageCounts.none++;
 
-   // DDD data source — prefer the stored answer; for older rows saved before
-   // ddd_data_source was persisted, ddd_dashboard_confirmed==='yes' only ever
-   // meant "logged into the dashboard", so it is a safe partial backfill.
+   // DDD data source — prefer the stored answer; older rows saved before
+   // ddd_data_source was persisted can be partially backfilled: the form only
+   // ever set ddd_dashboard_confirmed==='yes' when "dashboard" was chosen.
    // 'no' cannot be disambiguated (presentation/spreadsheet/shared) — left uncounted.
    if (det.ddd_data_source) {
      if (dddSourceCounts.hasOwnProperty(det.ddd_data_source)) dddSourceCounts[det.ddd_data_source]++;
@@ -6103,7 +6103,7 @@ function renderDashboard() {
 
  // ── PRE-COMPUTED OVERVIEW HTML ──
  var _latestDate = decs.reduce(function(b,d){return(d.date||'')>(b||'')?d.date:b;},'');
- var _actColors = {'School support visit':'#000000','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#000000','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#B84A0C','Monitoring / follow-up visit':'#000000','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
+ var _actColors = {'School support visit':'#00647F','Curriculum support visit':'#00897B','Data review meeting':'#1565C0','Workshop / training session':'#1E7F2C','Learner profiling session':'#D84315','Coaching & mentoring session':'#7B1FA2','Support meeting':'#5C6BC0','Lesson observation':'#B84A0C','Monitoring / follow-up visit':'#074445','Assessment moderation':'#0097A7','Holiday revision programme':'#8D6E63','District / circuit review meeting':'#546E7A','Rapid Response session':'#D32F2F'};
  var _ovActChart = '';
  if (actTypes.length) {
    var _mxA = actTypes[0][1];
@@ -6115,7 +6115,7 @@ function renderDashboard() {
    _ovActChart += '</div>';
  } else { _ovActChart = '<div style="text-align:center;color:var(--grey);padding:24px;font-size:13px">No activities logged yet</div>'; }
 
- var _themeColors = {'Underperforming Schools':'#C62222','DBE Mentorship Programme':'#1565C0','District Support':'#000000','Intermediate & GET Phase':'#000000'};
+ var _themeColors = {'Underperforming Schools':'#C62222','DBE Mentorship Programme':'#1565C0','District Support':'#00647F','Intermediate & GET Phase':'#1E7F2C'};
  var _ovThemeChart = '';
  if (topThemes.length) {
    var _totalTh = topThemes.reduce(function(s,t){return s+t[1]},0);
@@ -6249,7 +6249,7 @@ function renderDashboard() {
      var _pendRequested = _pendingActive.filter(function(it){return it.isRequested});
      var _pendRoleMatch = _pendingActive.filter(function(it){return !it.isRequested});
      var _pendNow = new Date();
-     _supHTML += '<div style="background:#FFF9E6;border:1.5px solid #FFE082;border-radius:12px;padding:14px 14px 10px;margin-bottom:14px">';
+     _supHTML += '<div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:12px;padding:14px 14px 10px;margin-bottom:14px">';
      _supHTML += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8A5A00;animation:pulse 2s infinite;flex-shrink:0"></span><div style="font-size:15px;font-weight:700;color:#B84A0C">Pending for you \u2014 '+_pendingActive.length+' item'+(_pendingActive.length!==1?'s':'')+' need'+(_pendingActive.length===1?'s':'')+' your attention</div></div>';
      _supHTML += '<div style="font-size:13px;color:var(--grey);line-height:1.5;margin-bottom:12px">These schools have been flagged as needing support from '+(_myRole?'a '+_myRole.toLowerCase():'someone in your role')+'. Based on your district and role, these are waiting on you.</div>';
      function _renderPendCard(it) {
@@ -6286,7 +6286,7 @@ function renderDashboard() {
        c += '<div class="act-post-meta">';
        if (it.subjects.length) it.subjects.forEach(function(s){ c += '<span class="act-meta-tag" style="background:#E7F6EA;color:#2E7D32">'+esc(s)+'</span>'; });
        if (it.grades.length) c += '<span class="act-meta-tag">Grade '+esc(it.grades.join(', '))+'</span>';
-       c += '<span class="act-meta-tag" style="background:#FFF9E6;color:#8A5A00;border:1px solid #FFE082">No visit logged since</span>';
+       c += '<span class="act-meta-tag" style="background:#FFF8E1;color:#8A5A00;border:1px solid #FFE082">No visit logged since</span>';
        if (it.isRequested) c += '<span class="act-meta-tag" style="background:#FFF6F1;color:#B84A0C;font-weight:700;border:1px solid #FFCC80">You were specifically requested</span>';
        c += '</div></div>';
 
@@ -6456,7 +6456,7 @@ function renderDashboard() {
 
        // ── POST BODY: need description + school/subject tags ──
        _supHTML += '<div class="act-post-body">';
-       _supHTML += '<div class="act-post-desc" style="font-weight:600">'+esc(need)+(isAddressed?' <span style="font-size:11.5px;font-weight:700;color:#14722A;background:#E7F6EA;padding:2px 8px;border-radius:4px;margin-left:6px">Addressed</span>':'')+'</div>';
+       _supHTML += '<div class="act-post-desc" style="font-weight:600">'+esc(need)+(isAddressed?' <span style="font-size:11.5px;font-weight:700;color:#1E7F2C;background:#E7F6EA;padding:2px 8px;border-radius:4px;margin-left:6px">Addressed</span>':'')+'</div>';
        _supHTML += '<div class="act-post-meta">';
        // Schools summary inline
        var schoolsByDist = {};
@@ -6590,7 +6590,7 @@ function renderDashboard() {
    ${['all','mine','colleagues'].map(function(v){
      var lbl = v==='all'?'📋 All Activities':v==='mine'?'👤 My Activities':"👥 My Colleagues' Activities";
      var sel = S.dashViewScope === v;
-     return '<button onclick="S.dashViewScope=\''+v+'\';render()" style="padding:8px 14px;border-radius:20px;font-size:13px;font-weight:'+(sel?'700':'500')+';border:'+(sel?'2px solid var(--teal)':'1.5px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'#4A5568')+';cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:'+(sel?'0 2px 8px rgba(0,0,0,.3)':'0 1px 3px rgba(0,0,0,.08)')+'">' + lbl + '</button>';
+     return '<button onclick="S.dashViewScope=\''+v+'\';render()" style="padding:8px 14px;border-radius:20px;font-size:13px;font-weight:'+(sel?'700':'500')+';border:'+(sel?'2px solid var(--teal)':'1.5px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'#4A5568')+';cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:'+(sel?'0 2px 8px rgba(0,100,127,.3)':'0 1px 3px rgba(0,0,0,.08)')+'">' + lbl + '</button>';
    }).join('')}
  </div>
 
@@ -6698,7 +6698,7 @@ ${tab==='trends'?`
          const h = Math.max(Math.round((count/maxMonthly)*95), 8);
          return `<div style="flex:1 0 36px;max-width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
            <div style="font-size:11.5px;font-weight:700;color:var(--navy)">${count}</div>
-           <div style="width:70%;max-width:40px;height:${h}px;background:linear-gradient(180deg,var(--teal),#000000);border-radius:4px 4px 0 0;transition:height .4s"></div>
+           <div style="width:70%;max-width:40px;height:${h}px;background:linear-gradient(180deg,var(--teal),#074445);border-radius:4px 4px 0 0;transition:height .4s"></div>
            <div class="timeline-bar-label" style="position:absolute;bottom:-22px;font-size:8px;color:var(--grey);white-space:nowrap;transform:rotate(-30deg);transform-origin:top center">${monthLabel(m)}</div>
          </div>`;
        }).join('')}
@@ -7062,7 +7062,7 @@ ${tab==='tracker'?`
          if (schools) html += '<span class="act-meta-tag">'+esc(schools.length>60?schools.slice(0,57)+'...':schools)+'</span>';
          if (district) html += '<span class="act-meta-tag">'+esc(district)+'</span>';
          if (c.det.subjects && c.det.subjects.length) c.det.subjects.slice(0,3).forEach(function(s){ html += '<span class="act-meta-tag" style="background:#E7F6EA;color:#2E7D32">'+esc(s)+'</span>'; });
-         if (c.hasFollowUp) html += '<span class="act-meta-tag" style="background:#FFF9E6;color:#8A5A00;font-weight:700;border:1px solid #FFE082">Follow-up due</span>';
+         if (c.hasFollowUp) html += '<span class="act-meta-tag" style="background:#FFF8E1;color:#8A5A00;font-weight:700;border:1px solid #FFE082">Follow-up due</span>';
          if (usedDDD || c.det.ddd_used === 'other-data') html += '<span class="act-meta-tag" style="background:#E3F2FD;color:#1565C0">Data-informed</span>';
          html += '</div></div>';
 
@@ -7089,7 +7089,7 @@ ${tab==='tracker'?`
            html += '</div>';
 
            if (c.det.follow_up && c.det.follow_up_desc) {
-             html += '<div style="background:#FFF9E6;border:1px solid #FFE082;border-radius:8px;padding:10px 12px;margin:8px 0">';
+             html += '<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 12px;margin:8px 0">';
              html += '<div style="font-size:12px;font-weight:700;color:#8A5A00;margin-bottom:4px">Follow-up due</div>';
              html += '<div style="font-size:13px;color:var(--navy);line-height:1.5">'+esc(c.det.follow_up_desc)+'</div>';
              if (c.det.follow_up_completed) {
@@ -7193,7 +7193,7 @@ const CYCLE_PHASES = [
  {
   id:1, num:'2', name:'ACTIVATE', title:'Train, Profile, and Equip Officials',
   duration:'2\u20136 weeks', timing:'Term 1\u20133', lead:'PM with Master Trainers',
-  color:'#000000',
+  color:'#1E7F2C',
   intro:'This is where you equip district and school officials with the skills to use DDD data for learner profiling and intervention planning. Trainings should be anchored on practical application, NOT generic dashboard navigation.',
   tip:'Combining DDD trainings with other directorate trainings leads to information overload and diluted impact. Push for dedicated DDD sessions.',
   checklist:[
@@ -7307,7 +7307,7 @@ function tkCycleGuide() {
       '<span style="font-size:11.5px;color:#546E7A">' + ph.lead + '</span>' +
      '</div>' +
      '<div style="font-size:13px;color:#37474F;line-height:1.6;margin-bottom:12px">' + ph.intro + '</div>' +
-     '<div style="background:#FFF9E6;border-radius:8px;padding:10px 12px;border-left:3px solid ' + ph.color + ';margin-bottom:4px">' +
+     '<div style="background:#FFF8E1;border-radius:8px;padding:10px 12px;border-left:3px solid ' + ph.color + ';margin-bottom:4px">' +
       '<div style="font-size:11.5px;font-weight:700;color:' + ph.color + ';margin-bottom:3px">FROM THE FIELD</div>' +
       '<div style="font-size:12px;color:#37474F;line-height:1.5">' + ph.tip + '</div>' +
      '</div>' +
@@ -7338,27 +7338,27 @@ function tkCycleGuide() {
    '<div style="font-size:13px;color:#37474F;line-height:1.6;margin-bottom:14px">Every DDD intervention follows the same five-phase cycle. The phases are sequential but the duration is flexible. Tap a phase below to see the full checklist and PM guidance.</div>' +
    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">' + overviewItems + '</div>' +
    phaseDetail +
-   '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:16px;border-top:3px solid #000000">' +
+   '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-top:16px;border-top:3px solid #00647F">' +
     '<div style="padding:14px 16px">' +
-     '<div style="font-size:14px;font-weight:700;color:#000000;margin-bottom:10px">Intervention Quality Checklist</div>' +
+     '<div style="font-size:14px;font-weight:700;color:#074445;margin-bottom:10px">Intervention Quality Checklist</div>' +
      '<div style="font-size:12px;color:#546E7A;line-height:1.5;margin-bottom:10px">Before you consider an intervention fully set up, check it against these six criteria. The first three are non-negotiable.</div>' +
      qualityRows +
     '</div>' +
    '</div>' +
-   '<div style="margin-top:12px;padding:10px 14px;background:#F2F2F4;border-radius:8px;border-left:3px solid #000000">' +
-    '<div style="font-size:12px;color:#000000;line-height:1.6"><strong>How this fits together:</strong> This guide is the process map. The Tracker is where you log what happens. The MERL Strategy explains why we measure what we measure. Together, they form the DDD Interventions Toolkit.</div>' +
+   '<div style="margin-top:12px;padding:10px 14px;background:#E6F3F7;border-radius:8px;border-left:3px solid #00647F">' +
+    '<div style="font-size:12px;color:#074445;line-height:1.6"><strong>How this fits together:</strong> This guide is the process map. The Tracker is where you log what happens. The MERL Strategy explains why we measure what we measure. Together, they form the DDD Interventions Toolkit.</div>' +
    '</div>' +
   '</div>';
  }
- return '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden;border:1.5px solid ' + (open ? '#000000' : '#e0e0e0') + '">' +
-  '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#000000,#000000)' : '#f8f9fa') + '">' +
+ return '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden;border:1.5px solid ' + (open ? '#00647F' : '#e0e0e0') + '">' +
+  '<div onclick="S.cycleGuideOpen=!S.cycleGuideOpen;if(!S.cycleGuideOpen)S.cyclePhase=null;render()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;background:' + (open ? 'linear-gradient(135deg,#074445,#00647F)' : '#f8f9fa') + '">' +
    '<div style="flex:1">' +
     '<div style="font-size:14px;font-weight:700;color:' + (open ? '#fff' : '#1A2332') + '">DDD Intervention Cycle Guide</div>' +
-    '<div style="font-size:12px;color:' + (open ? '#C9C9CF' : '#546E7A') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
+    '<div style="font-size:12px;color:' + (open ? '#EAF6FA' : '#546E7A') + ';margin-top:2px">' + (open ? 'The 5-phase process map for running DDD interventions' : 'DDD Programme team only \u2014 tap to expand the full intervention cycle') + '</div>' +
    '</div>' +
    '<div style="display:flex;align-items:center;gap:6px">' +
-    '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (open ? 'rgba(255,255,255,.15)' : '#F2F2F4') + ';color:' + (open ? '#fff' : '#000000') + ';font-weight:600">NLF Team</span>' +
-    '<span style="font-size:16px;color:' + (open ? '#C9C9CF' : '#999') + '">' + (open ? '\u25B2' : '\u25BC') + '</span>' +
+    '<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:' + (open ? 'rgba(255,255,255,.15)' : '#E6F3F7') + ';color:' + (open ? '#fff' : '#00647F') + ';font-weight:600">NLF Team</span>' +
+    '<span style="font-size:16px;color:' + (open ? '#EAF6FA' : '#999') + '">' + (open ? '\u25B2' : '\u25BC') + '</span>' +
    '</div>' +
   '</div>' +
   (open ? '<div style="padding:0 16px 16px">' + phasesHtml + '</div>' : '') +
@@ -7376,8 +7376,8 @@ function renderToolkit() {
 
 // NAVIGATOR 
 function tkNavigator() {
- return `<div style="background:linear-gradient(135deg,#000000,#000000);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:12px;color:#C9C9CF;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:11.5px;color:#C9C9CF;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#C9C9CF;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
- <div class="tk-card${sel?' sel':''}" style="${sel?'border-color:'+r.color:''}"> <div class="tk-card-h" onclick="S.selReport=S.selReport==='${r.id}'?null:'${r.id}';render()"> <div class="tk-ic" style="background:${r.color}15;color:${r.color};font-size:12px;font-weight:800">${r.icon}</div> <div style="flex:1"><div style="font-weight:700;font-size:14px;color:#1A2332">${r.name}</div><div style="font-size:12px;color:#546E7A;margin-top:2px">${r.desc}</div>${!sel?'<div class="tap-hint">Tap to see how to use this report</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${sel?'180':'0'}deg)">${sel?'&#9650;':'&#9660;'}</span> </div> ${sel?`<div class="tk-card-b"> <div class="tk-path"><span style="font-family:monospace">${r.path}</span></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Best for</div><div class="tk-chips">${r.bestFor.map(b=>`<span class="tk-chip" style="background:#f3f2f1;color:#37474F;font-weight:500">${b}</span>`).join('')}</div></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What you will see</div><div class="tk-chips">${r.dataPoints.map(dp=>`<span class="tk-chip" style="background:${r.color}10;color:${r.color};font-weight:500;border:1px solid ${r.color}30">${dp}</span>`).join('')}</div></div> <div class="tk-tip" style="background:#FFF9E6;border-color:${r.color}"><div style="font-size:11.5px;font-weight:700;color:${r.color};margin-bottom:4px">EXAMPLE \u2014 What to look for</div><div style="font-size:13px;color:#37474F;line-height:1.5">${r.realInsight}</div></div> ${r.policyLink?`<div style="margin-top:8px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${r.policyLink}';render()">${r.policyLink} \u2014 View Policy</button></div>`:''} </div>`:''}
+ return `<div style="background:linear-gradient(135deg,#074445,#00647F);border-radius:10px;padding:16px 18px;margin-bottom:14px"> <div style="margin-bottom:8px"><div style="font-size:15px;font-weight:700;color:#fff">Know where to look on the dashboard</div><div style="font-size:12px;color:#EAF6FA;margin-top:2px">Each DDD report answers different questions. Use this guide to find the right report for what you need.</div></div> <div style="font-size:11.5px;color:#EAF6FA;margin-top:8px;line-height:1.5"><a href="${DDD_DASHBOARD_URL}" target="_blank" rel="noopener" style="color:#EAF6FA;text-decoration:underline;font-weight:600">Open DDD Dashboard</a> — login: firstname.surname@dbedashboard.co.za</div> </div> <p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">Tap any report below to see <strong>where to find it</strong> on the dashboard, what it shows you, and how officials are using it.</p> ${TK_REPORTS.map(r=>{const sel=S.selReport===r.id;return`
+ <div class="tk-card${sel?' sel':''}" style="${sel?'border-color:'+r.color:''}"> <div class="tk-card-h" onclick="S.selReport=S.selReport==='${r.id}'?null:'${r.id}';render()"> <div class="tk-ic" style="background:${r.color}15;color:${r.color};font-size:12px;font-weight:800">${r.icon}</div> <div style="flex:1"><div style="font-weight:700;font-size:14px;color:#1A2332">${r.name}</div><div style="font-size:12px;color:#546E7A;margin-top:2px">${r.desc}</div>${!sel?'<div class="tap-hint">Tap to see how to use this report</div>':''}</div> <span class="tap-chevron" style="transform:rotate(${sel?'180':'0'}deg)">${sel?'&#9650;':'&#9660;'}</span> </div> ${sel?`<div class="tk-card-b"> <div class="tk-path"><span style="font-family:monospace">${r.path}</span></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Best for</div><div class="tk-chips">${r.bestFor.map(b=>`<span class="tk-chip" style="background:#f3f2f1;color:#37474F;font-weight:500">${b}</span>`).join('')}</div></div> <div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:${r.color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">What you will see</div><div class="tk-chips">${r.dataPoints.map(dp=>`<span class="tk-chip" style="background:${r.color}10;color:${r.color};font-weight:500;border:1px solid ${r.color}30">${dp}</span>`).join('')}</div></div> <div class="tk-tip" style="background:#FFF8E1;border-color:${r.color}"><div style="font-size:11.5px;font-weight:700;color:${r.color};margin-bottom:4px">EXAMPLE \u2014 What to look for</div><div style="font-size:13px;color:#37474F;line-height:1.5">${r.realInsight}</div></div> ${r.policyLink?`<div style="margin-top:8px"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${r.policyLink}';render()">${r.policyLink} \u2014 View Policy</button></div>`:''} </div>`:''}
  </div>`}).join('')}`;
 }
 
@@ -7396,11 +7396,11 @@ function tkLibrary(){
    });
  });
  const filtered=TK_INTERVENTIONS.filter(i=>S.filterCat==='All'||i.category===S.filterCat);
- return`<p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">A collection of <strong>intervention ideas</strong> that officials across the programme have found useful when working with DDD data. Each includes suggested steps, which DDD reports to reference, and relevant policy context.<br><br><span style="font-size:12px;color:#6E6E76;font-style:italic">These are suggestions, not prescriptions — results will depend on your local context and how you adapt them to your schools.</span></p>
+ return`<p style="font-size:13px;color:#546E7A;margin-bottom:12px;line-height:1.6">A collection of <strong>intervention ideas</strong> that officials across the programme have found useful when working with DDD data. Each includes suggested steps, which DDD reports to reference, and relevant policy context.<br><br><span style="font-size:12px;color:#5A6878;font-style:italic">These are suggestions, not prescriptions — results will depend on your local context and how you adapt them to your schools.</span></p>
  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${cats.map(c=>`<button class="tk-filt${S.filterCat===c?' on':''}" onclick="S.filterCat='${c}';render()">${c}</button>`).join('')}</div>
  ${filtered.map(iv=>{const sel=S.selIntv===iv.id;const reps=iv.dddReports.map(rid=>TK_REPORTS.find(r=>r.id===rid)).filter(Boolean);const myCount=usageCounts[iv.id]||0;return`
- <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E7F6EA':iv.difficulty==='Standard'?'#E3F2FD':'#FFF6F1'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#B84A0C'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:12px;color:#546E7A">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:11.5px;color:#546E7A">${iv.timeToImpact}</span><span style="font-size:11.5px;color:#546E7A">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:12px;font-weight:700;color:#000000;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:12px;font-weight:700;color:#000000;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
- <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:11.5px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:13px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:12px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:11.5px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#F2F2F4;border-radius:8px"><div style="font-size:12px;font-weight:700;color:#000000">Want to try this approach?</div><div style="font-size:12px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
+ <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:10px;overflow:hidden"> <div onclick="S.selIntv=S.selIntv===${iv.id}?null:${iv.id};render()" style="padding:14px 16px;cursor:pointer"> <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px;color:#1A2332">${iv.name}</span><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${iv.difficulty==='Light Touch'?'#E7F6EA':iv.difficulty==='Standard'?'#E3F2FD':'#FFF6F1'};color:${iv.difficulty==='Light Touch'?'#4CAF50':iv.difficulty==='Standard'?'#1565C0':'#B84A0C'};font-weight:700">${iv.difficulty}</span>${myCount?`<span style="font-size:9px;padding:2px 5px;border-radius:3px;background:var(--teal-lt);color:var(--teal-dk);font-weight:700">You: ${myCount}x</span>`:''}</div> <div style="font-size:12px;color:#546E7A">${iv.description}</div></div></div> <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><span style="font-size:11.5px;color:#546E7A">${iv.timeToImpact}</span><span style="font-size:11.5px;color:#546E7A">${reps.map(r=>r.name).join(', ')}</span></div> ${!sel?'<div class="tap-hint" style="margin-top:4px">Tap for suggested steps</div>':''} </div> ${sel?`<div style="padding:0 16px 16px;border-top:1px solid #f3f2f1"> <div style="margin-top:10px"><div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">DDD REPORTS TO USE</div><div class="tk-chips" style="margin-bottom:10px">${reps.map(r=>`<span class="tk-chip" style="background:${r.color}15;color:${r.color};font-weight:600">${r.name}</span>`).join('')}</div></div> <div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">SUGGESTED STEPS</div> ${iv.steps.map((s,i)=>`<div class="tk-step"><span class="tk-sn">${i+1}</span><span style="line-height:1.5">${s}</span></div>`).join('')}
+ <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><button class="tk-badge" onclick="event.stopPropagation();S.showPolicy='${iv.policyRef}';render()">${iv.policyRef} \u2014 View Policy</button></div> ${iv.webinar?`<div style="margin-top:10px;padding:10px 12px;background:#E3F2FD;border-radius:8px;border-left:3px solid #1565C0"><div style="font-size:11.5px;font-weight:700;color:#1565C0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">DDD Learning Hub</div><div style="font-size:13px;font-weight:600;color:#1A2332;margin-bottom:4px">${iv.webinar.name}</div><div style="font-size:12px;color:#37474F;line-height:1.5">Watch the training that walks through this approach step by step</div><div style="font-size:11.5px;color:#1565C0;margin-top:4px;font-family:monospace">${iv.webinar.path}</div></div>`:''} <div style="margin-top:10px;padding:10px 12px;background:#E6F3F7;border-radius:8px"><div style="font-size:12px;font-weight:700;color:#074445">Want to try this approach?</div><div style="font-size:12px;color:#37474F;line-height:1.5">Open the DDD Dashboard, find the data for your schools, then come back and log your activity</div></div> </div>`:''}
  </div>`}).join('')}`; 
 }
 
@@ -7479,7 +7479,7 @@ function renderPolicyModal(){
  if(existing)existing.remove();
  const el=document.createElement('div');
  el.id='policy-modal-overlay';
- el.innerHTML=`<div class="modal-bg" onclick="closePolicyModal()"><div class="modal-box" onclick="event.stopPropagation()"> <div style="padding:16px 20px;background:#000000;color:#fff"><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#C9C9CF;margin-bottom:4px">POLICY REFERENCE</div><div style="font-size:16px;font-weight:700">${S.showPolicy}</div></div> <div style="padding:20px"><div style="font-size:14px;font-weight:600;color:#1A2332;margin-bottom:8px">${p.full}</div><div style="font-size:12px;font-weight:700;color:#000000;margin-bottom:6px">KEY CRITERIA</div>${p.criteria.map(c=>`<div style="display:flex;gap:6px;margin-bottom:4px;font-size:13px;color:#37474F"><span style="color:#000000;font-weight:700">•</span> ${c}</div>`).join('')}
+ el.innerHTML=`<div class="modal-bg" onclick="closePolicyModal()"><div class="modal-box" onclick="event.stopPropagation()"> <div style="padding:16px 20px;background:#074445;color:#fff"><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#EAF6FA;margin-bottom:4px">POLICY REFERENCE</div><div style="font-size:16px;font-weight:700">${S.showPolicy}</div></div> <div style="padding:20px"><div style="font-size:14px;font-weight:600;color:#1A2332;margin-bottom:8px">${p.full}</div><div style="font-size:12px;font-weight:700;color:#00647F;margin-bottom:6px">KEY CRITERIA</div>${p.criteria.map(c=>`<div style="display:flex;gap:6px;margin-bottom:4px;font-size:13px;color:#37474F"><span style="color:#00647F;font-weight:700">•</span> ${c}</div>`).join('')}
  <button class="btn btn-teal btn-sm" style="width:100%;margin-top:14px" onclick="closePolicyModal()">Close</button></div> </div></div>`;
  document.body.appendChild(el);
  document.addEventListener('keydown',policyEscHandler);
@@ -7494,10 +7494,10 @@ function renderOutcomeModal(){
  const el=document.createElement('div');
  el.id='outcome-modal-overlay';
  el.innerHTML=`<div class="modal-bg" onclick="closeOutcomeModal()"><div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px">
-   <div style="padding:16px 20px;background:linear-gradient(135deg,#000000,#000000);color:#fff">
-     <div style="font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:#C9C9CF;margin-bottom:4px">RECORD WHAT CHANGED</div>
+   <div style="padding:16px 20px;background:linear-gradient(135deg,#074445,#00647F);color:#fff">
+     <div style="font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:#EAF6FA;margin-bottom:4px">RECORD WHAT CHANGED</div>
      <div style="font-size:15px;font-weight:700">${esc(m.actionText)}</div>
-     ${m.schools?'<div style="font-size:13px;color:#C9C9CF;margin-top:4px">'+esc(m.schools)+'</div>':''}
+     ${m.schools?'<div style="font-size:13px;color:#EAF6FA;margin-top:4px">'+esc(m.schools)+'</div>':''}
    </div>
    <div style="padding:20px">
      <div style="background:#F7F9FC;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:14px;color:var(--grey-dk);line-height:1.6">
@@ -7542,7 +7542,7 @@ function renderOutcomeModal(){
 function parseLocalDate(d){if(!d)return null;if(d instanceof Date)return d;var s=String(d);if(/^\d{4}-\d{2}-\d{2}$/.test(s)){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2],12,0,0);}return new Date(s);}
 function fmtDate(d) { if(!d)return'\u2014'; try{return parseLocalDate(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d} }
 function relTimeAgo(d){if(!d)return'';try{var dt=parseLocalDate(d);var ms=Date.now()-dt.getTime();var m=Math.floor(ms/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';var dy=Math.floor(h/24);if(dy===1)return'Yesterday';if(dy<7)return dy+'d ago';return dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}catch(e){return''}}
-function avatarColor(name){var colors=['#1565C0','#000000','#7B1FA2','#B84A0C','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
+function avatarColor(name){var colors=['#1565C0','#00647F','#7B1FA2','#B84A0C','#D84315','#00897B','#5C6BC0','#546E7A','#8D6E63','#2E7D32'];var h=0;for(var i=0;i<(name||'').length;i++)h=name.charCodeAt(i)+((h<<5)-h);return colors[Math.abs(h)%colors.length]}
 var _toastTimer=null;
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_toastTimer); var d=Math.min(10000,Math.max(4000,3000+msg.length*60)); _toastTimer=setTimeout(function(){t.classList.remove('show')},d); t.onclick=function(){clearTimeout(_toastTimer);t.classList.remove('show')}; }
 // Tactile feedback (2026.06.18.2). Local browser API — works offline; silently no-ops on iOS or where vibration is unsupported/disabled.
