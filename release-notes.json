@@ -1,4 +1,12 @@
 {
+  "2026.06.18.57": {
+    "title": "Inbox opens reliably, neatly placed",
+    "released": "2026-07-14",
+    "highlights": [
+      "Fixed the Inbox button not responding on some phones — a stray second tap was closing it the instant it opened",
+      "The Inbox button now sits neatly above Sign out in the header"
+    ]
+  },
   "2026.06.18.56": {
     "title": "A clearly labelled Inbox button",
     "released": "2026-07-14",
