@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.72';
+const APP_VERSION = '2026.06.18.73';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4515,6 +4515,61 @@ function removeSchool(name){const arr=parseSchoolsArr().filter(s=>s!==name);S.f.
 function _refocusSchoolFilter(){if(S.f._schoolDDOpen){setTimeout(function(){const el=document.getElementById('spFilter');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}},30);}}
 function toggleSchool(name){parseSchoolsArr().includes(name)?removeSchool(name):addSchool(name);}
 function emisForSchool(name){var d=S.f.district;if(!d||!SCHOOLS_MAP[d])return null;for(var cc in SCHOOLS_MAP[d]){var arr=SCHOOLS_MAP[d][cc];for(var q=0;q<arr.length;q++){if(arr[q][0]===name)return arr[q].length>2?arr[q][2]:null;}}return null;}
+
+// ═══════════ PERFORMANCE INSIGHTS (v.73) ═══════════
+// Resolve the signed-in official's scope to a list of EMIS numbers, then ask
+// Supabase which schools/subjects are weakest. We join on EMIS, never on
+// district/circuit NAME, because officials.district drifts from the masterlist
+// ("OR Tambo Inland" vs "O R Tambo Inland", "Francis Baard" vs "Frances Baard",
+// "Pixley Ka Seme" vs "Pixley-Ka-Seme"). Normalising + one alias covers it.
+function _normDistrict(x){ return (x||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+var _DISTRICT_ALIAS = { 'francisbaard':'francesbaard' };   // true misspelling; normaliser can't fix i->e
+function _resolveDistrictKey(name){
+  if(!name) return null;
+  var k=_normDistrict(name); k=_DISTRICT_ALIAS[k]||k;
+  for(var real in SCHOOLS_MAP){ if(_normDistrict(real)===k) return real; }
+  return null;
+}
+// Turn whatever officials.district holds (one name, a comma list, "All", "", null)
+// into a de-duplicated EMIS array from schools.json.
+function scopeEmisList(){
+  var raw=(S.official && S.official.district || '').trim();
+  if(!raw || raw==='All') return [];               // no single scope -> no perf card
+  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  var out={};
+  parts.forEach(function(pn){
+    var key=_resolveDistrictKey(pn); if(!key) return;
+    var circs=SCHOOLS_MAP[key]||{};
+    Object.keys(circs).forEach(function(cc){
+      (circs[cc]||[]).forEach(function(r){
+        var e = (r && r.length>2) ? r[2] : null;
+        if(e) out[e]=true;
+      });
+    });
+  });
+  return Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
+}
+// Session cache so the tab doesn't refetch on every render.
+function loadPerformance(){
+  if(S._perf || S._perfLoading || S._perfTried) return Promise.resolve();
+  var emis=scopeEmisList();
+  if(!emis.length){ S._perfTried=true; return Promise.resolve(); }   // fail silent
+  S._perfLoading=true;
+  return sb.rpc('scope_performance', { p_emis: emis })
+    .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
+    .catch(function(){ S._perf = null; })          // offline / error -> silent
+    .then(function(){ S._perfLoading=false; S._perfTried=true; renderPerfCardsOnly(); });
+}
+// Repaint just the insight cards when perf data lands, without a full rebuild.
+function renderPerfCardsOnly(){ if(S.view==='dashboard' && (S.dashTab||'')==='insights') render(); }
+// Scope label that mirrors what the card can honestly claim.
+function scopeLabel(){
+  var raw=(S.official && S.official.district || '').trim();
+  if(!raw || raw==='All') return 'your area';
+  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  return parts.length>1 ? 'your districts' : 'your district';
+}
+
 function _updateSchoolPickerInPlace(){
   var listEl=document.querySelector('.school-picker .school-dd .school-dd-list');
   var footEl=document.querySelector('.school-picker .school-dd .school-dd-foot');
@@ -6734,6 +6789,7 @@ function renderDashboard() {
 // ── TAB STATE ──
  const tab = S.dashTab || 'overview';
  if (tab === 'impact' || tab === 'coverage' || tab === 'schools' || tab === 'tracker' || tab === 'trends') { S.dashTab = 'insights'; return renderDashboard(); }
+ if (tab === 'insights') loadPerformance();   // fetch scope performance once; fail-silent
 
  // ═══════════════════════════════════
  // RENDER
@@ -6882,6 +6938,48 @@ ${tab==='insights'?`
  ${(function(){
    var C = [];
 
+   // ── PERFORMANCE (v.73): scope-aware, visit-neutral, baseline only. ──
+   // Draws attention to where intervention is needed. Never mentions visits;
+   // never claims cause. Every card prints the term so it can't read as live.
+   if (S._perf) {
+     var _pf = S._perf;
+     var _scope = scopeLabel();
+     var _term = _pf.term ? esc(_pf.term) : '';
+     var _termLine = _term ? '<div class="ins-s">As at ' + _term + '.</div>' : '';
+
+     // Weakest single school across the whole scope (option A).
+     var _schools = (_pf.schools||[]).filter(function(x){ return x && x.worst_rate!=null; });
+     if (_schools.length) {
+       _schools.sort(function(a,b){ return a.worst_rate - b.worst_rate; });
+       var w = _schools[0];
+       var gr = (w.worst_grade!=null) ? ('Grade ' + w.worst_grade + ' ') : '';
+       // Only sound the alarm when a result is genuinely low. A 78% "worst"
+       // subject is a strong school; flagging it as "needs attention" would be
+       // a false alarm and cost trust. Threshold: below 50% = concern (orange),
+       // 50-60% = watch (neutral), above 60% = no card at all.
+       if (w.worst_rate < 60) {
+         var _crisis = w.worst_rate < 50;
+         var _cls  = _crisis ? 'ins-c gap' : 'ins-c';
+         var _kick = _crisis ? 'Needs attention' : 'Lowest result';
+         C.push('<div class="' + _cls + '"><div class="ins-k"><span class="ins-sq"></span>' + _kick + '</div>' +
+           '<p><b>' + esc(w.school_name) + '</b> \u2014 ' + gr + esc(w.worst_subject||'') +
+           ' at <b>' + Math.round(w.worst_rate) + '%</b>, the lowest in ' + _scope + '.</p>' +
+           _termLine + '</div>');
+       }
+     }
+
+     // Weakest subject across the scope.
+     var _subs = (_pf.subjects||[]).filter(function(x){ return x && x.avg_pass!=null; });
+     if (_subs.length && _subs[0].avg_pass < 65) {
+       _subs.sort(function(a,b){ return a.avg_pass - b.avg_pass; });
+       var sub = _subs[0];
+       C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Weakest subject</div>' +
+         '<p><b>' + esc(sub.subject) + '</b> averages <b>' + Math.round(sub.avg_pass) + '%</b> across ' +
+         sub.schools + ' school' + (sub.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
+         _termLine + '</div>');
+     }
+   }
+
    // GAP
    if (_gapSchools.length && _gapCircuits) {
      var shown = _gapSchools.slice(0,4).join(', ');
@@ -6995,6 +7093,7 @@ ${tab==='insights'?`
    </div>
  </div>
 
+<!-- TRIMMED v.73: barriers chart moved out of Insights. Kept in code, hidden.
  <!-- ═══ BARRIERS ANALYSIS ═══ -->
  <div class="dash-section" style="border-left:4px solid var(--red)">
    <div class="dash-section-hdr"><h3>What Challenges Are Schools Facing?</h3><span style="font-size:14px;color:var(--grey)">${barriers.length} type${barriers.length!==1?'s':''} reported</span></div>
@@ -7078,6 +7177,8 @@ ${tab==='insights'?`
      })() : '<div style="text-align:center;color:var(--grey);padding:24px;font-size:14px;line-height:1.6">No challenges recorded yet. As officials log school visits and flag context issues, challenges will appear here.</div>'}
    </div>
  </div>
+-->
+<!-- TRIMMED v.73: school-observations chart hidden.
  <!-- ═══ SCHOOL OBSERVATIONS ═══ -->
  ${(()=>{const totalObs=Object.keys(obsYes).length+Object.keys(obsNo).length;if(!totalObs)return'';const issues=SCHOOL_OBS.filter(o=>(obsNo[o.key]||0)>0).sort((a,b)=>(obsNo[b.key]||0)-(obsNo[a.key]||0));const inPlace=SCHOOL_OBS.filter(o=>(obsYes[o.key]||0)>0&&!(obsNo[o.key]||0));
    var obsHtml = '<div class="dash-section" style="border-left:4px solid #5C6BC0"><div class="dash-section-hdr"><h3>What Did You Find at Schools?</h3><span style="font-size:14px;color:var(--grey)">From school visits</span></div><div class="dash-section-body"><div class="dash-section-desc" style="font-size:14px;line-height:1.6">Things officials checked during school visits and what they found.</div>';
@@ -7144,6 +7245,7 @@ ${tab==='insights'?`
    return obsHtml;
  })()}
 
+-->
  </details>
 
 `:''}
