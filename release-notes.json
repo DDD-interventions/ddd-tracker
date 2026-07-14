@@ -1,45 +1,13 @@
 {
-  "2026.06.18.69": {
-    "title": "A cleaner, more professional finish",
+  "2026.06.18.72": {
+    "title": "Bigger, clearer text — and three fixes",
     "released": "2026-07-15",
     "highlights": [
-      "The sign-in screen and headers have been tidied up into a cleaner, more formal look built around the DDD blue and a deep navy"
-    ]
-  },
-  "2026.06.18.68": {
-    "title": "Insights: what to notice, in plain English",
-    "released": "2026-07-15",
-    "highlights": [
-      "The Trends tab is now Insights — short, plain-language notes about your work instead of charts you have to interpret",
-      "It will tell you which schools in your circuit still have no logged visit, how long your oldest follow-up has been waiting, how this month compares with last, and which subject keeps coming up",
-      "The charts have not gone anywhere — they are under “More detail” at the bottom of the tab"
-    ]
-  },
-  "2026.06.18.67": {
-    "title": "One dashboard instead of two",
-    "released": "2026-07-15",
-    "highlights": [
-      "The Overview and the Intervention Activity Tracker are now a single page — there are two tabs to choose from instead of three",
-      "Four key numbers now sit at the top: visits logged, schools reached, educators supported, and follow-ups still open",
-      "A new “Needs your attention” panel shows open follow-ups and support requests from schools — tap either one to jump straight to it",
-      "The charts are still there, tucked under “More detail” so the page opens on what matters first"
-    ]
-  },
-  "2026.06.18.66": {
-    "title": "A fresh new look",
-    "released": "2026-07-15",
-    "highlights": [
-      "The app has a refreshed design built around the DDD blue, with a cleaner header and clearer buttons",
-      "Text and buttons are now much easier to read — useful in bright sunlight or on an older phone screen",
-      "Anything that needs your attention is marked in orange, so it stands out at a glance"
-    ]
-  },
-  "2026.06.18.64": {
-    "title": "Your data answers are now recorded",
-    "released": "2026-07-14",
-    "highlights": [
-      "Fixed a fault where your answer to “How did you access the DDD data?” was not being saved — it is now recorded, and the Dashboard shows how your team is reaching DDD data",
-      "Tidied up the Review screen, which was showing a stray character in the Data Connection card"
+      "Text across the app is noticeably larger and easier to read, especially on a phone in bright light",
+      "Insights now shows the themes in your work — the barrier that keeps coming up, what schools most often did not have in place, the support officials flagged most, and what usually prompts you to step in",
+      "Fixed text being cut off or overlapping in tick boxes, badges and headings",
+      "Fixed Inbox messages showing the same sentence twice",
+      "Fixed the app saving a draft before you had entered anything about the visit"
     ]
   },
   "2026.06.18.63": {
