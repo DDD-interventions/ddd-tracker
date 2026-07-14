@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.74';
+const APP_VERSION = '2026.06.18.75';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4552,8 +4552,26 @@ function scopeEmisList(){
 // Session cache so the tab doesn't refetch on every render.
 function loadPerformance(){
   if(S._perf || S._perfLoading || S._perfTried) return Promise.resolve();
+  // RACE GUARD: schools.json loads in the background after sign-in (v.61).
+  // If Insights opens before it lands, SCHOOLS_MAP is empty and the EMIS list
+  // is [] — but that is NOT a final answer. Only lock (_perfTried) once the
+  // school list is actually ready; otherwise wait for it and try again.
+  if (SCHOOLS_STATE !== 'ready') {
+    if (SCHOOLS_STATE === 'idle') loadSchools();
+    if (!S._perfWaiting) {
+      S._perfWaiting = true;
+      var _poll = setInterval(function(){
+        if (SCHOOLS_STATE === 'ready' || SCHOOLS_STATE === 'failed') {
+          clearInterval(_poll); S._perfWaiting = false;
+          if (SCHOOLS_STATE === 'ready') loadPerformance();
+          else S._perfTried = true;                    // schools failed -> genuinely silent
+        }
+      }, 400);
+    }
+    return Promise.resolve();
+  }
   var emis=scopeEmisList();
-  if(!emis.length){ S._perfTried=true; return Promise.resolve(); }   // fail silent
+  if(!emis.length){ S._perfTried=true; return Promise.resolve(); }   // scope 'All'/empty -> silent
   S._perfLoading=true;
   return sb.rpc('scope_performance', { p_emis: emis })
     .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
