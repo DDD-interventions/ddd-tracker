@@ -1,4 +1,13 @@
 {
+  "2026.06.18.68": {
+    "title": "Insights: what to notice, in plain English",
+    "released": "2026-07-15",
+    "highlights": [
+      "The Trends tab is now Insights — short, plain-language notes about your work instead of charts you have to interpret",
+      "It will tell you which schools in your circuit still have no logged visit, how long your oldest follow-up has been waiting, how this month compares with last, and which subject keeps coming up",
+      "The charts have not gone anywhere — they are under “More detail” at the bottom of the tab"
+    ]
+  },
   "2026.06.18.67": {
     "title": "One dashboard instead of two",
     "released": "2026-07-15",
