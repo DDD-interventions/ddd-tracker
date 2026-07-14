@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.75';
+const APP_VERSION = '2026.06.18.76';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4530,27 +4530,60 @@ function _resolveDistrictKey(name){
   for(var real in SCHOOLS_MAP){ if(_normDistrict(real)===k) return real; }
   return null;
 }
-// Turn whatever officials.district holds (one name, a comma list, "All", "", null)
-// into a de-duplicated EMIS array from schools.json.
-function scopeEmisList(){
-  var raw=(S.official && S.official.district || '').trim();
-  if(!raw || raw==='All') return [];               // no single scope -> no perf card
-  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+// Resolve the ACTIVE scope to EMIS numbers. The dashboard's geographic
+// filters (S.dashFilter) take priority; the official's home district is the
+// fallback when no filter is set. Returns {emis, label, key} so the fetch can
+// cache per-selection and the cards can name what they're comparing within.
+function _emisForDistricts(names){
   var out={};
-  parts.forEach(function(pn){
+  names.forEach(function(pn){
     var key=_resolveDistrictKey(pn); if(!key) return;
     var circs=SCHOOLS_MAP[key]||{};
     Object.keys(circs).forEach(function(cc){
       (circs[cc]||[]).forEach(function(r){
-        var e = (r && r.length>2) ? r[2] : null;
-        if(e) out[e]=true;
+        var e=(r&&r.length>2)?r[2]:null; if(e) out[e]=true;
       });
     });
   });
-  return Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
+  return out;
 }
+function scopeSelection(){
+  var df = S.dashFilter || {province:'All',district:'All',circuit:'All',school:'All'};
+  var out={}, label='', key='';
+  if (df.district !== 'All') {
+    var dKey=_resolveDistrictKey(df.district);
+    if (dKey && SCHOOLS_MAP[dKey]) {
+      if (df.circuit !== 'All' && SCHOOLS_MAP[dKey][df.circuit]) {
+        (SCHOOLS_MAP[dKey][df.circuit]||[]).forEach(function(r){
+          var e=(r&&r.length>2)?r[2]:null; if(e) out[e]=true;
+        });
+        label='this circuit'; key='c|'+dKey+'|'+df.circuit;
+      } else {
+        out=_emisForDistricts([df.district]);
+        label='this district'; key='d|'+dKey;
+      }
+    }
+  } else if (df.province !== 'All' && typeof GEO_HIER==='object' && GEO_HIER[df.province]) {
+    out=_emisForDistricts(Object.keys(GEO_HIER[df.province]));
+    label='this province'; key='p|'+df.province;
+  } else {
+    // No geographic filter -> the official's own scope
+    var raw=(S.official && S.official.district || '').trim();
+    if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
+    var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+    out=_emisForDistricts(parts);
+    label=parts.length>1?'your districts':'your district'; key='home|'+raw;
+  }
+  var emis=Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
+  return {emis:emis, label:label, key:key};
+}
+// Back-compat shim for any older callers.
+function scopeEmisList(){ return scopeSelection().emis; }
 // Session cache so the tab doesn't refetch on every render.
 function loadPerformance(){
+  // Refetch when the geographic filter changes the scope.
+  var _selKey = scopeSelection().key;
+  if (S._perfKey !== undefined && S._perfKey !== _selKey) { S._perf=null; S._perfTried=false; }
   if(S._perf || S._perfLoading || S._perfTried) return Promise.resolve();
   // RACE GUARD: schools.json loads in the background after sign-in (v.61).
   // If Insights opens before it lands, SCHOOLS_MAP is empty and the EMIS list
@@ -4570,10 +4603,10 @@ function loadPerformance(){
     }
     return Promise.resolve();
   }
-  var emis=scopeEmisList();
-  if(!emis.length){ S._perfTried=true; return Promise.resolve(); }   // scope 'All'/empty -> silent
-  S._perfLoading=true;
-  return sb.rpc('scope_performance', { p_emis: emis })
+  var sel=scopeSelection();
+  if(!sel.emis.length){ S._perfTried=true; S._perfKey=sel.key; return Promise.resolve(); }
+  S._perfLoading=true; S._perfKey=sel.key; S._perfLabel=sel.label;
+  return sb.rpc('scope_performance', { p_emis: sel.emis })
     .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
     .catch(function(){ S._perf = null; })          // offline / error -> silent
     .then(function(){ S._perfLoading=false; S._perfTried=true; renderPerfCardsOnly(); });
@@ -6961,7 +6994,7 @@ ${tab==='insights'?`
    // never claims cause. Every card prints the term so it can't read as live.
    if (S._perf) {
      var _pf = S._perf;
-     var _scope = scopeLabel();
+     var _scope = S._perfLabel || scopeLabel();
      var _term = _pf.term ? esc(_pf.term) : '';
      var _termLine = _term ? '<div class="ins-s">As at ' + _term + '.</div>' : '';
 
@@ -6979,9 +7012,12 @@ ${tab==='insights'?`
          var _crisis = w.worst_rate < 50;
          var _cls  = _crisis ? 'ins-c gap' : 'ins-c';
          var _kick = _crisis ? 'Needs attention' : 'Lowest result';
+         // Coverage honesty: results exist for only a subset of schools, so the
+         // card says how many the comparison includes rather than implying all.
+         var _cov = ' among the ' + _schools.length + ' school' + (_schools.length!==1?'s':'') + ' with results in ' + _scope;
          C.push('<div class="' + _cls + '"><div class="ins-k"><span class="ins-sq"></span>' + _kick + '</div>' +
            '<p><b>' + esc(w.school_name) + '</b> \u2014 ' + gr + esc(w.worst_subject||'') +
-           ' at <b>' + Math.round(w.worst_rate) + '%</b>, the lowest in ' + _scope + '.</p>' +
+           ' at <b>' + Math.round(w.worst_rate) + '%</b>, the lowest' + _cov + '.</p>' +
            _termLine + '</div>');
        }
      }
@@ -6992,8 +7028,8 @@ ${tab==='insights'?`
        _subs.sort(function(a,b){ return a.avg_pass - b.avg_pass; });
        var sub = _subs[0];
        C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Weakest subject</div>' +
-         '<p><b>' + esc(sub.subject) + '</b> averages <b>' + Math.round(sub.avg_pass) + '%</b> across ' +
-         sub.schools + ' school' + (sub.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
+         '<p><b>' + esc(sub.subject) + '</b> averages <b>' + Math.round(sub.avg_pass) + '%</b> across the ' +
+         sub.schools + ' school' + (sub.schools!==1?'s':'') + ' with results in ' + _scope + '.</p>' +
          _termLine + '</div>');
      }
    }
