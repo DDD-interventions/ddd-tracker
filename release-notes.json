@@ -1,4 +1,14 @@
 {
+  "2026.06.18.67": {
+    "title": "One dashboard instead of two",
+    "released": "2026-07-15",
+    "highlights": [
+      "The Overview and the Intervention Activity Tracker are now a single page — there are two tabs to choose from instead of three",
+      "Four key numbers now sit at the top: visits logged, schools reached, educators supported, and follow-ups still open",
+      "A new “Needs your attention” panel shows open follow-ups and support requests from schools — tap either one to jump straight to it",
+      "The charts are still there, tucked under “More detail” so the page opens on what matters first"
+    ]
+  },
   "2026.06.18.66": {
     "title": "A fresh new look",
     "released": "2026-07-15",
