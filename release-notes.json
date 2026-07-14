@@ -1,11 +1,10 @@
 {
-  "2026.06.18.73": {
-    "title": "Insights now flags where results are weakest",
+  "2026.06.18.74": {
+    "title": "A cleaner Insights tab",
     "released": "2026-07-15",
     "highlights": [
-      "Insights now draws your attention to the schools and subjects with the lowest results in your area — so you can see where support is most needed, based on the latest performance data",
-      "These sit alongside the patterns from your own visits, giving one place to decide where to go next",
-      "Trends has been simplified to the monthly activity view; the other breakdowns now live inside Insights as plain-language cards"
+      "Fixed the old challenges and observations charts still appearing under Insights — their patterns now come through as the plain-language cards instead",
+      "Under “More detail” on the Insights tab you will now find just the monthly activity timeline"
     ]
   },
   "2026.06.18.63": {
