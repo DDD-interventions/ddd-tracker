@@ -1,4 +1,19 @@
 {
+  "2026.06.18.63": {
+    "title": "Updated school lists for 8 provinces",
+    "released": "2026-07-14",
+    "highlights": [
+      "The school picker now uses the latest DBE masterlists for Eastern Cape, Free State, Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, and Northern Cape",
+      "Every school in these provinces now carries its official EMIS number, so visit reports match departmental records exactly"
+    ]
+  },
+  "2026.06.18.61": {
+    "title": "A much faster app",
+    "released": "2026-07-14",
+    "highlights": [
+      "The app is now 60% smaller and opens noticeably faster, especially on slow connections — the school list is loaded quietly in the background after you sign in"
+    ]
+  },
   "2026.06.18.60": {
     "title": "Open each message on its own",
     "released": "2026-07-14",
