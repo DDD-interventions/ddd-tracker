@@ -590,7 +590,8 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 @keyframes notifSlide{from{transform:translateX(100%)}to{transform:translateX(0)}}
 .notif-pane-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e8e6e4;flex-shrink:0;background:#FAFBFC}
 .notif-pane-title{font-size:16px;font-weight:700;color:var(--navy)}
-.notif-pane-close{width:44px;height:44px;border-radius:50%;border:none;background:none;color:var(--grey);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:inherit}
+.notif-pane-close{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;transition:.15s}
+.notif-pane-close:hover{background:var(--teal-dk)}
 .notif-pane-close:hover{background:var(--grey-lt);color:var(--navy)}
 .notif-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .notif-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid #f3f2f1;cursor:pointer;min-height:60px;transition:background .1s}
@@ -1057,7 +1058,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.57';
+const APP_VERSION = '2026.06.18.59';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2517,6 +2518,20 @@ function feedAgoLabel() {
   return m <= 0 ? 'Updated just now' : m === 1 ? 'Updated 1 minute ago' : m < 60 ? 'Updated ' + m + ' minutes ago' : 'Updated over an hour ago';
 }
 
+// Absolute date-time for feed and inbox (global: used by renderHomeFeed and renderNotifPane)
+function fmtWhen(ts){ try{ var dt=new Date(ts); if(isNaN(dt))return '';
+    var now=new Date(); var hm=('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+    var d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var d1=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
+    var days=Math.round((d0-d1)/86400000);
+    if(days===0)return 'Today, '+hm;
+    if(days===1)return 'Yesterday, '+hm;
+    var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var s=DW[dt.getDay()]+' '+dt.getDate()+' '+MO[dt.getMonth()];
+    if(dt.getFullYear()!==now.getFullYear())s+=' '+dt.getFullYear();
+    return s+', '+hm; }catch(e){ return ''; } }
+
 function renderHomeFeed() {
   var o = S.official || {};
   var first = String(o.full_name || 'there').split(' ')[0];
@@ -2547,18 +2562,7 @@ function renderHomeFeed() {
     if(m<60*24)return Math.floor(m/60)+' h ago';
     var d=Math.floor(m/1440); if(d===1)return 'yesterday'; if(d<=13)return d+' d ago';
     var dt=new Date(ts); return dt.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]; }catch(e){ return ''; } }
-  function fmtWhen(ts){ try{ var dt=new Date(ts); if(isNaN(dt))return '';
-    var now=new Date(); var hm=('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
-    var d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var d1=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
-    var days=Math.round((d0-d1)/86400000);
-    if(days===0)return 'Today, '+hm;
-    if(days===1)return 'Yesterday, '+hm;
-    var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var s=DW[dt.getDay()]+' '+dt.getDate()+' '+MO[dt.getMonth()];
-    if(dt.getFullYear()!==now.getFullYear())s+=' '+dt.getFullYear();
-    return s+', '+hm; }catch(e){ return ''; } }
+
 
   var items = [];
   try { var rz = renderResumeDraftCard(); if (rz) items.push(rz); } catch(e){}
@@ -3343,16 +3347,16 @@ function toggleNotifPane() {
       var now = new Date().toISOString();
       S._notifLastSeen = now;
       try { localStorage.setItem('ddd_notif_last_seen', now); } catch(e) {}
-      markInboxRead();   // silent — badge refreshes when the pane closes
+      markInboxRead().then(refreshInboxBadge);   // silent: badge updates, pane does not redraw
     }, 1500);
   }
-  render();
+  paintNotifPane();   // overlay only — no full-app rebuild, so no double draw
 }
 
 function closeNotifPane() {
   if (Date.now() - (S._notifOpenedAt||0) < 400) return;   // swallow the ghost tap that lands on the overlay as it appears
   S._notifOpen = false;
-  render();
+  paintNotifPane();
 }
 
 function navigateToNotif(navTo, key) {
@@ -3421,7 +3425,7 @@ function renderNotifPane() {
 
   var html = '<div class="notif-overlay" onclick="closeNotifPane()"></div>';
   html += '<div class="notif-pane">';
-  html += '<div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()" title="Close">\xd7</button></div>';
+  html += '<div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()" title="Close inbox">\u00d7 Close</button></div>';
   html += '<div class="notif-list">';
   if (!items.length) {
     html += '<div class="notif-empty">Your inbox is empty.<br>When colleagues tag you, reply to you, or need your support, their messages will appear here.</div>';
@@ -3447,10 +3451,29 @@ function renderNotifPane() {
       html += '</div></div>';
     });
   }
-  html += '</div></div>';
+  html += '</div>';
+  html += '<div style="padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #E2E7E5;background:#fff"><button onclick="closeNotifPane()" style="width:100%;padding:13px;border:none;border-radius:10px;background:var(--teal);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">Close inbox</button></div>';
+  html += '</div>';
   return html;
 }
 function toggleInboxItem(id){ S._inboxOpen=S._inboxOpen||{}; S._inboxOpen[id]=!S._inboxOpen[id]; renderNotifPaneOnly(); }
+function paintNotifPane(){
+  var el = document.getElementById('notif-pane-root');
+  if (S._notifOpen) {
+    if (!el) { el = document.createElement('div'); el.id = 'notif-pane-root'; document.body.appendChild(el); }
+    try { el.innerHTML = renderNotifPane(); }
+    catch(e) { el.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#999">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
+  } else if (el) { el.innerHTML = ''; }
+  refreshInboxBadge();
+}
+function refreshInboxBadge(){
+  try{
+    var b = document.querySelector('.notif-bell');
+    if(!b) return;
+    var c = getNotifCount();
+    b.innerHTML = '&#128276;<span class="notif-bell-label">Inbox</span>' + (c>0 ? '<span class="notif-badge">'+c+'</span>' : '');
+  }catch(e){}
+}
 function renderNotifPaneOnly(){ var el=document.getElementById('notif-pane-root'); if(el && S._notifOpen) el.innerHTML = renderNotifPane(); }
 
 // ─── ACTIVITY TRACKER ───
@@ -3635,7 +3658,7 @@ function render() {
  if (S._notifOpen) {
    if (!notifEl) { notifEl = document.createElement('div'); notifEl.id = 'notif-pane-root'; document.body.appendChild(notifEl); }
    try { notifEl.innerHTML = renderNotifPane(); }
-   catch(e) { notifEl.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#999">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
+   catch(e) { notifEl.innerHTML = '<div class="notif-overlay" onclick="closeNotifPane()"></div><div class="notif-pane"><div class="notif-pane-hdr"><div class="notif-pane-title">Inbox</div><button class="notif-pane-close" onclick="closeNotifPane()">\u00d7 Close</button></div><div class="notif-empty">Something went wrong opening your inbox.<br><span style="font-size:11px;color:#999">'+String(e&&e.message||e).replace(/</g,'&lt;')+'</span></div></div>'; }
  } else if (notifEl) { notifEl.innerHTML = ''; }
 }
 
