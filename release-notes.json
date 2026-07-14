@@ -1,4 +1,19 @@
 {
+  "2026.06.18.59": {
+    "title": "A smoother Inbox",
+    "released": "2026-07-14",
+    "highlights": [
+      "Opening the Inbox no longer redraws the whole screen — it appears instantly, with no flicker"
+    ]
+  },
+  "2026.06.18.58": {
+    "title": "Inbox now opens properly",
+    "released": "2026-07-14",
+    "highlights": [
+      "Fixed the error that stopped the Inbox from loading your messages",
+      "Added clear Close buttons at the top and bottom of the Inbox"
+    ]
+  },
   "2026.06.18.57": {
     "title": "Inbox opens reliably, neatly placed",
     "released": "2026-07-14",
