@@ -1,4 +1,12 @@
 {
+  "2026.06.18.64": {
+    "title": "Your data answers are now recorded",
+    "released": "2026-07-14",
+    "highlights": [
+      "Fixed a fault where your answer to “How did you access the DDD data?” was not being saved — it is now recorded, and the Dashboard shows how your team is reaching DDD data",
+      "Tidied up the Review screen, which was showing a stray character in the Data Connection card"
+    ]
+  },
   "2026.06.18.63": {
     "title": "Updated school lists for 8 provinces",
     "released": "2026-07-14",
