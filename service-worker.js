@@ -18,13 +18,14 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-const VERSION = 'v1.0.15';
+const VERSION = 'v1.0.18';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
 const PRECACHE_URLS = [
   './',
   './index.html',
+  './schools.json',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
