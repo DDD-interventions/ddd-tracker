@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.78';
+const APP_VERSION = '2026.06.18.79';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4585,6 +4585,13 @@ function scopeSelection(){
   } else {
     // No geographic filter -> the official's own scope
     var raw=(S.official && S.official.district || '').trim();
+    var role=(S.official && S.official.role || '');
+    var isNational = raw==='National' || raw==='all-national' ||
+                     ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager','National'].indexOf(role) >= 0;
+    if (isNational) {
+      // Whole country. Do NOT ship ~24,700 EMIS; the RPC scans nationally.
+      return {emis:[], national:true, label:'the country', key:'national'};
+    }
     if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
     var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
     out=_emisForDistricts(parts);
@@ -4620,9 +4627,10 @@ function loadPerformance(){
     return Promise.resolve();
   }
   var sel=scopeSelection();
-  if(!sel.emis.length){ S._perfTried=true; S._perfKey=sel.key; return Promise.resolve(); }
+  if(!sel.national && !sel.emis.length){ S._perfTried=true; S._perfKey=sel.key; return Promise.resolve(); }
   S._perfLoading=true; S._perfKey=sel.key; S._perfLabel=sel.label;
-  return sb.rpc('scope_performance', { p_emis: sel.emis })
+  var _rpcArgs = sel.national ? { p_emis: null, p_national: true } : { p_emis: sel.emis, p_national: false };
+  return sb.rpc('scope_performance', _rpcArgs)
     .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
     .catch(function(){ S._perf = null; })          // offline / error -> silent
     .then(function(){ S._perfLoading=false; S._perfTried=true; renderPerfCardsOnly(); });
