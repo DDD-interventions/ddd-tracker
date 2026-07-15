@@ -1,11 +1,11 @@
 {
-  "2026.06.18.81": {
-    "title": "Faster insights everywhere, and the draft bug is gone",
+  "2026.06.18.82": {
+    "title": "Performance insights fixed at every level",
     "released": "2026-07-15",
     "highlights": [
-      "Performance insights now load quickly at every level — national, province, district and circuit — instead of only appearing when you drilled down to a circuit",
-      "Fixed the app saving a phantom draft of your form — including after you had already submitted, or before you had entered anything. A draft is now only kept when there is real work to come back to",
-      "Any old phantom drafts already on your phone are cleaned up automatically"
+      "Performance insights now appear at district, province and national level — not only at circuit level",
+      "These now load from fast precomputed summaries, so they appear quickly even across the whole country",
+      "If performance data ever can’t load, the app now tells you why instead of showing nothing"
     ]
   },
   "2026.06.18.63": {
