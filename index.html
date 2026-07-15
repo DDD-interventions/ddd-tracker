@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.80';
+const APP_VERSION = '2026.06.18.81';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4583,41 +4583,43 @@ function _emisForDistricts(names){
   return out;
 }
 function scopeSelection(){
+  // v.81: circuit resolves to an EMIS list (small -> computed live). District,
+  // province, multi-district and national pass NAMES so the RPC reads the
+  // precomputed summary tables instead of aggregating up to 958k rows live —
+  // that live aggregation is why cards only appeared at circuit level before.
   var df = S.dashFilter || {province:'All',district:'All',circuit:'All',school:'All'};
-  var out={}, label='', key='';
   if (df.district !== 'All') {
     var dKey=_resolveDistrictKey(df.district);
     if (dKey && SCHOOLS_MAP[dKey]) {
       if (df.circuit !== 'All' && SCHOOLS_MAP[dKey][df.circuit]) {
+        var out={};
         (SCHOOLS_MAP[dKey][df.circuit]||[]).forEach(function(r){
           var e=(r&&r.length>2)?r[2]:null; if(e) out[e]=true;
         });
-        label='this circuit'; key='c|'+dKey+'|'+df.circuit;
-      } else {
-        out=_emisForDistricts([df.district]);
-        label='this district'; key='d|'+dKey;
+        var emis=Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
+        return {emis:emis, label:'this circuit', key:'c|'+dKey+'|'+df.circuit};
       }
+      return {emis:[], districts:[dKey], label:'this district', key:'d|'+dKey};
     }
-  } else if (df.province !== 'All' && typeof GEO_HIER==='object' && GEO_HIER[df.province]) {
-    out=_emisForDistricts(Object.keys(GEO_HIER[df.province]));
-    label='this province'; key='p|'+df.province;
-  } else {
-    // No geographic filter -> the official's own scope
-    var raw=(S.official && S.official.district || '').trim();
-    var role=(S.official && S.official.role || '');
-    var isNational = raw==='National' || raw==='all-national' ||
-                     ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager','National'].indexOf(role) >= 0;
-    if (isNational) {
-      // Whole country. Do NOT ship ~24,700 EMIS; the RPC scans nationally.
-      return {emis:[], national:true, label:'the country', key:'national'};
-    }
-    if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
-    var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
-    out=_emisForDistricts(parts);
-    label=parts.length>1?'your districts':'your district'; key='home|'+raw;
+    return {emis:[], label:'', key:'none'};
   }
-  var emis=Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
-  return {emis:emis, label:label, key:key};
+  if (df.province !== 'All' && typeof GEO_HIER==='object' && GEO_HIER[df.province]) {
+    return {emis:[], province:df.province, label:'this province', key:'p|'+df.province};
+  }
+  // No geographic filter -> the official's own scope
+  var raw=(S.official && S.official.district || '').trim();
+  var role=(S.official && S.official.role || '');
+  var isNational = raw==='National' || raw==='all-national' ||
+                   ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager','National'].indexOf(role) >= 0;
+  if (isNational) {
+    return {emis:[], national:true, label:'the country', key:'national'};
+  }
+  if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
+  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  var keys=[]; parts.forEach(function(pn){ var k=_resolveDistrictKey(pn); if(k && keys.indexOf(k)<0) keys.push(k); });
+  if(!keys.length) return {emis:[], label:'', key:'none'};
+  return {emis:[], districts:keys,
+          label:keys.length>1?'your districts':'your district', key:'home|'+keys.join('|')};
 }
 // Back-compat shim for any older callers.
 function scopeEmisList(){ return scopeSelection().emis; }
@@ -4646,9 +4648,15 @@ function loadPerformance(){
     return Promise.resolve();
   }
   var sel=scopeSelection();
-  if(!sel.national && !sel.emis.length){ S._perfTried=true; S._perfKey=sel.key; return Promise.resolve(); }
+  var _hasScope = sel.national || (sel.districts && sel.districts.length) || sel.province || (sel.emis && sel.emis.length);
+  if(!_hasScope){ S._perfTried=true; S._perfKey=sel.key; return Promise.resolve(); }
   S._perfLoading=true; S._perfKey=sel.key; S._perfLabel=sel.label;
-  var _rpcArgs = sel.national ? { p_emis: null, p_national: true } : { p_emis: sel.emis, p_national: false };
+  var _rpcArgs = {
+    p_emis:      (sel.emis && sel.emis.length) ? sel.emis : null,
+    p_national:  !!sel.national,
+    p_province:  sel.province || null,
+    p_districts: (sel.districts && sel.districts.length) ? sel.districts : null
+  };
   return sb.rpc('scope_performance', _rpcArgs)
     .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
     .catch(function(){ S._perf = null; })          // offline / error -> silent
@@ -5686,7 +5694,7 @@ function saveAndExit() {
     showToast('Nothing to save yet — start filling in details and you can save any time');
     return;
   }
-  const ok = saveFormDraft();
+  const ok = saveFormDraft(true);   // user-initiated — bypasses the gate deliberately
   if (!ok) { showToast('Could not save — your browser storage may be full'); return; }
   S.f.formStep = -1;
   S.view = 'log';
@@ -7057,7 +7065,8 @@ ${tab==='insights'?`
          var _kick = _crisis ? 'Needs attention' : 'Lowest result';
          // Coverage honesty: results exist for only a subset of schools, so the
          // card says how many the comparison includes rather than implying all.
-         var _cov = ' among the ' + _schools.length + ' school' + (_schools.length!==1?'s':'') + ' with results in ' + _scope;
+         var _covN = _pf.schools_count || _schools.length;
+         var _cov = ' among the ' + Number(_covN).toLocaleString() + ' school' + (_covN!==1?'s':'') + ' with results in ' + _scope;
          C.push('<div class="' + _cls + '"><div class="ins-k"><span class="ins-sq"></span>' + _kick + '</div>' +
            '<p><b>' + esc(w.school_name) + '</b> \u2014 ' + gr + esc(w.worst_subject||'') +
            ' at <b>' + Math.round(w.worst_rate) + '%</b>, the lowest' + _cov + '.</p>' +
@@ -8053,18 +8062,7 @@ function isFormDirty() {
   //               advanced past Step 1, even having typed nothing.
   //   f.schools, f.province, f.district, f.official_* — all Step 1 fields.
   //               Completing Step 1 is not yet a draft worth resuming.
-  return !!(f.activity_type || f.activity_type_other || f.intervention_theme || f.description
-    || (f.subjects && f.subjects.length) || (f.grades && f.grades.length)
-    || (f.sip_focus_areas && f.sip_focus_areas.length)
-    || f.ddd_used || (f.ddd_reports && f.ddd_reports.length)
-    || f.insight_detail || f.insight_pass_rate || (f.insight_types && f.insight_types.length)
-    || f.action_types.length || f.decision_types.length || f.action_type || f.decision_type
-    || (f.intervention_triggers && f.intervention_triggers.length)
-    || (f.support_needed && f.support_needed.length) || f.support_level
-    || (f.ctx_staffing && f.ctx_staffing.length) || (f.ctx_resources && f.ctx_resources.length)
-    || (f.ctx_learners && f.ctx_learners.length) || f.ctx_notes
-    || f.educators_supported || f.follow_up_desc || f.doc_url
-    || (f.doc_files && f.doc_files.length));
+  return draftHasContent(f);
 }
 
 // ─── OFFLINE SUBMISSION QUEUE ───
@@ -8145,8 +8143,37 @@ function _draftKey() {
   var email = (S.official && S.official.email) || (S.f && S.f.official_email) || 'anon';
   return 'ddd_form_draft_' + String(email).toLowerCase();
 }
-function saveFormDraft() {
+// The single definition of "this form has content worth keeping".
+// Used by BOTH the save side (isFormDirty) and the read side
+// (getStoredDraftMeta), so they can never disagree.
+function draftHasContent(f) {
+  if (!f) return false;
+  return !!(f.activity_type || f.activity_type_other || f.intervention_theme || f.description
+    || (f.subjects && f.subjects.length) || (f.grades && f.grades.length)
+    || (f.sip_focus_areas && f.sip_focus_areas.length)
+    || f.ddd_used || (f.ddd_reports && f.ddd_reports.length)
+    || f.insight_detail || f.insight_pass_rate || (f.insight_types && f.insight_types.length)
+    || (f.action_types && f.action_types.length) || (f.decision_types && f.decision_types.length)
+    || f.action_type || f.decision_type
+    || (f.intervention_triggers && f.intervention_triggers.length)
+    || (f.support_needed && f.support_needed.length) || f.support_level
+    || (f.ctx_staffing && f.ctx_staffing.length) || (f.ctx_resources && f.ctx_resources.length)
+    || (f.ctx_learners && f.ctx_learners.length) || f.ctx_notes
+    || f.educators_supported || f.follow_up_desc || f.doc_url
+    || (f.doc_files && f.doc_files.length));
+}
+function saveFormDraft(force) {
   try {
+    // THE GATE. A draft may only exist for an unsubmitted form with real
+    // Step-2+ content. This runs INSIDE the save so no call site — including
+    // the update banner, beforeunload, or future code — can bypass it.
+    // (This is what previously created phantom drafts from submitted or
+    // empty Step-1 forms every time the app updated.)
+    if (!force) {
+      if (S.submitted) return false;
+      if (!S.f || S.f.formStep < 1) return false;
+      if (!draftHasContent(S.f)) return false;
+    }
     const draft = {
       f: S.f, view: S.view, openSections: S.openSections,
       savedAt: new Date().toISOString(), version: APP_VERSION
@@ -8166,6 +8193,9 @@ function getStoredDraftMeta() {
     if (!draft || !draft.savedAt) return null;
     const age = Date.now() - new Date(draft.savedAt).getTime();
     if (age > DRAFT_TTL_MS) { clearFormDraft(); return null; }
+    // Phantom-draft guard: drafts saved by older versions from empty or
+    // already-submitted forms have no real content — delete on sight.
+    if (!draftHasContent(draft.f)) { clearFormDraft(); return null; }
     return { savedAt: draft.savedAt, step: (draft.f && typeof draft.f.formStep==='number') ? draft.f.formStep : 0 };
   } catch(e) { return null; }
 }
