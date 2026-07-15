@@ -5,7 +5,8 @@
     "highlights": [
       "The performance insights now point to where the most learners are below the pass mark — weighted by how many learners sit each subject, so you focus where the impact is greatest",
       "A new ‘Winnable now’ insight highlights learners who passed but scored just under 50% — the group closest to a solid pass with focused support",
-      "Insights follow DBE promotion thresholds and compare subjects within the same phase; unreliable records are filtered out"
+      "Insights follow DBE promotion thresholds and compare subjects within the same phase",
+      "Unreliable records — including single schools showing an exact 0% or 100% — are now filtered out, so a data error can no longer masquerade as a crisis"
     ]
   },
   "2026.06.18.63": {
