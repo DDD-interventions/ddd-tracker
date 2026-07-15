@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.76';
+const APP_VERSION = '2026.06.18.77';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -7022,15 +7022,30 @@ ${tab==='insights'?`
        }
      }
 
-     // Weakest subject across the scope.
-     var _subs = (_pf.subjects||[]).filter(function(x){ return x && x.avg_pass!=null; });
-     if (_subs.length && _subs[0].avg_pass < 65) {
-       _subs.sort(function(a,b){ return a.avg_pass - b.avg_pass; });
-       var sub = _subs[0];
-       C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Weakest subject</div>' +
-         '<p><b>' + esc(sub.subject) + '</b> averages <b>' + Math.round(sub.avg_pass) + '%</b> across the ' +
-         sub.schools + ' school' + (sub.schools!==1?'s':'') + ' with results in ' + _scope + '.</p>' +
-         _termLine + '</div>');
+     // ── BIGGEST OPPORTUNITY: the largest pool of learners below the DBE
+     //    pass mark, enrolment-weighted, within a single phase. Ranks by
+     //    NUMBER of struggling children, not by lowest percentage — an
+     //    intervention moves more learners where the pool is biggest.
+     var _opp = _pf.opportunity;
+     if (_opp && _opp.below_pass && _opp.below_pass >= 50) {
+       var _oppN = Math.round(_opp.below_pass);
+       C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Biggest opportunity</div>' +
+         '<p>About <b>' + _oppN.toLocaleString() + ' learner' + (_oppN!==1?'s':'') + '</b> are below the pass mark in <b>' +
+         esc(_opp.phase) + ' Phase ' + esc(_opp.subject) + '</b> — more than any other subject in the phase, across ' +
+         _opp.schools + ' school' + (_opp.schools!==1?'s':'') + ' with results in ' + _scope + '.</p>' +
+         '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'Open the DDD Dashboard to see which schools.</div></div>');
+     }
+
+     // ── WINNABLE NOW: learners who PASSED on policy but scored under 50%
+     //    (the 40–49% band). The most movable pool — one push from a
+     //    solid pass. Estimated from aggregate columns; no learner-level data.
+     var _win = _pf.winnable;
+     if (_win && _win.winnable && _win.winnable >= 50) {
+       var _winN = Math.round(_win.winnable);
+       C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Winnable now</div>' +
+         '<p>About <b>' + _winN.toLocaleString() + ' ' + esc(_win.phase) + ' learner' + (_winN!==1?'s':'') +
+         '</b> passed <b>' + esc(_win.subject) + '</b> but scored under 50% — within reach of a solid pass with focused support.</p>' +
+         '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'These learners are closest to the 50% mark.</div></div>');
      }
    }
 
