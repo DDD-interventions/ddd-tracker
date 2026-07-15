@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.77';
+const APP_VERSION = '2026.06.18.78';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4148,8 +4148,24 @@ async function enablePushNotifications() {
     if (!(('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window))) {
       st.busy = false; showToast('Push notifications are not supported on this device'); render(); return;
     }
+    // Pre-check: if already blocked, the browser will NOT show a prompt again.
+    // Tell the user how to unblock rather than silently failing.
+    if (Notification.permission === 'denied') {
+      st.busy = false;
+      showToast('Notifications are blocked for this site. Tap the padlock in your browser address bar, then Permissions, then set Notifications to Allow, and try again.');
+      render(); return;
+    }
     var perm = await Notification.requestPermission();
-    if (perm !== 'granted') { st.busy = false; showToast('Notifications were not allowed'); render(); return; }
+    if (perm === 'denied') {
+      st.busy = false;
+      showToast('You blocked notifications. To turn them on: tap the padlock in the address bar, then set Notifications to Allow.');
+      render(); return;
+    }
+    if (perm !== 'granted') {   // 'default' = the prompt was dismissed without choosing
+      st.busy = false;
+      showToast('Notification prompt was dismissed. Tap Enable again and choose Allow.');
+      render(); return;
+    }
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
     if (!sub) { sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY) }); }
