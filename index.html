@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.79';
+const APP_VERSION = '2026.06.18.80';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4134,8 +4134,27 @@ async function checkPushState() {
     var supported = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
     st.supported = supported; st.on = false;
     if (supported && Notification.permission === 'granted') {
-      try { var reg = await navigator.serviceWorker.ready; var sub = await reg.pushManager.getSubscription(); st.on = !!sub; }
-      catch (e) { st.on = false; }
+      try {
+        var reg = await navigator.serviceWorker.ready;
+        var sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+          // Permission is still granted but the subscription was dropped
+          // (common after a service-worker update). Re-subscribe SILENTLY so
+          // the user never has to tap Enable again.
+          try {
+            sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY) });
+            var j = sub.toJSON();
+            var sess = await sb.auth.getSession();
+            var email = (sess && sess.data && sess.data.session && sess.data.session.user && sess.data.session.user.email) || (S.official && S.official.email) || null;
+            await sb.from('push_subscriptions').upsert({
+              official_id: (S._officialId || null), email: email,
+              endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth,
+              user_agent: navigator.userAgent, last_seen: new Date().toISOString()
+            }, { onConflict: 'endpoint' });
+          } catch (e2) { sub = null; }
+        }
+        st.on = !!sub;
+      } catch (e) { st.on = false; }
     }
   } catch (e) { st.supported = false; }
   st.checked = true; st.checking = false; render();
