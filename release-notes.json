@@ -1,9 +1,10 @@
 {
-  "2026.06.18.79": {
-    "title": "National-level view",
+  "2026.06.18.80": {
+    "title": "Notifications stay on, and national insights fixed",
     "released": "2026-07-15",
     "highlights": [
-      "National users now see performance insights across the whole country, and can filter down to a province, district or circuit — the insights update to match whatever you select"
+      "Phone notifications now stay on after an app update — you no longer have to switch them back on each time",
+      "Fixed national-level performance insights not appearing"
     ]
   },
   "2026.06.18.63": {
