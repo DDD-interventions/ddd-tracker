@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.81';
+const APP_VERSION = '2026.06.18.82';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4658,8 +4658,11 @@ function loadPerformance(){
     p_districts: (sel.districts && sel.districts.length) ? sel.districts : null
   };
   return sb.rpc('scope_performance', _rpcArgs)
-    .then(function(r){ S._perf = (r && r.data) ? r.data : null; })
-    .catch(function(){ S._perf = null; })          // offline / error -> silent
+    .then(function(r){
+      if (r && r.error) { S._perf = null; S._perfError = (r.error.message || 'RPC error'); }
+      else { S._perf = (r && r.data) ? r.data : null; S._perfError = null; }
+    })
+    .catch(function(e){ S._perf = null; S._perfError = (e && e.message) ? e.message : 'network error'; })
     .then(function(){ S._perfLoading=false; S._perfTried=true; renderPerfCardsOnly(); });
 }
 // Repaint just the insight cards when perf data lands, without a full rebuild.
@@ -7039,6 +7042,14 @@ ${tab==='insights'?`
  <div class="ins-hd">What to notice</div>
  ${(function(){
    var C = [];
+
+   // Safety net: never fail fully silent. If performance was fetched and errored,
+   // show a quiet, honest line rather than an empty tab with no explanation.
+   if (S._perfTried && S._perfError && !S._perf) {
+     C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Performance data</div>' +
+       '<p>Couldn\u2019t load performance insights just now.</p>' +
+       '<div class="ins-s">' + esc(String(S._perfError).slice(0,120)) + '</div></div>');
+   }
 
    // ── PERFORMANCE (v.73): scope-aware, visit-neutral, baseline only. ──
    // Draws attention to where intervention is needed. Never mentions visits;
