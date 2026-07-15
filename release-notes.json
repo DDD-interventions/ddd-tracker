@@ -1,9 +1,9 @@
 {
-  "2026.06.18.78": {
-    "title": "Clearer help when notifications are blocked",
+  "2026.06.18.79": {
+    "title": "National-level view",
     "released": "2026-07-15",
     "highlights": [
-      "If turning on phone notifications doesn’t work, the app now tells you exactly why and how to fix it — usually unblocking the site in your browser settings"
+      "National users now see performance insights across the whole country, and can filter down to a province, district or circuit — the insights update to match whatever you select"
     ]
   },
   "2026.06.18.63": {
