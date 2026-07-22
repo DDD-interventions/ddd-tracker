@@ -1128,7 +1128,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.82';
+const APP_VERSION = '2026.06.18.83';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3751,6 +3751,13 @@ function render() {
  const o = S.official;
 
  // Welcome screen shown once after first login
+ if (S.showNotifyStep) {
+   app.innerHTML = `
+   <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">One quick thing\u2026</div> </div> </div> </header>
+   ${renderNotifyStep()}
+   <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme \u00b7 Department of Basic Education \u00b7 New Leaders Foundation</span> </div>`;
+   return;
+ }
  if (S.showWelcome) {
    app.innerHTML = `
    <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Welcome!</div> </div> </div> </header>
@@ -3970,8 +3977,65 @@ function renderForm() {
 // ═══ WELCOME SCREEN ═══
 function dismissWelcome() {
   S.showWelcome = false;
+  // Onboarding step 2: ask about notifications ONCE, full screen, before the
+  // app proper. The old inline card was scrolled past and disappeared for good
+  // after two dismissals — which is why enablement stayed low. This cannot be
+  // missed, but it is never blocking: some users genuinely cannot grant
+  // permission (older iPhones, browser-level blocks), and must still get in.
+  if (shouldAskNotifications()) { S.showNotifyStep = true; }
   render();
   (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'instant'}));
+}
+
+function shouldAskNotifications(){
+  try {
+    if (!(('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window))) return false;
+    if (Notification.permission !== 'default') return false;   // already granted or blocked
+    var st = pushOptinState();
+    if (st.done) return false;                                 // already turned on
+    return (st.asked || 0) < 3;                                // ask on first 3 logins, then stop
+  } catch(e) { return false; }
+}
+
+function notifyStepEnable(){
+  var st = pushOptinState(); st.done = true; savePushOptin(st);
+  S.showNotifyStep = false;
+  if (typeof enablePushNotifications === 'function') enablePushNotifications();
+  render();
+}
+function notifyStepSkip(){
+  var st = pushOptinState(); st.asked = (st.asked || 0) + 1; savePushOptin(st);
+  S.showNotifyStep = false;
+  render();
+  (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'instant'}));
+}
+
+function renderNotifyStep(){
+  return '<div class="welcome-wrap"><div class="welcome-card">' +
+    '<div class="welcome-hero">' +
+      '<div class="welcome-wave">\uD83D\uDD14</div>' +
+      '<h2>Turn on notifications</h2>' +
+      '<p>The Tracker notifies you just like WhatsApp does \u2014 on your phone, even when the app is closed.</p>' +
+    '</div>' +
+    '<div class="welcome-cards">' +
+      '<div class="wc-card" style="border-left-color:var(--orange)"><div class="wc-icon">\u23F0</div><div>' +
+        '<div class="wc-title">When a follow-up is due</div>' +
+        '<div class="wc-desc">A reminder about the visit you promised to come back to, so it does not slip.</div></div></div>' +
+      '<div class="wc-card" style="border-left-color:var(--teal)"><div class="wc-icon">\uD83D\uDC65</div><div>' +
+        '<div class="wc-title">When a colleague needs you</div>' +
+        '<div class="wc-desc">You will know straight away when someone asks for your support at a school.</div></div></div>' +
+      '<div class="wc-card" style="border-left-color:var(--green)"><div class="wc-icon">\uD83D\uDCCA</div><div>' +
+        '<div class="wc-title">When new results come in</div>' +
+        '<div class="wc-desc">New performance data for your schools, so you can see where support is needed.</div></div></div>' +
+    '</div>' +
+    '<div class="welcome-cta">' +
+      '<button class="btn-go" onclick="notifyStepEnable()">Turn on notifications</button>' +
+      '<div style="margin-top:14px">' +
+        '<button onclick="notifyStepSkip()" style="background:none;border:none;color:var(--grey);font-size:14px;font-weight:600;cursor:pointer;padding:10px 16px;text-decoration:underline;text-underline-offset:3px;font-family:inherit">Not right now</button>' +
+      '</div>' +
+      '<div style="font-size:12.5px;color:var(--grey);margin-top:8px;line-height:1.5">Your phone will ask you to allow this \u2014 tap <strong>Allow</strong>. You can change it any time in Settings.</div>' +
+    '</div>' +
+  '</div></div>';
 }
 
 function navToLog() {
@@ -4222,8 +4286,8 @@ async function disablePushNotifications() {
 
 // ── Push soft pre-prompt (post-login opt-in nudge) ───────────────────────────
 function pushOptinState() {
-  try { var r = localStorage.getItem('ddd_push_optin'); return r ? JSON.parse(r) : { dismissed:0, done:false }; }
-  catch (e) { return { dismissed:0, done:false }; }
+  try { var r = localStorage.getItem('ddd_push_optin'); return r ? JSON.parse(r) : { dismissed:0, done:false, asked:0 }; }
+  catch (e) { return { dismissed:0, done:false, asked:0 }; }
 }
 function savePushOptin(st) { try { localStorage.setItem('ddd_push_optin', JSON.stringify(st)); } catch (e) {} }
 function renderPushPrompt() {
