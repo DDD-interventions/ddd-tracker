@@ -1,10 +1,12 @@
 {
-  "2026.06.18.83": {
-    "title": "Notifications made easy to switch on",
+  "2026.06.18.85": {
+    "title": "Multi-select, copy a colleague, and your own summary report",
     "released": "2026-07-22",
     "highlights": [
-      "When you sign in, the app now shows a short screen explaining what notifications do and lets you turn them on in one tap",
-      "You will be reminded when a follow-up is due, when a colleague asks for your support, and when new results come in for your schools"
+      "Activity type and intervention theme now let you select more than one — a visit often covers several",
+      "You can now copy a colleague or your line manager on your School Visit Report before you submit",
+      "New: generate a PDF summary of your own school visits over the last 3, 6 or 12 months — schools reached, themes, subjects, barriers and follow-ups still open. Find it under Dashboard, My reports",
+      "Fixed the Inbox and Sign out buttons not responding on iPhone when opened from the home screen"
     ]
   },
   "2026.06.18.63": {
