@@ -17,7 +17,7 @@
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f3f2f1;color:#323130;min-height:100vh}
 
 /* HEADER */
-.hdr{background:#0087AC;position:sticky;top:0;z-index:100}
+.hdr{background:#0087AC;position:sticky;top:0;z-index:100;padding-top:env(safe-area-inset-top)}
 .hdr-bar{height:4px;background:var(--orange-hi)}
 .hdr-content{display:flex;align-items:center;gap:12px;padding:10px 16px;max-width:720px;margin:0 auto}
 .hdr-logo{height:48px;border-radius:6px}
@@ -868,6 +868,17 @@ html,body{overscroll-behavior-y:none}
   .school-dd [style*="flex-wrap:wrap"]{gap:4px}
   /* Scope selector mobile */
   .sup-scope-select{font-size:14px;padding:10px 12px}
+  /* ── iPhone: keep Inbox / Sign out clear of the iOS floating control ──
+     iOS draws its own control top-right over installed PWAs. Stacking the
+     header actions onto a full-width row below the title moves our buttons
+     out from underneath it, so they are tappable again. ── */
+  .hdr-content{flex-wrap:wrap;padding:8px 14px}
+  .hdr-titles{flex:1 1 100%;min-width:0;order:1}
+  .hdr-logo{order:0}
+  .hdr-actions{flex:1 1 100%;order:2;flex-direction:row;gap:8px;margin-top:8px;
+               padding-right:56px}            /* clearance for the iOS control */
+  .notif-bell{flex:1;height:44px;min-height:44px;justify-content:center}
+  .hdr-actions .hdr-logout{flex:0 0 auto;min-height:44px;padding:8px 14px}
   /* ── Insights / merged dashboard: nothing may clip on a narrow screen ── */
   .hl-grid{gap:8px}
   .hl{padding:12px;min-height:78px}
@@ -1128,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.83';
+const APP_VERSION = '2026.06.18.85';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1174,12 +1185,12 @@ const S = {
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:deriveTermFromDate(today()),activity_date:today(),
- activity_type:'',intervention_theme:'',subjects:[],grades:[],description:'',
+ activity_type:'',activity_types:[],_actTypeDDOpen:false,intervention_theme:'',intervention_themes:[],_themeDDOpen:false,subjects:[],grades:[],description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'',follow_up:false,follow_up_desc:'',
- doc_url:'',doc_name:'',
+ doc_url:'',doc_name:'',cc_email:'',
     sip_focus_areas:[],support_needed:[],support_level:'',obs_curriculum:'',obs_apip:'',obs_time:'',doc_file:null,doc_file_name:'',doc_files:[],doc_file_names:[],additional_data_sources:'',
     tagged_officials:{},_offSearchQ:{},_offSearchResults:{},_offSearchLoading:{},
     formStep:-1,intervention_trigger:'',intervention_trigger_other:'',intervention_triggers:[],_trigDDOpen:false,official_name:'',official_role:'',official_specialisation:'',official_email:'',
@@ -1614,6 +1625,132 @@ function generateInterventionPDF(dec, act, official) {
     doc.text('Page ' + i + ' of ' + total, pageW - margin, pageH - 16, { align:'right' });
   }
   return doc;
+}
+
+// ─── AGGREGATED REPORT: my own school visits ───────────────────────────
+// Scoped to the signed-in official only (official_id = me), so it needs no
+// additional access rules. Summarises visits, schools, follow-ups, themes
+// and barriers over a chosen period.
+function myVisitsInRange(months){
+  var me=S._officialId; if(!me) return [];
+  var cutoff=new Date(); cutoff.setMonth(cutoff.getMonth()-(months||6));
+  return (S.decisions||[]).filter(function(d){
+    if(d.official_id!==me) return false;
+    try { return parseLocalDate(d.date||d.created_at) >= cutoff; } catch(e){ return false; }
+  }).sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
+}
+
+async function generateMyVisitsReport(months){
+  months = months || 6;
+  var rows = myVisitsInRange(months);
+  if(!rows.length){ showToast('No visits logged in this period yet'); return; }
+  var ok = await ensureJsPDF();
+  if(!ok){ showToast('Could not prepare the report \u2014 check your connection and try again'); return; }
+  showToast('Building your report\u2026');
+
+  var jsPDF=window.jspdf.jsPDF, doc=new jsPDF({unit:'pt',format:'a4',compress:true});
+  var pageW=doc.internal.pageSize.getWidth(), pageH=doc.internal.pageSize.getHeight(), M=40, y=0;
+
+  // ── aggregate ──
+  var schools={}, themes={}, barriers={}, subjects={}, fups=0, educators=0, dddUsed=0;
+  rows.forEach(function(d){
+    var det=d.details||{};
+    (det.schools||'').split(',').map(function(x){return x.trim()}).filter(Boolean).forEach(function(x){schools[x]=(schools[x]||0)+1;});
+    (det.intervention_themes&&det.intervention_themes.length?det.intervention_themes:[det.intervention_theme]).forEach(function(t){ if(t) themes[t]=(themes[t]||0)+1; });
+    [].concat(det.ctx_staffing||[],det.ctx_resources||[],det.ctx_learners||[]).forEach(function(b){
+      if(b&&b!=='All posts filled'&&b!=='Adequate'&&b!=='No major concerns') barriers[b]=(barriers[b]||0)+1; });
+    (det.subjects||[]).forEach(function(x){ subjects[x]=(subjects[x]||0)+1; });
+    if(det.follow_up&&det.follow_up_desc&&!det.follow_up_completed) fups++;
+    educators += parseInt(det.educators_supported)||0;
+    if(det.ddd_used&&det.ddd_used!=='no') dddUsed++;
+  });
+  var top=function(o,n){ return Object.entries(o).sort(function(a,b){return b[1]-a[1]}).slice(0,n||5); };
+
+  // ── header ──
+  doc.setFillColor(7,68,69); doc.rect(0,0,pageW,86,'F');
+  try{ doc.addImage(LOGO,'JPEG',M,16,52,52); }catch(e){}
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold').setFontSize(8);
+  doc.text('DATA DRIVEN DISTRICTS', M+64, 30);
+  doc.setFontSize(14); doc.text('My School Visits \u2014 Summary Report', M+64, 50);
+  doc.setFont('helvetica','normal').setFontSize(9);
+  doc.text('Last '+months+' months  \u00b7  '+(S.official.full_name||''), M+64, 66);
+  y=108;
+
+  // ── headline numbers ──
+  var stats=[[String(rows.length),'Visits logged'],[String(Object.keys(schools).length),'Schools reached'],
+             [String(educators),'Educators supported'],[String(fups),'Follow-ups open']];
+  var bw=(pageW-M*2-24)/4;
+  stats.forEach(function(st,i){
+    var x=M+i*(bw+8);
+    doc.setFillColor(247,249,252); doc.roundedRect(x,y,bw,54,5,5,'F');
+    doc.setTextColor(26,35,50); doc.setFont('helvetica','bold').setFontSize(20);
+    doc.text(st[0], x+10, y+26);
+    doc.setFont('helvetica','normal').setFontSize(8); doc.setTextColor(90,104,120);
+    doc.text(st[1], x+10, y+42);
+  });
+  y+=74;
+
+  function section(title){
+    if(y>pageH-120){ doc.addPage(); y=M; }
+    doc.setTextColor(7,68,69); doc.setFont('helvetica','bold').setFontSize(11);
+    doc.text(title.toUpperCase(), M, y); y+=5;
+    doc.setDrawColor(7,68,69); doc.setLineWidth(1).line(M,y,pageW-M,y); y+=12;
+  }
+  function listRows(pairs, empty){
+    doc.setFont('helvetica','normal').setFontSize(9.5); doc.setTextColor(26,35,50);
+    if(!pairs.length){ doc.setTextColor(120,120,120); doc.text(empty||'None recorded', M, y); y+=16; return; }
+    pairs.forEach(function(p){
+      if(y>pageH-60){ doc.addPage(); y=M; }
+      doc.setTextColor(26,35,50);
+      doc.text(String(p[0]).slice(0,72), M, y);
+      doc.text(String(p[1]), pageW-M, y, {align:'right'});
+      y+=15;
+    });
+    y+=6;
+  }
+
+  section('Data-informed practice');
+  doc.setFont('helvetica','normal').setFontSize(9.5); doc.setTextColor(26,35,50);
+  doc.text(dddUsed+' of '+rows.length+' visits ('+Math.round(dddUsed/rows.length*100)+'%) were informed by data.', M, y); y+=22;
+
+  section('Schools visited most');
+  listRows(top(schools,8).map(function(p){return [p[0], p[1]+' visit'+(p[1]!==1?'s':'')]}));
+
+  section('Themes of support');
+  listRows(top(themes,6).map(function(p){return [p[0], p[1]]}));
+
+  section('Subjects supported');
+  listRows(top(subjects,6).map(function(p){return [p[0], p[1]]}));
+
+  section('Barriers observed');
+  listRows(top(barriers,8).map(function(p){return [p[0], p[1]+' time'+(p[1]!==1?'s':'')]}), 'No barriers recorded');
+
+  section('Visit log');
+  doc.setFontSize(8.5);
+  rows.slice(0,40).forEach(function(d){
+    if(y>pageH-60){ doc.addPage(); y=M; }
+    var det=d.details||{};
+    doc.setTextColor(90,104,120); doc.text(String(d.date||'').slice(0,10), M, y);
+    doc.setTextColor(26,35,50);
+    doc.text(String((det.schools||'').split(',')[0]||'').slice(0,44), M+62, y);
+    doc.text(String(det.activity_type||'').slice(0,34), M+250, y);
+    y+=13;
+  });
+  if(rows.length>40){ doc.setTextColor(120,120,120); doc.text('\u2026and '+(rows.length-40)+' more visits', M, y+4); }
+
+  // footer on every page
+  var tot=doc.internal.getNumberOfPages();
+  var stamp=new Date().toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg',dateStyle:'long',timeStyle:'short'});
+  for(var i=1;i<=tot;i++){
+    doc.setPage(i);
+    doc.setDrawColor(220,220,220); doc.setLineWidth(.5).line(M,pageH-28,pageW-M,pageH-28);
+    doc.setFont('helvetica','normal').setFontSize(7); doc.setTextColor(120,120,120);
+    doc.text('DDD Learner Improvement Interventions Tracker \u00b7 '+stamp+' SAST \u00b7 v'+APP_VERSION, M, pageH-16);
+    doc.text('Page '+i+' of '+tot, pageW-M, pageH-16, {align:'right'});
+  }
+  doc.save('My-School-Visits-'+(new Date().toISOString().slice(0,10))+'.pdf');
+  haptic(HAPTIC_OK);
+  showToast('Report downloaded');
 }
 
 // Returns base64-encoded PDF (no data: prefix), ready for Resend `attachments` field
@@ -3903,8 +4040,8 @@ function getFormProgress() {
    [!!f.official_name, 2],
    [!!f.circuit, 1],
    // Step 2: What Happened
-   [!!f.activity_type && (f.activity_type !== 'Other' || !!f.activity_type_other.trim()), 3],
-   [!!f.intervention_theme, 2],
+   [f.activity_types.length > 0 && (!f.activity_types.includes('Other') || !!f.activity_type_other.trim()), 3],
+   [f.intervention_themes.length > 0, 2],
    [f.subjects.length > 0, 2],
    [f.grades.length > 0, 2],
    [!!f.description, 1],
@@ -5230,7 +5367,7 @@ function renderSubjectPicker(){
 }
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
-    <div class="field-row"><div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><select onchange="S.f.activity_type=this.value;if(this.value!=='Other')S.f.activity_type_other='';render()"><option value="">Select...</option>${ACTIVITY_TYPES.map(t=>`<option ${S.f.activity_type===t?'selected':''}>${t}</option>`).join('')}</select>${S.f.activity_type==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Activity Type \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}${getSelHint(S.f.activity_type,ACTIVITY_HINTS)}</div><div class="field"><label>Intervention Theme</label><select onchange="S.f.intervention_theme=this.value;if(this.value!=='Other')S.f.intervention_theme_other='';render()"><option value="">Select...</option>${(()=>{const t=[...THEMES];if(S.f.district==='Lejweleputswa')t.splice(t.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');return t.map(t=>`<option ${S.f.intervention_theme===t?'selected':''}>${t}</option>`).join('');})()}</select>${S.f.intervention_theme==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Intervention Theme \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}${getSelHint(S.f.intervention_theme,THEME_HINTS)}</div></div>
+    <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Select all that apply \u2014 a visit can cover more than one</div>${renderActivityTypePicker()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Intervention Theme</label><div class="hint">Select all that apply</div>${renderThemePicker()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
     <div class="field"><label>Subject(s)</label><div class="hint">Which subjects did your support focus on? This helps track where support is concentrated across the district and identify subjects that may be underserved</div>${renderSubjectPicker()}</div>
     <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
@@ -5293,6 +5430,22 @@ function toggleDecision(name){S.f.decision_types.includes(name)?S.f.decision_typ
 function removeDecision(name){S.f.decision_types=S.f.decision_types.filter(s=>s!==name);S.f.decision_type=S.f.decision_types[0]||'';if(!S.f.decision_types.includes('Other'))S.f.decision_other='';render();}
 function toggleAction(name){S.f.action_types.includes(name)?S.f.action_types=S.f.action_types.filter(s=>s!==name):S.f.action_types.push(name);S.f.action_type=S.f.action_types[0]||'';if(!S.f.action_types.includes('Other'))S.f.action_other='';render();}
 function removeAction(name){S.f.action_types=S.f.action_types.filter(s=>s!==name);S.f.action_type=S.f.action_types[0]||'';if(!S.f.action_types.includes('Other'))S.f.action_other='';render();}
+function toggleActivityType(name){S.f.activity_types.includes(name)?S.f.activity_types=S.f.activity_types.filter(s=>s!==name):S.f.activity_types.push(name);S.f.activity_type=S.f.activity_types[0]||'';if(!S.f.activity_types.includes('Other'))S.f.activity_type_other='';render();}
+function removeActivityType(name){S.f.activity_types=S.f.activity_types.filter(s=>s!==name);S.f.activity_type=S.f.activity_types[0]||'';if(!S.f.activity_types.includes('Other'))S.f.activity_type_other='';render();}
+function toggleTheme(name){S.f.intervention_themes.includes(name)?S.f.intervention_themes=S.f.intervention_themes.filter(s=>s!==name):S.f.intervention_themes.push(name);S.f.intervention_theme=S.f.intervention_themes[0]||'';if(!S.f.intervention_themes.includes('Other'))S.f.intervention_theme_other='';render();}
+function removeTheme(name){S.f.intervention_themes=S.f.intervention_themes.filter(s=>s!==name);S.f.intervention_theme=S.f.intervention_themes[0]||'';if(!S.f.intervention_themes.includes('Other'))S.f.intervention_theme_other='';render();}
+function renderActivityTypePicker(){
+  return renderChipPicker(S.f.activity_types,ACTIVITY_TYPES,S.f._actTypeDDOpen,'toggleActivityType','removeActivityType',
+    "S.f._actTypeDDOpen=!S.f._actTypeDDOpen;S.f._themeDDOpen=false;render()","S.f._actTypeDDOpen=false;render()",
+    'Select activity type(s)...',ACTIVITY_HINTS);
+}
+function renderThemePicker(){
+  var themes=[].concat(THEMES);
+  if(S.f.district==='Lejweleputswa') themes.splice(themes.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');
+  return renderChipPicker(S.f.intervention_themes,themes,S.f._themeDDOpen,'toggleTheme','removeTheme',
+    "S.f._themeDDOpen=!S.f._themeDDOpen;S.f._actTypeDDOpen=false;render()","S.f._themeDDOpen=false;render()",
+    'Select theme(s)...',THEME_HINTS);
+}
 function toggleTrigger(name){S.f.intervention_triggers.includes(name)?S.f.intervention_triggers=S.f.intervention_triggers.filter(s=>s!==name):S.f.intervention_triggers.push(name);S.f.intervention_trigger=S.f.intervention_triggers[0]||'';if(!S.f.intervention_triggers.includes('Other'))S.f.intervention_trigger_other='';render();}
 function removeTrigger(name){S.f.intervention_triggers=S.f.intervention_triggers.filter(s=>s!==name);S.f.intervention_trigger=S.f.intervention_triggers[0]||'';if(!S.f.intervention_triggers.includes('Other'))S.f.intervention_trigger_other='';render();}
 function renderTriggerPicker(){
@@ -5412,6 +5565,12 @@ function renderFormReview(){
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:13px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    <div class="field" style="margin:14px 0 4px;padding:12px 14px;background:#f7f9fc;border-radius:8px">
+      <label style="font-size:14.5px;font-weight:600;color:var(--navy)">Send a copy to a colleague <span style="font-weight:400;color:var(--grey)">(optional)</span></label>
+      <div class="hint">Your School Visit Report is emailed to you automatically. Add a colleague or your line manager here to copy them in.</div>
+      <input type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="e.g. manager@education.gov.za" value="${esc(S.f.cc_email||'')}" oninput="S.f.cc_email=this.value" style="width:100%;padding:10px 12px;border:1px solid #c8c6c4;border-radius:6px;font-size:14px;font-family:inherit">
+      ${(function(){var v=(S.f.cc_email||'').trim();if(!v)return '';return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)?'<div style="font-size:13px;color:var(--green-text);margin-top:5px;font-weight:600">\u2713 A copy will be sent to '+esc(v)+'</div>':'<div style="font-size:13px;color:var(--red);margin-top:5px">That does not look like a valid email address</div>';})()}
+    </div>
     <div style="margin:14px 0 8px"><label style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid ${S.f._reviewConfirmed?'var(--green)':'#c8c6c4'};border-radius:8px;cursor:pointer;background:${S.f._reviewConfirmed?'var(--green-lt)':'#fff'};transition:all .2s"><input type="checkbox" ${S.f._reviewConfirmed?'checked':''} onchange="S.f._reviewConfirmed=this.checked;render()" style="width:20px;height:20px;margin-top:1px;flex-shrink:0;accent-color:var(--green)"><span style="font-size:14px;color:var(--navy);line-height:1.5;font-weight:500">I confirm this information is correct and complete</span></label></div>
     ${renderLocationCard()}
     <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=3;render()">&larr; Back</button><button class="btn btn-teal" onclick="submitForm()" ${S.saving||!S.f._reviewConfirmed?'disabled':''} style="min-width:160px;${!S.f._reviewConfirmed?'opacity:.5;cursor:not-allowed':''}">${S.saving?'<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span> Submitting...':'Submit'}</button></div>
@@ -5522,8 +5681,8 @@ function getValidationErrors() {
  if (!f.official_specialisation) errs.push({step:0,field:'official_specialisation',label:'Specialisation',fieldId:'fld-spec'});
  if (f.official_specialisation==='Other'&&!f.official_specialisation_other.trim()) errs.push({step:0,field:'official_specialisation_other',label:'Specialisation (please specify)',fieldId:'fld-spec'});
  // Step 2: What Happened
- if (!f.activity_type) errs.push({step:1,field:'activity_type',label:'Activity type',fieldId:'fld-activity'});
- if (f.activity_type==='Other'&&!f.activity_type_other.trim()) errs.push({step:1,field:'activity_type_other',label:'Activity type (please describe)',fieldId:'fld-activity'});
+ if (!f.activity_types.length) errs.push({step:1,field:'activity_types',label:'Activity type',fieldId:'fld-activity'});
+ if (f.activity_types.includes('Other')&&!f.activity_type_other.trim()) errs.push({step:1,field:'activity_type_other',label:'Activity type (please describe)',fieldId:'fld-activity'});
  if (!f.grades.length) errs.push({step:1,field:'grades',label:'Grades supported',fieldId:'fld-grades'});
  // Step 3: Data Connection
  if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was data used?',fieldId:'fld-ddd-used'});
@@ -5595,8 +5754,11 @@ async function submitForm() {
 
  const details = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:S.f.schools, term:S.f.term,
- activity_type:S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type,
- intervention_theme:S.f.intervention_theme==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:S.f.intervention_theme,
+ activity_type:(S.f.activity_types.length?S.f.activity_types.map(function(t){return t==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:t}).join('; '):S.f.activity_type),
+ activity_types:S.f.activity_types,
+ intervention_theme:(S.f.intervention_themes.length?S.f.intervention_themes.map(function(t){return t==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:t}).join('; '):S.f.intervention_theme),
+ intervention_themes:S.f.intervention_themes,
+ cc_email:(S.f.cc_email||'').trim()||null,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
  ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return !!v && a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, ddd_data_source:S.f.ddd_data_source||null, ddd_data_source_person:S.f.ddd_data_source_person||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
@@ -5842,12 +6004,12 @@ function resetForm() {
  clearFormDraft();
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:deriveTermFromDate(today()), activity_date:today(),
- activity_type:'', activity_type_other:'', intervention_theme:'', intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
+ activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
  educators_supported:'', follow_up:false, follow_up_desc:'',
- doc_url:'', doc_name:'',
+ doc_url:'', doc_name:'', cc_email:'',
     sip_focus_areas:[], support_needed:[], support_level:'', obs_curriculum:'', obs_apip:'', obs_time:'', doc_file:null, doc_file_name:'', doc_files:[], doc_file_names:[],
     tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
     formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, official_specialisation_other:S.f.official_specialisation_other,
@@ -7596,6 +7758,16 @@ ${tab==='overview'?`
 
 
 <div style="max-width:640px;margin:20px auto 0;padding:0 16px">
+  <div style="font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">My reports</div>
+  <div style="padding:14px;background:#fff;border:1px solid #e8e6e4;border-left:4px solid var(--teal);border-radius:10px;margin-bottom:14px">
+    <div style="font-size:14.5px;font-weight:700;color:var(--navy)">School visits summary report</div>
+    <div style="font-size:13px;color:var(--grey);margin-top:2px;line-height:1.5">A PDF summary of the visits you have logged \u2014 schools reached, themes, subjects, barriers observed and follow-ups still open. Covers your own visits only.</div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="generateMyVisitsReport(3)" style="flex:1;min-width:110px;background:#fff;border:1.5px solid var(--teal);color:var(--teal);font-size:14px;font-weight:700;padding:10px 14px;border-radius:8px;min-height:44px;cursor:pointer;font-family:inherit">Last 3 months</button>
+      <button onclick="generateMyVisitsReport(6)" style="flex:1;min-width:110px;background:var(--teal);border:none;color:#fff;font-size:14px;font-weight:700;padding:10px 14px;border-radius:8px;min-height:44px;cursor:pointer;font-family:inherit">Last 6 months</button>
+      <button onclick="generateMyVisitsReport(12)" style="flex:1;min-width:110px;background:#fff;border:1.5px solid var(--teal);color:var(--teal);font-size:14px;font-weight:700;padding:10px 14px;border-radius:8px;min-height:44px;cursor:pointer;font-family:inherit">Last 12 months</button>
+    </div>
+  </div>
   <div style="font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Settings</div>
   ${renderNotifyToggle()}
   ${renderPushSetting()}
