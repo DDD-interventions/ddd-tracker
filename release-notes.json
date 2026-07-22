@@ -1,11 +1,10 @@
 {
-  "2026.06.18.82": {
-    "title": "Performance insights fixed at every level",
-    "released": "2026-07-15",
+  "2026.06.18.83": {
+    "title": "Notifications made easy to switch on",
+    "released": "2026-07-22",
     "highlights": [
-      "Performance insights now appear at district, province and national level — not only at circuit level",
-      "These now load from fast precomputed summaries, so they appear quickly even across the whole country",
-      "If performance data ever can’t load, the app now tells you why instead of showing nothing"
+      "When you sign in, the app now shows a short screen explaining what notifications do and lets you turn them on in one tap",
+      "You will be reminded when a follow-up is due, when a colleague asks for your support, and when new results come in for your schools"
     ]
   },
   "2026.06.18.63": {
