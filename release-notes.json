@@ -1,12 +1,9 @@
 {
-  "2026.06.18.85": {
-    "title": "Multi-select, copy a colleague, and your own summary report",
+  "2026.06.18.86": {
+    "title": "Provincial access",
     "released": "2026-07-22",
     "highlights": [
-      "Activity type and intervention theme now let you select more than one — a visit often covers several",
-      "You can now copy a colleague or your line manager on your School Visit Report before you submit",
-      "New: generate a PDF summary of your own school visits over the last 3, 6 or 12 months — schools reached, themes, subjects, barriers and follow-ups still open. Find it under Dashboard, My reports",
-      "Fixed the Inbox and Sign out buttons not responding on iPhone when opened from the home screen"
+      "Officials who work across a whole province — such as provincial subject advisers — now see insights and schools for every district in their province"
     ]
   },
   "2026.06.18.63": {
