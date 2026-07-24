@@ -1,9 +1,9 @@
 {
-  "2026.06.18.86": {
-    "title": "Provincial access",
-    "released": "2026-07-22",
+  "2026.06.18.87": {
+    "title": "Data now matches your area of responsibility",
+    "released": "2026-07-24",
     "highlights": [
-      "Officials who work across a whole province — such as provincial subject advisers — now see insights and schools for every district in their province"
+      "The home feed and dashboard now show only the activity for your own province or district — previously some users could see activity from other provinces"
     ]
   },
   "2026.06.18.63": {
