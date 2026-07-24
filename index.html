@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.88';
+const APP_VERSION = '2026.06.18.89';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2749,7 +2749,7 @@ function renderHomeFeed() {
   var own = feedOwnDecisions();
   var em = (o.email || '').toLowerCase();
   var termCount = own.filter(function(d){ try { return new Date(d.created_at) >= term.start; } catch(e){ return false; } }).length;
-  loadFeedSpotlight();
+  // (spotlight replaced by the policy-aligned performance cards below)
 
   var AVC = ['#00647F','#5D9331','#B5720F','#1A2332','#0A6162'];
   function av(txt, idx, sq){ return '<div class="fi-av'+(sq?' sq':'')+'" style="background:'+AVC[idx%AVC.length]+'">'+esc(txt)+'</div>'; }
@@ -2836,23 +2836,57 @@ function renderHomeFeed() {
     body: 'Subject results for ' + esc(termLbl) + ' are loaded for schools across the country \u2014 including yours.',
     actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
 
-  // Daily data items: one needs-attention, one bright spot (rotate every day)
-  if (S._spotlight && S._spotlight.day === feedDayKey()) {
-    var lo = S._spotlight.low, hi = S._spotlight.high;
-    if (lo) {
-      items.push(item({
-        avatar: av(ini(lo.school_name||'S'),2),
-        name: esc(lo.school_name||''),
-        meta: 'Needs attention \u00b7 ' + esc(lo.term_label||'') + ' \u00b7 your area',
-        body: 'Grade ' + esc(String(lo.grade)) + ' ' + esc(lo.subject||'') + ' averaged <b>' + Math.round(lo.average) + '%</b>. Worth a closer look before Term 3 planning.',
-        actions: [{label:'See details on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+  // ── Performance insights, at the official's own scope ──
+  // These replace the old daily-rotation "spotlight": same data source, but
+  // computed by the policy-aligned RPC (enrolment-weighted, anomaly-filtered,
+  // compared within phase) instead of picking a school at random.
+  loadPerformance();
+  if (S._perf) {
+    var pf = S._perf, term = pf.term ? esc(pf.term) : '';
+    var scopeTxt = S._perfLabel || 'your area';
+
+    var wsch = (pf.schools || []).filter(function(x){ return x && x.worst_rate != null; });
+    if (wsch.length) {
+      wsch.sort(function(a,b){ return a.worst_rate - b.worst_rate; });
+      var w = wsch[0];
+      if (w.worst_rate < 60) {
+        var gr = (w.worst_grade != null) ? ('Grade ' + w.worst_grade + ' ') : '';
+        items.push(item({
+          avatar: av(ini(w.school_name||'S'), w.worst_rate < 50 ? 2 : 3),
+          name: esc(w.school_name || ''),
+          meta: (w.worst_rate < 50 ? 'Needs attention' : 'Lowest result') + ' \u00b7 ' + esc(scopeTxt),
+          accent: w.worst_rate < 50 ? 'o' : 't',
+          body: gr + esc(w.worst_subject || '') + ' at <b>' + Math.round(w.worst_rate) + '%</b> \u2014 the lowest in ' + esc(scopeTxt) + '.' +
+                (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : ''),
+          actions: [{label:'See the schools on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+      }
     }
-    if (hi) {
+
+    var opp = pf.opportunity;
+    if (opp && opp.below_pass >= 50) {
+      var oppN = Math.round(opp.below_pass);
       items.push(item({
-        avatar: av(ini(hi.school_name||'S'),1),
-        name: esc(hi.school_name||''),
-        meta: 'Bright spot \u00b7 ' + esc(hi.term_label||'') + ' \u00b7 your area',
-        body: 'Grade ' + esc(String(hi.grade)) + ' ' + esc(hi.subject||'') + ' averaged <b>' + Math.round(hi.average) + '%</b>. Something is working here \u2014 a visit could surface lessons for other schools.' }));
+        avatar: av('!', 2, true),
+        name: 'Biggest opportunity',
+        meta: esc(opp.phase) + ' Phase \u00b7 ' + esc(scopeTxt),
+        accent: 'o',
+        body: 'About <b>' + oppN.toLocaleString() + ' learners</b> are below the pass mark in <b>' +
+              esc(opp.phase) + ' Phase ' + esc(opp.subject) + '</b> \u2014 more than any other subject in the phase.' +
+              (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : ''),
+        actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+    }
+
+    var win = pf.winnable;
+    if (win && win.winnable >= 50) {
+      var winN = Math.round(win.winnable);
+      items.push(item({
+        avatar: av('\u2713', 1, true),
+        name: 'Winnable now',
+        meta: esc(win.phase) + ' Phase \u00b7 ' + esc(scopeTxt),
+        accent: 't',
+        body: 'About <b>' + winN.toLocaleString() + ' ' + esc(win.phase) + ' learners</b> passed <b>' +
+              esc(win.subject) + '</b> but scored under 50% \u2014 within reach of a solid pass with focused support.' +
+              (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : '') }));
     }
   }
 
@@ -4876,7 +4910,11 @@ function loadPerformance(){
     .then(function(){ S._perfLoading=false; S._perfTried=true; renderPerfCardsOnly(); });
 }
 // Repaint just the insight cards when perf data lands, without a full rebuild.
-function renderPerfCardsOnly(){ if(S.view==='dashboard' && (S.dashTab||'')==='insights') render(); }
+function renderPerfCardsOnly(){
+  // Repaint wherever the cards appear: the dashboard, and now the home feed.
+  if (S.view==='dashboard') { render(); return; }
+  if (S.view==='log' && S.f.formStep===-1 && !S.submitted) render();
+}
 // Scope label that mirrors what the card can honestly claim.
 function scopeLabel(){
   var raw=(S.official && S.official.district || '').trim();
@@ -7174,9 +7212,8 @@ function renderDashboard() {
  }
 
 // ── TAB STATE ──
- const tab = S.dashTab || 'overview';
- if (tab === 'impact' || tab === 'coverage' || tab === 'schools' || tab === 'tracker' || tab === 'trends') { S.dashTab = 'insights'; return renderDashboard(); }
- if (tab === 'insights') loadPerformance();   // fetch scope performance once; fail-silent
+ // Dashboard and Insights are one scrolling page now — no sub-tabs.
+ loadPerformance();   // fetch scope performance once; fail-silent
 
  // ═══════════════════════════════════
  // RENDER
@@ -7187,10 +7224,6 @@ function renderDashboard() {
  ${renderFilterBar(decs)}
 
  
- <div class="dash-subnav">
-   <button class="${tab==='overview'?'active':''}" onclick="S.dashTab='overview';render()">Dashboard</button>
-   <button class="${tab==='insights'?'active':''}" onclick="S.dashTab='insights';render()">Insights</button>
- </div>
 
  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;flex-wrap:wrap">
    <span style="font-size:13.5px;color:var(--grey);font-weight:600;white-space:nowrap">Showing:</span>
@@ -7201,7 +7234,7 @@ function renderDashboard() {
    }).join('')}
  </div>
 
-${tab==='overview'?`
+${`
  <!-- ═══ FOUR HEADLINE NUMBERS ═══ -->
  <div class="hl-grid">
    <div class="hl">
@@ -7317,9 +7350,9 @@ ${tab==='overview'?`
  <!-- ═══ DDD DASHBOARD REFERENCE (removed to avoid confusion) ═══ -->
  </details>
 
-`:''}
+`}
 
-${tab==='insights'?`
+${`
  <!-- ═══ INSIGHT CARDS ═══ -->
  <div class="ins-hd">What to notice</div>
  ${(function(){
@@ -7510,9 +7543,9 @@ ${tab==='insights'?`
 
  </details>
 
-`:''}
+`}
 
-${tab==='overview'?`
+${`
  <div class="dash-section" style="border-left:4px solid var(--teal)">
    <div class="dash-section-hdr">
      <h3 id="dash-tracker">Intervention Activity Tracker</h3>
@@ -7809,7 +7842,7 @@ ${tab==='overview'?`
      })()}
    </div>
  </div>
-`:''}\
+`}
 
 
 
