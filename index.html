@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.89';
+const APP_VERSION = '2026.06.18.90';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4853,6 +4853,26 @@ function scopeSelection(){
   // district = 'Province' means the whole of their province. Passes the
   // province NAME so the RPC reads the precomputed summaries, same as the
   // province filter path above.
+  // Circuit official: resolve their circuit's EMIS so the cards match their
+  // ceiling. Small list -> the RPC computes it live.
+  var _myCircs = officialCircuits(S.official);
+  if (_myCircs.length && raw && raw !== 'All' && raw !== 'Province' && raw !== 'Provincial') {
+    var _dKey = _resolveDistrictKey(raw);
+    if (_dKey && SCHOOLS_MAP[_dKey]) {
+      var _out = {};
+      _myCircs.forEach(function(cn){
+        (SCHOOLS_MAP[_dKey][cn] || []).forEach(function(r){
+          var e = (r && r.length > 2) ? r[2] : null; if (e) _out[e] = true;
+        });
+      });
+      var _emisC = Object.keys(_out).map(function(x){ return parseInt(x,10); }).filter(function(n){ return !!n; });
+      if (_emisC.length) {
+        return {emis:_emisC,
+                label: _myCircs.length > 1 ? 'your circuits' : 'your circuit',
+                key: 'circ|' + _dKey + '|' + _myCircs.join(',')};
+      }
+    }
+  }
   if (raw === 'Province' || raw === 'Provincial') {
     var myProv = (S.official && S.official.province || '').trim();
     if (myProv) return {emis:[], province:myProv, label:'your province', key:'prov|'+myProv};
@@ -6080,12 +6100,15 @@ function initDashFilters() {
   const realDist = (!rawDist || rawDist === 'All' || rawDist === 'Province' || rawDist === 'Provincial')
                    ? 'All'
                    : (rawDist.indexOf(',') >= 0 ? 'All' : rawDist);   // multi-district -> All
+  const myCircs = officialCircuits(S.official);
   S.dashFilter = {
     // Default to the official's own area so the filter bar shows what they
     // actually see. Only national users start on 'All'.
     province: (scope === 'national') ? 'All' : realProv,
-    district: (scope === 'district') ? realDist : 'All',
-    circuit: 'All',
+    district: (scope === 'district' || scope === 'circuit') ? realDist : 'All',
+    // A circuit official lands on their own circuit; if they cover several,
+    // start on 'All' (the ceiling still confines them to those circuits).
+    circuit: (scope === 'circuit' && myCircs.length === 1) ? myCircs[0] : 'All',
     school: 'All'
   };
   S.dashTermFilter = { year: new Date().getFullYear(), term: 'All' };
@@ -6126,6 +6149,15 @@ function getDashYears() {
   return [...years].sort(function(a, b) { return b - a; });
 }
 
+// officials.circuit is text[] in the database, but can reach the client as an
+// array, a single string, or empty. Normalise to a clean array of names.
+function officialCircuits(o){
+  var c = (o || S.official || {}).circuit;
+  if (!c) return [];
+  if (Array.isArray(c)) return c.map(function(x){ return String(x||'').trim(); }).filter(Boolean);
+  return String(c).split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+}
+
 function getClientScope() {
   const role = S.official.role || '';
   const prov = S.official.province || '';
@@ -6140,6 +6172,11 @@ function getClientScope() {
 
   // Provincial scope
   if (['Provincial Manager','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Director','Chief Director','Gauteng Provincial Project Manager','North West Junior PM'].includes(role) || role.includes('Provincial')) return 'province';
+
+  // Circuit scope: assigned to specific circuit(s) -> sees only those.
+  // Officials with no circuit recorded keep district scope, so existing
+  // records without a circuit are unaffected.
+  if (officialCircuits(S.official).length) return 'circuit';
 
   // District scope
   if (['Circuit Manager','Subject Advisor','Cluster Lead','District Director','Senior Education Specialist'].includes(role)) return 'district';
@@ -6165,6 +6202,17 @@ function applyScopeCeiling(decs){
   if (scope === 'province') {
     if (!prov) return decs;
     return decs.filter(function(d){ return ((d.details||{}).province || '') === prov; });
+  }
+
+  // Circuit: only activity in their own circuit(s).
+  if (scope === 'circuit') {
+    var myCircs = officialCircuits(o).map(function(x){ return x.toLowerCase(); });
+    if (myCircs.length) {
+      return decs.filter(function(d){
+        var c = String((d.details||{}).circuit || '').trim().toLowerCase();
+        return c && myCircs.indexOf(c) >= 0;
+      });
+    }
   }
 
   // District (incl. multi-district): only their district(s).
