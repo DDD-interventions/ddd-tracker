@@ -1,9 +1,9 @@
 {
-  "2026.06.18.87": {
-    "title": "Data now matches your area of responsibility",
+  "2026.06.18.88": {
+    "title": "Filters start on your own area",
     "released": "2026-07-24",
     "highlights": [
-      "The home feed and dashboard now show only the activity for your own province or district — previously some users could see activity from other provinces"
+      "The dashboard now opens with your own province or district already selected, instead of “All”"
     ]
   },
   "2026.06.18.63": {
