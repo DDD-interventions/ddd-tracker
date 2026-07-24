@@ -1,9 +1,10 @@
 {
-  "2026.06.18.90": {
-    "title": "Circuit-level view",
+  "2026.06.18.91": {
+    "title": "Circuit view now works correctly",
     "released": "2026-07-24",
     "highlights": [
-      "Officials assigned to a circuit now see activity and insights for their own circuit, rather than the whole district"
+      "Fixed circuit officials seeing the whole district — your circuit is now selected by default and the insights refer to your circuit",
+      "Fixed the “support requests” row on the dashboard not responding when tapped"
     ]
   },
   "2026.06.18.63": {
