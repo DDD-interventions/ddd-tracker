@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.85';
+const APP_VERSION = '2026.06.18.86';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4815,6 +4815,15 @@ function scopeSelection(){
   if (isNational) {
     return {emis:[], national:true, label:'the country', key:'national'};
   }
+  // Provincial official (e.g. NW Maths/Languages subject advisers):
+  // district = 'Province' means the whole of their province. Passes the
+  // province NAME so the RPC reads the precomputed summaries, same as the
+  // province filter path above.
+  if (raw === 'Province' || raw === 'Provincial') {
+    var myProv = (S.official && S.official.province || '').trim();
+    if (myProv) return {emis:[], province:myProv, label:'your province', key:'prov|'+myProv};
+    return {emis:[], label:'', key:'none'};
+  }
   if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
   var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
   var keys=[]; parts.forEach(function(pn){ var k=_resolveDistrictKey(pn); if(k && keys.indexOf(k)<0) keys.push(k); });
@@ -6075,6 +6084,11 @@ function getDashYears() {
 function getClientScope() {
   const role = S.official.role || '';
   const prov = S.official.province || '';
+  const dist = (S.official.district || '').trim();
+  // Explicit PROVINCIAL scope: district = 'Province' means the whole province.
+  // Used for provincial subject advisers (e.g. NW Maths/Languages SES) who work
+  // across every district. Checked first so it applies to any role.
+  if (dist === 'Province' || dist === 'Provincial') return 'province';
 
   // National scope: explicit national province or national-level roles
   if (prov === 'National' || prov === 'All' || ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager'].includes(role)) return 'national';
