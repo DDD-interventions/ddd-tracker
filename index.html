@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.86';
+const APP_VERSION = '2026.06.18.87';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2858,7 +2858,7 @@ function renderHomeFeed() {
 
   // Activity timeline: every logged visit in the past 2 months, told as a story
   var d60 = Date.now() - 60*86400000;
-  var streamRows = (S.decisions || []).filter(function(d){
+  var streamRows = applyScopeCeiling(S.decisions || []).filter(function(d){
     try { return new Date(d.created_at).getTime() >= d60; } catch(e){ return false; }
   }).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
 
@@ -2931,7 +2931,7 @@ function renderHomeFeed() {
 
   // Programme pulse: the year so far
   var yStart = new Date(new Date().getFullYear(), 0, 1);
-  var yearDecs = (S.decisions || []).filter(function(d){ try { return new Date(d.created_at) >= yStart; } catch(e){ return false; } });
+  var yearDecs = applyScopeCeiling(S.decisions || []).filter(function(d){ try { return new Date(d.created_at) >= yStart; } catch(e){ return false; } });
   if (yearDecs.length >= 5) {
     var schoolSet = {};
     yearDecs.forEach(function(d){ ((d.details||{}).schools||'').split(',').forEach(function(x){ x=x.trim(); if(x) schoolSet[x]=1; }); });
@@ -2947,7 +2947,7 @@ function renderHomeFeed() {
   var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
   var monthLabel = mStart.toLocaleString('en-ZA', { month: 'long', year: 'numeric' });
   var distName = (o.district || '').trim();
-  var scopeDecs = (S.decisions || []).filter(function(d){
+  var scopeDecs = applyScopeCeiling(S.decisions || []).filter(function(d){
     try { if (new Date(d.created_at) < mStart) return false; } catch(e){ return false; }
     return distName ? ((d.district||'').trim() === distName) : true;
   });
@@ -6103,7 +6103,42 @@ function getClientScope() {
   return 'district';
 }
 
+// Restrict any list of decisions to what the signed-in official is entitled
+// to see. This is a CEILING, applied before the user's own dashboard filters:
+// a provincial official can narrow within their province, but can never widen
+// beyond it. National users see everything; district users see their
+// district(s); everyone else sees their own province.
+function applyScopeCeiling(decs){
+  var o = S.official || {};
+  var scope = (typeof getClientScope === 'function') ? getClientScope() : 'district';
+  if (scope === 'national') return decs;
+
+  var prov = (o.province || '').trim();
+  var rawDist = (o.district || '').trim();
+
+  // Provincial: everything inside their province.
+  if (scope === 'province') {
+    if (!prov) return decs;
+    return decs.filter(function(d){ return ((d.details||{}).province || '') === prov; });
+  }
+
+  // District (incl. multi-district): only their district(s).
+  if (rawDist && rawDist !== 'All' && rawDist !== 'Province' && rawDist !== 'Provincial') {
+    var keys = rawDist.split(',').map(function(x){ return x.trim(); }).filter(Boolean)
+                 .map(function(n){ return (typeof _resolveDistrictKey==='function' ? (_resolveDistrictKey(n)||n) : n); });
+    return decs.filter(function(d){
+      var dd = (d.details||{}).district || '';
+      var k  = (typeof _resolveDistrictKey==='function' ? (_resolveDistrictKey(dd)||dd) : dd);
+      return keys.indexOf(k) >= 0;
+    });
+  }
+  // Fallback: at least keep them inside their own province.
+  if (prov) return decs.filter(function(d){ return ((d.details||{}).province || '') === prov; });
+  return decs;
+}
+
 function applyDashFilters(decs) {
+  decs = applyScopeCeiling(decs);
   const f = S.dashFilter;
   const tf = S.dashTermFilter || { year: new Date().getFullYear(), term: 'All' };
   return decs.filter(d => {
