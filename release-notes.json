@@ -1,9 +1,10 @@
 {
-  "2026.06.18.88": {
-    "title": "Filters start on your own area",
+  "2026.06.18.89": {
+    "title": "Insights where you need them",
     "released": "2026-07-24",
     "highlights": [
-      "The dashboard now opens with your own province or district already selected, instead of “All”"
+      "Your key insights now appear on the home screen as soon as you sign in — the school needing attention, the biggest opportunity, and the learners closest to a pass",
+      "Dashboard and Insights are now one page you can scroll through, instead of two tabs"
     ]
   },
   "2026.06.18.63": {
