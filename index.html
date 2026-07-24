@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.90';
+const APP_VERSION = '2026.06.18.91';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2604,7 +2604,7 @@ async function checkAuth() {
      }
 
      const { data, error } = await sb.from('officials')
-       .select('id,full_name,role,province,district,email,is_active,details')
+       .select('id,full_name,role,province,district,circuit,email,is_active,details')
        .eq('email', sessionEmail)
        .limit(1);
 
@@ -3079,7 +3079,7 @@ async function handleOtpSubmit() {
    S._freshLogin = true;
    // Session is now set - JWT attached to all future requests
    const { data: officials } = await sb.from('officials')
-     .select('id,full_name,role,province,district,email,details')
+     .select('id,full_name,role,province,district,circuit,email,details')
      .eq('email', S._otpEmail)
      .limit(1);
 
@@ -6190,6 +6190,20 @@ function getClientScope() {
 // a provincial official can narrow within their province, but can never widen
 // beyond it. National users see everything; district users see their
 // district(s); everyone else sees their own province.
+// The dashboard's detail panels live inside a collapsed <details>. Scrolling to
+// an element inside a closed panel does nothing, which made the "N support
+// requests" row look unresponsive. Open the panel first, then scroll.
+function openDashPanel(targetId){
+  try {
+    var dm = document.querySelector('details.dash-more');
+    if (dm && !dm.open) dm.open = true;
+  } catch(e){}
+  setTimeout(function(){
+    var el = document.getElementById(targetId);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 80);
+}
+
 function applyScopeCeiling(decs){
   var o = S.official || {};
   var scope = (typeof getClientScope === 'function') ? getClientScope() : 'district';
@@ -7316,11 +7330,11 @@ ${`
      if (age === 0) txt += ' \u2014 the oldest from a visit today';
      else if (age !== null) txt += ' \u2014 the oldest from a visit ' + age + ' day' + (age!==1?'s':'') + ' ago';
      txt += '.';
-     rows.push('<button class="att-r" onclick="S.dashTab=\'overview\';render();setTimeout(function(){var e=document.getElementById(\'dash-tracker\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'start\'});},60)"><span>' + txt + '</span><span class="att-chev">\u203A</span></button>');
+     rows.push('<button class="att-r" onclick="openDashPanel(\'dash-tracker\')"><span>' + txt + '</span><span class="att-chev">\u203A</span></button>');
    }
    if (supportRequests.length) {
      var n = supportRequests.length;
-     rows.push('<button class="att-r" onclick="S.dashTab=\'overview\';render();setTimeout(function(){var e=document.getElementById(\'dash-support\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'start\'});},60)"><span><b>' + n + ' support request' + (n!==1?'s':'') + '</b> ' + (n!==1?'have':'has') + ' been logged by schools.</span><span class="att-chev">\u203A</span></button>');
+     rows.push('<button class="att-r" onclick="openDashPanel(\'dash-support\')"><span><b>' + n + ' support request' + (n!==1?'s':'') + '</b> ' + (n!==1?'have':'has') + ' been logged by schools.</span><span class="att-chev">\u203A</span></button>');
    }
    if (!rows.length) return '';
    return '<div class="att"><div class="att-h"><span class="att-sq"></span>Needs your attention</div>' + rows.join('') + '</div>';
