@@ -1139,7 +1139,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.87';
+const APP_VERSION = '2026.06.18.88';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6036,10 +6036,17 @@ function resetForm() {
 function initDashFilters() {
   const scope = getClientScope();
   const realProv = (S.official.province && S.official.province !== 'National' && S.official.province !== 'All') ? S.official.province : 'All';
-  const realDist = S.official.district || 'All';
+  // 'Province' / 'Provincial' are scope markers, not real districts — never
+  // put them in the district filter or it matches nothing.
+  const rawDist = (S.official.district || '').trim();
+  const realDist = (!rawDist || rawDist === 'All' || rawDist === 'Province' || rawDist === 'Provincial')
+                   ? 'All'
+                   : (rawDist.indexOf(',') >= 0 ? 'All' : rawDist);   // multi-district -> All
   S.dashFilter = {
-    province: (scope === 'district' || scope === 'own') ? realProv : 'All',
-    district: scope === 'own' ? realDist : 'All',
+    // Default to the official's own area so the filter bar shows what they
+    // actually see. Only national users start on 'All'.
+    province: (scope === 'national') ? 'All' : realProv,
+    district: (scope === 'district') ? realDist : 'All',
     circuit: 'All',
     school: 'All'
   };
