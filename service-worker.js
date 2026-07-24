@@ -18,7 +18,7 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-const VERSION = 'v1.0.44';
+const VERSION = 'v1.0.45';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
