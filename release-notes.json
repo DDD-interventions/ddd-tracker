@@ -1,9 +1,10 @@
 {
-  "2026.06.18.92": {
-    "title": "Cleaner card styling",
+  "2026.06.18.93": {
+    "title": "See how far along your entry is",
     "released": "2026-08-13",
     "highlights": [
-      "Simplified the look of cards throughout the app for a cleaner, more consistent appearance"
+      "A progress ring now appears at the top of the screen while you are logging — it fills up and turns green as you complete the entry",
+      "If you have a saved entry, the home screen now shows how complete it is so you know what is left to finish"
     ]
   },
   "2026.06.18.63": {
