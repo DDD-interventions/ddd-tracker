@@ -1,9 +1,11 @@
 {
-  "2026.06.18.101": {
-    "title": "Save and continue later, and a new support contact",
+  "2026.06.18.102": {
+    "title": "Fuller detail, and a consistent order",
     "released": "2026-08-13",
     "highlights": [
-      "When you tap “Save & continue later”, the app now confirms your entry is saved, tells you how complete it is, and takes you back to the home screen",
+      "Tapping “see more” on an activity now shows the complete text, instead of cutting it off mid-sentence",
+      "The Intervention Activity Tracker on your dashboard now lists the most recently logged visit first, matching the home screen",
+      "“Save & continue later” confirms your entry is saved and returns you to the home screen",
       "Support requests now go to Uthandile at uthandile@newleaders.co.za"
     ]
   },
