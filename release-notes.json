@@ -1,11 +1,10 @@
 {
-  "2026.06.18.95": {
-    "title": "See what changed since last term",
+  "2026.06.18.96": {
+    "title": "Insights now appear for national users",
     "released": "2026-08-13",
     "highlights": [
-      "New insight: which grade and subject slipped most since the previous term, and which improved most",
-      "Insights now name a specific grade — for example “Grade 8 Social Sciences” — instead of grouping grades together",
-      "The insights list is capped at five, so the most important ones are not buried"
+      "Fixed performance insights not showing for officials whose area is set to “All”",
+      "The term shown on the DDD Dashboard card now follows the data instead of being fixed to Term 1"
     ]
   },
   "2026.06.18.63": {
