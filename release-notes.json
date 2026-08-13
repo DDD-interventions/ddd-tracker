@@ -1,10 +1,9 @@
 {
-  "2026.06.18.96": {
-    "title": "Insights now appear for national users",
+  "2026.06.18.98": {
+    "title": "Every insight now states what it measures",
     "released": "2026-08-13",
     "highlights": [
-      "Fixed performance insights not showing for officials whose area is set to “All”",
-      "The term shown on the DDD Dashboard card now follows the data instead of being fixed to Term 1"
+      "Each insight now says clearly whether it is based on subject pass rates or on average marks, so the numbers are never ambiguous"
     ]
   },
   "2026.06.18.63": {
