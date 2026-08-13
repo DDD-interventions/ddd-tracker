@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.98';
+const APP_VERSION = '2026.06.18.99';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2908,7 +2908,8 @@ function renderHomeFeed() {
         meta: esc(gradeName(dec.grade)) + ' \u00b7 ' + esc(scopeTxt),
         accent: 'o',
         body: 'The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(dec)) + '</b> fell from <b>' +
-              Math.round(dec.prev_mark) + '%</b> to <b>' + Math.round(dec.cur_mark) + '%</b> \u2014 down ' +
+              Math.round(dec.prev_mark) + '% in ' + esc(shortTerm(pf.prev_term_label)) + '</b> to <b>' +
+              Math.round(dec.cur_mark) + '% in ' + esc(shortTerm(pf.term)) + '</b> \u2014 down ' +
               Math.abs(Math.round(dec.delta * 10) / 10) + ' points across ' + dec.schools +
               ' school' + (dec.schools !== 1 ? 's' : '') + '.' +
               ' <span style="color:#8A94A0">Based on average marks, not pass rates.</span>',
@@ -2923,9 +2924,29 @@ function renderHomeFeed() {
         meta: esc(gradeName(imp.grade)) + ' \u00b7 ' + esc(scopeTxt),
         accent: 't',
         body: 'The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(imp)) + '</b> rose from <b>' +
-              Math.round(imp.prev_mark) + '%</b> to <b>' + Math.round(imp.cur_mark) + '%</b> across ' +
+              Math.round(imp.prev_mark) + '% in ' + esc(shortTerm(pf.prev_term_label)) + '</b> to <b>' +
+              Math.round(imp.cur_mark) + '% in ' + esc(shortTerm(pf.term)) + '</b> across ' +
               imp.schools + ' school' + (imp.schools !== 1 ? 's' : '') + '. Worth finding out what changed.' +
               ' <span style="color:#8A94A0">Based on average marks, not pass rates.</span>' }));
+    }
+
+    // ── LANGUAGE FOCUS ──
+    // Home Language and First Additional Language are surfaced regardless of
+    // where they sit in the general ranking: literacy underpins every other
+    // subject, so officials should always see how languages are doing.
+    var lang = pf.language;
+    if (lang && lang.below_pass >= 50) {
+      var langN = Math.round(lang.below_pass);
+      items.push(item({
+        avatar: av('\u201C', 3, true),
+        name: 'Language focus',
+        meta: esc(gradeName(lang.grade)) + ' \u00b7 ' + esc(scopeTxt),
+        accent: 't',
+        body: 'About <b>' + langN.toLocaleString() + ' learners</b> did not reach the pass mark in <b>' +
+              esc(gradeSubjectLabel(lang)) + '</b>, across ' + lang.schools + ' school' +
+              (lang.schools !== 1 ? 's' : '') + '. Language underpins every other subject.' +
+              ' <span style="color:#8A94A0">Based on subject pass rates.</span>',
+        actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
     }
 
     var win = pf.winnable;
@@ -4121,6 +4142,13 @@ function renderOtpGate() {
 // Name a result by GRADE, not phase. Averaging grades hides the problem:
 // 'Senior Phase Maths' was really Grade 8 (79k), Grade 9 (70k), Grade 7 (17k)
 // \u2014 very different sizes needing very different responses.
+// Shorten a term label for use inside a sentence: '2026 Term 2' -> 'Term 2'.
+function shortTerm(t){
+  if (!t) return '';
+  var m = String(t).match(/Term\s*\d+/i);
+  return m ? m[0] : String(t);
+}
+
 function gradeName(g){
   if (g === undefined || g === null || g === '') return '';
   return String(g) === '0' ? 'Grade R' : 'Grade ' + g;
@@ -7651,12 +7679,24 @@ ${`
          '<div class="ins-s">Based on subject pass rates. ' + (_term ? 'As at ' + _term + '. ' : '') + 'These learners are closest to the 50% mark.</div></div>');
      }
 
+     // ── LANGUAGE FOCUS: always reported, whatever the general ranking ──
+     var _lang = _pf.language;
+     if (_lang && _lang.below_pass >= 50) {
+       var _langN = Math.round(_lang.below_pass);
+       C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Language focus</div>' +
+         '<p>About <b>' + _langN.toLocaleString() + ' learners</b> did not reach the pass mark in <b>' +
+         esc(gradeSubjectLabel(_lang)) + '</b>, across ' + _lang.schools + ' school' +
+         (_lang.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
+         '<div class="ins-s">Based on subject pass rates. Language underpins every other subject.</div></div>');
+     }
+
      // ── MOVEMENT between the two most recent terms ──
      var _dec = _pf.declined;
      if (_dec && _dec.delta != null) {
        C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Slipped since last term</div>' +
          '<p>The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(_dec)) + '</b> fell from <b>' +
-         Math.round(_dec.prev_mark) + '%</b> to <b>' + Math.round(_dec.cur_mark) + '%</b> \u2014 down ' +
+         Math.round(_dec.prev_mark) + '% in ' + esc(shortTerm(_pf.prev_term_label)) + '</b> to <b>' +
+         Math.round(_dec.cur_mark) + '% in ' + esc(shortTerm(_pf.term)) + '</b> \u2014 down ' +
          Math.abs(Math.round(_dec.delta*10)/10) + ' points across ' + _dec.schools +
          ' school' + (_dec.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
          '<div class="ins-s">Based on average marks, not pass rates. Compared with the previous term.</div></div>');
@@ -7666,7 +7706,8 @@ ${`
      if (_imp && _imp.delta != null) {
        C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Moving in the right direction</div>' +
          '<p>The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(_imp)) + '</b> rose from <b>' +
-         Math.round(_imp.prev_mark) + '%</b> to <b>' + Math.round(_imp.cur_mark) + '%</b> across ' + _imp.schools +
+         Math.round(_imp.prev_mark) + '% in ' + esc(shortTerm(_pf.prev_term_label)) + '</b> to <b>' +
+         Math.round(_imp.cur_mark) + '% in ' + esc(shortTerm(_pf.term)) + '</b> across ' + _imp.schools +
          ' school' + (_imp.schools!==1?'s':'') + '.</p>' +
          '<div class="ins-s">Based on average marks, not pass rates. Worth finding out what these schools changed.</div></div>');
      }
@@ -7760,10 +7801,10 @@ ${`
    C = C.concat(T);
 
    if (!C.length) return '<div class="ins-c"><p>Nothing to show yet.</p><div class="ins-s">Log a visit and insights will appear here.</div></div>';
-   // HARD CAP: five cards. Each one must prompt an action; beyond five the
-   // tab becomes a wall and officials stop reading. The rest lives under
-   // "More detail".
-   return C.slice(0, 5).join('');
+   // HARD CAP: six cards — five general insights plus the standing language
+   // focus. Beyond this the tab becomes a wall and officials stop reading.
+   // Everything else lives under "More detail".
+   return C.slice(0, 6).join('');
  })()}
 
  <!-- ═══ TREND CHARTS (collapsed) ═══ -->
