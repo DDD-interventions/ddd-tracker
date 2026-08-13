@@ -1,10 +1,11 @@
 {
-  "2026.06.18.93": {
-    "title": "See how far along your entry is",
+  "2026.06.18.95": {
+    "title": "See what changed since last term",
     "released": "2026-08-13",
     "highlights": [
-      "A progress ring now appears at the top of the screen while you are logging — it fills up and turns green as you complete the entry",
-      "If you have a saved entry, the home screen now shows how complete it is so you know what is left to finish"
+      "New insight: which grade and subject slipped most since the previous term, and which improved most",
+      "Insights now name a specific grade — for example “Grade 8 Social Sciences” — instead of grouping grades together",
+      "The insights list is capped at five, so the most important ones are not buried"
     ]
   },
   "2026.06.18.63": {
