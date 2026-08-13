@@ -1,10 +1,9 @@
 {
-  "2026.06.18.91": {
-    "title": "Circuit view now works correctly",
-    "released": "2026-07-24",
+  "2026.06.18.92": {
+    "title": "Cleaner card styling",
+    "released": "2026-08-13",
     "highlights": [
-      "Fixed circuit officials seeing the whole district — your circuit is now selected by default and the insights refer to your circuit",
-      "Fixed the “support requests” row on the dashboard not responding when tapped"
+      "Simplified the look of cards throughout the app for a cleaner, more consistent appearance"
     ]
   },
   "2026.06.18.63": {
