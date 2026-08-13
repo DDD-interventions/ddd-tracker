@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.101';
+const APP_VERSION = '2026.06.18.102';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2986,22 +2986,40 @@ function renderHomeFeed() {
     var body = 'Logged a visit' + (sch.length ? ' to <b>' + esc(sch[0]) + '</b>' + (sch.length>1?' and '+(sch.length-1)+' more':'') : '') + (d.activity_type ? ' \u2014 ' + esc(d.activity_type) : '') + '.';
 
     // the story: why, how supported, what next
-    var lines = [];
+    // Two versions of each line: a short one for the collapsed view, and the
+    // COMPLETE text for when the official taps "see more". Previously every
+    // field was truncated up front, so expanding still showed cut sentences.
+    var linesShort = [], linesFull = [];
+    function addLine(label, text, cap) {
+      var t = String(text || '').trim();
+      if (!t) return;
+      linesFull.push('<span class="fl"><b>' + label + ':</b> ' + esc(t) + '</span>');
+      linesShort.push('<span class="fl"><b>' + label + ':</b> ' +
+        esc(cap && t.length > cap ? t.slice(0, cap) : t) + (cap && t.length > cap ? '\u2026' : '') + '</span>');
+    }
     var found = String(d.insight || det.description || '').trim();
-    if (found) lines.push('<span class="fl"><b>What was found:</b> ' + esc(found.slice(0,150)) + (found.length>150?'\u2026':'') + '</span>');
+    addLine('What was found', found, 150);
     var sup = Array.isArray(det.support_needed) ? det.support_needed.join(', ') : (det.support_needed||'');
-    if (sup) lines.push('<span class="fl"><b>Support:</b> ' + esc(sup) + (det.support_level ? ' \u00b7 ' + esc(det.support_level==='light'?'light touch':det.support_level==='regular'?'regular':det.support_level==='intensive'?'intensive':det.support_level) : '') + '</span>');
-    var dm = String(d.decision_made||'').trim();
-    if (dm) lines.push('<span class="fl"><b>Decided:</b> ' + esc(dm.slice(0,130)) + (dm.length>130?'\u2026':'') + '</span>');
-    if (det.follow_up_completed) lines.push('<span class="fl"><b>Loop closed</b> \u2014 the follow-up on this visit is done.</span>');
-    else if (det.follow_up && det.follow_up_desc) lines.push('<span class="fl"><b>Committed:</b> ' + esc(String(det.follow_up_desc).slice(0,110)) + '</span>');
+    if (sup) {
+      var supTxt = sup + (det.support_level ? ' \u00b7 ' + (det.support_level==='light'?'light touch':det.support_level==='regular'?'regular':det.support_level==='intensive'?'intensive':det.support_level) : '');
+      addLine('Support', supTxt, 0);
+    }
+    addLine('Decided', String(d.decision_made||'').trim(), 130);
+    if (det.follow_up_completed) {
+      var closed = '<span class="fl"><b>Loop closed</b> \u2014 the follow-up on this visit is done.</span>';
+      linesFull.push(closed); linesShort.push(closed);
+    } else if (det.follow_up && det.follow_up_desc) {
+      addLine('Committed', String(det.follow_up_desc), 110);
+    }
 
-    if (lines.length) {
-      var first = lines[0];
-      var rest = lines.slice(1).join('');
-      body += '<span class="fi-story">' + first
-        + (rest ? '<span style="display:none">' + rest + '</span> <span class="fi-see" onclick="var h=this.previousElementSibling;h.style.display=\'inline\';this.style.display=\'none\'">\u2026 see more</span>' : '')
-        + '</span>';
+    if (linesFull.length) {
+      var hasMore = linesFull.length > 1 || linesFull.join('') !== linesShort.join('');
+      body += '<span class="fi-story">' +
+        '<span class="fi-collapsed">' + linesShort[0] +
+          (hasMore ? ' <span class="fi-see" onclick="expandStory(this)">\u2026 see more</span>' : '') +
+        '</span>' +
+        '<span class="fi-expanded" style="display:none">' + linesFull.join('') + '</span>' +
+      '</span>';
     }
 
     // quality badges — quiet signals of good practice
@@ -4143,6 +4161,21 @@ function renderOtpGate() {
 // 'Senior Phase Maths' was really Grade 8 (79k), Grade 9 (70k), Grade 7 (17k)
 // \u2014 very different sizes needing very different responses.
 // Shorten a term label for use inside a sentence: '2026 Term 2' -> 'Term 2'.
+// "See more" on a feed item: swap the shortened summary for the complete text.
+function expandStory(el){
+  try {
+    var story = el.parentNode && el.parentNode.parentNode;   // .fi-collapsed -> .fi-story
+    if (!story || story.className.indexOf('fi-story') === -1) {
+      story = el.closest ? el.closest('.fi-story') : null;
+    }
+    if (!story) return;
+    var c = story.querySelector('.fi-collapsed');
+    var e = story.querySelector('.fi-expanded');
+    if (c) c.style.display = 'none';
+    if (e) e.style.display = 'inline';
+  } catch(err){}
+}
+
 function shortTerm(t){
   if (!t) return '';
   var m = String(t).match(/Term\s*\d+/i);
@@ -7982,7 +8015,16 @@ ${`
        if (trackerFilter === 'follow-up') {
          allChains = allChains.filter(function(c){return c.hasFollowUp;});
        }
-       allChains.sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
+       // Most recently LOGGED first, matching the home feed. Falls back to the
+       // visit date when created_at is missing, and uses the visit date as a
+       // tie-breaker so same-day entries stay in a sensible order.
+       allChains.sort(function(a,b){
+         var at = 0, bt = 0;
+         try { at = new Date((a.dec && a.dec.created_at) || a.date || 0).getTime() || 0; } catch(e){}
+         try { bt = new Date((b.dec && b.dec.created_at) || b.date || 0).getTime() || 0; } catch(e){}
+         if (bt !== at) return bt - at;
+         return String(b.date||'').localeCompare(String(a.date||''));
+       });
 
        if (!allChains.length) return '<div style="text-align:center;color:var(--grey);padding:20px;font-size:14px">No activities to show'+(trackerFilter!=='all'?' for this filter':'')+'</div>';
 
