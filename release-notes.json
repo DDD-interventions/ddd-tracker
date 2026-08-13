@@ -1,12 +1,12 @@
 {
-  "2026.06.18.102": {
-    "title": "Fuller detail, and a consistent order",
+  "2026.06.18.104": {
+    "title": "A clearer activity timeline",
     "released": "2026-08-13",
     "highlights": [
-      "Tapping “see more” on an activity now shows the complete text, instead of cutting it off mid-sentence",
-      "The Intervention Activity Tracker on your dashboard now lists the most recently logged visit first, matching the home screen",
-      "“Save & continue later” confirms your entry is saved and returns you to the home screen",
-      "Support requests now go to Uthandile at uthandile@newleaders.co.za"
+      "The Intervention Activity Tracker now shows the date and time each activity was logged, the same way the home screen does, with the visit date alongside",
+      "The timeline loads 20 activities at a time with a “Show more” button, so it opens quickly even with hundreds of entries",
+      "“What is in place at the school” has been merged into the school observation checklist, so you are no longer asked the same thing twice",
+      "School context is now a set of quick multi-select lists instead of long rows of tick boxes"
     ]
   },
   "2026.06.18.63": {
