@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.96';
+const APP_VERSION = '2026.06.18.98';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2876,7 +2876,7 @@ function renderHomeFeed() {
           name: esc(w.school_name || ''),
           meta: (w.worst_rate < 50 ? 'Needs attention' : 'Lowest result') + ' \u00b7 ' + esc(scopeTxt),
           accent: w.worst_rate < 50 ? 'o' : 't',
-          body: gr + esc(w.worst_subject || '') + ' at <b>' + Math.round(w.worst_rate) + '%</b> \u2014 the lowest in ' + esc(scopeTxt) + '.' +
+          body: gr + esc(w.worst_subject || '') + ' has a <b>pass rate of ' + Math.round(w.worst_rate) + '%</b> \u2014 the lowest in ' + esc(scopeTxt) + '.' +
                 (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : ''),
           actions: [{label:'See the schools on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
       }
@@ -2890,8 +2890,9 @@ function renderHomeFeed() {
         name: 'Biggest opportunity',
         meta: (opp.grade!=null?esc(gradeName(opp.grade)):esc(opp.phase)+' Phase') + ' \u00b7 ' + esc(scopeTxt),
         accent: 'o',
-        body: 'About <b>' + oppN.toLocaleString() + ' learners</b> are below the pass mark in <b>' +
+        body: 'About <b>' + oppN.toLocaleString() + ' learners</b> did not reach the pass mark in <b>' +
               esc(gradeSubjectLabel(opp)) + '</b> \u2014 the largest group of any grade and subject in ' + esc(scopeTxt) + '.' +
+              ' <span style="color:#8A94A0">Based on subject pass rates.</span>' +
               (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : ''),
         actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
     }
@@ -2906,10 +2907,11 @@ function renderHomeFeed() {
         name: 'Slipped since last term',
         meta: esc(gradeName(dec.grade)) + ' \u00b7 ' + esc(scopeTxt),
         accent: 'o',
-        body: '<b>' + esc(gradeSubjectLabel(dec)) + '</b> fell from <b>' + Math.round(dec.prev_mark) +
-              '%</b> to <b>' + Math.round(dec.cur_mark) + '%</b> \u2014 down ' +
+        body: 'The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(dec)) + '</b> fell from <b>' +
+              Math.round(dec.prev_mark) + '%</b> to <b>' + Math.round(dec.cur_mark) + '%</b> \u2014 down ' +
               Math.abs(Math.round(dec.delta * 10) / 10) + ' points across ' + dec.schools +
-              ' school' + (dec.schools !== 1 ? 's' : '') + '.',
+              ' school' + (dec.schools !== 1 ? 's' : '') + '.' +
+              ' <span style="color:#8A94A0">Based on average marks, not pass rates.</span>',
         actions: [{label:'See the schools on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
     }
 
@@ -2920,9 +2922,10 @@ function renderHomeFeed() {
         name: 'Moving in the right direction',
         meta: esc(gradeName(imp.grade)) + ' \u00b7 ' + esc(scopeTxt),
         accent: 't',
-        body: '<b>' + esc(gradeSubjectLabel(imp)) + '</b> rose from <b>' + Math.round(imp.prev_mark) +
-              '%</b> to <b>' + Math.round(imp.cur_mark) + '%</b> across ' + imp.schools +
-              ' school' + (imp.schools !== 1 ? 's' : '') + '. Worth finding out what changed.' }));
+        body: 'The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(imp)) + '</b> rose from <b>' +
+              Math.round(imp.prev_mark) + '%</b> to <b>' + Math.round(imp.cur_mark) + '%</b> across ' +
+              imp.schools + ' school' + (imp.schools !== 1 ? 's' : '') + '. Worth finding out what changed.' +
+              ' <span style="color:#8A94A0">Based on average marks, not pass rates.</span>' }));
     }
 
     var win = pf.winnable;
@@ -2935,6 +2938,7 @@ function renderHomeFeed() {
         accent: 't',
         body: 'About <b>' + winN.toLocaleString() + ' learners</b> passed <b>' +
               esc(gradeSubjectLabel(win)) + '</b> but scored under 50% \u2014 within reach of a solid pass with focused support.' +
+              ' <span style="color:#8A94A0">Based on subject pass rates.</span>' +
               (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : '') }));
     }
   }
@@ -7632,7 +7636,7 @@ ${`
          '<p>About <b>' + _oppN.toLocaleString() + ' learner' + (_oppN!==1?'s':'') + '</b> are below the pass mark in <b>' +
          esc(gradeSubjectLabel(_opp)) + '</b> — the largest group of any grade and subject, across ' +
          _opp.schools + ' school' + (_opp.schools!==1?'s':'') + ' with results in ' + _scope + '.</p>' +
-         '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'Open the DDD Dashboard to see which schools.</div></div>');
+         '<div class="ins-s">Based on subject pass rates. ' + (_term ? 'As at ' + _term + '. ' : '') + 'Open the DDD Dashboard to see which schools.</div></div>');
      }
 
      // ── WINNABLE NOW: learners who PASSED on policy but scored under 50%
@@ -7644,27 +7648,27 @@ ${`
        C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Winnable now</div>' +
          '<p>About <b>' + _winN.toLocaleString() + ' learner' + (_winN!==1?'s':'') +
          '</b> passed <b>' + esc(gradeSubjectLabel(_win)) + '</b> but scored under 50% — within reach of a solid pass with focused support.</p>' +
-         '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'These learners are closest to the 50% mark.</div></div>');
+         '<div class="ins-s">Based on subject pass rates. ' + (_term ? 'As at ' + _term + '. ' : '') + 'These learners are closest to the 50% mark.</div></div>');
      }
 
      // ── MOVEMENT between the two most recent terms ──
      var _dec = _pf.declined;
      if (_dec && _dec.delta != null) {
        C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Slipped since last term</div>' +
-         '<p><b>' + esc(gradeSubjectLabel(_dec)) + '</b> fell from <b>' + Math.round(_dec.prev_mark) +
-         '%</b> to <b>' + Math.round(_dec.cur_mark) + '%</b> \u2014 down ' +
+         '<p>The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(_dec)) + '</b> fell from <b>' +
+         Math.round(_dec.prev_mark) + '%</b> to <b>' + Math.round(_dec.cur_mark) + '%</b> \u2014 down ' +
          Math.abs(Math.round(_dec.delta*10)/10) + ' points across ' + _dec.schools +
          ' school' + (_dec.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
-         '<div class="ins-s">Compared with the previous term. Open the DDD Dashboard to see which schools.</div></div>');
+         '<div class="ins-s">Based on average marks, not pass rates. Compared with the previous term.</div></div>');
      }
 
      var _imp = _pf.improved;
      if (_imp && _imp.delta != null) {
        C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Moving in the right direction</div>' +
-         '<p><b>' + esc(gradeSubjectLabel(_imp)) + '</b> rose from <b>' + Math.round(_imp.prev_mark) +
-         '%</b> to <b>' + Math.round(_imp.cur_mark) + '%</b> across ' + _imp.schools +
+         '<p>The <b>average mark</b> in <b>' + esc(gradeSubjectLabel(_imp)) + '</b> rose from <b>' +
+         Math.round(_imp.prev_mark) + '%</b> to <b>' + Math.round(_imp.cur_mark) + '%</b> across ' + _imp.schools +
          ' school' + (_imp.schools!==1?'s':'') + '.</p>' +
-         '<div class="ins-s">Worth finding out what these schools changed.</div></div>');
+         '<div class="ins-s">Based on average marks, not pass rates. Worth finding out what these schools changed.</div></div>');
      }
    }
 
