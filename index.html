@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.93';
+const APP_VERSION = '2026.06.18.95';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2888,12 +2888,41 @@ function renderHomeFeed() {
       items.push(item({
         avatar: av('!', 2, true),
         name: 'Biggest opportunity',
-        meta: esc(opp.phase) + ' Phase \u00b7 ' + esc(scopeTxt),
+        meta: (opp.grade!=null?esc(gradeName(opp.grade)):esc(opp.phase)+' Phase') + ' \u00b7 ' + esc(scopeTxt),
         accent: 'o',
         body: 'About <b>' + oppN.toLocaleString() + ' learners</b> are below the pass mark in <b>' +
-              esc(opp.phase) + ' Phase ' + esc(opp.subject) + '</b> \u2014 more than any other subject in the phase.' +
+              esc(gradeSubjectLabel(opp)) + '</b> \u2014 the largest group of any grade and subject in ' + esc(scopeTxt) + '.' +
               (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : ''),
         actions: [{label:'Open the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+    }
+
+    // ── MOVEMENT between the two most recent terms ──
+    // Enrolment-weighted server-side, so a 173-learner subject cannot outrank
+    // a 138,000-learner one on percentage points alone.
+    var dec = pf.declined;
+    if (dec && dec.delta != null) {
+      items.push(item({
+        avatar: av('\u2193', 2, true),
+        name: 'Slipped since last term',
+        meta: esc(gradeName(dec.grade)) + ' \u00b7 ' + esc(scopeTxt),
+        accent: 'o',
+        body: '<b>' + esc(gradeSubjectLabel(dec)) + '</b> fell from <b>' + Math.round(dec.prev_mark) +
+              '%</b> to <b>' + Math.round(dec.cur_mark) + '%</b> \u2014 down ' +
+              Math.abs(Math.round(dec.delta * 10) / 10) + ' points across ' + dec.schools +
+              ' school' + (dec.schools !== 1 ? 's' : '') + '.',
+        actions: [{label:'See the schools on the DDD Dashboard', on:"window.open('https://www.dbedashboard.co.za/','_blank')", strong:true}] }));
+    }
+
+    var imp = pf.improved;
+    if (imp && imp.delta != null) {
+      items.push(item({
+        avatar: av('\u2191', 1, true),
+        name: 'Moving in the right direction',
+        meta: esc(gradeName(imp.grade)) + ' \u00b7 ' + esc(scopeTxt),
+        accent: 't',
+        body: '<b>' + esc(gradeSubjectLabel(imp)) + '</b> rose from <b>' + Math.round(imp.prev_mark) +
+              '%</b> to <b>' + Math.round(imp.cur_mark) + '%</b> across ' + imp.schools +
+              ' school' + (imp.schools !== 1 ? 's' : '') + '. Worth finding out what changed.' }));
     }
 
     var win = pf.winnable;
@@ -2902,10 +2931,10 @@ function renderHomeFeed() {
       items.push(item({
         avatar: av('\u2713', 1, true),
         name: 'Winnable now',
-        meta: esc(win.phase) + ' Phase \u00b7 ' + esc(scopeTxt),
+        meta: (win.grade!=null?esc(gradeName(win.grade)):esc(win.phase)+' Phase') + ' \u00b7 ' + esc(scopeTxt),
         accent: 't',
-        body: 'About <b>' + winN.toLocaleString() + ' ' + esc(win.phase) + ' learners</b> passed <b>' +
-              esc(win.subject) + '</b> but scored under 50% \u2014 within reach of a solid pass with focused support.' +
+        body: 'About <b>' + winN.toLocaleString() + ' learners</b> passed <b>' +
+              esc(gradeSubjectLabel(win)) + '</b> but scored under 50% \u2014 within reach of a solid pass with focused support.' +
               (term ? ' <span style="color:#8A94A0">As at ' + term + '.</span>' : '') }));
     }
   }
@@ -4085,6 +4114,23 @@ function renderOtpGate() {
 // calculation as the in-form bar (getFormProgress), so the two never disagree.
 // On the header it reflects the live form; on Home it reflects a saved draft,
 // so an unfinished entry is visible before you open it.
+// Name a result by GRADE, not phase. Averaging grades hides the problem:
+// 'Senior Phase Maths' was really Grade 8 (79k), Grade 9 (70k), Grade 7 (17k)
+// \u2014 very different sizes needing very different responses.
+function gradeName(g){
+  if (g === undefined || g === null || g === '') return '';
+  return String(g) === '0' ? 'Grade R' : 'Grade ' + g;
+}
+
+function gradeSubjectLabel(o){
+  if (!o) return '';
+  var subj = o.subject || '';
+  if (o.grade !== undefined && o.grade !== null && o.grade !== '') {
+    return gradeName(o.grade) + ' ' + subj;
+  }
+  return (o.phase ? o.phase + ' Phase ' : '') + subj;
+}
+
 function ringColour(pct){
   if (pct >= 100) return '#3AB54A';        // complete
   if (pct >= 60)  return '#7AB648';        // nearly there
@@ -7584,7 +7630,7 @@ ${`
        var _oppN = Math.round(_opp.below_pass);
        C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Biggest opportunity</div>' +
          '<p>About <b>' + _oppN.toLocaleString() + ' learner' + (_oppN!==1?'s':'') + '</b> are below the pass mark in <b>' +
-         esc(_opp.phase) + ' Phase ' + esc(_opp.subject) + '</b> — more than any other subject in the phase, across ' +
+         esc(gradeSubjectLabel(_opp)) + '</b> — the largest group of any grade and subject, across ' +
          _opp.schools + ' school' + (_opp.schools!==1?'s':'') + ' with results in ' + _scope + '.</p>' +
          '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'Open the DDD Dashboard to see which schools.</div></div>');
      }
@@ -7596,9 +7642,29 @@ ${`
      if (_win && _win.winnable && _win.winnable >= 50) {
        var _winN = Math.round(_win.winnable);
        C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Winnable now</div>' +
-         '<p>About <b>' + _winN.toLocaleString() + ' ' + esc(_win.phase) + ' learner' + (_winN!==1?'s':'') +
-         '</b> passed <b>' + esc(_win.subject) + '</b> but scored under 50% — within reach of a solid pass with focused support.</p>' +
+         '<p>About <b>' + _winN.toLocaleString() + ' learner' + (_winN!==1?'s':'') +
+         '</b> passed <b>' + esc(gradeSubjectLabel(_win)) + '</b> but scored under 50% — within reach of a solid pass with focused support.</p>' +
          '<div class="ins-s">' + (_term ? 'As at ' + _term + '. ' : '') + 'These learners are closest to the 50% mark.</div></div>');
+     }
+
+     // ── MOVEMENT between the two most recent terms ──
+     var _dec = _pf.declined;
+     if (_dec && _dec.delta != null) {
+       C.push('<div class="ins-c gap"><div class="ins-k"><span class="ins-sq"></span>Slipped since last term</div>' +
+         '<p><b>' + esc(gradeSubjectLabel(_dec)) + '</b> fell from <b>' + Math.round(_dec.prev_mark) +
+         '%</b> to <b>' + Math.round(_dec.cur_mark) + '%</b> \u2014 down ' +
+         Math.abs(Math.round(_dec.delta*10)/10) + ' points across ' + _dec.schools +
+         ' school' + (_dec.schools!==1?'s':'') + ' in ' + _scope + '.</p>' +
+         '<div class="ins-s">Compared with the previous term. Open the DDD Dashboard to see which schools.</div></div>');
+     }
+
+     var _imp = _pf.improved;
+     if (_imp && _imp.delta != null) {
+       C.push('<div class="ins-c"><div class="ins-k"><span class="ins-sq"></span>Moving in the right direction</div>' +
+         '<p><b>' + esc(gradeSubjectLabel(_imp)) + '</b> rose from <b>' + Math.round(_imp.prev_mark) +
+         '%</b> to <b>' + Math.round(_imp.cur_mark) + '%</b> across ' + _imp.schools +
+         ' school' + (_imp.schools!==1?'s':'') + '.</p>' +
+         '<div class="ins-s">Worth finding out what these schools changed.</div></div>');
      }
    }
 
@@ -7690,9 +7756,10 @@ ${`
    C = C.concat(T);
 
    if (!C.length) return '<div class="ins-c"><p>Nothing to show yet.</p><div class="ins-s">Log a visit and insights will appear here.</div></div>';
-   // HARD CAP: eight cards. Beyond that the tab becomes a wall and officials
-   // stop reading. Everything else lives under "More detail".
-   return C.slice(0, 8).join('');
+   // HARD CAP: five cards. Each one must prompt an action; beyond five the
+   // tab becomes a wall and officials stop reading. The rest lives under
+   // "More detail".
+   return C.slice(0, 5).join('');
  })()}
 
  <!-- ═══ TREND CHARTS (collapsed) ═══ -->
