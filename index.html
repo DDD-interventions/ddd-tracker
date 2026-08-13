@@ -934,7 +934,7 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 // NOTIFICATIONS (login alerts via Cloudflare Worker → Resend)
 const NOTIFY_URL = 'https://ddd-notify.victor-67b.workers.dev';
-const ADMIN_EMAIL = 'victor@newleaders.co.za';
+const ADMIN_EMAIL = 'uthandile@newleaders.co.za';
 
 // CONFIG 
 const DISTRICTS = {"Eastern Cape":["Alfred Nzo East","Alfred Nzo West","Amathole East","Amathole West","Buffalo City","Chris Hani East","Chris Hani West","Joe Gqabi","Nelson Mandela","O R Tambo Coastal","O R Tambo Inland","Sarah Baartman"],"Free State":["Fezile Dabi","Lejweleputswa","Mangaung Metro","Thabo Mofutsanyana","Xhariep"],"Gauteng":["Ekurhuleni North","Ekurhuleni South","Gauteng East","Gauteng North","Gauteng West","Johannesburg Central","Johannesburg East","Johannesburg North","Johannesburg South","Johannesburg West","Sedibeng East","Sedibeng West","Tshwane North","Tshwane South","Tshwane West"],"KwaZulu-Natal":["Amajuba","Harry Gwala","Ilembe","King Cetshwayo","Pinetown","Ugu","Umgungundlovu","Umkhanyakude","Umlazi","Umzinyathi","Uthukela","Zululand"],"Limpopo":["Capricorn North","Capricorn South","Mogalakwena","Mopani East","Mopani West","Sekhukhune East","Sekhukhune South","Vhembe East","Vhembe West","Waterberg"],"Mpumalanga":["Bohlabela","Ehlanzeni","Gert Sibande","Nkangala"],"North West":["Ditsobotla","Greater Taung","Jb Marks","Kagisano Molopo","Madibeng","Mahikeng","Maquassi Hills","Matlosana","Moretele","Moses Kotane","Naledi","Ramotshere Moiloa","Ratlou","Rustenburg","Tswaing"],"Northern Cape":["Frances Baard","John Taolo Gaetsewe","Namakwa","Pixley-Ka-Seme","Zf Mgcawu"],"Western Cape":["Cape Winelands","Eden And Central Karoo","Metro Central","Metro East","Metro North","Metro South","Overberg","Partnership Schools","West Coast"]};
@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.99';
+const APP_VERSION = '2026.06.18.101';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2686,7 +2686,7 @@ async function verifyEmail(email) {
    const { data, error } = await sb.rpc('check_official_exists', { p_email: cleanEmail });
    if (error) throw new Error(error.message || JSON.stringify(error));
    if (!data) {
-     S.gateError = 'This email is not registered. Contact the DDD Interventions Manager on victor@newleaders.co.za for access.';
+     S.gateError = 'This email is not registered. Contact the DDD Interventions Manager on uthandile@newleaders.co.za for access.';
      S.gateLoading = false; render();
      return;
    }
@@ -4007,13 +4007,13 @@ function render() {
    app.innerHTML = `
    <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Welcome!</div> </div> </div> </header>
    ${renderWelcome()}
-   <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">victor@newleaders.co.za</a></span> </div>`;
+   <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">uthandile@newleaders.co.za</a></span> </div>`;
    return;
  }
 
  app.innerHTML = `
  <header class="hdr"> <div class="hdr-bar"></div> <div class="hdr-content"> <img class="hdr-logo" src="${LOGO}" alt="DDD Logo" style="cursor:pointer" onclick="S.view='log';S.submitted=false;S.f.formStep=-1;render();(S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}))" title="Back to start"> <div class="hdr-titles"> <div class="hdr-brand">DATA DRIVEN DISTRICTS</div> <div class="hdr-title">Learner Improvement Interventions Tracker</div> <div class="hdr-sub">Logged in as <strong style="color:#fff">${esc(o.full_name)}</strong>${o.district?' · '+esc(o.district):''}</div> </div> <div class="hdr-actions">${renderHeaderRing()}<button class="notif-bell" onclick="event.stopPropagation();toggleNotifPane()" title="Inbox">${(()=>{var c=getNotifCount();return '&#128276;<span class="notif-bell-label">Inbox</span>'+(c>0?'<span class="notif-badge">'+c+'</span>':'');})()}</button><button class="hdr-logout" onclick="logout()" title="Sign out">Sign out</button></div> </div> <nav class="nav"> ${`<div class="nav-compact"><button class="nav-compact-btn ${S.view==='log'&&S.f.formStep===-1&&!S.submitted?'active':''}" onclick="navHome()">Home</button><button class="nav-compact-btn ${S.view==='log'&&(S.f.formStep>-1||S.submitted)?'active':''}" onclick="navFromForm('log')">Record</button><button class="nav-compact-btn ${S.view==='dashboard'?'active':''}" onclick="navFromForm('dashboard')">My dashboard</button><button class="nav-compact-btn tk ${S.view==='toolkit'?'active':''}" onclick="navFromForm('toolkit')">Toolkit</button></div>`} </nav> </header> ${renderPendingBanner()} ${renderPushPrompt()} ${S.view === 'log' ? (S.submitted ? renderSuccess() : (S.f.formStep===-1 ? renderHomeFeed() : renderForm())) : S.view === 'dashboard' ? renderDashboard() : renderToolkit()}
- <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">victor@newleaders.co.za</a></span> </div> ${renderBottomNav()} `;
+ <div class="footer"> <img src="${LOGO}" alt="DDD"> <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span> <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">uthandile@newleaders.co.za</a></span> </div> ${renderBottomNav()} `;
  if(S.showPolicy) renderPolicyModal();
  else { const stale=document.getElementById('policy-modal-overlay'); if(stale)stale.remove(); }
  if(S.outcomeModal) renderOutcomeModal();
@@ -4063,7 +4063,7 @@ function renderEmailGate() {
        </button>
        <div class="gate-note">
          Only pre-registered officials can access this tool.<br>
-         If you don\u2019t have access, contact the DDD Interventions Manager on <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">victor@newleaders.co.za</a>
+         If you don\u2019t have access, contact the DDD Interventions Manager on <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600">uthandile@newleaders.co.za</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
          <div style="font-size:13.5px;color:#546E7A;line-height:1.6">By signing in, you agree that information you enter, including activity logs, school visits, and outcomes, will be used by the DDD Programme and yourself to track and improve learner interventions. Your data is stored securely and will only be shared with authorised programme staff for programme improvement purposes.</div>
@@ -4074,7 +4074,7 @@ function renderEmailGate() {
  <div class="footer" style="max-width:440px">
    <img src="${LOGO}" alt="DDD">
    <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span>
-   <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">victor@newleaders.co.za</a></span>
+   <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">uthandile@newleaders.co.za</a></span>
  </div>`;
 }
 
@@ -4114,7 +4114,7 @@ function renderOtpGate() {
        <div class="gate-note">
          <a href="#" onclick="event.preventDefault();S._forgotEmail=S._otpEmail||'';S._forgotMsg='';S.authState='forgot';render()"
            style="display:block;text-align:center;color:var(--teal-dk);font-weight:800;font-size:16px;padding:14px 10px;margin:10px 0 6px;border:1.5px solid #C9D2D0;border-radius:12px;text-decoration:none">Forgot your PIN? Reset it by email</a>
-         <span style="display:block;text-align:center;font-size:14px;color:var(--grey);margin-bottom:6px">or contact <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600">the Interventions Manager</a></span><br>
+         <span style="display:block;text-align:center;font-size:14px;color:var(--grey);margin-bottom:6px">or contact <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600">the Interventions Manager</a></span><br>
          <a href="#" onclick="event.preventDefault();S.authState='gate';S.gateError='';S.gateLoading=false;render()" style="color:var(--teal);font-weight:600">Use a different email</a>
        </div>
        <div style="margin-top:16px;padding:12px 14px;background:#F5F7FA;border-radius:8px;border:1px solid #D0D7DE">
@@ -4126,7 +4126,7 @@ function renderOtpGate() {
  <div class="footer" style="max-width:440px">
    <img src="${LOGO}" alt="DDD">
    <span>Data Driven Districts Programme · Department of Basic Education · New Leaders Foundation</span>
-   <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:victor@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">victor@newleaders.co.za</a></span>
+   <span style="display:block;margin-top:4px">Need help? Email <a href="mailto:uthandile@newleaders.co.za" style="color:var(--teal);font-weight:600;text-decoration:none">uthandile@newleaders.co.za</a></span>
  </div>`;
 }
 
@@ -4684,7 +4684,7 @@ function pushPromptDismiss() {
 }
 
 // ── Admin broadcast (send a push to chosen officials) ────────────────────────
-const ADMIN_EMAILS = ['victorhuni@gmail.com', 'victor@newleaders.co.za'];
+const ADMIN_EMAILS = ['uthandile@newleaders.co.za'];
 function isAdminUser() {
   return !!(S.official && S.official.email && ADMIN_EMAILS.indexOf(String(S.official.email).toLowerCase()) !== -1);
 }
@@ -6171,25 +6171,34 @@ async function submitForm() {
  (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}));
 }
 
-// Save & continue later — persists the draft and returns to the landing screen
+// Save & continue later — saves the draft, confirms it clearly, then takes the
+// official back to the home screen where the Resume card is waiting.
 function saveAndExit() {
   if (!isFormDirty()) {
-    showToast('Nothing to save yet — start filling in details and you can save any time');
+    showToast('Nothing to save yet \u2014 start filling in details and you can save any time');
     return;
   }
   const ok = saveFormDraft(true);   // user-initiated — bypasses the gate deliberately
-  if (!ok) { showToast('Could not save — your browser storage may be full'); return; }
-  S.f.formStep = -1;
+  if (!ok) { showToast('Could not save \u2014 your browser storage may be full'); return; }
+
+  // Confirm the save first, so the message is seen before the screen changes.
+  var pct = (typeof getFormProgress === 'function') ? getFormProgress() : null;
+  showToast('Saved' + (pct != null ? ' \u2014 ' + pct + '% complete' : '') +
+            '. You can carry on from the home screen any time.');
+  haptic(HAPTIC_OK);
+
+  // Then navigate home, matching what the Home button does exactly.
   S.view = 'log';
+  S.submitted = false;
+  S.f.formStep = -1;
   S._validationErrors = null;
   render();
-  (S._suppressScrollRestore=true,window.scrollTo({top:0,behavior:'smooth'}));
-  setTimeout(() => showToast('Saved — resume any time from the home screen'), 200);
+  (S._suppressScrollRestore = true, window.scrollTo({top: 0, behavior: 'auto'}));
 }
 
 // Shared HTML for the "Save & continue later" secondary action below step nav buttons
 function _saveLaterBar() {
-  return '<div class="save-later-row"><button type="button" class="btn-save-later" onclick="saveAndExit()">Save &amp; continue later</button><span class="save-later-hint">You can resume this intervention next time you sign in</span></div>';
+  return '<div class="save-later-row"><button type="button" class="btn-save-later" onclick="saveAndExit()">Save &amp; continue later</button><span class="save-later-hint">Saves your progress and returns you to the home screen</span></div>';
 }
 
 // Friendly relative timestamp: "just now", "2 hours ago", "yesterday", "3 days ago", "12 Apr"
@@ -6569,7 +6578,7 @@ function renderFilterBar(decs) {
       '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":"") + ' &nbsp;·&nbsp; ' + termScopeLabel + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
       '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
-      ((S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:13px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
+      ((S.official?.email || '').toLowerCase() === 'uthandile@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:13px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
       '</div>' +
     '</div>' +
   '</div>';
@@ -6577,7 +6586,7 @@ function renderFilterBar(decs) {
 
 // ── EXPORT ALL DATA AS CSV ──
 function exportAllDataCSV() {
- const exportAllowed = (S.official?.email || '').toLowerCase() === 'victor@newleaders.co.za';
+ const exportAllowed = (S.official?.email || '').toLowerCase() === 'uthandile@newleaders.co.za';
  if (!exportAllowed) { showToast('Export is restricted to programme administrators'); return; }
 
  const decs = S.decisions || [];
