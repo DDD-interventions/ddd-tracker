@@ -1159,7 +1159,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.95';
+const APP_VERSION = '2026.06.18.96';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2848,8 +2848,8 @@ function renderHomeFeed() {
   }
 
   // New data on the DDD Dashboard (term-tagged from real data)
-  var termLbl = (S._spotlight && ((S._spotlight.low||{}).term_label || (S._spotlight.high||{}).term_label)) || '2026 Term 1';
-  items.push(item({
+  var termLbl = (S._perf && S._perf.term) ? S._perf.term : '';
+  if (termLbl) items.push(item({
     avatar: av('DDD',0,true),
     name: 'New on the DDD Dashboard',
     meta: esc(termLbl) + ' \u00b7 all provinces',
@@ -4999,7 +4999,7 @@ function scopeSelection(){
   // No geographic filter -> the official's own scope
   var raw=(S.official && S.official.district || '').trim();
   var role=(S.official && S.official.role || '');
-  var isNational = raw==='National' || raw==='all-national' ||
+  var isNational = raw==='National' || raw==='all-national' || raw==='All' ||
                    ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager','National'].indexOf(role) >= 0;
   if (isNational) {
     return {emis:[], national:true, label:'the country', key:'national'};
@@ -6327,7 +6327,7 @@ function getClientScope() {
   if (dist === 'Province' || dist === 'Provincial') return 'province';
 
   // National scope: explicit national province or national-level roles
-  if (prov === 'National' || prov === 'All' || ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager'].includes(role)) return 'national';
+  if (prov === 'National' || prov === 'All' || dist === 'National' || dist === 'All' || ['Director General','Deputy Minister','Member','Interventions & Monitoring Manager','Interventions & MERL Manager','Data Analytics Lead','National'].includes(role)) return 'national';
 
   // Provincial scope
   if (['Provincial Manager','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Director','Chief Director','Gauteng Provincial Project Manager','North West Junior PM'].includes(role) || role.includes('Provincial')) return 'province';
