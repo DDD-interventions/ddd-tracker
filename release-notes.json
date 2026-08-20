@@ -1,4 +1,15 @@
 {
+  "2026.08.20.105": {
+    "title": "Record how far behind the ATP a class is",
+    "released": "2026-08-20",
+    "highlights": [
+      "When you log a visit, you can now record how curriculum coverage compares to the Annual Teaching Plan for each subject you selected",
+      "Coverage is recorded per grade, not per phase, so a problem in one grade is not hidden by another grade doing well",
+      "You can record what you actually checked — learner books, the teacher file, the ATP tracker, the SBA record, or a discussion",
+      "“Could not verify” is there for when you could not check properly. It is a better answer than a guess",
+      "The whole section is optional and the visit saves normally without it"
+    ]
+  },
   "2026.06.18.104": {
     "title": "A clearer activity timeline",
     "released": "2026-08-13",
