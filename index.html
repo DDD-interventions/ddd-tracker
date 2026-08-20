@@ -848,6 +848,20 @@ html,body{overscroll-behavior-y:none}
 .pring-home-sub{font-size:13px;color:var(--grey);margin-top:2px;line-height:1.45}
 @media(max-width:500px){.pring{width:40px;height:40px}.pring .pring-num{font-size:11.5px}}
 
+/* ATP coverage block */
+.atp-card{background:#fff;border:1px solid var(--line,#d6e1df);border-radius:10px;padding:14px 14px 4px;margin:0 0 12px;box-shadow:0 1px 3px rgba(7,68,69,.07)}
+.atp-card h4{margin:0 0 2px;font-size:17px;font-weight:700;color:var(--teal-dark,#074445)}
+.atp-card .atp-sub{font-size:13px;color:var(--grey,#5e6e6c);margin:0 0 12px}
+.atp-opt{display:block;background:#fff;border:2px solid #d6e1df;border-radius:8px;padding:11px 13px;margin-bottom:7px;font-size:15px;cursor:pointer;min-height:44px;line-height:1.3}
+.atp-opt input{position:absolute;opacity:0;pointer-events:none}
+.atp-opt.on{border-color:#0B8E8D;background:#eaf5f5;font-weight:600;color:#074445}
+.atp-opt.on.atp-warn{border-color:#E8952E;background:#fff6e8;color:#8a5410}
+.atp-opt.on.atp-good{border-color:#7AB648;background:#f1f8e8;color:#43701f}
+.atp-opt.on.atp-grey{border-color:#9aa9a7;background:#eef1f1;color:#3f4e4c}
+.atp-empty{background:#f0f7f7;border:1px dashed #b9d2d1;border-radius:8px;padding:16px 14px;font-size:14px;color:var(--grey,#5e6e6c);line-height:1.5}
+.atp-count{font-size:13px;color:var(--grey,#5e6e6c);margin:0 0 10px}
+
+
   @media(max-width:500px){
   /* Sub-nav: 3×2 grid instead of horizontal scroll */
   .dash-subnav{display:grid !important;grid-template-columns:1fr 1fr;gap:5px;overflow-x:visible;padding:8px 12px 6px}
@@ -1117,6 +1131,21 @@ const SUBJECT_GROUPS = [
  {label:"Arts",items:["Creative Arts","Visual Arts","Dramatic Arts","Dance Studies","Design","Music"]},
 ];
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
+const ATP_COVERAGE = [
+ {v:'ahead',      t:'Ahead of the ATP',         c:'atp-good'},
+ {v:'on_track',   t:'On track',                 c:'atp-good'},
+ {v:'behind_1_2', t:'1 to 2 weeks behind',      c:'atp-warn'},
+ {v:'behind_3_4', t:'3 to 4 weeks behind',      c:'atp-warn'},
+ {v:'behind_4p',  t:'More than 4 weeks behind', c:'atp-warn'},
+ {v:'unverified', t:'Could not verify',         c:'atp-grey'}
+];
+const ATP_EVIDENCE = [
+ {v:'learner_books', t:'Learner books'},
+ {v:'teacher_file',  t:'Teacher file'},
+ {v:'atp_tracker',   t:'ATP tracker'},
+ {v:'sba_record',    t:'SBA record'},
+ {v:'discussion',    t:'Discussion only'}
+];
 const SIP_FOCUS_AREAS = ["Reading and literacy","Maths and numeracy","Improving specific subjects","Learner attendance and keeping learners in school","Covering the curriculum on time","Tests, exams and marking","Educator training and mentoring","School leadership and management","Working with parents and the community"];
 const SUPPORT_NEEDED = ["More visits from subject advisors","A specialist to help with a specific subject","Help for progressed learners","Mentoring for the principal or Departmental Heads","Staffing problem \u2014 needs to go to HR/PED","Learning materials and resources","Learner welfare or psychosocial support","Building or infrastructure problem","On track \u2014 keep doing what we're doing"];
 const ROLE_SUPPORT_MAP = {
@@ -1167,7 +1196,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.06.18.104';
+const APP_VERSION = '2026.08.20.105';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1213,7 +1242,7 @@ const S = {
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:deriveTermFromDate(today()),activity_date:today(),
- activity_type:'',activity_types:[],_actTypeDDOpen:false,intervention_theme:'',intervention_themes:[],_themeDDOpen:false,subjects:[],grades:[],description:'',
+ activity_type:'',activity_types:[],_actTypeDDOpen:false,intervention_theme:'',intervention_themes:[],_themeDDOpen:false,subjects:[],grades:[],atp:{},description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',_ctxOpen_staffing:false,_ctxOpen_resources:false,_ctxOpen_learners:false,
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
@@ -5730,11 +5759,72 @@ function renderSubjectPicker(){
   const other=sel.includes('Other')?`<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Subject \u2014 please specify:</div><input type="text" placeholder="e.g. Computer Applications Technology, Tourism..." value="${esc(S.f.subjects_other)}" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>`:'';
   return `<div class="school-picker">${tags}${trigger}${dd}</div>${other}`;
 }
+function atpEnsure(i){
+  var sub = S.f.subjects[i]; if(!sub) return null;
+  if(!S.f.atp[sub]) S.f.atp[sub] = {grades:S.f.grades.slice(), coverage:'', evidence:[], note:''};
+  var a = S.f.atp[sub];
+  a.grades = a.grades.filter(function(g){return S.f.grades.indexOf(g)>-1});
+  return a;
+}
+function atpTogGrade(i,g){ var a=atpEnsure(i); if(!a) return; togArr(a.grades,g,a.grades.indexOf(g)===-1); render(); }
+function atpSetCov(i,v){ var a=atpEnsure(i); if(!a) return; a.coverage=(a.coverage===v?'':v); render(); }
+function atpTogEv(i,v){ var a=atpEnsure(i); if(!a) return; togArr(a.evidence,v,a.evidence.indexOf(v)===-1); render(); }
+function atpSetNote(i,v){ var a=atpEnsure(i); if(!a) return; a.note=v; }
+function atpPayload(){
+  var rows=[];
+  (S.f.subjects||[]).forEach(function(sub){
+    var a=S.f.atp[sub]; if(!a||!a.coverage) return;
+    (a.grades||[]).forEach(function(g){
+      rows.push({grade:g, subject:sub, coverage:a.coverage, evidence:a.evidence||[], note:(a.note||'').trim()||null});
+    });
+  });
+  return rows.length?rows:null;
+}
+function renderAtpCoverage(){
+  var subs = S.f.subjects||[], grs = S.f.grades||[];
+  var head = '<div class="field"><label>Curriculum coverage <span style="font-weight:400;color:var(--grey)">(optional)</span></label>'+
+             '<div class="hint">How does teaching compare to the Annual Teaching Plan? Answer only for what you actually checked.</div>';
+  if(!subs.length || !grs.length){
+    return head+'<div class="atp-empty">Select at least one subject and one grade above to record ATP coverage.</div></div>';
+  }
+  var pairs=0;
+  subs.forEach(function(_,i){ var a=atpEnsure(i); if(a) pairs+=a.grades.length; });
+  var body = subs.map(function(sub,i){
+    var a=atpEnsure(i); if(!a) return '';
+    var gchips = grs.map(function(g){
+      var on=a.grades.indexOf(g)>-1;
+      return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="atpTogGrade('+i+',\''+g+'\')"><span>Grade '+g+'</span></label>';
+    }).join('');
+    var copts = ATP_COVERAGE.map(function(c){
+      var on=a.coverage===c.v;
+      return '<label class="atp-opt'+(on?' on '+c.c:'')+'" onclick="atpSetCov('+i+',\''+c.v+'\')"><span>'+c.t+'</span></label>';
+    }).join('');
+    var echips = ATP_EVIDENCE.map(function(e){
+      var on=a.evidence.indexOf(e.v)>-1;
+      return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="atpTogEv('+i+',\''+e.v+'\')"><span>'+e.t+'</span></label>';
+    }).join('');
+    return '<div class="atp-card"><h4>'+esc(sub)+'</h4>'+
+      '<p class="atp-sub">Coverage against the Annual Teaching Plan</p>'+
+      '<div class="field"><label>Which grades does this apply to?</label>'+
+      '<div class="hint">Untick any grade you did not check for this subject</div>'+
+      '<div class="grade-grid">'+gchips+'</div></div>'+
+      '<div class="field"><label>How does coverage compare to the ATP?</label>'+copts+'</div>'+
+      '<div class="field"><label>What did you check?</label><div class="hint">Tap all that apply</div>'+
+      '<div class="grade-grid">'+echips+'</div></div>'+
+      '<div class="field"><label>Note <span style="font-weight:400;color:var(--grey)">(optional)</span></label>'+
+      '<textarea rows="2" placeholder="e.g. Term 2 topics not started, educator on extended leave" '+
+      'onchange="atpSetNote('+i+',this.value)">'+esc(a.note||'')+'</textarea></div>'+
+      '</div>';
+  }).join('');
+  var count = pairs ? '<p class="atp-count">'+pairs+' grade and subject record'+(pairs===1?'':'s')+' will be saved.</p>' : '';
+  return head+count+body+'</div>';
+}
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
     <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Select all that apply \u2014 a visit can cover more than one</div>${renderActivityTypePicker()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Intervention Theme</label><div class="hint">Select all that apply</div>${renderThemePicker()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
     <div class="field"><label>Subject(s)</label><div class="hint">Which subjects did your support focus on? This helps track where support is concentrated across the district and identify subjects that may be underserved</div>${renderSubjectPicker()}</div>
     <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
+    ${renderAtpCoverage()}
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
     <div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:14px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:13px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:13px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E7F6EA':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:13.5px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\x27\x27":"\x27yes\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\x27\x27":"\x27no\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>
@@ -6123,7 +6213,7 @@ async function submitForm() {
  intervention_theme:(S.f.intervention_themes.length?S.f.intervention_themes.map(function(t){return t==='Other'&&S.f.intervention_theme_other?'Other: '+S.f.intervention_theme_other:t}).join('; '):S.f.intervention_theme),
  intervention_themes:S.f.intervention_themes,
  cc_email:(S.f.cc_email||'').trim()||null,
- subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, description:S.f.description,
+ subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, atp_coverage:atpPayload(), description:S.f.description,
  ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return !!v && a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, ddd_data_source:S.f.ddd_data_source||null, ddd_data_source_person:S.f.ddd_data_source_person||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
  insight_types:S.f.insight_types,
@@ -6386,7 +6476,7 @@ function resetForm() {
  clearFormDraft();
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:deriveTermFromDate(today()), activity_date:today(),
- activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], description:'',
+ activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], atp:{}, description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
