@@ -1196,7 +1196,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.08.20.105';
+const APP_VERSION = '2026.09.03.106';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5161,12 +5161,12 @@ function scopeSelection(){
         var emis=Object.keys(out).map(function(x){return parseInt(x,10);}).filter(function(n){return !!n;});
         return {emis:emis, label:'this circuit', key:'c|'+dKey+'|'+df.circuit};
       }
-      return {emis:[], districts:[dKey], label:'this district', key:'d|'+dKey};
+      return {emis:[], districts:[dKey], label:dKey, key:'d|'+dKey};
     }
     return {emis:[], label:'', key:'none'};
   }
   if (df.province !== 'All' && typeof GEO_HIER==='object' && GEO_HIER[df.province]) {
-    return {emis:[], province:df.province, label:'this province', key:'p|'+df.province};
+    return {emis:[], province:df.province, label:df.province, key:'p|'+df.province};
   }
   // No geographic filter -> the official's own scope
   var raw=(S.official && S.official.district || '').trim();
@@ -5195,14 +5195,14 @@ function scopeSelection(){
       var _emisC = Object.keys(_out).map(function(x){ return parseInt(x,10); }).filter(function(n){ return !!n; });
       if (_emisC.length) {
         return {emis:_emisC,
-                label: _myCircs.length > 1 ? 'your circuits' : 'your circuit',
+                label: joinNames(_myCircs,3) + (_myCircs.length>1 ? ' circuits' : ' circuit'),
                 key: 'circ|' + _dKey + '|' + _myCircs.join(',')};
       }
     }
   }
   if (raw === 'Province' || raw === 'Provincial') {
     var myProv = (S.official && S.official.province || '').trim();
-    if (myProv) return {emis:[], province:myProv, label:'your province', key:'prov|'+myProv};
+    if (myProv) return {emis:[], province:myProv, label:myProv, key:'prov|'+myProv};
     return {emis:[], label:'', key:'none'};
   }
   if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
@@ -5210,7 +5210,7 @@ function scopeSelection(){
   var keys=[]; parts.forEach(function(pn){ var k=_resolveDistrictKey(pn); if(k && keys.indexOf(k)<0) keys.push(k); });
   if(!keys.length) return {emis:[], label:'', key:'none'};
   return {emis:[], districts:keys,
-          label:keys.length>1?'your districts':'your district', key:'home|'+keys.join('|')};
+          label: joinNames(keys,3), key:'home|'+keys.join('|')};
 }
 // Back-compat shim for any older callers.
 function scopeEmisList(){ return scopeSelection().emis; }
@@ -5262,12 +5262,36 @@ function renderPerfCardsOnly(){
   if (S.view==='dashboard') { render(); return; }
   if (S.view==='log' && S.f.formStep===-1 && !S.submitted) render();
 }
+// Districts an official actually holds, resolved to canonical names.
+// Empty for national / provincial / circuit-only officials.
+function ownDistrictKeys(){
+  var raw=(S.official && S.official.district || '').trim();
+  if(!raw || raw==='All' || raw==='National' || raw==='Province' || raw==='Provincial') return [];
+  var out=[];
+  raw.split(',').map(function(x){return x.trim();}).filter(Boolean).forEach(function(pn){
+    var k=(typeof _resolveDistrictKey==='function' ? (_resolveDistrictKey(pn)||pn) : pn);
+    if(k && out.indexOf(k)<0) out.push(k);
+  });
+  return out;
+}
+// Join names for reading: "A", "A and B", "A, B and C".
+function joinNames(list, max){
+  var a=(list||[]).slice();
+  if(!a.length) return '';
+  if(max && a.length>max) return a.length + ' districts';
+  if(a.length===1) return a[0];
+  return a.slice(0,-1).join(', ') + ' and ' + a[a.length-1];
+}
 // Scope label that mirrors what the card can honestly claim.
 function scopeLabel(){
   var raw=(S.official && S.official.district || '').trim();
-  if(!raw || raw==='All') return 'your area';
-  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
-  return parts.length>1 ? 'your districts' : 'your district';
+  var prov=(S.official && S.official.province || '').trim();
+  if(!raw) return 'your area';
+  if(raw==='All' || raw==='National') return 'the country';
+  if(raw==='Province' || raw==='Provincial') return prov || 'your province';
+  var keys=ownDistrictKeys();
+  if(keys.length) return joinNames(keys,3);
+  return 'your area';
 }
 
 function _updateSchoolPickerInPlace(){
@@ -6720,7 +6744,18 @@ function renderFilterBar(decs) {
     schools.sort();
   }
 
-  const provLocked = scope === 'district' || scope === 'own';
+  // A multi-district official may hold districts in more than one province
+  // (e.g. a DBE mentor covering two provinces). Locking the province filter
+  // would hide the districts outside their home province entirely, so the
+  // lock is lifted for them and the district list is drawn from their own
+  // mandate rather than from the selected province. The scope ceiling is
+  // unchanged, so this widens what they can FILTER, never what they can SEE.
+  const _ownDists = (typeof ownDistrictKeys === 'function') ? ownDistrictKeys() : [];
+  const _multiDist = _ownDists.length > 1;
+  if (_multiDist) {
+    districts = _ownDists.slice().sort();
+  }
+  const provLocked = (scope === 'district' && !_multiDist) || scope === 'own';
   const distLocked = scope === 'own';
   const tf = S.dashTermFilter || { year: new Date().getFullYear(), term: 'All' };
   const years = getDashYears();
