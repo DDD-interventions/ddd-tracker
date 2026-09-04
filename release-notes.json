@@ -1,4 +1,13 @@
 {
+  "2026.09.04.108": {
+    "title": "See DBE mentor activity on its own",
+    "released": "2026-09-04",
+    "highlights": [
+      "My Dashboard has a new DBE Mentors view alongside All, My and My Colleagues’ Activities",
+      "It shows a summary of mentor activity: visits, mentors active, schools reached, districts covered, follow-ups open and how much was data-informed",
+      "You only ever see mentor activity in the area you already have access to"
+    ]
+  },
   "2026.09.04.107": {
     "title": "Fixes for officials who cover more than one district",
     "released": "2026-09-04",
