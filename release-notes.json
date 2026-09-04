@@ -1,4 +1,13 @@
 {
+  "2026.09.03.106": {
+    "title": "Insights now name the districts they cover",
+    "released": "2026-09-03",
+    "highlights": [
+      "Insight cards name the district, province or circuit they are based on, instead of saying “your districts”",
+      "Officials who cover more than one district now see all of those districts in the dashboard filters, including a district in another province",
+      "Every insight continues to show the term it is based on"
+    ]
+  },
   "2026.08.20.105": {
     "title": "Record how far behind the ATP a class is",
     "released": "2026-08-20",
