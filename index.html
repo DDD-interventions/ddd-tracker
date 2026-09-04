@@ -1196,7 +1196,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.03.106';
+const APP_VERSION = '2026.09.04.107';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5206,7 +5206,7 @@ function scopeSelection(){
     return {emis:[], label:'', key:'none'};
   }
   if(!raw || raw==='All') return {emis:[], label:'', key:'none'};
-  var parts=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  var parts=splitList(raw);
   var keys=[]; parts.forEach(function(pn){ var k=_resolveDistrictKey(pn); if(k && keys.indexOf(k)<0) keys.push(k); });
   if(!keys.length) return {emis:[], label:'', key:'none'};
   return {emis:[], districts:keys,
@@ -5262,13 +5262,20 @@ function renderPerfCardsOnly(){
   if (S.view==='dashboard') { render(); return; }
   if (S.view==='log' && S.f.formStep===-1 && !S.submitted) render();
 }
+// Split a district or circuit list on either separator. Accounts have been
+// created with commas and with semicolons; a mismatch here means the value
+// never resolves and the official is left with an empty screen and no
+// explanation, so both are accepted everywhere a list is parsed.
+function splitList(raw){
+  return String(raw||'').split(/[;,]/).map(function(x){ return x.trim(); }).filter(Boolean);
+}
 // Districts an official actually holds, resolved to canonical names.
 // Empty for national / provincial / circuit-only officials.
 function ownDistrictKeys(){
   var raw=(S.official && S.official.district || '').trim();
   if(!raw || raw==='All' || raw==='National' || raw==='Province' || raw==='Provincial') return [];
   var out=[];
-  raw.split(',').map(function(x){return x.trim();}).filter(Boolean).forEach(function(pn){
+  splitList(raw).forEach(function(pn){
     var k=(typeof _resolveDistrictKey==='function' ? (_resolveDistrictKey(pn)||pn) : pn);
     if(k && out.indexOf(k)<0) out.push(k);
   });
@@ -6528,12 +6535,17 @@ function initDashFilters() {
   const rawDist = (S.official.district || '').trim();
   const realDist = (!rawDist || rawDist === 'All' || rawDist === 'Province' || rawDist === 'Provincial')
                    ? 'All'
-                   : (rawDist.indexOf(',') >= 0 ? 'All' : rawDist);   // multi-district -> All
+                   : (/[;,]/.test(rawDist) ? 'All' : rawDist);   // multi-district -> All
   const myCircs = officialCircuits(S.official);
+  // An official holding several districts must start on 'All' provinces.
+  // Defaulting to their home province makes scopeSelection() compute
+  // province-wide insights and drop any district they hold elsewhere.
+  const _ownD = (typeof ownDistrictKeys === 'function') ? ownDistrictKeys() : [];
+  const _multi = _ownD.length > 1;
   S.dashFilter = {
     // Default to the official's own area so the filter bar shows what they
     // actually see. Only national users start on 'All'.
-    province: (scope === 'national') ? 'All' : realProv,
+    province: (scope === 'national' || _multi) ? 'All' : realProv,
     district: (scope === 'district' || scope === 'circuit') ? realDist : 'All',
     // A circuit official lands on their own circuit; if they cover several,
     // start on 'All' (the ceiling still confines them to those circuits).
@@ -6584,7 +6596,7 @@ function officialCircuits(o){
   var c = (o || S.official || {}).circuit;
   if (!c) return [];
   if (Array.isArray(c)) return c.map(function(x){ return String(x||'').trim(); }).filter(Boolean);
-  return String(c).split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+  return splitList(c);
 }
 
 function getClientScope() {
@@ -6660,7 +6672,7 @@ function applyScopeCeiling(decs){
 
   // District (incl. multi-district): only their district(s).
   if (rawDist && rawDist !== 'All' && rawDist !== 'Province' && rawDist !== 'Provincial') {
-    var keys = rawDist.split(',').map(function(x){ return x.trim(); }).filter(Boolean)
+    var keys = splitList(rawDist)
                  .map(function(n){ return (typeof _resolveDistrictKey==='function' ? (_resolveDistrictKey(n)||n) : n); });
     return decs.filter(function(d){
       var dd = (d.details||{}).district || '';
