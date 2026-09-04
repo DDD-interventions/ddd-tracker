@@ -1,4 +1,13 @@
 {
+  "2026.09.04.107": {
+    "title": "Fixes for officials who cover more than one district",
+    "released": "2026-09-04",
+    "highlights": [
+      "Officials covering several districts now see insights for all of them, including a district in another province",
+      "The district filter lists the districts an official actually covers",
+      "Insight cards name the districts they are based on, and the term"
+    ]
+  },
   "2026.09.03.106": {
     "title": "Insights now name the districts they cover",
     "released": "2026-09-03",
