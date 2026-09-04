@@ -1,4 +1,12 @@
 {
+  "2026.09.04.109": {
+    "title": "DBE Mentors view now picks up every mentor visit",
+    "released": "2026-09-04",
+    "highlights": [
+      "The DBE Mentors view now includes visits where the designation was typed in under “Other”",
+      "A visit covering more than one district is counted in each of them"
+    ]
+  },
   "2026.09.04.108": {
     "title": "See DBE mentor activity on its own",
     "released": "2026-09-04",
