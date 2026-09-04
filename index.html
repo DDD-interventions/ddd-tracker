@@ -1196,7 +1196,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.04.107';
+const APP_VERSION = '2026.09.04.108';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5269,6 +5269,35 @@ function renderPerfCardsOnly(){
 function splitList(raw){
   return String(raw||'').split(/[;,]/).map(function(x){ return x.trim(); }).filter(Boolean);
 }
+// The designation used for DBE mentors. Matched on the role stored with
+// each record, so the summary works from data already loaded.
+var MENTOR_ROLE = 'DBE Mentor';
+function isMentorRec(d){
+  var det = d && d.details ? d.details : {};
+  return String(det.official_role || '').trim().toLowerCase() === MENTOR_ROLE.toLowerCase();
+}
+// Aggregate mentor activity within whatever the viewer is already allowed
+// to see. Never widens scope; it only summarises the same rows.
+function mentorSummary(decs){
+  var out = { visits:0, mentors:{}, schools:{}, districts:{}, followOpen:0, dataInformed:0 };
+  (decs || []).forEach(function(d){
+    if (!isMentorRec(d)) return;
+    var det = d.details || {};
+    out.visits++;
+    var who = (det.official_name || det.official_email || '').trim();
+    if (who) out.mentors[who] = (out.mentors[who] || 0) + 1;
+    splitList(det.schools || '').forEach(function(x){ if (x) out.schools[x] = 1; });
+    var dist = (det.district || d.district || '').trim();
+    if (dist) out.districts[dist] = (out.districts[dist] || 0) + 1;
+    if (det.follow_up && !det.follow_up_completed) out.followOpen++;
+    var du = String(det.ddd_used || '');
+    if (['yes-direct','yes-informed','partially','other-data'].indexOf(du) >= 0) out.dataInformed++;
+  });
+  out.mentorCount   = Object.keys(out.mentors).length;
+  out.schoolCount   = Object.keys(out.schools).length;
+  out.districtCount = Object.keys(out.districts).length;
+  return out;
+}
 // Districts an official actually holds, resolved to canonical names.
 // Empty for national / provincial / circuit-only officials.
 function ownDistrictKeys(){
@@ -6827,7 +6856,7 @@ function renderFilterBar(decs) {
       '<div class="dash-filter-grp"><label>School</label>' + sel(schools, f.school, 'school', false) + '</div>' +
     '</div>' +
     '<div class="dash-filters-info">' +
-      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":"") + ' &nbsp;·&nbsp; ' + termScopeLabel + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
+      '<span class="dash-filters-count">Showing ' + filtered.length + ' of ' + decs.length + ' activities' + (S.dashViewScope==='mine'?' (mine)':S.dashViewScope==='colleagues'?" (my colleagues\\')":S.dashViewScope==='mentors'?' (DBE mentors)':"") + ' &nbsp;·&nbsp; ' + termScopeLabel + (!f.district || f.district === 'All' ? ' &nbsp;·&nbsp; Select a district to filter by school' : '') + '</span>' +
       '<div style="display:flex;gap:6px;align-items:center">' +
       (hasFilters ? '<button class="dash-filters-clear" onclick="initDashFilters();render()">Clear filters</button>' : '') +
       ((S.official?.email || '').toLowerCase() === 'uthandile@newleaders.co.za' ? '<button onclick="exportAllDataCSV()" style="font-size:13px;color:#fff;background:var(--teal);border:none;cursor:pointer;font-family:inherit;padding:4px 10px;border-radius:4px;font-weight:600;white-space:nowrap;transition:.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Export CSV</button>' : '') +
@@ -6969,12 +6998,14 @@ function renderDashboard() {
  var decs;
  if (S.dashViewScope === 'mine') { decs = _geoFiltered.filter(function(d){ return d.official_id === S._officialId; }); }
  else if (S.dashViewScope === 'colleagues') { decs = _geoFiltered.filter(function(d){ return d.official_id !== S._officialId; }); }
+ else if (S.dashViewScope === 'mentors') { decs = _geoFiltered.filter(isMentorRec); }
  else { decs = _geoFiltered; }
  // Dynamic label helpers
  var _isMine = S.dashViewScope === 'mine';
  var _isColl = S.dashViewScope === 'colleagues';
- var _lYou = _isMine ? 'you' : _isColl ? 'colleagues' : 'officials';
- var _lYour = _isMine ? 'your' : _isColl ? "your colleagues'" : "officials'";
+ var _isMent = S.dashViewScope === 'mentors';
+ var _lYou = _isMine ? 'you' : _isColl ? 'colleagues' : _isMent ? 'DBE mentors' : 'officials';
+ var _lYour = _isMine ? 'your' : _isColl ? "your colleagues'" : _isMent ? "DBE mentors'" : "officials'";
  var _lYouCap = _isMine ? 'You' : _isColl ? 'Colleagues' : 'Officials';
  var _lAre = _isMine ? 'Are You' : _isColl ? 'Are Colleagues' : 'Are Officials';
  const decIds = new Set(decs.map(d => d.id));
@@ -7741,14 +7772,46 @@ function renderDashboard() {
 
  <div style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;flex-wrap:wrap">
    <span style="font-size:13.5px;color:var(--grey);font-weight:600;white-space:nowrap">Showing:</span>
-   ${['all','mine','colleagues'].map(function(v){
-     var lbl = v==='all'?'📋 All Activities':v==='mine'?'👤 My Activities':"👥 My Colleagues' Activities";
+   ${['all','mine','colleagues','mentors'].map(function(v){
+     var lbl = v==='all'?'📋 All Activities':v==='mine'?'👤 My Activities':v==='mentors'?'DBE Mentors':"👥 My Colleagues' Activities";
      var sel = S.dashViewScope === v;
      return '<button onclick="S.dashViewScope=\''+v+'\';render()" style="padding:8px 14px;border-radius:20px;font-size:14px;font-weight:'+(sel?'700':'500')+';border:'+(sel?'2px solid var(--teal)':'1.5px solid #D0D4DA')+';background:'+(sel?'var(--teal)':'#fff')+';color:'+(sel?'#fff':'#4A5568')+';cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:'+(sel?'0 2px 8px rgba(0,100,127,.3)':'0 1px 3px rgba(0,0,0,.08)')+'">' + lbl + '</button>';
    }).join('')}
  </div>
 
-${`
+${(function(){
+   if (S.dashViewScope !== 'mentors') return '';
+   var m = mentorSummary(decs);
+   if (!m.visits) {
+     return '<div style="background:#fff;border:1px solid #E3E9E8;border-left:5px solid var(--teal);' +
+            'border-radius:10px;padding:16px 18px;margin:0 0 14px">' +
+            '<div style="font-weight:700;color:var(--teal-dk);margin-bottom:4px">DBE mentor activity</div>' +
+            '<div style="font-size:14px;color:var(--grey);line-height:1.5">No visits recorded by DBE mentors ' +
+            'in the area you can see. As mentors log visits, a summary appears here.</div></div>';
+   }
+   var top = Object.keys(m.districts).sort(function(a,b){ return m.districts[b]-m.districts[a]; }).slice(0,4);
+   var pct = m.visits ? Math.round(m.dataInformed * 100 / m.visits) : 0;
+   var cell = function(n,l){
+     return '<div style="flex:1 1 120px;min-width:120px"><div style="font-size:26px;font-weight:700;' +
+            'color:var(--teal-dk);line-height:1.1">' + n + '</div>' +
+            '<div style="font-size:12.5px;color:var(--grey);margin-top:2px">' + l + '</div></div>';
+   };
+   return '<div style="background:#fff;border:1px solid #E3E9E8;border-left:5px solid var(--teal);' +
+     'border-radius:10px;padding:16px 18px;margin:0 0 14px">' +
+     '<div style="font-weight:700;color:var(--teal-dk);margin-bottom:12px">DBE mentor activity</div>' +
+     '<div style="display:flex;flex-wrap:wrap;gap:14px 10px">' +
+       cell(m.visits, 'Visits logged') +
+       cell(m.mentorCount, 'Mentors active') +
+       cell(m.schoolCount, 'Schools reached') +
+       cell(m.districtCount, 'Districts covered') +
+       cell(m.followOpen, 'Follow-ups open') +
+       cell(pct + '%', 'Data-informed') +
+     '</div>' +
+     (top.length ? '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #EEF2F1;' +
+       'font-size:13px;color:var(--grey)">Most active: ' +
+       top.map(function(d){ return esc(d) + ' (' + m.districts[d] + ')'; }).join(' \u00b7 ') + '</div>' : '') +
+     '</div>';
+ })()}${`
  <!-- ═══ FOUR HEADLINE NUMBERS ═══ -->
  <div class="hl-grid">
    <div class="hl">
