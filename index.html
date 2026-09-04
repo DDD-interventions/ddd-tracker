@@ -1196,7 +1196,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.04.108';
+const APP_VERSION = '2026.09.04.109';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5274,7 +5274,9 @@ function splitList(raw){
 var MENTOR_ROLE = 'DBE Mentor';
 function isMentorRec(d){
   var det = d && d.details ? d.details : {};
-  return String(det.official_role || '').trim().toLowerCase() === MENTOR_ROLE.toLowerCase();
+  var r = String(det.official_role || '').toLowerCase();
+  // "Other: DBE Mentor" and casing variants must all match.
+  return r.indexOf(MENTOR_ROLE.toLowerCase()) >= 0;
 }
 // Aggregate mentor activity within whatever the viewer is already allowed
 // to see. Never widens scope; it only summarises the same rows.
@@ -5287,8 +5289,10 @@ function mentorSummary(decs){
     var who = (det.official_name || det.official_email || '').trim();
     if (who) out.mentors[who] = (out.mentors[who] || 0) + 1;
     splitList(det.schools || '').forEach(function(x){ if (x) out.schools[x] = 1; });
-    var dist = (det.district || d.district || '').trim();
-    if (dist) out.districts[dist] = (out.districts[dist] || 0) + 1;
+    // A record may carry more than one district in a single field.
+    splitList(det.district || d.district || '').forEach(function(dd){
+      if (dd) out.districts[dd] = (out.districts[dd] || 0) + 1;
+    });
     if (det.follow_up && !det.follow_up_completed) out.followOpen++;
     var du = String(det.ddd_used || '');
     if (['yes-direct','yes-informed','partially','other-data'].indexOf(du) >= 0) out.dataInformed++;
