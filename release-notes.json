@@ -1,4 +1,24 @@
 {
+  "2026.09.05.111": {
+    "title": "Your designation is remembered",
+    "released": "2026-09-05",
+    "highlights": [
+      "Designation and specialisation are asked once. After that the form shows them on one line with a Change button",
+      "If your record already has them, you will not be asked at all"
+    ]
+  },
+  "2026.09.04.110": {
+    "title": "A simpler visit form — no more dropdowns",
+    "released": "2026-09-04",
+    "highlights": [
+      "Every option on the form is now shown as a large tap row. Nothing is hidden behind a dropdown",
+      "School list: if you cover a circuit or a small district, your schools are shown straight away, with the ones you have visited before at the top",
+      "Grades now come before subjects, so the Annual Teaching Plan question appears as soon as you choose a subject",
+      "Subjects: the eight most common are one tap away; the rest are under group headings that open in place",
+      "“Planned interventions” and “Actions you took” are one question: What did you do? The six most common actions come first",
+      "Three rarely-used questions on the Data Connection step have been removed"
+    ]
+  },
   "2026.09.04.109": {
     "title": "DBE Mentors view now picks up every mentor visit",
     "released": "2026-09-04",
