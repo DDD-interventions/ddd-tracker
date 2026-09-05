@@ -1225,7 +1225,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.05.111';
+const APP_VERSION = '2026.09.05.113';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5370,8 +5370,7 @@ function scopeLabel(){
 // searching. Longer lists keep the collapsed, searchable picker.
 var SCHOOL_INLINE_MAX = 30;
 function _schoolListInline(){
-  if(!S.f || !S.f.district) return false;
-  try { return getAvailableSchools().length <= SCHOOL_INLINE_MAX; } catch(e){ return false; }
+  return !!(S.f && S.f.district);
 }
 // Put schools with prior visits first, keeping alphabetical order within
 // each block. vh is the visit-history lookup already built by the caller.
@@ -5776,7 +5775,7 @@ function schoolPickerHTML(){
     _spItems=phaseFiltered;
 
     dd+='<div class="school-dd-list">';
-    if(phaseFiltered.length===0){
+    if(phaseFiltered.length===0 && !(_inline && allSchools.length>SCHOOL_INLINE_MAX && !q)){
       dd+='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
     }else{
       var typeBadgeColors={S:'#00647F',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
@@ -5785,7 +5784,11 @@ function schoolPickerHTML(){
       // Build visit history lookup for dropdown badges
       var _vhLookup={};
       if(S.decisions&&S.decisions.length){var _vhTerms=getLookbackTerms(S.f.term);for(var _vdi=0;_vdi<S.decisions.length;_vdi++){var _vd=S.decisions[_vdi];if(!_vd.details||!_vd.details.term||_vhTerms.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhLookup[_vsn])_vhLookup[_vsn]={total:0,byYou:0};_vhLookup[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhLookup[_vsn].byYou++;}}}
-      const shown=_visitedFirst(phaseFiltered,_vhLookup).slice(0,120); _spItems=shown;
+      const _bigList=_inline && allSchools.length>SCHOOL_INLINE_MAX && !q && phaseFilter==='ALL';
+      let shown=_visitedFirst(phaseFiltered,_vhLookup);
+      if(_bigList){ shown=shown.filter(function(x){return _vhLookup[x[0]]&&_vhLookup[x[0]].total>0;}).slice(0,10); }
+      else { shown=shown.slice(0,120); }
+      _spItems=shown;
       const showCircuit=!S.f.circuit;
       const circuitLookup={};
       if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
@@ -5804,7 +5807,9 @@ function schoolPickerHTML(){
         var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
         dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:13px;color:#5A6878;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
       }
-      if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
+      if(_bigList){
+        dd+='<div class="school-dd-hint" style="padding:12px 14px;font-size:14px;line-height:1.5">'+(shown.length?'Not one of these? ':'')+'Type part of the school name in the box above to find any school in '+esc(S.f.circuit||S.f.district)+' ('+allSchools.length+' schools).</div>';
+      } else if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
     dd+='</div>';
     const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
@@ -5837,17 +5842,30 @@ document.addEventListener('click',function(e){
   if(S._mention.active&&!e.target.closest('.reply-box')&&!e.target.closest('.sup-resolve-form')&&!e.target.closest('.pt-reply')&&!e.target.closest('.post-thread')){var _mKey=S._mention.key;S._mention={active:false,key:'',elId:'',query:'',results:[],recents:[],loading:false};updateMentionUI(_mKey);}
 });
 
+// Location selects live in their own function so they can be shown either
+// before the school (no district yet) or collapsed after it (district known).
+function renderLocationSelects(){
+  return `    <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
+}
+function renderLocationSummary(){
+  if(!S.f.district || S.f._editLoc) return renderLocationSelects();
+  var parts=[S.f.province,S.f.district,S.f.circuit].filter(Boolean);
+  return '<div class="field"><label>Location</label><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F3F9F9;border:1.5px solid var(--teal);border-radius:8px;padding:11px 13px">'+
+    '<span style="font-size:15.5px;font-weight:600;color:var(--teal-dk)">'+esc(parts.join(' \u00b7 '))+'</span>'+
+    '<button type="button" onclick="S.f._editLoc=true;render()" style="background:none;border:1.5px solid var(--teal);color:var(--teal);border-radius:6px;padding:6px 10px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Change</button></div></div>';
+}
 function renderFormStep1(){
   const _schoolArr = parseSchoolsArr();
   const _schoolCount = _schoolArr.length;
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
+    <div class="form-group"><div class="form-group-label">Which school?</div>
+    ${S.f.district ? '' : renderLocationSelects()}
+    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':''}${renderVisitHistoryCard()}</div>
+    ${S.f.district ? renderLocationSummary() : ''}
+    </div>
     <div class="form-group"><div class="form-group-label">Date and term</div>
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value;S.f.term=deriveTermFromDate(this.value);render()"></div></div>
-    </div>
-    <div class="form-group"><div class="form-group-label">School location</div>
-    <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
-    <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
-    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':''}${renderVisitHistoryCard()}</div>
     </div>
     <div class="form-group"><div class="form-group-label">Your details</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
@@ -5857,7 +5875,15 @@ function renderFormStep1(){
     ${_saveLaterBar()}
   </div></div>`;
 }
-function toggleSubject(name){S.f.subjects.includes(name)?S.f.subjects=S.f.subjects.filter(s=>s!==name):S.f.subjects.push(name);render();}
+function toggleSubject(name){
+  var adding=!S.f.subjects.includes(name);
+  adding?S.f.subjects.push(name):(S.f.subjects=S.f.subjects.filter(s=>s!==name));
+  render();
+  // If the subject came from a group below the card, scroll the card into view.
+  if(adding && COMMON_SUBJECTS.indexOf(name)<0){
+    setTimeout(function(){ var el=document.getElementById('atp-anchor'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
+  }
+}
 function removeSubject(name){S.f.subjects=S.f.subjects.filter(s=>s!==name);render();}
 let _subjFilterTimer=null;
 function subjectFilterInput(val){
@@ -5948,7 +5974,7 @@ function renderAtpCoverage(){
   var head = '<div class="field"><label>Curriculum coverage <span style="font-weight:400;color:var(--grey)">(optional)</span></label>'+
              '<div class="hint">How does teaching compare to the Annual Teaching Plan? Answer only for what you actually checked.</div>';
   if(!subs.length || !grs.length){
-    return head+'<div class="atp-empty">Select at least one subject and one grade above to record ATP coverage.</div></div>';
+    return head+'<div class="atp-empty">'+(!grs.length?'Choose the grade(s) above, then a subject, and the ATP coverage question will appear here.':'Tap a subject and the ATP coverage question will appear here.')+'</div></div>';
   }
   var pairs=0;
   subs.forEach(function(_,i){ var a=atpEnsure(i); if(a) pairs+=a.grades.length; });
@@ -6006,6 +6032,9 @@ function renderSubjectsVisible(){
     return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleSubject(\''+_jsq(sname)+'\')"><span>'+esc(sname)+'</span></label>';
   };
   var html='<div class="sg-sub">Most common</div><div class="grade-grid">'+COMMON_SUBJECTS.map(chip).join('')+'</div>';
+  // ATP coverage appears right here, under the chips the official just
+  // tapped, rather than below the full group list where it is off-screen.
+  html+='<div id="atp-anchor">'+renderAtpCoverage()+'</div>';
   html+='<div class="sg-sub">All subjects by group</div>';
   var open=S.f._sgOpen||{};
   html+=SUBJECT_GROUPS.map(function(g){
@@ -6024,7 +6053,6 @@ function renderFormStep2(){
     <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Tap all that apply \u2014 a visit can cover more than one</div>${renderActivityTypeVisible()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Programme</label><div class="hint">Tap any that apply. Leave blank if unsure.</div>${renderThemeVisible()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
     <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Subject(s)</label><div class="hint">Tap the subjects your support focused on.</div>${renderSubjectsVisible()}</div>
-    ${renderAtpCoverage()}
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
     <div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:14px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:13px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:13px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E7F6EA':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:13.5px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\x27\x27":"\x27yes\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\x27\x27":"\x27no\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>
@@ -6795,7 +6823,7 @@ function resetForm() {
  doc_url:'', doc_name:'', cc_email:'',
     sip_focus_areas:[], support_needed:[], support_level:'', obs_curriculum:'', obs_apip:'', obs_time:'', doc_file:null, doc_file_name:'', doc_files:[], doc_file_names:[],
     tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
-    formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, _editProfile:false, official_specialisation_other:S.f.official_specialisation_other,
+    formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, _editProfile:false, _editLoc:false, official_specialisation_other:S.f.official_specialisation_other,
     insight_type:'', insight_types:[], _insightDDOpen:false, insight_pass_rate:'', insight_learners_affected:'', insight_threshold:'', insight_detail:'', insight_educator_absent:'', insight_attendance_days:'', insight_sba_exam_gap:'', insight_curriculum_pct:''
   };
   S.openSections = {1:false,2:false,3:false,4:false};
