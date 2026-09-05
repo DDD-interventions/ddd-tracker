@@ -848,6 +848,35 @@ html,body{overscroll-behavior-y:none}
 .pring-home-sub{font-size:13px;color:var(--grey);margin-top:2px;line-height:1.45}
 @media(max-width:500px){.pring{width:40px;height:40px}.pring .pring-num{font-size:11.5px}}
 
+/* School picker shown open and inline when the official's list is short */
+.school-picker.inline .school-trigger{border-radius:6px 6px 0 0;cursor:default;background:#F3F9F9;border-color:var(--teal)}
+.school-picker.inline .school-trigger .arrow{display:none}
+.school-dd.inline{position:static;box-shadow:none;border-top:none}
+.school-dd.inline .school-dd-list{max-height:none}
+.school-dd-sub{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#0B8E8D;font-weight:700;padding:10px 12px 4px;background:#fff}
+
+/* Visible option lists (replaces collapsed pickers) */
+.vo-grp{margin:12px 0 4px}
+.vo-grp h5{margin:0 0 7px;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--teal,#0B8E8D);font-weight:700}
+.vo-opt{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid #d6e1df;border-radius:8px;padding:11px 13px;margin-bottom:7px;font-size:15.5px;cursor:pointer;min-height:48px;line-height:1.3;user-select:none;color:#22312F}
+.vo-opt .vo-box{flex:0 0 22px;width:22px;height:22px;border:2px solid #9AA9A7;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.vo-opt.radio .vo-box{border-radius:50%}
+.vo-opt.on{border-color:#0B8E8D;background:#eaf5f5;font-weight:600;color:#074445}
+.vo-opt.on .vo-box{background:#0B8E8D;border-color:#0B8E8D}
+.vo-opt.on .vo-box::after{content:"\2713"}
+.vo-opt.warn.on{border-color:#E8952E;background:#fff6e8;color:#8a5410}
+.vo-opt.warn.on .vo-box{background:#E8952E;border-color:#E8952E}
+.vo-count{font-size:13px;color:var(--grey,#5e6e6c);margin:2px 0 0}
+.vo-count b{color:#074445}
+
+/* Subject groups: heading rows open inline, chips beneath */
+.sg-head{display:flex;align-items:center;justify-content:space-between;background:#fff;border:2px solid #d6e1df;border-radius:8px;padding:11px 13px;margin-bottom:7px;font-size:15.5px;cursor:pointer;user-select:none;min-height:48px;color:#22312F}
+.sg-head .sg-n{font-size:13px;color:var(--grey,#5e6e6c);white-space:nowrap;margin-left:10px}
+.sg-head.open{border-color:#0B8E8D;background:#F3F9F9}
+.sg-head.has{font-weight:600;color:#074445}
+.sg-body{padding:2px 0 8px 6px}
+.sg-sub{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:#0B8E8D;font-weight:700;margin:12px 0 8px}
+
 /* ATP coverage block */
 .atp-card{background:#fff;border:1px solid var(--line,#d6e1df);border-radius:10px;padding:14px 14px 4px;margin:0 0 12px;box-shadow:0 1px 3px rgba(7,68,69,.07)}
 .atp-card h4{margin:0 0 2px;font-size:17px;font-weight:700;color:var(--teal-dark,#074445)}
@@ -1196,7 +1225,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.04.109';
+const APP_VERSION = '2026.09.05.111';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2684,6 +2713,7 @@ async function checkAuth() {
        S.f.official_name = official.full_name || '';
        S.f.official_role = official.role || '';
        S.f.official_email = official.email || '';
+       _applyKnownProfile(official);
        if (official.province) S.f.province = official.province;
        if (official.district) S.f.district = official.district;
        initDashFilters();
@@ -3232,6 +3262,7 @@ async function handleOtpSubmit() {
    S.f.official_name = official.full_name || '';
    S.f.official_role = official.role || '';
    S.f.official_email = S._otpEmail;
+   _applyKnownProfile(official);
    if (official.province) S.f.province = official.province;
    if (official.district) S.f.district = official.district;
 
@@ -5334,6 +5365,68 @@ function scopeLabel(){
   return 'your area';
 }
 
+// A short school list (a circuit, or a small district) is shown open and
+// inline so the official taps a school rather than opening a dropdown and
+// searching. Longer lists keep the collapsed, searchable picker.
+var SCHOOL_INLINE_MAX = 30;
+function _schoolListInline(){
+  if(!S.f || !S.f.district) return false;
+  try { return getAvailableSchools().length <= SCHOOL_INLINE_MAX; } catch(e){ return false; }
+}
+// Put schools with prior visits first, keeping alphabetical order within
+// each block. vh is the visit-history lookup already built by the caller.
+function _visitedFirst(list, vh){
+  if(!vh) return list;
+  var seen=[], rest=[];
+  for(var i=0;i<list.length;i++){ (vh[list[i][0]] && vh[list[i][0]].total>0 ? seen : rest).push(list[i]); }
+  return seen.concat(rest);
+}
+
+// Designation and specialisation are asked once. After that they come from
+// the official's record and the form shows a one-line summary instead.
+function _applyKnownProfile(official){
+  var det = (official && official.details) || {};
+  var spec = String(det.specialisation || '').trim();
+  if (spec.indexOf('Other: ') === 0) { S.f.official_specialisation = 'Other'; S.f.official_specialisation_other = spec.slice(7); }
+  else if (spec) { S.f.official_specialisation = spec; S.f.official_specialisation_other = ''; }
+  var role = String(official && official.role || '').trim();
+  if (role.indexOf('Other: ') === 0) { S.f.official_role = 'Other'; S.f.official_role_other = role.slice(7); }
+}
+function _profileKnown(){
+  var r = S.f.official_role, ro = S.f.official_role_other, sp = S.f.official_specialisation, so = S.f.official_specialisation_other;
+  var roleOk = r && (r !== 'Other' || (ro && ro.trim()));
+  var specOk = sp && (sp !== 'Other' || (so && so.trim()));
+  return { role: !!roleOk, spec: !!specOk, both: !!(roleOk && specOk) };
+}
+function _profileLabel(){
+  var r = S.f.official_role === 'Other' ? S.f.official_role_other : S.f.official_role;
+  var sp = S.f.official_specialisation === 'Other' ? S.f.official_specialisation_other : S.f.official_specialisation;
+  return [r, sp].filter(Boolean).join(' \u00b7 ');
+}
+// Write designation / specialisation back to the official's record when
+// the record has none, so they are not asked again on the next visit.
+async function _rememberProfileIfMissing(){
+  try {
+    if (!S._officialId || !S.official) return;
+    var roleVal = S.f.official_role === 'Other' && S.f.official_role_other ? 'Other: ' + S.f.official_role_other.trim() : (S.f.official_role || '');
+    var specVal = S.f.official_specialisation === 'Other' && S.f.official_specialisation_other ? 'Other: ' + S.f.official_specialisation_other.trim() : (S.f.official_specialisation || '');
+    var needRole = roleVal && !(S.official.role || '').trim();
+    var curSpec  = String((S.official.details || {}).specialisation || '').trim();
+    var needSpec = specVal && !curSpec;
+    if (!needRole && !needSpec) return;
+    var patch = {};
+    if (needRole) patch.role = roleVal;
+    if (needSpec) {
+      var {data:row} = await sb.from('officials').select('details').eq('id', S._officialId).single();
+      patch.details = Object.assign({}, row && row.details || {}, { specialisation: specVal });
+    }
+    var res = await sb.from('officials').update(patch).eq('id', S._officialId);
+    if (!res.error) {
+      if (needRole) S.official.role = roleVal;
+      if (needSpec) { S.official.details = Object.assign({}, S.official.details || {}, { specialisation: specVal }); }
+    }
+  } catch(e) { /* never block a submission on this */ }
+}
 function _updateSchoolPickerInPlace(){
   var listEl=document.querySelector('.school-picker .school-dd .school-dd-list');
   var footEl=document.querySelector('.school-picker .school-dd .school-dd-foot');
@@ -5362,7 +5455,7 @@ function _updateSchoolPickerInPlace(){
     var showCircuit=!S.f.circuit;var circuitLookup={};
     if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(var cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(var pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
     var _vhL={};if(S.decisions&&S.decisions.length){var _vhT=getLookbackTerms(S.f.term);for(var _vi=0;_vi<S.decisions.length;_vi++){var _vd=S.decisions[_vi];if(!_vd.details||!_vd.details.term||_vhT.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhL[_vsn])_vhL[_vsn]={total:0,byYou:0};_vhL[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhL[_vsn].byYou++;}}}
-    var shown=phaseFiltered.slice(0,120);
+    var shown=_visitedFirst(phaseFiltered,_vhL).slice(0,120); _spItems=shown;
     for(var i=0;i<shown.length;i++){
       var s=shown[i];var isChecked=selected.includes(s[0]);
       var circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
@@ -5580,7 +5673,7 @@ function schoolFilterInput(val){
       const showCircuit=!S.f.circuit;const circuitLookup={};
       if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
       var _vhL2={};if(S.decisions&&S.decisions.length){var _vhT2=getLookbackTerms(S.f.term);for(var _vi2=0;_vi2<S.decisions.length;_vi2++){var _vd2=S.decisions[_vi2];if(!_vd2.details||!_vd2.details.term||_vhT2.indexOf(_vd2.details.term)===-1)continue;var _vs2=(_vd2.details.schools||'').split(',');for(var _vk2=0;_vk2<_vs2.length;_vk2++){var _vsn2=_vs2[_vk2].trim();if(!_vsn2)continue;if(!_vhL2[_vsn2])_vhL2[_vsn2]={total:0,byYou:0};_vhL2[_vsn2].total++;if(_vd2.official_id&&_vd2.official_id===S._officialId)_vhL2[_vsn2].byYou++;}}}
-      const shown=phaseFiltered.slice(0,120);
+      const shown=_visitedFirst(phaseFiltered,_vhL2).slice(0,120); _spItems=shown;
       for(let i=0;i<shown.length;i++){
         const s=shown[i];const isChecked=selected.includes(s[0]);
         const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
@@ -5610,7 +5703,8 @@ function schoolPickerHTML(){
   }
   const selected=parseSchoolsArr();
   const q=(S.f._schoolQ||'').toLowerCase();
-  const isOpen=S.f._schoolDDOpen;
+  const _inline=_schoolListInline();
+  const isOpen=S.f._schoolDDOpen||_inline;
   const allSchools=getAvailableSchools();
   const hasDistrict=!!S.f.district;
   _spItems=[];
@@ -5635,15 +5729,17 @@ function schoolPickerHTML(){
     return tags+'<div class="school-picker"><div class="school-trigger disabled"><span>Select a district first</span><span class="arrow">&#9662;</span></div></div>';
   }
 
-  const label=selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':'Select school(s)...';
-  let trigger='<div class="school-trigger'+(isOpen?' open':'')+'" data-sp-toggle><span>'+label+'</span><span class="arrow">&#9662;</span></div>';
+  const label=_inline
+    ? (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected \u2014 tap to change':'Tap the school(s) you visited')
+    : (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':'Select school(s)...');
+  let trigger='<div class="school-trigger'+(isOpen?' open':'')+'"'+(_inline?'':' data-sp-toggle')+'><span>'+label+'</span><span class="arrow">&#9662;</span></div>';
 
   let dd='';
   if(isOpen){
     const filtered=q?allSchools.filter(s=>s[0].toLowerCase().includes(q)):allSchools;
     _spItems=filtered;
 
-    dd='<div class="school-dd">';
+    dd='<div class="school-dd'+(_inline?' inline':'')+'">';
 
     // Quick-select buttons
     const counts={ALL:allSchools.length,P:0,S:0,C:0,I:0};
@@ -5689,13 +5785,16 @@ function schoolPickerHTML(){
       // Build visit history lookup for dropdown badges
       var _vhLookup={};
       if(S.decisions&&S.decisions.length){var _vhTerms=getLookbackTerms(S.f.term);for(var _vdi=0;_vdi<S.decisions.length;_vdi++){var _vd=S.decisions[_vdi];if(!_vd.details||!_vd.details.term||_vhTerms.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhLookup[_vsn])_vhLookup[_vsn]={total:0,byYou:0};_vhLookup[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhLookup[_vsn].byYou++;}}}
-      const shown=phaseFiltered.slice(0,120);
+      const shown=_visitedFirst(phaseFiltered,_vhLookup).slice(0,120); _spItems=shown;
       const showCircuit=!S.f.circuit;
       const circuitLookup={};
       if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
+      let _lastBlock=null;
       for(let i=0;i<shown.length;i++){
         const s=shown[i];
         const isChecked=selected.includes(s[0]);
+        const _blk=(_vhLookup[s[0]]&&_vhLookup[s[0]].total>0)?'visited':'rest';
+        if(_inline&&!q&&_blk!==_lastBlock){dd+='<div class="school-dd-sub">'+(_blk==='visited'?'Schools you have visited before':'All schools in '+esc(S.f.circuit||S.f.district))+'</div>';_lastBlock=_blk;}
         const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
         var tBadge=s[1]&&typeBadgeLabels[s[1]]?'<span style="display:inline-block;font-size:12px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+typeBadgeColors[s[1]]+'22;color:'+typeBadgeColors[s[1]]+';margin-left:6px;flex-shrink:0">'+typeBadgeLabels[s[1]]+'</span>':'';
         var _vh=_vhLookup[s[0]];var vhBadge='';
@@ -5716,7 +5815,7 @@ function schoolPickerHTML(){
   let count='';
   if(selected.length&&!isOpen)count='<div class="school-count">'+selected.length+' school'+(selected.length>1?'s':'')+' selected</div>';
 
-  return tags+'<div class="school-picker">'+trigger+dd+'</div>'+count;
+  return tags+'<div class="school-picker'+(_inline?' inline':'')+'">'+trigger+dd+'</div>'+count;
 }
 // Event delegation for school picker
 document.addEventListener('click',function(e){
@@ -5728,7 +5827,7 @@ document.addEventListener('click',function(e){
   if(addBtn){const idx=parseInt(addBtn.dataset.spAdd);if(_spItems[idx])toggleSchool(_spItems[idx][0]);return;}
   const rmBtn=e.target.closest('[data-sp-rm]');
   if(rmBtn){const idx=parseInt(rmBtn.dataset.spRm);const arr=parseSchoolsArr();if(arr[idx])removeSchool(arr[idx]);e.stopPropagation();return;}
-  if(S.f._schoolDDOpen&&!e.target.closest('.school-picker')){S.f._schoolDDOpen=false;S.f._schoolQ='';render();}
+  if(S.f._schoolDDOpen&&!_schoolListInline()&&!e.target.closest('.school-picker')){S.f._schoolDDOpen=false;S.f._schoolQ='';render();}
   if(S.f._subjectDDOpen&&!e.target.closest('.school-picker')){S.f._subjectDDOpen=false;S.f._subjectQ='';render();}
   if(S.f._decDDOpen&&!e.target.closest('.chip-picker')){S.f._decDDOpen=false;render();}
   if(S.f._actDDOpen&&!e.target.closest('.chip-picker')){S.f._actDDOpen=false;render();}
@@ -5752,7 +5851,7 @@ function renderFormStep1(){
     </div>
     <div class="form-group"><div class="form-group-label">Your details</div>
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
-    <div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','Departmental Head','Teacher','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Designation \u2014 please specify:</div><input type="text" placeholder="e.g. Curriculum Implementer, GET Coordinator..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Specialisation \u2014 please specify:</div><input type="text" placeholder="e.g. ICT in Education, Inclusive Education..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div></div>
+    ${(function(){ var pk=_profileKnown(); if(pk.both && !S.f._editProfile){ return '<div class="field"><label>Logging as</label><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F3F9F9;border:1.5px solid var(--teal);border-radius:8px;padding:11px 13px"><span style="font-size:15.5px;font-weight:600;color:var(--teal-dk)">'+esc(_profileLabel())+'</span><button type="button" onclick="S.f._editProfile=true;render()" style="background:none;border:1.5px solid var(--teal);color:var(--teal);border-radius:6px;padding:6px 10px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Change</button></div></div>'; } return `<div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','Departmental Head','Teacher','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Designation \u2014 please specify:</div><input type="text" placeholder="e.g. Curriculum Implementer, GET Coordinator..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Specialisation \u2014 please specify:</div><input type="text" placeholder="e.g. ICT in Education, Inclusive Education..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div></div>`; })()}
     </div>
     <div class="form-nav form-nav--end"><button class="btn btn-teal" onclick="validateAndNext(0,1)">Next &rarr;</button></div>
     ${_saveLaterBar()}
@@ -5883,11 +5982,48 @@ function renderAtpCoverage(){
   var count = pairs ? '<p class="atp-count">'+pairs+' grade and subject record'+(pairs===1?'':'s')+' will be saved.</p>' : '';
   return head+count+body+'</div>';
 }
+// Subjects officials choose most often; shown as direct chips. The rest
+// sit under group headings that open inline (never a dropdown).
+const COMMON_SUBJECTS = ['Mathematics','Mathematical Literacy','English FAL','English HL',
+                         'Physical Sciences','Life Sciences','Natural Sciences','Accounting'];
+function renderActivityTypeVisible(){
+  return ACTIVITY_TYPES.map(function(a){
+    return _voRow(a, S.f.activity_types.indexOf(a)>-1, "toggleActivityType('"+_jsq(a)+"')");
+  }).join('');
+}
+function renderThemeVisible(){
+  var themes=[].concat(THEMES);
+  if(S.f.district==='Lejweleputswa') themes.splice(themes.length-1,0,'Lejweleputswa Underperforming Schools Support Programme');
+  return themes.map(function(t){
+    return _voRow(t, S.f.intervention_themes.indexOf(t)>-1, "toggleTheme('"+_jsq(t)+"')");
+  }).join('');
+}
+function toggleSubjGroup(label){ S.f._sgOpen=S.f._sgOpen||{}; S.f._sgOpen[label]=!S.f._sgOpen[label]; render(); }
+function renderSubjectsVisible(){
+  var sel=S.f.subjects||[];
+  var chip=function(sname){
+    var on=sel.indexOf(sname)>-1;
+    return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleSubject(\''+_jsq(sname)+'\')"><span>'+esc(sname)+'</span></label>';
+  };
+  var html='<div class="sg-sub">Most common</div><div class="grade-grid">'+COMMON_SUBJECTS.map(chip).join('')+'</div>';
+  html+='<div class="sg-sub">All subjects by group</div>';
+  var open=S.f._sgOpen||{};
+  html+=SUBJECT_GROUPS.map(function(g){
+    var n=g.items.filter(function(i){return sel.indexOf(i)>-1;}).length;
+    var isOpen=!!open[g.label];
+    var head='<div class="sg-head'+(isOpen?' open':'')+(n?' has':'')+'" onclick="toggleSubjGroup(\''+_jsq(g.label)+'\')">'+
+      '<span>'+esc(g.label)+(n?' \u2014 '+n+' selected':'')+'</span><span class="sg-n">'+(isOpen?'Hide':g.items.length+' subjects')+'</span></div>';
+    var body=isOpen?'<div class="sg-body"><div class="grade-grid">'+g.items.map(chip).join('')+'</div></div>':'';
+    return head+body;
+  }).join('');
+  if(sel.length) html+='<p class="vo-count"><b>'+sel.length+'</b> selected</p>';
+  return html;
+}
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
-    <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Select all that apply \u2014 a visit can cover more than one</div>${renderActivityTypePicker()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Intervention Theme</label><div class="hint">Select all that apply</div>${renderThemePicker()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
-    <div class="field"><label>Subject(s)</label><div class="hint">Which subjects did your support focus on? This helps track where support is concentrated across the district and identify subjects that may be underserved</div>${renderSubjectPicker()}</div>
+    <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Tap all that apply \u2014 a visit can cover more than one</div>${renderActivityTypeVisible()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Programme</label><div class="hint">Tap any that apply. Leave blank if unsure.</div>${renderThemeVisible()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
     <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
+    <div class="field"><label>Subject(s)</label><div class="hint">Tap the subjects your support focused on.</div>${renderSubjectsVisible()}</div>
     ${renderAtpCoverage()}
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
@@ -6009,6 +6145,121 @@ function renderDecisionPicker(){
 function renderActionPicker(){
   return renderChipPicker(S.f.action_types,ACTIONS,S.f._actDDOpen,'toggleAction','removeAction',"S.f._actDDOpen=!S.f._actDDOpen;S.f._decDDOpen=false;S.f._trigDDOpen=false;render()","S.f._actDDOpen=false;render()",'Select actions taken...',ACTION_HINTS);
 }
+// ── Visible option lists for step 3 ─────────────────────────────────
+// Every option is shown; nothing is behind a dropdown. Ordering of the
+// action list follows real usage: the six most-chosen actions account
+// for roughly 60% of all selections and sit first.
+const TRIGGER_GROUPS = [
+  {g:'Learner performance', items:[
+    'Learners below 30% (not passing)',
+    'Learners at 30-39% (close to passing)',
+    'Learners missing one thing they need to be promoted',
+    'Big gap between SBA marks and exam marks',
+    'Subject pass rate dropping from one term to the next',
+    'Progressed learners who need extra support']},
+  {g:'Attendance and retention', items:[
+    'Learners absent a lot and doing badly',
+    'High learner dropout or transfers out',
+    'High educator absenteeism']},
+  {g:'Curriculum and teaching', items:[
+    'Parts of the curriculum not being covered',
+    'Educator not covering the curriculum on time',
+    'Educator needing subject content support',
+    'Educator teaching outside their specialisation',
+    'Educator not using data to inform teaching',
+    'Vacant educator post(s) affecting delivery']},
+  {g:'School level', items:[
+    'School flagged as underperforming (Circular D3)',
+    'Late or missing SA-SAMS submissions',
+    'School leadership or governance concerns']},
+  {g:'', items:['Other']}
+];
+// Each row writes the same stored values as before (action_types AND
+// decision_types), so downstream views and reports are unchanged.
+const ACTION_GROUPS = [
+  {g:'Most common', items:[
+    {t:'Learners grouped into support bands', a:'Learners grouped into support bands', d:'Provide targeted support to identified learners'},
+    {t:'Educator coaching or mentoring', a:'Educator coaching / mentoring', d:'Arrange educator coaching or mentoring'},
+    {t:'Helped the school get onto the DDD dashboard', a:'DDD dashboard access support provided', d:'Other'},
+    {t:'Support plan for progressed learners', a:'Support plan for progressed learners', d:'Support progressed learners (policy requirement)'},
+    {t:'Extra lessons or revision classes', a:'Extra lessons / revision classes', d:'Set up extra classes'},
+    {t:'Visit schedule reprioritised', a:'School visit schedule reprioritised', d:'Prioritise schools for support visits'}]},
+  {g:'With learners', items:[
+    {t:'Learner support agreement signed', a:'Learner support agreement signed', d:'Provide targeted support to identified learners'},
+    {t:'Remedial scheduling', a:'Remedial scheduling', d:'Set up extra classes'},
+    {t:'Past papers and worksheet packs', a:'Past papers & worksheet packs distributed', d:'Provide targeted support to identified learners'},
+    {t:'Exam technique workshop', a:'Exam technique workshop conducted', d:'Provide targeted support to identified learners'},
+    {t:'SBA targets set with learners', a:'SBA targets set with learners', d:'Set performance targets'}]},
+  {g:'With educators', items:[
+    {t:'Lesson modelling or demonstration', a:'Lesson modelling / demonstration', d:'Adjust teaching strategy'},
+    {t:'Curriculum pacing support', a:'Curriculum pacing support', d:'Address curriculum pacing gaps'},
+    {t:'Differentiated teaching arranged', a:'Differentiated teaching arranged', d:'Adjust teaching strategy'},
+    {t:'Educator reassigned to subject', a:'Educator reassignment to subject', d:'Request staffing or HR intervention'}]},
+  {g:'Assessment', items:[
+    {t:'Assessment moderation or task review', a:'Assessment task review & moderation', d:'Check and improve assessment tasks'},
+    {t:'Diagnostic assessment administered', a:'Diagnostic assessment administered', d:'Investigate SBA-exam gap'}]},
+  {g:'With the school', items:[
+    {t:'Attendance monitoring activated', a:'Attendance monitoring plan activated', d:'Activate attendance monitoring'},
+    {t:'Accountability meeting with school', a:'Accountability meeting with school', d:'Escalate to management'},
+    {t:'Parent meeting arranged', a:'Parent meeting arranged', d:'Meet with parents/guardians'},
+    {t:'Term review meeting held', a:'Term review meeting held', d:'Schedule a data review meeting'},
+    {t:'School-to-school peer learning', a:'Peer learning (school-to-school)', d:'Arrange school-to-school peer learning'}]},
+  {g:'Data and referral', items:[
+    {t:'Data pack prepared for a meeting', a:'Data pack prepared for meeting', d:'Schedule a data review meeting'},
+    {t:'SA-SAMS data corrected', a:'SA-SAMS data corrected to improve reporting', d:'Other'},
+    {t:'Referral to SMT, DMT or PED', a:'Referral to SMT / DMT / PED', d:'Escalate to management'}]},
+  {g:'', items:[{t:'Other', a:'Other', d:'Other'}]}
+];
+function _voRow(label, on, onclick, extraCls){
+  return '<div class="vo-opt'+(on?' on':'')+(extraCls?' '+extraCls:'')+'" onclick="'+onclick+'"><span class="vo-box"></span><span>'+esc(label)+'</span></div>';
+}
+function _jsq(str){ return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+// Grouped multi-select where items are plain strings
+function renderVisibleGroups(groups, selected, toggleFn){
+  return groups.map(function(g){
+    return '<div class="vo-grp">'+(g.g?'<h5>'+esc(g.g)+'</h5>':'')+
+      g.items.map(function(t){ return _voRow(t, selected.indexOf(t)>-1, toggleFn+"('"+_jsq(t)+"')"); }).join('')+
+    '</div>';
+  }).join('');
+}
+// Merged decision + action list
+function isMergedActionOn(item){ return S.f.action_types.indexOf(item.a)>-1; }
+function toggleMergedAction(label){
+  var item=null;
+  ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){ if(i.t===label) item=i; }); });
+  if(!item) return;
+  var on=isMergedActionOn(item);
+  if(on){
+    S.f.action_types=S.f.action_types.filter(function(x){return x!==item.a;});
+    // drop the paired decision only if nothing else selected still needs it
+    var stillNeeded=false;
+    ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){ if(i!==item && i.d===item.d && isMergedActionOn(i)) stillNeeded=true; }); });
+    if(!stillNeeded) S.f.decision_types=S.f.decision_types.filter(function(x){return x!==item.d;});
+  } else {
+    if(S.f.action_types.indexOf(item.a)<0) S.f.action_types.push(item.a);
+    if(S.f.decision_types.indexOf(item.d)<0) S.f.decision_types.push(item.d);
+  }
+  S.f.action_type=S.f.action_types[0]||'';
+  S.f.decision_type=S.f.decision_types[0]||'';
+  if(!S.f.action_types.includes('Other')) S.f.action_other='';
+  if(!S.f.decision_types.includes('Other')) S.f.decision_other='';
+  render();
+}
+function renderMergedActions(){
+  var n=0;
+  var html=ACTION_GROUPS.map(function(g){
+    return '<div class="vo-grp">'+(g.g?'<h5>'+esc(g.g)+'</h5>':'')+
+      g.items.map(function(i){ var on=isMergedActionOn(i); if(on) n++; return _voRow(i.t, on, "toggleMergedAction('"+_jsq(i.t)+"')"); }).join('')+
+    '</div>';
+  }).join('');
+  return html+(n?'<p class="vo-count"><b>'+n+'</b> selected</p>':'');
+}
+function renderInsightVisible(){
+  return INSIGHT_TYPE_OPTIONS.map(function(o){
+    var on=S.f.insight_types.indexOf(o.value)>-1;
+    return _voRow(o.label, on, "toggleInsightType('"+_jsq(o.label)+"')");
+  }).join('');
+}
 function renderFormStep3(){
   const phase=getPhaseForGrades();
   const usedDDD=S.f.ddd_used && S.f.ddd_used!=='no' && S.f.ddd_used!=='other-data';
@@ -6016,27 +6267,22 @@ function renderFormStep3(){
     <div class="field" id="fld-ddd-used"><label>Did you use data to inform this intervention?<span class="req">*</span></label><div class="hint">Did you look at any data before or during this activity?</div><div class="radio-grp">${['Yes \u2014 DDD data directly triggered this','Yes \u2014 DDD data informed my approach','DDD data partially used','Yes \u2014 but from another source (not DDD)','No data used'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','other-data','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
     ${usedDDD ? `
       <div class="field"><label>What did you want to know from DDD?</label><div style="font-size:13.5px;color:var(--grey);margin:-4px 0 10px;line-height:1.4">Tap all that apply</div>${renderDDDTasks()}</div>
-      <div class="field"><label>When did you access this report?</label><input type="date" value="${S.f.ddd_access_date||''}" max="${today()}" onchange="S.f.ddd_access_date=this.value;render()" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px"></div>
       <div class="field"><label>How did you access the DDD data?<span class="req">*</span></label><div class="hint">Select how you received or viewed the data</div><div class="radio-grp"><label><input type="radio" name="dddSource" value="dashboard" ${S.f.ddd_data_source==='dashboard'?'checked':''} onchange="S.f.ddd_data_source='dashboard';S.f.ddd_dashboard_confirmed='yes';S.f.ddd_data_source_person='';render()"><span>Logged into the DDD Dashboard myself</span></label><label><input type="radio" name="dddSource" value="presentation" ${S.f.ddd_data_source==='presentation'?'checked':''} onchange="S.f.ddd_data_source='presentation';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a presentation (e.g. PowerPoint) with DDD data</span></label><label><input type="radio" name="dddSource" value="spreadsheet" ${S.f.ddd_data_source==='spreadsheet'?'checked':''} onchange="S.f.ddd_data_source='spreadsheet';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a spreadsheet (e.g. Excel) with DDD data</span></label><label><input type="radio" name="dddSource" value="shared" ${S.f.ddd_data_source==='shared'?'checked':''} onchange="S.f.ddd_data_source='shared';S.f.ddd_dashboard_confirmed='no';render()"><span>Someone showed or presented the data to me</span></label></div></div>
-      ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div class="field"><label>Who prepared or shared this data?</label><div class="hint">e.g. Programme Manager, Subject Advisor, Provincial Official</div><input type="text" placeholder="e.g. John Mokoena (Programme Manager)" value="${esc(S.f.ddd_data_source_person)}" oninput="S.f.ddd_data_source_person=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>`:''}
       ${S.f.ddd_data_source==='dashboard'?`<div style="background:#E7F6EA;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:1px solid #E4E7EA"><div style="font-size:13.5px;color:#2E7D32;line-height:1.5">Great \u2014 logging in directly gives you the most current data and lets you explore further.</div></div>`:''}
       ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div style="background:#E3F2FD;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:1px solid #E4E7EA"><div style="font-size:13.5px;color:#1565C0;line-height:1.5">Good \u2014 using DDD data in any form strengthens your support.</div></div>`:''}
       <div style="background:var(--off);border-radius:8px;padding:14px;margin:8px 0">
         <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px">What did you see in the data?</div>
         <div style="font-size:13.5px;color:var(--grey);margin-bottom:10px;line-height:1.5">Select all types of issues you observed</div>
-        <div style="margin-bottom:10px">${renderInsightPicker()}</div>
+        <div style="margin-bottom:10px">${renderInsightVisible()}</div>
         ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:14px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found in the data</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
         ${S.f.insight_types.length&&!(S.f.insight_types.length===1&&S.f.insight_types[0]==='other-issue'&&!S.f.insight_detail)?(buildInsightStatement()?`<div style="margin-top:10px;background:var(--green-lt);border-radius:8px;padding:10px 12px;border-left:1px solid #E4E7EA"><div style="font-size:13px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.6">${buildInsightStatement()}</div></div>`:''):''}      </div>
     ` : ''}
     ${S.f.ddd_used==='other-data'?`<div style="background:#E3F2FD;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:14px;color:#1565C0;line-height:1.6;margin-bottom:10px">Good \u2014 using any data to inform your support is valuable. Please tell us what data you used.</div></div><div class="field"><label>What data source did you use?</label><div class="hint">e.g. SA-SAMS reports, school assessment records, provincial data, LURITS, own records</div><textarea rows="2" placeholder="Describe the data source briefly\u2026" oninput="S.f.other_data_source=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;resize:vertical">${esc(S.f.other_data_source||'')}</textarea></div>`:''}
     ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:14px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs data. But next time, try starting from the data. You can log into the DDD Dashboard yourself, use SA-SAMS reports, or ask your Programme Manager or Subject Advisor for a data pack.</div></div>`:''}
-    ${S.f.ddd_used&&S.f.ddd_used!=='no'&&S.f.ddd_used!=='other-data'?`<div class="field"><label>Additional data sources used <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Did you also use other data alongside DDD? e.g. SA-SAMS reports, school assessment records, LURITS, your own records, provincial spreadsheets</div><textarea rows="2" placeholder="e.g. Also used SA-SAMS attendance report and school's internal assessment tracker\u2026" oninput="S.f.additional_data_sources=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;resize:vertical">${esc(S.f.additional_data_sources||'')}</textarea></div>`:''}
 
-    <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data or at the school that prompted you to step in? Select all that apply.</div>${renderTriggerPicker()}</div>
+    <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data or at the school that prompted you to step in? Tap all that apply.</div>${renderVisibleGroups(TRIGGER_GROUPS, S.f.intervention_triggers, 'toggleTrigger')}</div>
     ${S.f.intervention_triggers.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for what made you act \u2014 please describe:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}
-    <div class="field"><label>Planned intervention(s)</label><div class="hint">Based on what you observed, what did you decide to do? Select all that apply.</div>${renderDecisionPicker()}</div>
-    ${S.f.decision_types.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for Planned Intervention \u2014 please describe:</label><input type="text" placeholder="e.g. Custom remediation plan..." value="'+esc(S.f.decision_other)+'" oninput="S.f.decision_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}
-    <div class="field" id="fld-action"><label>Action(s) you took<span class="req">*</span></label><div class="hint">What did you actually do? Select all that apply.</div>${renderActionPicker()}</div>
+    <div class="field" id="fld-action"><label>What did you do?<span class="req">*</span></label><div class="hint">Tap everything you did or put in place. The most common are first.</div>${renderMergedActions()}</div>
     ${S.f.action_types.includes('Other')?`<div class="field"><label>You selected \u201cOther\u201d for Action Taken \u2014 please describe:</label><textarea rows="2" placeholder="e.g. Arranged mentoring from neighbouring school..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
     
     <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(2,3)">Next &rarr;</button></div>
@@ -6400,6 +6646,7 @@ async function submitForm() {
  if (r1.error) throw r1.error;
  const r2 = await sb.from('actions').insert(act);
  if (r2.error) throw r2.error;
+ _rememberProfileIfMissing();
 
  // Success — remove from queue
  var q = getSubmitQueue();
@@ -6548,7 +6795,7 @@ function resetForm() {
  doc_url:'', doc_name:'', cc_email:'',
     sip_focus_areas:[], support_needed:[], support_level:'', obs_curriculum:'', obs_apip:'', obs_time:'', doc_file:null, doc_file_name:'', doc_files:[], doc_file_names:[],
     tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
-    formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, official_specialisation_other:S.f.official_specialisation_other,
+    formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, _editProfile:false, official_specialisation_other:S.f.official_specialisation_other,
     insight_type:'', insight_types:[], _insightDDOpen:false, insight_pass_rate:'', insight_learners_affected:'', insight_threshold:'', insight_detail:'', insight_educator_absent:'', insight_attendance_days:'', insight_sba_exam_gap:'', insight_curriculum_pct:''
   };
   S.openSections = {1:false,2:false,3:false,4:false};
