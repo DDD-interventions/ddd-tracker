@@ -1,4 +1,21 @@
 {
+  "2026.09.05.113": {
+    "title": "ATP coverage appears where you tapped",
+    "released": "2026-09-05",
+    "highlights": [
+      "The Annual Teaching Plan question now appears directly under the subject you tapped, not at the bottom of the list",
+      "If you choose a subject from a group lower down, the page scrolls to the question for you"
+    ]
+  },
+  "2026.09.05.112": {
+    "title": "The school comes first",
+    "released": "2026-09-05",
+    "highlights": [
+      "Which school? is now the first question on the form",
+      "Your location is shown on one line with a Change button, instead of three dropdowns you have to scroll past",
+      "The school list is always open. Schools you have visited before are shown first; type part of a name to find any other"
+    ]
+  },
   "2026.09.05.111": {
     "title": "Your designation is remembered",
     "released": "2026-09-05",
