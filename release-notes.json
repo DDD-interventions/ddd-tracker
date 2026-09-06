@@ -1,4 +1,12 @@
 {
+  "2026.09.06.115": {
+    "title": "Location is no longer assumed",
+    "released": "2026-09-06",
+    "highlights": [
+      "If you have national or provincial access, the form asks which province and district the visit was in instead of assuming one",
+      "If you cover more than one district, the form asks which district the visit was in"
+    ]
+  },
   "2026.09.05.114": {
     "title": "Finding a school is clearer",
     "released": "2026-09-05",
