@@ -848,6 +848,29 @@ html,body{overscroll-behavior-y:none}
 .pring-home-sub{font-size:13px;color:var(--grey);margin-top:2px;line-height:1.45}
 @media(max-width:500px){.pring{width:40px;height:40px}.pring .pring-num{font-size:11.5px}}
 
+/* Full-screen school finder */
+.sf-btn{display:block;width:100%;background:#fff;color:#074445;border:2px solid #0B8E8D;border-radius:8px;padding:13px 14px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;min-height:54px;text-align:left}
+.sf-btn span{display:block;color:var(--grey,#5e6e6c);font-weight:400;font-size:14px;margin-top:2px}
+.sf{position:fixed;inset:0;background:#F4F7F6;z-index:9000;display:flex;flex-direction:column}
+.sf-top{background:#074445;padding:12px;display:flex;gap:10px;align-items:center;flex:0 0 auto;padding-top:calc(12px + env(safe-area-inset-top))}
+.sf-top .sf-back{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:0 14px;height:48px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap}
+.sf-top input{flex:1;height:48px;border:none;border-radius:8px;padding:0 14px;font:inherit;font-size:17px;background:#fff;min-width:0}
+.sf-top input:focus{outline:3px solid #7AB648}
+.sf-body{flex:1 1 auto;overflow-y:auto;padding:12px 12px 100px}
+.sf-h{margin:10px 2px 8px;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:#0B8E8D;font-weight:700}
+.sf-row{display:flex;align-items:center;gap:12px;border:2px solid #d6e1df;border-radius:8px;padding:12px 13px;margin-bottom:7px;cursor:pointer;min-height:58px;background:#fff;user-select:none}
+.sf-row .sf-box{flex:0 0 24px;width:24px;height:24px;border:2px solid #9AA9A7;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff}
+.sf-row.on{border-color:#0B8E8D;background:#EAF5F5}
+.sf-row.on .sf-box{background:#0B8E8D;border-color:#0B8E8D}
+.sf-row.on .sf-box::after{content:"\2713"}
+.sf-row .sf-nm{font-size:16.5px;font-weight:600;color:#074445;line-height:1.25}
+.sf-row .sf-meta{font-size:13px;color:var(--grey,#5e6e6c);margin-top:2px}
+.sf-hint{background:#fff;border:1px dashed #b9d2d1;border-radius:8px;padding:16px 14px;font-size:15.5px;line-height:1.5;color:#22312F}
+.sf-hint b{color:#074445}
+.sf-foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #d6e1df;padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center;z-index:9001}
+.sf-foot .sf-n{flex:1;font-size:15px;color:var(--grey,#5e6e6c)}
+.sf-foot .sf-n b{color:#074445}
+.sf-foot button{background:#074445;color:#fff;border:none;border-radius:8px;padding:0 22px;height:48px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 /* Long lists: the search box is the first and most prominent thing */
 .school-dd-filter.big{padding:10px 10px 6px;background:#F3F9F9;border-bottom:1px solid #d6e1df}
 .school-dd-filter.big input{font-size:17px;padding:13px 14px;min-height:50px;border:2px solid #0B8E8D;border-radius:8px;width:100%;background:#fff}
@@ -1228,7 +1251,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.06.115';
+const APP_VERSION = '2026.09.06.116';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5699,150 +5722,105 @@ function schoolFilterInput(val){
     if(footEl){const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);footEl.innerHTML='<span>'+scope+' \xb7 '+phaseFiltered.length+' schools'+(phaseFilter!=='ALL'?' (filtered)':'')+'</span><span>'+selected.length+' selected</span>';}
   },120);
 }
-function schoolPickerHTML(){
-  // Guard: the school list is fetched after login. Never present an empty picker silently.
-  if (SCHOOLS_STATE !== 'ready') {
-    if (SCHOOLS_STATE === 'idle') loadSchools();
-    if (SCHOOLS_STATE === 'failed') {
-      return '<div style="padding:14px;background:#FDECEA;border:1px solid #F5B7B1;border-radius:10px;font-size:14px;color:#922B21;line-height:1.5">'
-        + 'We could not load the school list. Please check your connection.'
-        + '<button onclick="retrySchools()" style="display:block;margin-top:10px;padding:10px 16px;border:none;border-radius:8px;background:var(--teal);color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">Try again</button></div>';
+// ── Full-screen school finder ────────────────────────────────────────
+// Lives outside #app so the form's render() never rebuilds it mid-typing.
+var _sfQ='';
+function _sfVisitHistory(){
+  var vh={};
+  if(S.decisions&&S.decisions.length){
+    var terms=getLookbackTerms(S.f.term);
+    for(var i=0;i<S.decisions.length;i++){
+      var d=S.decisions[i]; if(!d.details||!d.details.term||terms.indexOf(d.details.term)===-1) continue;
+      var list=String(d.details.schools||'').split(',');
+      for(var k=0;k<list.length;k++){ var n=list[k].trim(); if(!n) continue; if(!vh[n]) vh[n]={total:0,byYou:0}; vh[n].total++; if(d.official_id===S._officialId) vh[n].byYou++; }
     }
-    return '<div style="padding:14px;background:var(--bg);border:1px solid #E2E7E5;border-radius:10px;font-size:14px;color:var(--grey)">Loading the school list\u2026</div>';
   }
+  return vh;
+}
+function _sfRow(name,meta,on){
+  return '<div class="sf-row'+(on?' on':'')+'" data-sf-pick="'+esc(name)+'"><span class="sf-box"></span><div><div class="sf-nm">'+esc(name)+'</div>'+(meta?'<div class="sf-meta">'+esc(meta)+'</div>':'')+'</div></div>';
+}
+function openSchoolFinder(){
+  if(!isRealDistrict(S.f.district)) return;
+  closeSchoolFinder();
+  _sfQ='';
+  var el=document.createElement('div'); el.className='sf'; el.id='schoolFinder';
+  el.innerHTML='<div class="sf-top"><button type="button" class="sf-back" data-sf-close>\u2039 Back</button>'+
+    '<input type="text" id="sfQ" placeholder="Type the school name" autocomplete="off" autocorrect="off" spellcheck="false"></div>'+
+    '<div class="sf-body" id="sfBody"></div>'+
+    '<div class="sf-foot"><div class="sf-n" id="sfFoot"></div><button type="button" data-sf-close>Done</button></div>';
+  document.body.appendChild(el);
+  var inp=document.getElementById('sfQ');
+  inp.addEventListener('input',function(){ _sfQ=inp.value; _sfRenderList(); });
+  el.addEventListener('click',function(e){
+    var c=e.target.closest('[data-sf-close]'); if(c){ closeSchoolFinder(); return; }
+    var r=e.target.closest('[data-sf-pick]'); if(r){ _sfToggle(r.getAttribute('data-sf-pick')); }
+  });
+  _sfRenderList();
+  setTimeout(function(){ try{ inp.focus(); }catch(e){} },60);
+}
+function closeSchoolFinder(){
+  var el=document.getElementById('schoolFinder'); if(!el) return;
+  el.parentNode.removeChild(el);
+  render();
+}
+// Selection goes through the existing helpers but must not re-render #app
+// while the finder is open (that would steal focus from the search box).
+function _sfToggle(name){
+  var arr=parseSchoolsArr();
+  if(arr.includes(name)) arr=arr.filter(function(x){return x!==name;}); else arr.push(name);
+  S.f.schools=arr.join(', ');
+  S.f._vhExpanded=false;
+  _sfRenderList();
+}
+function _sfRenderList(){
+  var body=document.getElementById('sfBody'), foot=document.getElementById('sfFoot'); if(!body) return;
+  var all=getAvailableSchools(); var names=all.map(function(x){return x[0];});
+  var sel=parseSchoolsArr(); var vh=_sfVisitHistory();
+  var q=_sfQ.trim().toLowerCase(); var h='';
+  var scope=S.f.circuit||S.f.district;
+  if(q.length){
+    // starts-with matches first, then contains; capped so the list never needs scrolling
+    var starts=[], contains=[];
+    for(var i=0;i<names.length;i++){ var ln=names[i].toLowerCase(); if(ln.indexOf(q)===0) starts.push(names[i]); else if(ln.indexOf(q)>-1) contains.push(names[i]); }
+    var hits=starts.concat(contains).slice(0,10);
+    h+='<div class="sf-h">Matching \u201c'+esc(_sfQ.trim())+'\u201d</div>';
+    h+=hits.length ? hits.map(function(n){ return _sfRow(n, (vh[n]&&vh[n].total)?'Visited before':'', sel.includes(n)); }).join('')
+                   : '<div class="sf-hint">No school matches. Try a shorter part of the name.</div>';
+    if(starts.length+contains.length>10) h+='<div class="sf-hint" style="border-style:solid;margin-top:4px">More than 10 match \u2014 type another letter to narrow it down.</div>';
+  } else {
+    if(sel.length) h+='<div class="sf-h">Selected</div>'+sel.map(function(n){return _sfRow(n,'',true);}).join('');
+    var hist=names.filter(function(n){return vh[n]&&vh[n].total>0&&!sel.includes(n);});
+    if(hist.length) h+='<div class="sf-h">Schools you have visited before</div>'+hist.slice(0,10).map(function(n){return _sfRow(n,'Visited before',false);}).join('');
+    if(names.length<=SCHOOL_INLINE_MAX){
+      var rest=names.filter(function(n){return !sel.includes(n)&&hist.indexOf(n)<0;});
+      if(rest.length) h+='<div class="sf-h">All schools in '+esc(scope)+'</div>'+rest.map(function(n){return _sfRow(n,'',false);}).join('');
+    } else if(!hist.length&&!sel.length){
+      h+='<div class="sf-hint"><b>Start typing the school name above.</b><br>There are '+names.length+' schools in '+esc(scope)+'. Matches appear as you type.</div>';
+    } else {
+      h+='<div class="sf-hint">Not one of these? Type part of the school name above.</div>';
+    }
+  }
+  body.innerHTML=h;
+  if(foot) foot.innerHTML=sel.length?'<b>'+sel.length+'</b> selected':'Nothing selected yet';
+}
+function schoolPickerHTML(){
   const selected=parseSchoolsArr();
-  const q=(S.f._schoolQ||'').toLowerCase();
-  const _inline=_schoolListInline();
-  const isOpen=S.f._schoolDDOpen||_inline;
-  const allSchools=getAvailableSchools();
-  const hasDistrict=!!S.f.district;
-  _spItems=[];
-
+  if(!isRealDistrict(S.f.district)){
+    return '<div class="school-picker"><div class="school-trigger disabled"><span>Select a district first</span></div></div>';
+  }
   let tags='';
   if(selected.length){
-    const allSch=getAvailableSchools();
-    tags='<div class="school-tags">'+selected.map((s,i)=>{
-      const match=allSch.find(sc=>sc[0]===s);
-      const circuit=S.f.circuit||'';
-      const district=S.f.district||'';
-      const phase=match&&match[1]?PHASE_LABELS[match[1]]||'':'';
-      const meta=[district,circuit,phase].filter(Boolean).join(' \xb7 ');
-      return '<span class="school-tag"><span class="st-info"><span class="st-name">'+esc(s)+'</span>'+(meta?'<span class="st-meta">'+esc(meta)+'</span>':'')+'</span><button data-sp-rm="'+i+'">Remove</button></span>';
-    }).join('')+'</div>';
-    // D3 underperformance banner for selected schools
-    var _d3html=d3AlertsInnerHTML(selected);
-    tags+='<div class="d3-alerts"'+(_d3html?' style="margin-top:8px;display:flex;flex-direction:column;gap:6px"':' style="display:none"')+'>'+_d3html+'</div>';
+    tags='<div class="school-tags">'+selected.map((sname,i)=>'<span class="school-tag"><span class="st-info"><span class="st-name">'+esc(sname)+'</span></span><button type="button" data-sp-rm="'+i+'">Remove</button></span>').join('')+'</div>';
   }
-
-  if(!hasDistrict){
-    return tags+'<div class="school-picker"><div class="school-trigger disabled"><span>Select a district first</span><span class="arrow">&#9662;</span></div></div>';
-  }
-
-  const label=_inline
-    ? (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':(allSchools.length>SCHOOL_INLINE_MAX?'Find your school':'Choose the school(s) you visited'))
-    : (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':'Select school(s)...');
-  let trigger='<div class="school-trigger'+(isOpen?' open':'')+'"'+(_inline?'':' data-sp-toggle')+'><span>'+label+'</span><span class="arrow">&#9662;</span></div>';
-
-  let dd='';
-  if(isOpen){
-    const filtered=q?allSchools.filter(s=>s[0].toLowerCase().includes(q)):allSchools;
-    _spItems=filtered;
-
-    dd='<div class="school-dd'+(_inline?' inline':'')+'">';
-    const _big=_inline && allSchools.length>SCHOOL_INLINE_MAX;
-    const _filterHtml=(allSchools.length>5)
-      ? '<div class="school-dd-filter'+(_big?' big':'')+'"><input type="text" placeholder="'+(_big?'Type the school name here':'Start typing a school name...')+'" value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter" autocomplete="off"></div>'
-      : '';
-    if(_big) dd+=_filterHtml;
-
-    // Quick-select buttons
-    const counts={ALL:allSchools.length,P:0,S:0,C:0,I:0};
-    for(const s of allSchools){if(s[1])counts[s[1]]=(counts[s[1]]||0)+1;}
-    // Filter tabs (type + phase + UP)
-    var phaseFilter=S.f._schoolPhaseFilter||'ALL';
-    var _upCount=getUPSchoolNames().length;
-    dd+='<div data-phase-tabs style="padding:6px 8px;border-bottom:1px solid #e8e6e4;display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
-    var filterTabs=[['ALL','All ('+counts.ALL+')',counts.ALL],['P','Primary ('+counts.P+')',counts.P],['S','Secondary ('+counts.S+')',counts.S],['C','Combined ('+counts.C+')',counts.C],['FET','FET Phase (Gr 10\u201312)',null],['SENIOR','Senior Phase (Gr 7\u20139)',null],['INTERMEDIATE','Intermediate (Gr 4\u20136)',null],['FOUNDATION','Foundation (Gr R\u20133)',null]];
-    for(var ft=0;ft<filterTabs.length;ft++){
-      var ftCode=filterTabs[ft][0],ftLabel=filterTabs[ft][1],ftCnt=filterTabs[ft][2];
-      if(ftCnt===0)continue;
-      var ftActive=phaseFilter===ftCode;
-      dd+='<button data-phase="'+ftCode+'" onclick="S.f._schoolPhaseFilter=\''+ftCode+'\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\''+ftCode+'\')" style="font-size:13.5px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(ftActive?'var(--teal)':'#c8c6c4')+';background:'+(ftActive?'var(--teal-lt)':'#fff')+';color:'+(ftActive?'var(--teal-dk)':'var(--grey)')+';cursor:pointer;font-weight:'+(ftActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">'+ftLabel+'</button>';
-    }
-    if(_upCount>0){var upActive=phaseFilter==='UP';dd+='<button data-phase="UP" onclick="S.f._schoolPhaseFilter=\'UP\';_updateSchoolPickerInPlace();_updatePhaseTabsUI(\'UP\')" style="font-size:13.5px;padding:6px 12px;border-radius:16px;border:1.5px solid '+(upActive?'#C62828':'#c8c6c4')+';background:'+(upActive?'#FFF5F5':'#fff')+';color:'+(upActive?'#C62828':'var(--grey)')+';cursor:pointer;font-weight:'+(upActive?'700':'500')+';font-family:inherit;min-height:32px;white-space:normal;text-align:left">Circular D3 Underperforming Secondary Schools ('+_upCount+')</button>';}
-    if(selected.length>0)dd+='<button data-sp-clear style="font-size:13.5px;padding:6px 12px;border-radius:16px;border:1.5px solid #c00;background:#fff;color:#c00;cursor:pointer;font-weight:600;font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">Clear all</button>';
-    dd+='</div>';
-
-    // Filter input (short lists: below the tabs, as before)
-    if(!_big) dd+=_filterHtml;
-
-    // Apply filter
-    var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C'],'P':['P'],'S':['S'],'C':['C']};
-    var phaseFiltered=filtered;
-    if(phaseFilter==='UP'){
-      var _upSet=getUPSchoolNames();phaseFiltered=filtered.filter(function(s){return _upSet.includes(s[0]);});
-    }else if(phaseFilter!=='ALL'&&phaseTypeMap[phaseFilter]){
-      var allowedTypes=phaseTypeMap[phaseFilter];
-      phaseFiltered=filtered.filter(function(s){return s[1]&&allowedTypes.includes(s[1]);});
-    }
-    _spItems=phaseFiltered;
-
-    dd+='<div class="school-dd-list">';
-    if(phaseFiltered.length===0 && !(_inline && allSchools.length>SCHOOL_INLINE_MAX && !q)){
-      dd+='<div class="school-dd-hint">'+(phaseFilter!=='ALL'?'No schools match this phase filter'+(q?' and \u201c'+esc(S.f._schoolQ)+'\u201d':''):'No schools match \u201c'+esc(S.f._schoolQ)+'\u201d')+'</div>';
-    }else{
-      var typeBadgeColors={S:'#00647F',P:'#B84A0C',C:'#7B1FA2',I:'#546E7A'};
-      var typeBadgeLabels={S:'Secondary',P:'Primary',C:'Combined',I:'Intermediate'};
-      var phaseLabelsForType={S:'Senior \xb7 FET',P:'Foundation \xb7 Intermediate',C:'Foundation \xb7 Senior',I:'Intermediate'};
-      // Build visit history lookup for dropdown badges
-      var _vhLookup={};
-      if(S.decisions&&S.decisions.length){var _vhTerms=getLookbackTerms(S.f.term);for(var _vdi=0;_vdi<S.decisions.length;_vdi++){var _vd=S.decisions[_vdi];if(!_vd.details||!_vd.details.term||_vhTerms.indexOf(_vd.details.term)===-1)continue;var _vs=(_vd.details.schools||'').split(',');for(var _vk=0;_vk<_vs.length;_vk++){var _vsn=_vs[_vk].trim();if(!_vsn)continue;if(!_vhLookup[_vsn])_vhLookup[_vsn]={total:0,byYou:0};_vhLookup[_vsn].total++;if(_vd.official_id&&_vd.official_id===S._officialId)_vhLookup[_vsn].byYou++;}}}
-      const _bigList=_inline && allSchools.length>SCHOOL_INLINE_MAX && !q && phaseFilter==='ALL';
-      let shown=_visitedFirst(phaseFiltered,_vhLookup);
-      if(_bigList){ shown=shown.filter(function(x){return _vhLookup[x[0]]&&_vhLookup[x[0]].total>0;}).slice(0,10); }
-      else { shown=shown.slice(0,120); }
-      _spItems=shown;
-      const showCircuit=!S.f.circuit;
-      const circuitLookup={};
-      if(showCircuit&&S.f.district&&SCHOOLS_MAP[S.f.district]){for(const cc of Object.keys(SCHOOLS_MAP[S.f.district])){for(const pair of SCHOOLS_MAP[S.f.district][cc]){if(!circuitLookup[pair[0]])circuitLookup[pair[0]]=cc;}}}
-      let _lastBlock=null;
-      for(let i=0;i<shown.length;i++){
-        const s=shown[i];
-        const isChecked=selected.includes(s[0]);
-        const _blk=(_vhLookup[s[0]]&&_vhLookup[s[0]].total>0)?'visited':'rest';
-        if(_inline&&!q&&_blk!==_lastBlock){dd+='<div class="school-dd-sub">'+(_blk==='visited'?'Schools you have visited before':'All schools in '+esc(S.f.circuit||S.f.district))+'</div>';_lastBlock=_blk;}
-        const circLbl=showCircuit&&circuitLookup[s[0]]?circuitLookup[s[0]]:'';
-        var tBadge=s[1]&&typeBadgeLabels[s[1]]?'<span style="display:inline-block;font-size:12px;font-weight:700;padding:1px 6px;border-radius:8px;background:'+typeBadgeColors[s[1]]+'22;color:'+typeBadgeColors[s[1]]+';margin-left:6px;flex-shrink:0">'+typeBadgeLabels[s[1]]+'</span>':'';
-        var _vh=_vhLookup[s[0]];var vhBadge='';
-        if(_vh&&_vh.total>0){var _vhTip=_vh.total+' prior visit'+(_vh.total!==1?'s':'')+(_vh.byYou?' ('+_vh.byYou+' by you)':'');vhBadge='<span style="display:inline-block;font-size:12px;font-weight:700;padding:1px 6px;border-radius:8px;background:#FFF6F1;color:#B84A0C;margin-left:4px;flex-shrink:0" title="'+_vhTip+'">\u21BB '+_vh.total+'</span>';}
-        var phaseSub=s[1]&&phaseLabelsForType[s[1]]?phaseLabelsForType[s[1]]:'';
-        var metaParts=[circLbl,phaseSub].filter(Boolean).join(' \xb7 ');
-        var d3=d3BadgeHTML(getSchoolD3Info(s[0]));
-        dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:13px;color:#5A6878;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
-      }
-      if(_bigList){
-        dd+='<div class="school-dd-hint" style="padding:14px;font-size:15px;line-height:1.55;color:#22312F">'+
-            (shown.length
-              ? 'Not one of these? Type part of the school name in the box at the top.'
-              : '<b>Start typing the school name in the box at the top.</b><br>There are '+allSchools.length+' schools in '+esc(S.f.circuit||S.f.district)+'. Matches appear as you type.')+
-            '</div>';
-      } else if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
-    }
-    dd+='</div>';
-    const scope=S.f.circuit?esc(S.f.circuit):esc(S.f.district);
-    dd+='<div class="school-dd-foot"><span>'+scope+' \xb7 '+allSchools.length+' schools</span><span>'+selected.length+' selected</span></div>';
-    dd+='</div>';
-  }
-
-  let count='';
-  if(selected.length&&!isOpen)count='<div class="school-count">'+selected.length+' school'+(selected.length>1?'s':'')+' selected</div>';
-
-  return tags+'<div class="school-picker'+(_inline?' inline':'')+'">'+trigger+dd+'</div>'+count;
+  const label=selected.length?'Add another school':'Find school';
+  const sub=selected.length?'Tap to add or change':'Tap to choose the school you visited';
+  return tags+'<button type="button" class="sf-btn" onclick="openSchoolFinder()">'+label+'<span>'+sub+'</span></button>';
 }
 // Event delegation for school picker
 document.addEventListener('click',function(e){
   const toggle=e.target.closest('[data-sp-toggle]');
-  if(toggle){S.f._schoolDDOpen=!S.f._schoolDDOpen;S.f._schoolQ='';render();setTimeout(()=>{const el=document.getElementById('spFilter');if(el)el.focus();},50);return;}
+  if(toggle){return;}
   const clear=e.target.closest('[data-sp-clear]');
   if(clear){S.f.schools='';if(S.f._schoolDDOpen){_updateSchoolPickerInPlace();}else{render();}return;}
   const addBtn=e.target.closest('[data-sp-add]');
