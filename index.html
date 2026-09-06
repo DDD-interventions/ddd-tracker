@@ -848,6 +848,9 @@ html,body{overscroll-behavior-y:none}
 .pring-home-sub{font-size:13px;color:var(--grey);margin-top:2px;line-height:1.45}
 @media(max-width:500px){.pring{width:40px;height:40px}.pring .pring-num{font-size:11.5px}}
 
+/* Long lists: the search box is the first and most prominent thing */
+.school-dd-filter.big{padding:10px 10px 6px;background:#F3F9F9;border-bottom:1px solid #d6e1df}
+.school-dd-filter.big input{font-size:17px;padding:13px 14px;min-height:50px;border:2px solid #0B8E8D;border-radius:8px;width:100%;background:#fff}
 /* School picker shown open and inline when the official's list is short */
 .school-picker.inline .school-trigger{border-radius:6px 6px 0 0;cursor:default;background:#F3F9F9;border-color:var(--teal)}
 .school-picker.inline .school-trigger .arrow{display:none}
@@ -1225,7 +1228,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.05.113';
+const APP_VERSION = '2026.09.05.114';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -5729,7 +5732,7 @@ function schoolPickerHTML(){
   }
 
   const label=_inline
-    ? (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected \u2014 tap to change':'Tap the school(s) you visited')
+    ? (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':(allSchools.length>SCHOOL_INLINE_MAX?'Find your school':'Choose the school(s) you visited'))
     : (selected.length?selected.length+' school'+(selected.length>1?'s':'')+' selected':'Select school(s)...');
   let trigger='<div class="school-trigger'+(isOpen?' open':'')+'"'+(_inline?'':' data-sp-toggle')+'><span>'+label+'</span><span class="arrow">&#9662;</span></div>';
 
@@ -5739,6 +5742,11 @@ function schoolPickerHTML(){
     _spItems=filtered;
 
     dd='<div class="school-dd'+(_inline?' inline':'')+'">';
+    const _big=_inline && allSchools.length>SCHOOL_INLINE_MAX;
+    const _filterHtml=(allSchools.length>5)
+      ? '<div class="school-dd-filter'+(_big?' big':'')+'"><input type="text" placeholder="'+(_big?'Type the school name here':'Start typing a school name...')+'" value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter" autocomplete="off"></div>'
+      : '';
+    if(_big) dd+=_filterHtml;
 
     // Quick-select buttons
     const counts={ALL:allSchools.length,P:0,S:0,C:0,I:0};
@@ -5758,10 +5766,8 @@ function schoolPickerHTML(){
     if(selected.length>0)dd+='<button data-sp-clear style="font-size:13.5px;padding:6px 12px;border-radius:16px;border:1.5px solid #c00;background:#fff;color:#c00;cursor:pointer;font-weight:600;font-family:inherit;min-height:32px;white-space:nowrap;flex-shrink:0">Clear all</button>';
     dd+='</div>';
 
-    // Filter input
-    if(allSchools.length>5){
-      dd+='<div class="school-dd-filter"><input type="text" placeholder="Start typing a school name..." value="'+esc(S.f._schoolQ)+'" oninput="schoolFilterInput(this.value)" id="spFilter"></div>';
-    }
+    // Filter input (short lists: below the tabs, as before)
+    if(!_big) dd+=_filterHtml;
 
     // Apply filter
     var phaseTypeMap={'FET':['S'],'SENIOR':['S','C'],'INTERMEDIATE':['P','C'],'FOUNDATION':['P','C'],'P':['P'],'S':['S'],'C':['C']};
@@ -5808,7 +5814,11 @@ function schoolPickerHTML(){
         dd+='<div class="school-dd-item'+(isChecked?' checked':'')+'" data-sp-add="'+i+'" style="min-height:52px"><span class="tick">'+(isChecked?'&#10003;':'')+'</span><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;flex-wrap:wrap">'+esc(s[0])+tBadge+vhBadge+'</div>'+(metaParts?'<div style="font-size:13px;color:#5A6878;margin-top:1px">'+esc(metaParts)+'</div>':'')+d3+'</div></div>';
       }
       if(_bigList){
-        dd+='<div class="school-dd-hint" style="padding:12px 14px;font-size:14px;line-height:1.5">'+(shown.length?'Not one of these? ':'')+'Type part of the school name in the box above to find any school in '+esc(S.f.circuit||S.f.district)+' ('+allSchools.length+' schools).</div>';
+        dd+='<div class="school-dd-hint" style="padding:14px;font-size:15px;line-height:1.55;color:#22312F">'+
+            (shown.length
+              ? 'Not one of these? Type part of the school name in the box at the top.'
+              : '<b>Start typing the school name in the box at the top.</b><br>There are '+allSchools.length+' schools in '+esc(S.f.circuit||S.f.district)+'. Matches appear as you type.')+
+            '</div>';
       } else if(phaseFiltered.length>120)dd+='<div class="school-dd-hint">Showing 120 of '+phaseFiltered.length+' \u2014 filter to see more</div>';
     }
     dd+='</div>';
