@@ -1,4 +1,14 @@
 {
+  "2026.09.06.116": {
+    "title": "A new way to find your school",
+    "released": "2026-09-06",
+    "highlights": [
+      "Tap Find school and the whole screen becomes a search box, with the keyboard ready",
+      "Schools you have visited before are shown before you type. In a small circuit, all your schools are listed",
+      "As you type, the closest matches come first. You never need to scroll a long list",
+      "Tap the school, tap Done, and you are back on the form"
+    ]
+  },
   "2026.09.06.115": {
     "title": "Location is no longer assumed",
     "released": "2026-09-06",
