@@ -1228,7 +1228,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.05.114';
+const APP_VERSION = '2026.09.06.115';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2718,7 +2718,7 @@ async function checkAuth() {
        S.f.official_email = official.email || '';
        _applyKnownProfile(official);
        if (official.province) S.f.province = official.province;
-       if (official.district) S.f.district = official.district;
+       if (isRealDistrict(official.district)) S.f.district = official.district;
        initDashFilters();
        S.authState = 'ready';
        S._sessionExpired = false;
@@ -3267,7 +3267,7 @@ async function handleOtpSubmit() {
    S.f.official_email = S._otpEmail;
    _applyKnownProfile(official);
    if (official.province) S.f.province = official.province;
-   if (official.district) S.f.district = official.district;
+   if (isRealDistrict(official.district)) S.f.district = official.district;
 
    initDashFilters();
    notifyLogin(S.official);
@@ -5372,8 +5372,15 @@ function scopeLabel(){
 // inline so the official taps a school rather than opening a dropdown and
 // searching. Longer lists keep the collapsed, searchable picker.
 var SCHOOL_INLINE_MAX = 30;
+// True only for an actual district name. 'National', 'All', 'Province' and
+// 'Provincial' are scope markers stored in the same column; they must never
+// be treated as a location on the form.
+function isRealDistrict(d){
+  d=String(d||'').trim();
+  return !!d && ['National','All','Province','Provincial'].indexOf(d)<0 && !/[;,]/.test(d);
+}
 function _schoolListInline(){
-  return !!(S.f && S.f.district);
+  return !!(S.f && isRealDistrict(S.f.district));
 }
 // Put schools with prior visits first, keeping alphabetical order within
 // each block. vh is the visit-history lookup already built by the caller.
@@ -5859,7 +5866,7 @@ function renderLocationSelects(){
     <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
 }
 function renderLocationSummary(){
-  if(!S.f.district || S.f._editLoc) return renderLocationSelects();
+  if(!isRealDistrict(S.f.district) || S.f._editLoc) return renderLocationSelects();
   var parts=[S.f.province,S.f.district,S.f.circuit].filter(Boolean);
   return '<div class="field"><label>Location</label><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F3F9F9;border:1.5px solid var(--teal);border-radius:8px;padding:11px 13px">'+
     '<span style="font-size:15.5px;font-weight:600;color:var(--teal-dk)">'+esc(parts.join(' \u00b7 '))+'</span>'+
@@ -5870,9 +5877,9 @@ function renderFormStep1(){
   const _schoolCount = _schoolArr.length;
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     <div class="form-group"><div class="form-group-label">Which school?</div>
-    ${S.f.district ? '' : renderLocationSelects()}
+    ${isRealDistrict(S.f.district) ? '' : renderLocationSelects()}
     <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':''}${renderVisitHistoryCard()}</div>
-    ${S.f.district ? renderLocationSummary() : ''}
+    ${isRealDistrict(S.f.district) ? renderLocationSummary() : ''}
     </div>
     <div class="form-group"><div class="form-group-label">Date and term</div>
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value;S.f.term=deriveTermFromDate(this.value);render()"></div></div>
