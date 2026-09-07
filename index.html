@@ -1251,7 +1251,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.06.116';
+const APP_VERSION = '2026.09.06.117';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6046,7 +6046,7 @@ function renderSubjectsVisible(){
 function renderFormStep2(){
   return `<div class="section fade-in"><div class="sec-hdr green" style="border-color:var(--green)"><div><h2>2. What Happened</h2><p>What type of activity and which subjects/grades?</p></div></div><div class="sec-body">
     <div class="field" id="fld-activity"><label>Activity Type<span class="req">*</span></label><div class="hint">Tap all that apply \u2014 a visit can cover more than one</div>${renderActivityTypeVisible()}${S.f.activity_types.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Phone call follow-up, community meeting..." value="'+esc(S.f.activity_type_other)+'" oninput="S.f.activity_type_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field"><label>Programme</label><div class="hint">Tap any that apply. Leave blank if unsure.</div>${renderThemeVisible()}${S.f.intervention_themes.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d \u2014 please describe:</div><input type="text" placeholder="e.g. Specialised reading programme..." value="'+esc(S.f.intervention_theme_other)+'" oninput="S.f.intervention_theme_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div>
-    <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togArr(S.f.grades,'${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
+    <div class="field" id="fld-grades"><label>Grade(s)<span class="req">*</span></label><div class="hint">Tap all that apply</div><div class="grade-grid">${GRADES.map(g=>`<label class="tag"><input type="checkbox" ${S.f.grades.includes(g)?'checked':''} onchange="togGrade('${g}',this.checked)"><span>Grade ${g}</span></label>`).join('')}</div></div>
     <div class="field"><label>Subject(s)</label><div class="hint">Tap the subjects your support focused on.</div>${renderSubjectsVisible()}</div>
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked)"><span>${a}</span></label>`}).join('')}</div></div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
@@ -6388,6 +6388,12 @@ function togArr(arr, val, add) {
  const i = arr.indexOf(val);
  if (add && i===-1) arr.push(val);
  if (!add && i!==-1) arr.splice(i,1);
+}
+// Grades feed the ATP coverage block, which only redraws on render().
+function togGrade(val, add) {
+  togArr(S.f.grades, val, add);
+  S.f.grades.sort(function(a,b){ return GRADES.indexOf(a) - GRADES.indexOf(b); });
+  render();
 }
 
 // Context toggles with mutual exclusivity
