@@ -1251,7 +1251,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.06.117';
+const APP_VERSION = '2026.09.06.118';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -4267,8 +4267,8 @@ function ctxArr(kind){
   return kind==='staffing' ? S.f.ctx_staffing : kind==='resources' ? S.f.ctx_resources : S.f.ctx_learners;
 }
 function _ctxTog(kind,name){
-  var a=ctxArr(kind); var i=a.indexOf(name);
-  if(i>=0) a.splice(i,1); else a.push(name);
+  var a=ctxArr(kind);
+  togCtx(a, name, a.indexOf(name)===-1, kind);
   render();
 }
 function _ctxDel(kind,name){
@@ -4285,16 +4285,12 @@ function delCtxResources(n){ _ctxDel('resources',n); }
 function togCtxLearners(n){ _ctxTog('learners',n); }
 function delCtxLearners(n){ _ctxDel('learners',n); }
 function renderCtxPicker(kind,label,items){
-  var openKey='_ctxOpen_'+kind;
-  var open=!!S.f[openKey];
-  var openExpr="S.f._ctxOpen_staffing=false;S.f._ctxOpen_resources=false;S.f._ctxOpen_learners=false;S.f."+openKey+"="+(open?'false':'true')+";render()";
-  var closeExpr="S.f."+openKey+"=false;render()";
-  return '<div style="margin-bottom:10px">' +
-    '<div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:4px">' + label + '</div>' +
-    renderChipPicker(ctxArr(kind), items, open,
-      'togCtx' + kind.charAt(0).toUpperCase() + kind.slice(1),
-      'delCtx' + kind.charAt(0).toUpperCase() + kind.slice(1),
-      openExpr, closeExpr, 'Select if relevant\u2026', null) +
+  var sel=ctxArr(kind);
+  var fn='togCtx' + kind.charAt(0).toUpperCase() + kind.slice(1);
+  return '<div class="vo-grp"><h5>'+esc(label)+'</h5>' +
+    items.map(function(it){
+      return _voRow(it, sel.indexOf(it)>-1, fn+"('"+_jsq(it)+"')");
+    }).join('') +
   '</div>';
 }
 
