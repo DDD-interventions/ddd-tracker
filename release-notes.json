@@ -1,4 +1,19 @@
 {
+  "2026.09.06.118": {
+    "title": "School context is now tick options too",
+    "released": "2026-09-06",
+    "highlights": [
+      "Staffing, Resources and Learners under School context are shown as tap rows instead of dropdowns",
+      "Choosing “Adequate” or “No major concerns” now correctly clears the other options in that group"
+    ]
+  },
+  "2026.09.06.117": {
+    "title": "ATP question now appears as soon as you tick a grade",
+    "released": "2026-09-06",
+    "highlights": [
+      "Ticking a grade now brings up the Annual Teaching Plan question straight away, instead of only after you tap something else"
+    ]
+  },
   "2026.09.06.116": {
     "title": "A new way to find your school",
     "released": "2026-09-06",
