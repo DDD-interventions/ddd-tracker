@@ -1,4 +1,18 @@
 {
+  "2026.09.22.120": {
+    "title": "Subjects now match the grade you pick",
+    "released": "2026-09-22",
+    "highlights": [
+      "The subject list now follows official DBE/CAPS policy for the grade(s) you've ticked, instead of showing every subject at every grade",
+      "Grades R–3: Home Language, First Additional Language, Mathematics, and Life Skills",
+      "Grades 4–6: adds Social Sciences and the combined Natural Sciences and Technology subject",
+      "Grades 7–9: Natural Sciences and Technology split into two separate subjects, plus EMS, Life Orientation, and Creative Arts",
+      "Grades 10–12: the full subject and elective list — Accounting, the separate Sciences, Technology subjects, Humanities, Commerce, and the Arts",
+      "Coding and Robotics is now selectable for Grades R–9",
+      "If you untick a grade after picking a subject that no longer fits it, that subject is removed automatically so your report can't mismatch grade and subject",
+      "Can't find a subject? A new “Other” option at the bottom of the subject list lets you type it in"
+    ]
+  },
   "2026.09.15.119": {
     "title": "Log a visit at district or province level, not just school",
     "released": "2026-09-15",
