@@ -1,4 +1,14 @@
 {
+  "2026.09.15.119": {
+    "title": "Log a visit at district or province level, not just school",
+    "released": "2026-09-15",
+    "highlights": [
+      "New report level choice at the start of a visit: School, District Monitoring, or Province Monitoring — pick whichever matches what you're actually reporting on",
+      "District Monitoring and Province Monitoring skip the school field entirely, so you can record what you found across the whole district or province",
+      "A dropdown of every school in your chosen district now sits right next to Find school — pick straight from the list, or use the full-screen search, whichever is faster",
+      "Tagging a colleague now shows a ready list of officials covering that district or province to tap, instead of only a search box"
+    ]
+  },
   "2026.09.06.118": {
     "title": "School context is now tick options too",
     "released": "2026-09-06",
