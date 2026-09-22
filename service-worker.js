@@ -18,11 +18,11 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.76 — index.html updated: the subject list in Step 2 is now filtered
-// to match official CAPS policy for the grade(s) selected. No new precached
-// assets or CDN hosts were added, so only the version bumps here — that's
-// what forces the new app shell past old caches on the next visit.
-const VERSION = 'v1.0.76';
+// v1.0.77 — index.html updated: Step 2's subject picker is now a single
+// search box instead of "most common" chips + grouped accordion. No new
+// precached assets or CDN hosts were added, so only the version bumps here
+// — that's what forces the new app shell past old caches on the next visit.
+const VERSION = 'v1.0.77';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
