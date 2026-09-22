@@ -1330,7 +1330,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.22.120';
+const APP_VERSION = '2026.09.22.121';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6176,13 +6176,22 @@ function toggleSubject(name){
   var adding=!S.f.subjects.includes(name);
   adding?S.f.subjects.push(name):(S.f.subjects=S.f.subjects.filter(s=>s!==name));
   render();
-  // If the subject came from a group below the card, scroll the card into view.
-  if(adding && COMMON_SUBJECTS.indexOf(name)<0){
+  // Scroll the ATP coverage card into view once a subject is picked from the search.
+  if(adding){
     setTimeout(function(){ var el=document.getElementById('atp-anchor'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
   }
 }
 function removeSubject(name){S.f.subjects=S.f.subjects.filter(s=>s!==name);render();}
 let _subjFilterTimer=null;
+// Flat (ungrouped) list of every CAPS-tracked subject, in a stable order,
+// used by the subject search below instead of the old subject-family groups.
+function allCapsSubjectsFlat(){
+  var seen={}, out=[];
+  SUBJECT_GROUPS.forEach(function(g){
+    g.items.forEach(function(s){ if(!seen[s]){ seen[s]=true; out.push(s); } });
+  });
+  return out;
+}
 function subjectFilterInput(val){
   S.f._subjectQ=val;
   if(_subjFilterTimer)clearTimeout(_subjFilterTimer);
@@ -6192,58 +6201,24 @@ function subjectFilterInput(val){
     var footEl=document.querySelector('.school-picker .school-dd .school-dd-foot');
     if(!listEl){render();return;}
     var sel=S.f.subjects;
+    var grs=S.f.grades||[];
     var q=(S.f._subjectQ||'').toLowerCase();
+    var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
+    var filtered=eligible.filter(function(s){return !q||s.toLowerCase().includes(q)});
     var items='';
-    SUBJECT_GROUPS.forEach(function(g){
-      var filtered=g.items.filter(function(s){return !q||s.toLowerCase().includes(q)});
-      if(!filtered.length)return;
-      items+='<div style="padding:5px 10px;font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">'+esc(g.label)+'</div>';
-      filtered.forEach(function(s){
-        var checked=sel.includes(s);
-        var se=s.replace(/'/g,"\\'");
-        items+='<div class="school-dd-item '+(checked?'checked':'')+'" onclick="toggleSubject(\''+se+'\')"><div class="tick">'+(checked?'\u2713':'')+'</div>'+esc(s)+'</div>';
-      });
+    filtered.forEach(function(s){
+      var checked=sel.includes(s);
+      var se=s.replace(/'/g,"\\'");
+      items+='<div class="school-dd-item '+(checked?'checked':'')+'" onclick="toggleSubject(\''+se+'\')"><div class="tick">'+(checked?'\u2713':'')+'</div>'+esc(s)+'</div>';
     });
     if(!q||'other'.includes(q)){
       var otherChecked=sel.includes('Other');
-      items+='<div style="padding:5px 10px;font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">Other</div>';
       items+='<div class="school-dd-item '+(otherChecked?'checked':'')+'" onclick="toggleSubject(\'Other\')"><div class="tick">'+(otherChecked?'\u2713':'')+'</div>Other (specify below)</div>';
     }
     if(!items)items='<div class="school-dd-hint">No subjects match your search</div>';
     listEl.innerHTML=items;
     if(footEl)footEl.innerHTML='<span>'+sel.length+' selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span>';
   },120);
-}
-function renderSubjectPicker(){
-  const sel=S.f.subjects;
-  const open=S.f._subjectDDOpen;
-  const q=S.f._subjectQ.toLowerCase();
-  const tags=sel.length?`<div class="school-tags">${sel.map(s=>`<span class="school-tag">${esc(s)}<button onclick="event.stopPropagation();removeSubject('${s.replace(/'/g,"\\\\'")}')">&times;</button></span>`).join('')}</div>`:'';
-  const trigger=`<button class="school-trigger ${open?'open':''}" onclick="S.f._subjectDDOpen=!S.f._subjectDDOpen;S.f._subjectQ='';render()">${sel.length?sel.length+' subject'+(sel.length>1?'s':'')+' selected':'Select subjects...'}<span class="arrow">\u25BC</span></button>`;
-  let dd='';
-  if(open){
-    let items='';
-    SUBJECT_GROUPS.forEach(g=>{
-      const filtered=g.items.filter(s=>!q||s.toLowerCase().includes(q));
-      if(!filtered.length)return;
-      items+=`<div style="padding:5px 10px;font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">${g.label}</div>`;
-      filtered.forEach(s=>{
-        const checked=sel.includes(s);
-        const se=s.replace(/'/g,"\\\\'");
-        items+=`<div class="school-dd-item ${checked?'checked':''}" onclick="toggleSubject('${se}')"><div class="tick">${checked?'\u2713':''}</div>${esc(s)}</div>`;
-      });
-    });
-    // Add "Other" at the bottom
-    if(!q||'other'.includes(q)){
-      const otherChecked=sel.includes('Other');
-      items+=`<div style="padding:5px 10px;font-size:13px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;background:#f8f7f6;border-bottom:1px solid #e8e6e4">Other</div>`;
-      items+=`<div class="school-dd-item ${otherChecked?'checked':''}" onclick="toggleSubject('Other')"><div class="tick">${otherChecked?'\u2713':''}</div>Other (specify below)</div>`;
-    }
-    if(!items)items=`<div class="school-dd-hint">No subjects match your search</div>`;
-    dd=`<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Type to search subjects..." value="${esc(S.f._subjectQ)}" oninput="subjectFilterInput(this.value)" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:250px">${items}</div><div class="school-dd-foot"><span>${sel.length} selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span></div></div>`;
-  }
-  const other=sel.includes('Other')?`<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Subject \u2014 please specify:</div><input type="text" placeholder="e.g. Computer Applications Technology, Tourism..." value="${esc(S.f.subjects_other)}" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>`:'';
-  return `<div class="school-picker">${tags}${trigger}${dd}</div>${other}`;
 }
 function atpEnsure(i){
   var sub = S.f.subjects[i]; if(!sub) return null;
@@ -6305,10 +6280,6 @@ function renderAtpCoverage(){
   var count = pairs ? '<p class="atp-count">'+pairs+' grade and subject record'+(pairs===1?'':'s')+' will be saved.</p>' : '';
   return head+count+body+'</div>';
 }
-// Subjects officials choose most often; shown as direct chips. The rest
-// sit under group headings that open inline (never a dropdown).
-const COMMON_SUBJECTS = ['Mathematics','Mathematical Literacy','English FAL','English HL',
-                         'Physical Sciences','Life Sciences','Natural Sciences','Accounting'];
 function renderActivityTypeVisible(){
   return ACTIVITY_TYPES.map(function(a){
     return _voRow(a, S.f.activity_types.indexOf(a)>-1, "toggleActivityType('"+_jsq(a)+"')");
@@ -6321,36 +6292,34 @@ function renderThemeVisible(){
     return _voRow(t, S.f.intervention_themes.indexOf(t)>-1, "toggleTheme('"+_jsq(t)+"')");
   }).join('');
 }
-function toggleSubjGroup(label){ S.f._sgOpen=S.f._sgOpen||{}; S.f._sgOpen[label]=!S.f._sgOpen[label]; render(); }
 function renderSubjectsVisible(){
   var sel=S.f.subjects||[];
   var grs=S.f.grades||[];
-  var chip=function(sname){
-    var on=sel.indexOf(sname)>-1;
-    return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleSubject(\''+_jsq(sname)+'\')"><span>'+esc(sname)+'</span></label>';
-  };
-  var otherChip='<label class="tag'+(sel.indexOf('Other')>-1?' on':'')+'"><input type="checkbox" '+(sel.indexOf('Other')>-1?'checked':'')+' onchange="toggleSubject(\'Other\')"><span>Other</span></label>';
   if(!grs.length){
     return '<div class="atp-empty">Tick a grade above first \u2014 the subject list is matched to what CAPS actually offers at that grade.</div>';
   }
-  var common=COMMON_SUBJECTS.filter(function(s){return subjectAllowedForGrades(s,grs);});
-  var html=common.length?('<div class="sg-sub">Most common</div><div class="grade-grid">'+common.map(chip).join('')+'</div>'):'';
-  // ATP coverage appears right here, under the chips the official just
-  // tapped, rather than below the full group list where it is off-screen.
+  var open=S.f._subjectDDOpen;
+  var q=(S.f._subjectQ||'').toLowerCase();
+  var tags=sel.length?'<div class="school-tags">'+sel.map(function(s){return '<span class="school-tag">'+esc(s)+'<button onclick="event.stopPropagation();removeSubject(\''+s.replace(/'/g,"\\\\'")+'\')">&times;</button></span>';}).join('')+'</div>':'';
+  var trigger='<button class="school-trigger '+(open?'open':'')+'" onclick="S.f._subjectDDOpen=!S.f._subjectDDOpen;S.f._subjectQ=\'\';render()">'+(sel.length?sel.length+' subject'+(sel.length>1?'s':'')+' selected':'Search subjects...')+'<span class="arrow">\u25bc</span></button>';
+  var dd='';
+  if(open){
+    var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
+    var filtered=eligible.filter(function(s){return !q||s.toLowerCase().includes(q);});
+    var items=filtered.map(function(s){
+      var checked=sel.includes(s);
+      var se=s.replace(/'/g,"\\\\'");
+      return '<div class="school-dd-item '+(checked?'checked':'')+'" onclick="toggleSubject(\''+se+'\')"><div class="tick">'+(checked?'\u2713':'')+'</div>'+esc(s)+'</div>';
+    }).join('');
+    if(!q||'other'.includes(q)){
+      var otherChecked=sel.includes('Other');
+      items+='<div class="school-dd-item '+(otherChecked?'checked':'')+'" onclick="toggleSubject(\'Other\')"><div class="tick">'+(otherChecked?'\u2713':'')+'</div>Other (specify below)</div>';
+    }
+    if(!items)items='<div class="school-dd-hint">No subjects match your search</div>';
+    dd='<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Type to search subjects..." value="'+esc(S.f._subjectQ)+'" oninput="subjectFilterInput(this.value)" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:250px">'+items+'</div><div class="school-dd-foot"><span>'+sel.length+' selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span></div></div>';
+  }
+  var html='<div class="school-picker">'+tags+trigger+dd+'</div>';
   html+='<div id="atp-anchor">'+renderAtpCoverage()+'</div>';
-  html+='<div class="sg-sub">All subjects by group</div>';
-  var open=S.f._sgOpen||{};
-  html+=SUBJECT_GROUPS.map(function(g){
-    var items=g.items.filter(function(i){return subjectAllowedForGrades(i,grs);});
-    if(!items.length) return '';
-    var n=items.filter(function(i){return sel.indexOf(i)>-1;}).length;
-    var isOpen=!!open[g.label];
-    var head='<div class="sg-head'+(isOpen?' open':'')+(n?' has':'')+'" onclick="toggleSubjGroup(\''+_jsq(g.label)+'\')">'+
-      '<span>'+esc(g.label)+(n?' \u2014 '+n+' selected':'')+'</span><span class="sg-n">'+(isOpen?'Hide':items.length+' subjects')+'</span></div>';
-    var body=isOpen?'<div class="sg-body"><div class="grade-grid">'+items.map(chip).join('')+'</div></div>':'';
-    return head+body;
-  }).join('');
-  html+='<div class="sg-sub">Not listed?</div><div class="grade-grid">'+otherChip+'</div>';
   var other=sel.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Subject \u2014 please specify:</div><input type="text" placeholder="e.g. Computer Applications Technology, Tourism..." value="'+esc(S.f.subjects_other)+'" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':'';
   html+=other;
   if(sel.length) html+='<p class="vo-count"><b>'+sel.length+'</b> selected</p>';
