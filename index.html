@@ -1297,6 +1297,7 @@ const S = {
  openSections:{1:false,2:false,3:false,4:false},
  f: {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:deriveTermFromDate(today()),activity_date:today(),
+ report_level:'school',
  activity_type:'',activity_types:[],_actTypeDDOpen:false,intervention_theme:'',intervention_themes:[],_themeDDOpen:false,subjects:[],grades:[],atp:{},description:'',
  ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',_ctxOpen_staffing:false,_ctxOpen_resources:false,_ctxOpen_learners:false,
@@ -1304,7 +1305,7 @@ const S = {
  educators_supported:'',follow_up:false,follow_up_desc:'',
  doc_url:'',doc_name:'',cc_email:'',
     sip_focus_areas:[],support_needed:[],support_level:'',obs_curriculum:'',obs_apip:'',obs_time:'',doc_file:null,doc_file_name:'',doc_files:[],doc_file_names:[],additional_data_sources:'',
-    tagged_officials:{},_offSearchQ:{},_offSearchResults:{},_offSearchLoading:{},
+    tagged_officials:{},_offSearchQ:{},_offSearchResults:{},_offSearchLoading:{},_offQuickPick:{},_offQuickPickLoading:{},_offQuickPickKey:{},
     formStep:-1,intervention_trigger:'',intervention_trigger_other:'',intervention_triggers:[],_trigDDOpen:false,official_name:'',official_role:'',official_specialisation:'',official_email:'',
     insight_type:'',insight_types:[],_insightDDOpen:false,insight_pass_rate:'',insight_learners_affected:'',insight_threshold:'',insight_detail:'',insight_educator_absent:'',insight_attendance_days:'',insight_sba_exam_gap:'',insight_curriculum_pct:''
   }
@@ -1605,12 +1606,13 @@ function generateInterventionPDF(dec, act, official) {
   // ═══ Where & When ═══
   sectionHeader('Where & When', PDF_COLOR.teal);
   kvTable([
+    ['Report Level', det.report_level==='province'?'Province Monitoring':det.report_level==='district'?'District Monitoring':''],
     ['Term', det.term],
     ['Province', det.province],
     ['District', det.district],
     ['Circuit', det.circuit],
     ['Activity Date', dec.date || det.activity_date],
-    ['School(s)', det.schools]
+    ['School(s)', det.schools || (det.report_level && det.report_level!=='school' ? 'None — report covers the ' + (det.report_level==='province'?'province':'district') + ' as a whole' : '')]
   ]);
 
   // ═══ Activity Details ═══
@@ -1975,6 +1977,47 @@ async function toggleNotifyOptOut() {
 
 // Search officials for tagging (form)
 var _offSearchTimer = null;
+// Where an official-tagging quick-pick should scope to right now: the
+// form's district when one is set, else its province for a Province
+// Monitoring report with no district chosen. Returns null when neither is
+// known yet, so the quick-pick simply doesn't render.
+function officialScopeForForm() {
+  if (isRealDistrict(S.f.district)) return { kind:'district', val:S.f.district, label:S.f.district };
+  if ((S.f.report_level||'school')==='province' && S.f.province) return { kind:'province', val:S.f.province, label:S.f.province };
+  return null;
+}
+// Loads a short list of officials for the current district/province so they
+// can be tapped straight away, without typing into the search box first.
+// Cached per (need, scope) — re-fetches only when the district/province the
+// official is filling in actually changes. Reuses the same search_officials
+// RPC the type-to-search box already calls, just with a blank query.
+async function loadOfficialsQuickPick(need) {
+  var scope = officialScopeForForm();
+  if (!scope) { S.f._offQuickPick[need] = []; updateOffQuickPickUI(need); return; }
+  var cacheKey = scope.kind + '|' + scope.val;
+  if (S.f._offQuickPickKey[need] === cacheKey) return;
+  S.f._offQuickPickKey[need] = cacheKey;
+  S.f._offQuickPickLoading[need] = true; updateOffQuickPickUI(need);
+  var baseArgs = { search_query: '', filter_district: scope.kind === 'district' ? scope.val : null };
+  try {
+    var res;
+    if (scope.kind === 'province') {
+      // filter_province is a newer parameter — older deployments of
+      // search_officials() won't have it yet. Try it first; if the RPC
+      // errors because the parameter doesn't exist, fall back to the
+      // district-only signature (quick-pick will just stay empty for a
+      // province-level report until that function is updated).
+      res = await sb.rpc('search_officials', Object.assign({}, baseArgs, { filter_province: scope.val }));
+      if (res && res.error) res = await sb.rpc('search_officials', baseArgs);
+    } else {
+      res = await sb.rpc('search_officials', baseArgs);
+    }
+    var seen = {}; var results = [];
+    ((res && res.data) || []).forEach(function(o) { if (!seen[o.email]) { seen[o.email] = true; results.push({ id:o.id, name:o.full_name||'', role:o.role||'', email:o.email||'', circuit:o.circuit||'', district:o.district||'' }); } });
+    S.f._offQuickPick[need] = results.slice(0, 50);
+  } catch(e) { S.f._offQuickPick[need] = []; console.warn('Officials quick-pick failed:', e); }
+  S.f._offQuickPickLoading[need] = false; updateOffQuickPickUI(need);
+}
 async function searchOfficialsForNeed(need, query) {
   if (!query || query.length < 2) { S.f._offSearchResults[need] = []; S.f._offSearchLoading[need] = false; updateOffSearchUI(need); return; }
   S.f._offSearchLoading[need] = true; updateOffSearchUI(need);
@@ -1999,6 +2042,35 @@ function untagOfficial(need, officialId) {
   render();
 }
 function offSearchContainerId(need) { return 'off-sr-' + need.replace(/[^a-zA-Z0-9]/g, ''); }
+// ── Officials quick-pick: tappable list scoped to the district/province on
+// the form, shown above the type-to-search box so most taggings need no
+// typing at all. The search box (and everything below) is unchanged.
+function officialQuickPickContainerId(need) { return 'off-qp-' + need.replace(/[^a-zA-Z0-9]/g, ''); }
+function renderOfficialQuickPickInner(need) {
+  var scope = officialScopeForForm();
+  if (!scope) return '';
+  var loading = S.f._offQuickPickLoading[need];
+  var list = S.f._offQuickPick[need] || [];
+  var tagged = S.f.tagged_officials[need] || [];
+  var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
+  if (loading && !list.length) return '<div style="font-size:13px;color:var(--grey);padding:4px 0 6px">Loading officials in ' + esc(scope.label) + '\u2026</div>';
+  var untagged = list.filter(function(o){ return !tagged.some(function(t){ return t.id === o.id; }); });
+  if (!untagged.length) return '';
+  var html = '<div style="font-size:12.5px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 5px">Officials in ' + esc(scope.label) + ' \u2014 tap to tag</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">';
+  untagged.forEach(function(o) {
+    html += '<button type="button" onclick="tagOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')" style="text-align:left;padding:7px 10px;border:1px solid #e0ded9;border-radius:8px;background:#fff;cursor:pointer;font:inherit;min-height:44px">' +
+      '<div style="font-weight:700;font-size:13.5px;color:var(--navy)">' + esc(o.name) + '</div>' +
+      '<div style="font-size:12px;color:var(--grey)">' + esc(o.role) + (o.circuit ? ' \xb7 ' + esc(o.circuit) : '') + '</div>' +
+      '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+function updateOffQuickPickUI(need) {
+  var el = document.getElementById(officialQuickPickContainerId(need));
+  if (el) el.innerHTML = renderOfficialQuickPickInner(need);
+}
 function renderOffSearchResultsInner(need) {
   var q = S.f._offSearchQ[need] || '';
   var results = S.f._offSearchResults[need] || [];
@@ -2038,6 +2110,18 @@ function renderOfficialSearch(need) {
   var tagged = S.f.tagged_officials[need] || [];
   var needKey = need.replace(/'/g, "\\x27").replace(/\u2014/g, '\u2014');
   var html = '';
+  // Kick off (or refresh) the quick-pick list whenever the district/province
+  // on the form has changed since it was last loaded for this need. Runs
+  // off the render path so it never blocks paint; duplicate schedules from
+  // repeated renders are cheap no-ops (loadOfficialsQuickPick re-checks the
+  // cache key itself before fetching).
+  (function(){
+    var scope = officialScopeForForm();
+    if (scope && S.f._offQuickPickKey[need] !== (scope.kind + '|' + scope.val)) {
+      setTimeout(function(){ loadOfficialsQuickPick(need); }, 0);
+    }
+  })();
+  html += '<div id="' + officialQuickPickContainerId(need) + '">' + renderOfficialQuickPickInner(need) + '</div>';
   // Tagged pills
   if (tagged.length) {
     html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">';
@@ -5811,7 +5895,36 @@ function schoolPickerHTML(){
   }
   const label=selected.length?'Add another school':'Find school';
   const sub=selected.length?'Tap to add or change':'Tap to choose the school you visited';
-  return tags+'<button type="button" class="sf-btn" onclick="openSchoolFinder()">'+label+'<span>'+sub+'</span></button>';
+  return tags+'<button type="button" class="sf-btn" onclick="openSchoolFinder()">'+label+'<span>'+sub+'</span></button>'+schoolDropdownHTML();
+}
+// Plain <select> alternative to the full-screen finder above — same district
+// scope, same addSchool() call, so the two stay in sync. Officials who'd
+// rather scan a short list than type can use this instead; the full-screen
+// search is untouched for everyone else.
+function schoolDropdownHTML(){
+  if(!isRealDistrict(S.f.district)) return '';
+  const selected=parseSchoolsArr();
+  const all=getAvailableSchools();
+  const available=all.filter(function(o){return selected.indexOf(o[0])===-1;});
+  if(!available.length) return '';
+  const showCircuit=!S.f.circuit;
+  const circuitLookup={};
+  if(showCircuit && S.f.district && SCHOOLS_MAP[S.f.district]){
+    Object.keys(SCHOOLS_MAP[S.f.district]).forEach(function(cc){
+      (SCHOOLS_MAP[S.f.district][cc]||[]).forEach(function(pair){ if(!circuitLookup[pair[0]]) circuitLookup[pair[0]]=cc; });
+    });
+  }
+  let opts='<option value="">Or choose from the list…</option>';
+  if(showCircuit){
+    const byCirc={};
+    available.forEach(function(o){ const c=circuitLookup[o[0]]||'Other'; (byCirc[c]=byCirc[c]||[]).push(o); });
+    Object.keys(byCirc).sort().forEach(function(c){
+      opts+='<optgroup label="'+esc(c)+'">'+byCirc[c].map(function(o){return '<option value="'+esc(o[0])+'">'+esc(o[0])+'</option>';}).join('')+'</optgroup>';
+    });
+  } else {
+    opts+=available.map(function(o){return '<option value="'+esc(o[0])+'">'+esc(o[0])+'</option>';}).join('');
+  }
+  return '<select onchange="if(this.value){addSchool(this.value);this.value=\'\';}" style="width:100%;margin-top:8px;padding:9px 10px;border:1px solid #c8c6c4;border-radius:6px;font-size:14px;font-family:inherit;background:#fff;color:var(--navy)">'+opts+'</select>';
 }
 // Event delegation for school picker
 document.addEventListener('click',function(e){
@@ -5835,9 +5948,126 @@ document.addEventListener('click',function(e){
 
 // Location selects live in their own function so they can be shown either
 // before the school (no district yet) or collapsed after it (district known).
-function renderLocationSelects(){
-  return `    <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="field" id="fld-district"><label>District<span class="req">*</span></label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div></div>
-    <div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
+// districtOptional: true when the enclosing report level (Province Monitoring)
+// does not require a district — label reads "(optional)" instead of "*".
+function renderLocationSelects(districtOptional){
+  var f = renderDistrictCircuitFields(districtOptional);
+  return `    <div class="field-row"><div class="field" id="fld-province"><label>Province<span class="req">*</span></label><select onchange="S.f.province=this.value;S.f.district='';S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;render()"><option value="">Select province</option>${Object.keys(DISTRICTS).map(p=>`<option ${S.f.province===p?'selected':''}>${p}</option>`).join('')}</select></div>${f.fieldOnly}</div>
+    ${f.circuitRow}`;
+}
+// District + Circuit selects on their own, with no Province select — used
+// when Province is already shown separately (the Province Monitoring
+// expander), so the province never appears twice on screen.
+function renderDistrictCircuitFields(districtOptional){
+  var distLabel = districtOptional ? 'District <span style="font-weight:400;color:var(--grey)">(optional)</span>' : 'District<span class="req">*</span>';
+  var fieldOnly = `<div class="field" id="fld-district"><label>${distLabel}</label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div>`;
+  var circuitRow = `<div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
+  return { fieldOnly:fieldOnly, circuitRow:circuitRow };
+}
+function renderDistrictCircuitSelects(districtOptional){
+  var f = renderDistrictCircuitFields(districtOptional);
+  return `<div class="field-row">${f.fieldOnly}</div>\n    ${f.circuitRow}`;
+}
+// ── Report level (School / District Monitoring / Province Monitoring) ──
+// Officials pick the scope of the report itself. School keeps the exact
+// original flow. District Monitoring and Province Monitoring make the
+// narrower fields optional instead of required, so a report can genuinely
+// be about a whole district or province rather than forcing a school pick.
+function setReportLevel(lv){
+  if (S.f.report_level === lv) return;
+  S.f.report_level = lv;
+  if (lv === 'province') { S.f.district=''; S.f.circuit=''; S.f.schools=''; S.f._provinceExpand=false; }
+  render();
+}
+function renderReportLevelSelector(){
+  var lv = S.f.report_level || 'school';
+  var opts = [
+    ['school','School visit','A specific school or schools'],
+    ['district','District Monitoring','The district as a whole — school(s) optional'],
+    ['province','Province Monitoring','The whole province — district optional']
+  ];
+  var html = '<div class="form-group"><div class="form-group-label">Report level</div><div class="hint" style="margin:-6px 0 8px">What is this report about?</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
+  opts.forEach(function(o){
+    var on = lv===o[0];
+    html += '<button type="button" onclick="setReportLevel(\''+o[0]+'\')" style="flex:1;min-width:150px;text-align:left;padding:10px 12px;border-radius:8px;border:1.5px solid '+(on?'var(--teal)':'#c8c6c4')+';background:'+(on?'#F3F9F9':'#fff')+';cursor:pointer;font:inherit">'+
+      '<div style="font-size:14.5px;font-weight:700;color:'+(on?'var(--teal-dk)':'var(--navy)')+'">'+o[1]+'</div>'+
+      '<div style="font-size:12.5px;color:var(--grey);margin-top:2px;line-height:1.35">'+o[2]+'</div></button>';
+  });
+  html += '</div></div>';
+  return html;
+}
+function renderProvinceOnlySelect(){
+  return '<div class="field" id="fld-province"><label>Province<span class="req">*</span></label>'+
+    '<select onchange="S.f.province=this.value;render()"><option value="">Select province</option>'+
+    Object.keys(DISTRICTS).map(function(p){return '<option '+(S.f.province===p?'selected':'')+'>'+p+'</option>';}).join('')+
+    '</select></div>';
+}
+// The "Which school / district / province?" block, branched by report level.
+// School level is byte-for-byte what this block always rendered, so the
+// default flow that most officials use is completely unaffected.
+function renderScopeSection(){
+  var lv = S.f.report_level || 'school';
+
+  if (lv === 'province') {
+    var provKnown = !!S.f.province;
+    var provBlock = provKnown
+      ? '<div class="field"><label>Province</label><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F3F9F9;border:1.5px solid var(--teal);border-radius:8px;padding:11px 13px"><span style="font-size:15.5px;font-weight:600;color:var(--teal-dk)">'+esc(S.f.province)+'</span><button type="button" onclick="S.f.province=\'\';S.f.district=\'\';S.f.circuit=\'\';S.f.schools=\'\';render()" style="background:none;border:1.5px solid var(--teal);color:var(--teal);border-radius:6px;padding:6px 10px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Change</button></div></div>'
+      : renderProvinceOnlySelect();
+    var extra = '';
+    if (provKnown) {
+      if (S.f._provinceExpand) {
+        extra += '<div style="margin-top:10px">' + renderDistrictCircuitSelects(true);
+        if (isRealDistrict(S.f.district)) {
+          var _pSchoolArr = parseSchoolsArr(); var _pSchoolCount = _pSchoolArr.length;
+          extra += '<div class="field" id="fld-schools"><label>School(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Only if this report also covers specific schools</div>'+schoolPickerHTML()+(_pSchoolCount>0?'<div class="school-count-indicator">'+_pSchoolCount+' school'+(_pSchoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>';
+        }
+        extra += '</div>';
+      } else {
+        extra += '<button type="button" onclick="S.f._provinceExpand=true;render()" style="margin-top:10px;background:none;border:1px dashed #c8c6c4;color:var(--teal);border-radius:6px;padding:9px 10px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;width:100%;text-align:left">+ Optionally name a district, circuit or specific school(s)</button>';
+      }
+    }
+    return '<div class="form-group"><div class="form-group-label">Which province?</div>' + provBlock + extra + '</div>';
+  }
+
+  if (lv === 'district') {
+    var _dSchoolArr = parseSchoolsArr(); var _dSchoolCount = _dSchoolArr.length;
+    var html = '<div class="form-group"><div class="form-group-label">Which district?</div>';
+    html += isRealDistrict(S.f.district) ? '' : renderLocationSelects(false);
+    html += '<div class="field" id="fld-schools"><label>School(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">This report covers the district as a whole — add specific school(s) too if useful'+(S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):'')+'</div>'+schoolPickerHTML()+(_dSchoolCount>0?'<div class="school-count-indicator">'+_dSchoolCount+' school'+(_dSchoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>';
+    html += isRealDistrict(S.f.district) ? renderLocationSummary() : '';
+    html += '</div>';
+    return html;
+  }
+
+  // School level — identical to the original, single-purpose flow.
+  var _schoolArr = parseSchoolsArr(); var _schoolCount = _schoolArr.length;
+  return '<div class="form-group"><div class="form-group-label">Which school?</div>'+
+    (isRealDistrict(S.f.district) ? '' : renderLocationSelects(false))+
+    '<div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools'+(S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):'')+'</div>'+schoolPickerHTML()+(_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>'+
+    (isRealDistrict(S.f.district) ? renderLocationSummary() : '')+
+    '</div>';
+}
+// Human-readable stand-in for "which school(s)" once schools can be blank
+// (District/Province Monitoring). Used anywhere the app previously assumed
+// S.f.schools/det.schools always had a value.
+function scopeSummaryText(){
+  var schools=(S.f.schools||'').trim();
+  if (schools) return schools;
+  var lv=S.f.report_level||'school';
+  if (lv==='province') return 'Province-wide monitoring: '+(S.f.province||'');
+  if (lv==='district') return 'District-wide monitoring: '+(S.f.district||S.f.province||'');
+  return '';
+}
+// Same idea, but reading a saved record's details blob rather than the live
+// form — used wherever historical visits are listed or summarised.
+function scopeSummaryTextFor(det){
+  det = det || {};
+  var schools=(det.schools||'').trim();
+  if (schools) return schools;
+  var lv=det.report_level||'school';
+  if (lv==='province') return 'Province-wide monitoring: '+(det.province||'');
+  if (lv==='district') return 'District-wide monitoring: '+(det.district||det.province||'');
+  return '';
 }
 function renderLocationSummary(){
   if(!isRealDistrict(S.f.district) || S.f._editLoc) return renderLocationSelects();
@@ -5850,11 +6080,8 @@ function renderFormStep1(){
   const _schoolArr = parseSchoolsArr();
   const _schoolCount = _schoolArr.length;
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
-    <div class="form-group"><div class="form-group-label">Which school?</div>
-    ${isRealDistrict(S.f.district) ? '' : renderLocationSelects()}
-    <div class="field" id="fld-schools"><label>School(s)<span class="req">*</span></label><div class="hint">Select one or more schools${S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):''}</div>${schoolPickerHTML()}${_schoolCount>0?'<div class="school-count-indicator">'+_schoolCount+' school'+(_schoolCount!==1?'s':'')+' selected</div>':''}${renderVisitHistoryCard()}</div>
-    ${isRealDistrict(S.f.district) ? renderLocationSummary() : ''}
-    </div>
+    ${renderReportLevelSelector()}
+    ${renderScopeSection()}
     <div class="form-group"><div class="form-group-label">Date and term</div>
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value;S.f.term=deriveTermFromDate(this.value);render()"></div></div>
     </div>
@@ -6344,7 +6571,7 @@ function renderFormReview(){
   return`<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--navy)"><div><h2>5. Review & Submit</h2><p>Check your entry before submitting</p></div></div><div class="sec-body">
     <div style="background:#FFF8E1;border:1.5px solid #FFE082;border-radius:8px;padding:12px 14px;margin-bottom:14px"><div style="font-size:14px;font-weight:600;color:#8A5A00;line-height:1.5">Please check all information below carefully. You cannot change this after submitting.</div></div>
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools)}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Report level',f.report_level==='province'?'Province Monitoring':f.report_level==='district'?'District Monitoring':'')}${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools||(f.report_level!=='school'?'None — report covers the '+(f.report_level==='province'?'province':'district')+' as a whole':''))}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?f.sip_focus_areas.join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:13px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?f.support_needed.join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...f.ctx_staffing,...f.ctx_resources,...f.ctx_learners].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
@@ -6447,7 +6674,7 @@ function renderSuccess() {
    <div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.6">${insight}</div>
    <div style="font-size:13.5px;color:var(--grey);margin-top:8px;line-height:1.5">This is a strong entry \u2014 real numbers from DDD data showing what you saw and how you responded.</div>
  </div>`:``}
- <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:13.5px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:14px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> at <strong>${esc(S.f.schools)}</strong><br> ${S.f.district}, ${S.f.province} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
+ <div style="margin-top:12px;padding:14px;background:var(--off);border-radius:8px;text-align:left"> <div style="font-size:13.5px;font-weight:700;color:var(--teal-dk);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">What you logged</div> <div style="font-size:14px;color:var(--navy);line-height:1.6"> <strong>${esc(S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type)}</strong> \u2014 <strong>${esc(scopeSummaryText())}</strong><br> ${[S.f.district,S.f.province].filter(Boolean).join(', ')} \u00b7 ${S.f.activity_date}<br> ${S.f.subjects.length ? 'Subjects: ' + S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s).join(', ') + '<br>' : ''}
  ${S.f.action_types.length ? 'Intervention activity: ' + esc(S.f.action_types.join('; ')) : ''}
  ${S.f.educators_supported ? ' \u00b7 ~' + S.f.educators_supported + ' educators' : ''}
  </div> </div> ${renderFeedbackSection()}
@@ -6462,8 +6689,8 @@ function getValidationErrors() {
  const f = S.f, errs = [];
  // Step 1: Where & When
  if (!f.province) errs.push({step:0,field:'province',label:'Province',fieldId:'fld-province'});
- if (!f.district) errs.push({step:0,field:'district',label:'District',fieldId:'fld-district'});
- if (!f.schools) errs.push({step:0,field:'schools',label:'School(s)',fieldId:'fld-schools'});
+ if (f.report_level!=='province' && !f.district) errs.push({step:0,field:'district',label:'District',fieldId:'fld-district'});
+ if (f.report_level==='school' && !f.schools) errs.push({step:0,field:'schools',label:'School(s)',fieldId:'fld-schools'});
  if (!f.official_email) errs.push({step:0,field:'official_email',label:'Email address',fieldId:'fld-email'});
  if (!f.official_role) errs.push({step:0,field:'official_role',label:'Designation',fieldId:'fld-role'});
  if (f.official_role==='Other'&&!f.official_role_other.trim()) errs.push({step:0,field:'official_role_other',label:'Designation (please specify)',fieldId:'fld-role'});
@@ -6542,6 +6769,7 @@ async function submitForm() {
  S.saving = true; render();
 
  const details = {
+ report_level:S.f.report_level||'school',
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:S.f.schools, term:S.f.term,
  activity_type:(S.f.activity_types.length?S.f.activity_types.map(function(t){return t==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:t}).join('; '):S.f.activity_type),
  activity_types:S.f.activity_types,
@@ -6596,7 +6824,7 @@ async function submitForm() {
  official_id: S._officialId,
  intervention_id: S.interventions[0]?.id || null,
  ddd_tool: S.f.ddd_reports.join(', '),
- data_viewed: (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type) + ' — ' + S.f.schools,
+ data_viewed: (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type) + ' — ' + scopeSummaryText(),
  insight: buildInsightStatement() || S.f.insight_detail || S.f.description,
  decision_made: (S.f.decision_types.length?(S.f.decision_types.includes('Other')&&S.f.decision_other?S.f.decision_types.filter(d=>d!=='Other').concat(['Other: '+S.f.decision_other]).join('; '):S.f.decision_types.join('; ')):'') || (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type),
  contextual_factors: [...S.f.ctx_staffing,...S.f.ctx_resources,...S.f.ctx_learners].join(', ') + (S.f.ctx_notes ? ' | ' + S.f.ctx_notes : ''),
@@ -6812,6 +7040,7 @@ function resetForm() {
  clearFormDraft();
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:deriveTermFromDate(today()), activity_date:today(),
+ report_level:'school',
  activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], atp:{}, description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'',
@@ -6819,7 +7048,7 @@ function resetForm() {
  educators_supported:'', follow_up:false, follow_up_desc:'',
  doc_url:'', doc_name:'', cc_email:'',
     sip_focus_areas:[], support_needed:[], support_level:'', obs_curriculum:'', obs_apip:'', obs_time:'', doc_file:null, doc_file_name:'', doc_files:[], doc_file_names:[],
-    tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{},
+    tagged_officials:{}, _offSearchQ:{}, _offSearchResults:{}, _offSearchLoading:{}, _offQuickPick:{}, _offQuickPickLoading:{}, _offQuickPickKey:{},
     formStep:-1, intervention_trigger:'', intervention_trigger_other:'', intervention_triggers:[], _trigDDOpen:false,  official_name:S.f.official_name, official_email:S.f.official_email, official_role:S.f.official_role, official_role_other:S.f.official_role_other, official_specialisation:S.f.official_specialisation, _editProfile:false, _editLoc:false, official_specialisation_other:S.f.official_specialisation_other,
     insight_type:'', insight_types:[], _insightDDOpen:false, insight_pass_rate:'', insight_learners_affected:'', insight_threshold:'', insight_detail:'', insight_educator_absent:'', insight_attendance_days:'', insight_sba_exam_gap:'', insight_curriculum_pct:''
   };
