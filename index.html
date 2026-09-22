@@ -1174,18 +1174,97 @@ function renderDDDTasks() {
 
 const SUBJECT_GROUPS = [
  {label:"Mathematics",items:["Mathematics","Mathematical Literacy","Technical Mathematics"]},
- {label:"Sciences",items:["Physical Sciences","Life Sciences","Natural Sciences","Technical Sciences","Agricultural Sciences","Marine Sciences"]},
+ {label:"Sciences",items:["Physical Sciences","Life Sciences","Natural Sciences","Natural Sciences and Technology","Technical Sciences","Agricultural Sciences","Marine Sciences"]},
  {label:"English",items:["English HL","English FAL"]},
  {label:"Afrikaans",items:["Afrikaans HL","Afrikaans FAL"]},
  {label:"African Languages",items:["IsiZulu HL","IsiZulu FAL","IsiXhosa HL","IsiXhosa FAL","Sepedi HL","Sepedi FAL","Setswana HL","Setswana FAL","Sesotho HL","Sesotho FAL","SiSwati HL","SiSwati FAL","IsiNdebele HL","IsiNdebele FAL","Tshivenda HL","Tshivenda FAL","Xitsonga HL","Xitsonga FAL","SA Sign Language HL"]},
  {label:"Commerce",items:["Accounting","Business Studies","Economics","EMS"]},
  {label:"Humanities",items:["Geography","History","Life Orientation","Life Skills","Religion Studies","Social Sciences"]},
- {label:"Technology",items:["Technology","Information Technology","CAT","Engineering Graphics and Design","Civil Technology","Electrical Technology","Mechanical Technology"]},
+ {label:"Technology",items:["Technology","Information Technology","CAT","Engineering Graphics and Design","Civil Technology","Electrical Technology","Mechanical Technology","Coding and Robotics"]},
  {label:"Agriculture",items:["Agricultural Management Practices","Agricultural Technology"]},
  {label:"Hospitality & Tourism",items:["Tourism","Hospitality Studies","Consumer Studies"]},
  {label:"Arts",items:["Creative Arts","Visual Arts","Dramatic Arts","Dance Studies","Design","Music"]},
 ];
 const GRADES = ["R","1","2","3","4","5","6","7","8","9","10","11","12"];
+
+// ── CAPS-aligned subject/grade eligibility ──────────────────────────────
+// Which grades each subject is actually offered in per the DBE's Curriculum
+// and Assessment Policy Statements (CAPS) — confirmed against the official
+// Foundation, Senior and FET Phase CAPS pages on education.gov.za and the
+// Intermediate Phase CAPS documents on Thutong, Sept 2026. Subjects not
+// listed here (i.e. only "Other") are always available and unfiltered.
+const CAPS_PHASE_GRADES = {
+  foundation: ["R","1","2","3"],
+  intermediate: ["4","5","6"],
+  senior: ["7","8","9"],
+  fet: ["10","11","12"]
+};
+const CAPS_R12 = CAPS_PHASE_GRADES.foundation.concat(CAPS_PHASE_GRADES.intermediate, CAPS_PHASE_GRADES.senior, CAPS_PHASE_GRADES.fet);
+const CAPS_1_12 = CAPS_R12.filter(function(g){ return g!=='R'; }); // First Additional Language starts Grade 1, not Grade R
+const CAPS_GET = CAPS_PHASE_GRADES.foundation.concat(CAPS_PHASE_GRADES.intermediate, CAPS_PHASE_GRADES.senior); // R-9, Coding & Robotics rollout band
+const CAPS_SENIOR_FET = CAPS_PHASE_GRADES.senior.concat(CAPS_PHASE_GRADES.fet); // 7-12, Life Orientation
+const CAPS_INTER_SENIOR = CAPS_PHASE_GRADES.intermediate.concat(CAPS_PHASE_GRADES.senior); // 4-9, Social Sciences
+const CAPS_FOUND_INTER = CAPS_PHASE_GRADES.foundation.concat(CAPS_PHASE_GRADES.intermediate); // R-6, Life Skills
+
+const CAPS_SUBJECT_GRADES = {
+  'Mathematics': CAPS_R12,
+  'Mathematical Literacy': CAPS_PHASE_GRADES.fet,
+  'Technical Mathematics': CAPS_PHASE_GRADES.fet,
+  'Physical Sciences': CAPS_PHASE_GRADES.fet,
+  'Life Sciences': CAPS_PHASE_GRADES.fet,
+  'Natural Sciences': CAPS_PHASE_GRADES.senior,
+  'Natural Sciences and Technology': CAPS_PHASE_GRADES.intermediate,
+  'Technical Sciences': CAPS_PHASE_GRADES.fet,
+  'Agricultural Sciences': CAPS_PHASE_GRADES.fet,
+  'Marine Sciences': CAPS_PHASE_GRADES.fet,
+  'Accounting': CAPS_PHASE_GRADES.fet,
+  'Business Studies': CAPS_PHASE_GRADES.fet,
+  'Economics': CAPS_PHASE_GRADES.fet,
+  'EMS': CAPS_PHASE_GRADES.senior,
+  'Geography': CAPS_PHASE_GRADES.fet,
+  'History': CAPS_PHASE_GRADES.fet,
+  'Life Orientation': CAPS_SENIOR_FET,
+  'Life Skills': CAPS_FOUND_INTER,
+  'Religion Studies': CAPS_PHASE_GRADES.fet,
+  'Social Sciences': CAPS_INTER_SENIOR,
+  'Technology': CAPS_PHASE_GRADES.senior,
+  'Information Technology': CAPS_PHASE_GRADES.fet,
+  'CAT': CAPS_PHASE_GRADES.fet,
+  'Engineering Graphics and Design': CAPS_PHASE_GRADES.fet,
+  'Civil Technology': CAPS_PHASE_GRADES.fet,
+  'Electrical Technology': CAPS_PHASE_GRADES.fet,
+  'Mechanical Technology': CAPS_PHASE_GRADES.fet,
+  'Coding and Robotics': CAPS_GET,
+  'Agricultural Management Practices': CAPS_PHASE_GRADES.fet,
+  'Agricultural Technology': CAPS_PHASE_GRADES.fet,
+  'Tourism': CAPS_PHASE_GRADES.fet,
+  'Hospitality Studies': CAPS_PHASE_GRADES.fet,
+  'Consumer Studies': CAPS_PHASE_GRADES.fet,
+  'Creative Arts': CAPS_PHASE_GRADES.senior,
+  'Visual Arts': CAPS_PHASE_GRADES.fet,
+  'Dramatic Arts': CAPS_PHASE_GRADES.fet,
+  'Dance Studies': CAPS_PHASE_GRADES.fet,
+  'Design': CAPS_PHASE_GRADES.fet,
+  'Music': CAPS_PHASE_GRADES.fet
+};
+// Home Language / First Additional Language entries (24 languages incl. SA
+// Sign Language) follow a simple suffix rule rather than being listed by name.
+SUBJECT_GROUPS.forEach(function(g){
+  g.items.forEach(function(s){
+    if (CAPS_SUBJECT_GRADES[s]) return;
+    if (/ HL$/.test(s) || s === 'SA Sign Language HL') CAPS_SUBJECT_GRADES[s] = CAPS_R12;
+    else if (/ FAL$/.test(s)) CAPS_SUBJECT_GRADES[s] = CAPS_1_12;
+  });
+});
+// True if `name` is CAPS-offered in at least one of the given grades.
+// Anything not in CAPS_SUBJECT_GRADES (i.e. "Other") is always allowed.
+function subjectAllowedForGrades(name, grades){
+  var allowed = CAPS_SUBJECT_GRADES[name];
+  if (!allowed) return true;
+  if (!grades || !grades.length) return false;
+  return grades.some(function(g){ return allowed.indexOf(g)>-1; });
+}
+
 const ATP_COVERAGE = [
  {v:'ahead',      t:'Ahead of the ATP',         c:'atp-good'},
  {v:'on_track',   t:'On track',                 c:'atp-good'},
@@ -1251,7 +1330,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.15.119';
+const APP_VERSION = '2026.09.22.120';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6245,24 +6324,35 @@ function renderThemeVisible(){
 function toggleSubjGroup(label){ S.f._sgOpen=S.f._sgOpen||{}; S.f._sgOpen[label]=!S.f._sgOpen[label]; render(); }
 function renderSubjectsVisible(){
   var sel=S.f.subjects||[];
+  var grs=S.f.grades||[];
   var chip=function(sname){
     var on=sel.indexOf(sname)>-1;
     return '<label class="tag'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleSubject(\''+_jsq(sname)+'\')"><span>'+esc(sname)+'</span></label>';
   };
-  var html='<div class="sg-sub">Most common</div><div class="grade-grid">'+COMMON_SUBJECTS.map(chip).join('')+'</div>';
+  var otherChip='<label class="tag'+(sel.indexOf('Other')>-1?' on':'')+'"><input type="checkbox" '+(sel.indexOf('Other')>-1?'checked':'')+' onchange="toggleSubject(\'Other\')"><span>Other</span></label>';
+  if(!grs.length){
+    return '<div class="atp-empty">Tick a grade above first \u2014 the subject list is matched to what CAPS actually offers at that grade.</div>';
+  }
+  var common=COMMON_SUBJECTS.filter(function(s){return subjectAllowedForGrades(s,grs);});
+  var html=common.length?('<div class="sg-sub">Most common</div><div class="grade-grid">'+common.map(chip).join('')+'</div>'):'';
   // ATP coverage appears right here, under the chips the official just
   // tapped, rather than below the full group list where it is off-screen.
   html+='<div id="atp-anchor">'+renderAtpCoverage()+'</div>';
   html+='<div class="sg-sub">All subjects by group</div>';
   var open=S.f._sgOpen||{};
   html+=SUBJECT_GROUPS.map(function(g){
-    var n=g.items.filter(function(i){return sel.indexOf(i)>-1;}).length;
+    var items=g.items.filter(function(i){return subjectAllowedForGrades(i,grs);});
+    if(!items.length) return '';
+    var n=items.filter(function(i){return sel.indexOf(i)>-1;}).length;
     var isOpen=!!open[g.label];
     var head='<div class="sg-head'+(isOpen?' open':'')+(n?' has':'')+'" onclick="toggleSubjGroup(\''+_jsq(g.label)+'\')">'+
-      '<span>'+esc(g.label)+(n?' \u2014 '+n+' selected':'')+'</span><span class="sg-n">'+(isOpen?'Hide':g.items.length+' subjects')+'</span></div>';
-    var body=isOpen?'<div class="sg-body"><div class="grade-grid">'+g.items.map(chip).join('')+'</div></div>':'';
+      '<span>'+esc(g.label)+(n?' \u2014 '+n+' selected':'')+'</span><span class="sg-n">'+(isOpen?'Hide':items.length+' subjects')+'</span></div>';
+    var body=isOpen?'<div class="sg-body"><div class="grade-grid">'+items.map(chip).join('')+'</div></div>':'';
     return head+body;
   }).join('');
+  html+='<div class="sg-sub">Not listed?</div><div class="grade-grid">'+otherChip+'</div>';
+  var other=sel.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Subject \u2014 please specify:</div><input type="text" placeholder="e.g. Computer Applications Technology, Tourism..." value="'+esc(S.f.subjects_other)+'" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':'';
+  html+=other;
   if(sel.length) html+='<p class="vo-count"><b>'+sel.length+'</b> selected</p>';
   return html;
 }
@@ -6616,6 +6706,10 @@ function togArr(arr, val, add) {
 function togGrade(val, add) {
   togArr(S.f.grades, val, add);
   S.f.grades.sort(function(a,b){ return GRADES.indexOf(a) - GRADES.indexOf(b); });
+  // CAPS subjects are filtered by the grades ticked here, so drop any
+  // already-picked subject that no longer fits (e.g. unticking Grade 11
+  // after Physical Sciences was picked for grades 3 & 11 together).
+  S.f.subjects = S.f.subjects.filter(function(s){ return subjectAllowedForGrades(s, S.f.grades); });
   render();
 }
 
