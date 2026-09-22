@@ -18,12 +18,11 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.75 — index.html updated: report level (School/District/Province
-// Monitoring), the schools dropdown next to the full-screen finder, and the
-// officials quick-pick. No new precached assets or CDN hosts were added, so
-// only the version bumps here — that's what forces the new app shell past
-// old caches on the next visit.
-const VERSION = 'v1.0.75';
+// v1.0.76 — index.html updated: the subject list in Step 2 is now filtered
+// to match official CAPS policy for the grade(s) selected. No new precached
+// assets or CDN hosts were added, so only the version bumps here — that's
+// what forces the new app shell past old caches on the next visit.
+const VERSION = 'v1.0.76';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
