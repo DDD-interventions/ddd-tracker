@@ -1,4 +1,14 @@
 {
+  "2026.09.22.121": {
+    "title": "Find a subject by searching, instead of scrolling groups",
+    "released": "2026-09-22",
+    "highlights": [
+      "The “Most common” shortcut row and the “All subjects by group” accordion in Step 2 are gone",
+      "In their place: a single search box — type a few letters of a subject and tap it to add it",
+      "Search results still follow CAPS policy for the grade(s) you've ticked, same as before",
+      "Your picked subjects show as removable tags above the search box"
+    ]
+  },
   "2026.09.22.120": {
     "title": "Subjects now match the grade you pick",
     "released": "2026-09-22",
