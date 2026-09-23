@@ -18,15 +18,12 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.78 — index.html updated: added an "Other (please specify)" option to
-// every visit-recording checklist that was missing one — What Support Do
-// These Schools Need?, Performance Focus Area(s), and School Context
-// (Staffing / Resources / Learners). Ticking "Other" reveals a text box to
-// describe it, which is saved with the report and shown on the review step
-// and in the emailed School Visit Report. No new precached assets or CDN
-// hosts were added, so only the version bumps here — that's what forces the
-// new app shell past old caches on the next visit.
-const VERSION = 'v1.0.78';
+// v1.0.79 — index.html updated: removed the "(optional)" label text from
+// the Step 2 "Curriculum coverage" question. No behavior change — the field
+// was never required for validation either way. No new precached assets or
+// CDN hosts were added, so only the version bumps here — that's what forces
+// the new app shell past old caches on the next visit.
+const VERSION = 'v1.0.79';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
