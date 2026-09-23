@@ -1330,7 +1330,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.23.123';
+const APP_VERSION = '2026.09.23.124';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6462,23 +6462,26 @@ const TRIGGER_GROUPS = [
     'Learners missing one thing they need to be promoted',
     'Big gap between SBA marks and exam marks',
     'Subject pass rate dropping from one term to the next',
-    'Progressed learners who need extra support']},
+    'Progressed learners who need extra support',
+    'Other']},
   {g:'Attendance and retention', items:[
     'Learners absent a lot and doing badly',
     'High learner dropout or transfers out',
-    'High educator absenteeism']},
+    'High educator absenteeism',
+    'Other']},
   {g:'Curriculum and teaching', items:[
     'Parts of the curriculum not being covered',
     'Educator not covering the curriculum on time',
     'Educator needing subject content support',
     'Educator teaching outside their specialisation',
     'Educator not using data to inform teaching',
-    'Vacant educator post(s) affecting delivery']},
+    'Vacant educator post(s) affecting delivery',
+    'Other']},
   {g:'School level', items:[
     'School flagged as underperforming (Circular D3)',
     'Late or missing SA-SAMS submissions',
-    'School leadership or governance concerns']},
-  {g:'', items:['Other']}
+    'School leadership or governance concerns',
+    'Other']}
 ];
 // Each row writes the same stored values as before (action_types AND
 // decision_types), so downstream views and reports are unchanged.
@@ -6489,32 +6492,37 @@ const ACTION_GROUPS = [
     {t:'Helped the school get onto the DDD dashboard', a:'DDD dashboard access support provided', d:'Other'},
     {t:'Support plan for progressed learners', a:'Support plan for progressed learners', d:'Support progressed learners (policy requirement)'},
     {t:'Extra lessons or revision classes', a:'Extra lessons / revision classes', d:'Set up extra classes'},
-    {t:'Visit schedule reprioritised', a:'School visit schedule reprioritised', d:'Prioritise schools for support visits'}]},
+    {t:'Visit schedule reprioritised', a:'School visit schedule reprioritised', d:'Prioritise schools for support visits'},
+    {t:'Other', a:'Other', d:'Other'}]},
   {g:'With learners', items:[
     {t:'Learner support agreement signed', a:'Learner support agreement signed', d:'Provide targeted support to identified learners'},
     {t:'Remedial scheduling', a:'Remedial scheduling', d:'Set up extra classes'},
     {t:'Past papers and worksheet packs', a:'Past papers & worksheet packs distributed', d:'Provide targeted support to identified learners'},
     {t:'Exam technique workshop', a:'Exam technique workshop conducted', d:'Provide targeted support to identified learners'},
-    {t:'SBA targets set with learners', a:'SBA targets set with learners', d:'Set performance targets'}]},
+    {t:'SBA targets set with learners', a:'SBA targets set with learners', d:'Set performance targets'},
+    {t:'Other', a:'Other', d:'Other'}]},
   {g:'With educators', items:[
     {t:'Lesson modelling or demonstration', a:'Lesson modelling / demonstration', d:'Adjust teaching strategy'},
     {t:'Curriculum pacing support', a:'Curriculum pacing support', d:'Address curriculum pacing gaps'},
     {t:'Differentiated teaching arranged', a:'Differentiated teaching arranged', d:'Adjust teaching strategy'},
-    {t:'Educator reassigned to subject', a:'Educator reassignment to subject', d:'Request staffing or HR intervention'}]},
+    {t:'Educator reassigned to subject', a:'Educator reassignment to subject', d:'Request staffing or HR intervention'},
+    {t:'Other', a:'Other', d:'Other'}]},
   {g:'Assessment', items:[
     {t:'Assessment moderation or task review', a:'Assessment task review & moderation', d:'Check and improve assessment tasks'},
-    {t:'Diagnostic assessment administered', a:'Diagnostic assessment administered', d:'Investigate SBA-exam gap'}]},
+    {t:'Diagnostic assessment administered', a:'Diagnostic assessment administered', d:'Investigate SBA-exam gap'},
+    {t:'Other', a:'Other', d:'Other'}]},
   {g:'With the school', items:[
     {t:'Attendance monitoring activated', a:'Attendance monitoring plan activated', d:'Activate attendance monitoring'},
     {t:'Accountability meeting with school', a:'Accountability meeting with school', d:'Escalate to management'},
     {t:'Parent meeting arranged', a:'Parent meeting arranged', d:'Meet with parents/guardians'},
     {t:'Term review meeting held', a:'Term review meeting held', d:'Schedule a data review meeting'},
-    {t:'School-to-school peer learning', a:'Peer learning (school-to-school)', d:'Arrange school-to-school peer learning'}]},
+    {t:'School-to-school peer learning', a:'Peer learning (school-to-school)', d:'Arrange school-to-school peer learning'},
+    {t:'Other', a:'Other', d:'Other'}]},
   {g:'Data and referral', items:[
     {t:'Data pack prepared for a meeting', a:'Data pack prepared for meeting', d:'Schedule a data review meeting'},
     {t:'SA-SAMS data corrected', a:'SA-SAMS data corrected to improve reporting', d:'Other'},
-    {t:'Referral to SMT, DMT or PED', a:'Referral to SMT / DMT / PED', d:'Escalate to management'}]},
-  {g:'', items:[{t:'Other', a:'Other', d:'Other'}]}
+    {t:'Referral to SMT, DMT or PED', a:'Referral to SMT / DMT / PED', d:'Escalate to management'},
+    {t:'Other', a:'Other', d:'Other'}]}
 ];
 function _voRow(label, on, onclick, extraCls){
   return '<div class="vo-opt'+(on?' on':'')+(extraCls?' '+extraCls:'')+'" onclick="'+onclick+'"><span class="vo-box"></span><span>'+esc(label)+'</span></div>';
