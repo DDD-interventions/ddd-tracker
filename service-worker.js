@@ -18,12 +18,19 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.79 — index.html updated: removed the "(optional)" label text from
-// the Step 2 "Curriculum coverage" question. No behavior change — the field
-// was never required for validation either way. No new precached assets or
-// CDN hosts were added, so only the version bumps here — that's what forces
-// the new app shell past old caches on the next visit.
-const VERSION = 'v1.0.79';
+// v1.0.80 — index.html updated: "Other" is now offered inside every topic
+// group of Step 3's "What made you decide to act?" (Learner performance,
+// Attendance and retention, Curriculum and teaching, School level) and
+// "What did you do?" (Most common, With learners, With educators,
+// Assessment, With the school, Data and referral), instead of only in a
+// single catch-all row at the end of the list. Every "Other" chip still
+// reads and writes the same single value, so ticking any one of them reveals
+// the same "please specify" box and behaves identically to before — this
+// just makes it reachable from whichever topic you're already browsing. No
+// new precached assets or CDN hosts were added, so only the version bumps
+// here — that's what forces the new app shell past old caches on the next
+// visit.
+const VERSION = 'v1.0.80';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
