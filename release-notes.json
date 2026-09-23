@@ -1,4 +1,13 @@
 {
+  "2026.09.23.122": {
+    "title": "“Other” option added to visit-recording checklists",
+    "released": "2026-09-23",
+    "highlights": [
+      "“What Support Do These Schools Need?”, “Performance Focus Area(s)”, and “School Context” (Staffing / Resources / Learners) now all have an “Other” option, like the other checklists in the form already did",
+      "Ticking “Other” opens a text box right there to describe it — no need to force your answer into one of the listed options",
+      "What you type is saved with the report, shown on the Review step before you submit, and included in the School Visit Report emailed to you"
+    ]
+  },
   "2026.09.22.121": {
     "title": "Find a subject by searching, instead of scrolling groups",
     "released": "2026-09-22",
