@@ -18,11 +18,15 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.77 — index.html updated: Step 2's subject picker is now a single
-// search box instead of "most common" chips + grouped accordion. No new
-// precached assets or CDN hosts were added, so only the version bumps here
-// — that's what forces the new app shell past old caches on the next visit.
-const VERSION = 'v1.0.77';
+// v1.0.78 — index.html updated: added an "Other (please specify)" option to
+// every visit-recording checklist that was missing one — What Support Do
+// These Schools Need?, Performance Focus Area(s), and School Context
+// (Staffing / Resources / Learners). Ticking "Other" reveals a text box to
+// describe it, which is saved with the report and shown on the review step
+// and in the emailed School Visit Report. No new precached assets or CDN
+// hosts were added, so only the version bumps here — that's what forces the
+// new app shell past old caches on the next visit.
+const VERSION = 'v1.0.78';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
