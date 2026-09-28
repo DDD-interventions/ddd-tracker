@@ -1,4 +1,14 @@
 {
+  "2026.09.28.125": {
+    "title": "Subject search redesigned to match the school search",
+    "released": "2026-09-28",
+    "highlights": [
+      "Searching for a subject in Step 2 now opens a full-screen finder with the search bar fixed at the top and the results list scrolling separately below it — the same layout already used for finding a school in Step 1",
+      "The finder doesn't pre-list every eligible subject when it opens — it shows only what you've already picked, plus a “Start typing” prompt, and matches appear as soon as you type a letter",
+      "A plain “Or choose from the list…” drop-down also sits underneath, for anyone who'd rather scan a short list than type — the same alternative already offered for schools",
+      "Selecting and removing subjects, and the “Other” specify box, all work exactly as before — only how the search is presented has changed"
+    ]
+  },
   "2026.09.23.124": {
     "title": "“Other” now reachable from every topic in Step 3",
     "released": "2026-09-23",
