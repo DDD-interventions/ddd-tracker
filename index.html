@@ -1330,7 +1330,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.23.124';
+const APP_VERSION = '2026.09.28.125';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1378,7 +1378,7 @@ const S = {
  province:'',district:'',circuit:'',schools:'',_schoolQ:'',_schoolDDOpen:false,_schoolPhaseFilter:'ALL',term:deriveTermFromDate(today()),activity_date:today(),
  report_level:'school',
  activity_type:'',activity_types:[],_actTypeDDOpen:false,intervention_theme:'',intervention_themes:[],_themeDDOpen:false,subjects:[],grades:[],atp:{},description:'',
- ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_subjectQ:'',_subjectDDOpen:false,_reviewConfirmed:false,
+ ddd_used:'',ddd_reports:[],ddd_access_date:'',ddd_dashboard_confirmed:'',ddd_data_source:'',ddd_data_source_person:'',other_data_source:'',decision_type:'',decision_other:'',action_type:'',action_other:'',decision_types:[],action_types:[],_decDDOpen:false,_actDDOpen:false,activity_type_other:'',intervention_theme_other:'',official_role_other:'',official_specialisation_other:'',subjects_other:'',_reviewConfirmed:false,
  ctx_staffing:[],ctx_resources:[],ctx_learners:[],ctx_notes:'',_ctxOpen_staffing:false,_ctxOpen_resources:false,_ctxOpen_learners:false,
  ctx_staffing_other:'',ctx_resources_other:'',ctx_learners_other:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
@@ -6017,7 +6017,6 @@ document.addEventListener('click',function(e){
   const rmBtn=e.target.closest('[data-sp-rm]');
   if(rmBtn){const idx=parseInt(rmBtn.dataset.spRm);const arr=parseSchoolsArr();if(arr[idx])removeSchool(arr[idx]);e.stopPropagation();return;}
   if(S.f._schoolDDOpen&&!_schoolListInline()&&!e.target.closest('.school-picker')){S.f._schoolDDOpen=false;S.f._schoolQ='';render();}
-  if(S.f._subjectDDOpen&&!e.target.closest('.school-picker')){S.f._subjectDDOpen=false;S.f._subjectQ='';render();}
   if(S.f._decDDOpen&&!e.target.closest('.chip-picker')){S.f._decDDOpen=false;render();}
   if(S.f._actDDOpen&&!e.target.closest('.chip-picker')){S.f._actDDOpen=false;render();}
   if(S.f._trigDDOpen&&!e.target.closest('.chip-picker')){S.f._trigDDOpen=false;render();}
@@ -6173,17 +6172,7 @@ function renderFormStep1(){
     ${_saveLaterBar()}
   </div></div>`;
 }
-function toggleSubject(name){
-  var adding=!S.f.subjects.includes(name);
-  adding?S.f.subjects.push(name):(S.f.subjects=S.f.subjects.filter(s=>s!==name));
-  render();
-  // Scroll the ATP coverage card into view once a subject is picked from the search.
-  if(adding){
-    setTimeout(function(){ var el=document.getElementById('atp-anchor'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
-  }
-}
 function removeSubject(name){S.f.subjects=S.f.subjects.filter(s=>s!==name);render();}
-let _subjFilterTimer=null;
 // Flat (ungrouped) list of every CAPS-tracked subject, in a stable order,
 // used by the subject search below instead of the old subject-family groups.
 function allCapsSubjectsFlat(){
@@ -6193,33 +6182,98 @@ function allCapsSubjectsFlat(){
   });
   return out;
 }
-function subjectFilterInput(val){
-  S.f._subjectQ=val;
-  if(_subjFilterTimer)clearTimeout(_subjFilterTimer);
-  _subjFilterTimer=setTimeout(function(){
-    _subjFilterTimer=null;
-    var listEl=document.querySelector('.school-picker .school-dd .school-dd-list');
-    var footEl=document.querySelector('.school-picker .school-dd .school-dd-foot');
-    if(!listEl){render();return;}
-    var sel=S.f.subjects;
-    var grs=S.f.grades||[];
-    var q=(S.f._subjectQ||'').toLowerCase();
-    var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
-    var filtered=eligible.filter(function(s){return !q||s.toLowerCase().includes(q)});
-    var items='';
-    filtered.forEach(function(s){
-      var checked=sel.includes(s);
-      var se=s.replace(/'/g,"\\'");
-      items+='<div class="school-dd-item '+(checked?'checked':'')+'" onclick="toggleSubject(\''+se+'\')"><div class="tick">'+(checked?'\u2713':'')+'</div>'+esc(s)+'</div>';
-    });
-    if(!q||'other'.includes(q)){
-      var otherChecked=sel.includes('Other');
-      items+='<div class="school-dd-item '+(otherChecked?'checked':'')+'" onclick="toggleSubject(\'Other\')"><div class="tick">'+(otherChecked?'\u2713':'')+'</div>Other (specify below)</div>';
-    }
-    if(!items)items='<div class="school-dd-hint">No subjects match your search</div>';
-    listEl.innerHTML=items;
-    if(footEl)footEl.innerHTML='<span>'+sel.length+' selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span>';
-  },120);
+// Full-screen subject finder \u2014 same pattern as the school finder (openSchoolFinder
+// et al. above): a fixed search bar at the top, a separately-scrolling results
+// list below it, and a footer with a running count + Done. Replaces the old
+// combined search-box-and-list dropdown.
+var _sjQ='';
+var _sjAddedAny=false;
+function openSubjectFinder(){
+  var grs=S.f.grades||[];
+  if(!grs.length) return;
+  closeSubjectFinder();
+  _sjQ=''; _sjAddedAny=false;
+  var el=document.createElement('div'); el.className='sf'; el.id='subjectFinder';
+  el.innerHTML='<div class="sf-top"><button type="button" class="sf-back" data-sj-close>\u2039 Back</button>'+
+    '<input type="text" id="sjQ" placeholder="Type the subject name" autocomplete="off" autocorrect="off" spellcheck="false"></div>'+
+    '<div class="sf-body" id="sjBody"></div>'+
+    '<div class="sf-foot"><div class="sf-n" id="sjFoot"></div><button type="button" data-sj-close>Done</button></div>';
+  document.body.appendChild(el);
+  var inp=document.getElementById('sjQ');
+  inp.addEventListener('input',function(){ _sjQ=inp.value; _sjRenderList(); });
+  el.addEventListener('click',function(e){
+    var c=e.target.closest('[data-sj-close]'); if(c){ closeSubjectFinder(); return; }
+    var r=e.target.closest('[data-sj-pick]'); if(r){ _sjToggle(r.getAttribute('data-sj-pick')); }
+  });
+  _sjRenderList();
+  setTimeout(function(){ try{ inp.focus(); }catch(e){} },60);
+}
+function closeSubjectFinder(){
+  var el=document.getElementById('subjectFinder'); if(!el) return;
+  el.parentNode.removeChild(el);
+  render();
+  if(_sjAddedAny){
+    setTimeout(function(){ var a=document.getElementById('atp-anchor'); if(a&&a.scrollIntoView) a.scrollIntoView({behavior:'smooth',block:'start'}); },60);
+  }
+}
+// Selection goes through S.f.subjects directly but must not re-render #app
+// while the finder is open (that would steal focus from the search box) \u2014
+// same reasoning as _sfToggle for schools.
+function _sjToggle(name){
+  var adding=!S.f.subjects.includes(name);
+  if(adding) S.f.subjects.push(name); else S.f.subjects=S.f.subjects.filter(function(s){return s!==name;});
+  if(adding) _sjAddedAny=true;
+  _sjRenderList();
+}
+function _sjRow(name,on){
+  return '<div class="sf-row'+(on?' on':'')+'" data-sj-pick="'+esc(name)+'"><span class="sf-box"></span><div><div class="sf-nm">'+esc(name)+'</div></div></div>';
+}
+function _sjOtherRow(on){
+  return '<div class="sf-row'+(on?' on':'')+'" data-sj-pick="Other"><span class="sf-box"></span><div><div class="sf-nm">Other</div><div class="sf-meta">Not on the list? Specify below</div></div></div>';
+}
+function _sjRenderList(){
+  var body=document.getElementById('sjBody'), foot=document.getElementById('sjFoot'); if(!body) return;
+  var sel=S.f.subjects||[];
+  var grs=S.f.grades||[];
+  var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
+  var q=_sjQ.trim().toLowerCase();
+  var h='';
+  if(q.length){
+    var starts=[], contains=[];
+    for(var i=0;i<eligible.length;i++){ var ln=eligible[i].toLowerCase(); if(ln.indexOf(q)===0) starts.push(eligible[i]); else if(ln.indexOf(q)>-1) contains.push(eligible[i]); }
+    var hits=starts.concat(contains);
+    h+='<div class="sf-h">Matching \u201c'+esc(_sjQ.trim())+'\u201d</div>';
+    h+=hits.length ? hits.map(function(n){return _sjRow(n,sel.includes(n));}).join('')
+                   : '<div class="sf-hint">No subject matches. Try a shorter part of the name.</div>';
+    if('other'.indexOf(q)>-1) h+=_sjOtherRow(sel.includes('Other'));
+  } else {
+    if(sel.length) h+='<div class="sf-h">Selected</div>'+sel.filter(function(n){return n!=='Other';}).map(function(n){return _sjRow(n,true);}).join('')+(sel.includes('Other')?_sjOtherRow(true):'');
+    h+='<div class="sf-hint"><b>Start typing the subject name above.</b><br>Matches appear as you type.</div>';
+  }
+  body.innerHTML=h;
+  if(foot) foot.innerHTML=sel.length?'<b>'+sel.length+'</b> selected':'Nothing selected yet';
+}
+// Plain <select> alternative to the full-screen finder above — same grade
+// scope, same S.f.subjects list, so the two stay in sync. Officials who'd
+// rather scan a short list than type can use this instead; the full-screen
+// search is untouched for everyone else. Mirrors schoolDropdownHTML() above.
+function addSubjectFromList(name){
+  if(!name||S.f.subjects.includes(name)) return;
+  S.f.subjects.push(name);
+  render();
+  setTimeout(function(){ var el=document.getElementById('atp-anchor'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
+}
+function subjectDropdownHTML(){
+  var grs=S.f.grades||[];
+  if(!grs.length) return '';
+  var sel=S.f.subjects||[];
+  var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
+  var available=eligible.filter(function(s){return sel.indexOf(s)===-1;});
+  if(!available.length && sel.includes('Other')) return '';
+  var opts='<option value="">Or choose from the list…</option>';
+  opts+=available.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('');
+  if(!sel.includes('Other')) opts+='<option value="Other">Other (specify below)</option>';
+  return '<select onchange="if(this.value){addSubjectFromList(this.value);this.value=\'\';}" style="width:100%;margin-top:8px;padding:9px 10px;border:1px solid #c8c6c4;border-radius:6px;font-size:14px;font-family:inherit;background:#fff;color:var(--navy)">'+opts+'</select>';
 }
 function atpEnsure(i){
   var sub = S.f.subjects[i]; if(!sub) return null;
@@ -6299,27 +6353,11 @@ function renderSubjectsVisible(){
   if(!grs.length){
     return '<div class="atp-empty">Tick a grade above first \u2014 the subject list is matched to what CAPS actually offers at that grade.</div>';
   }
-  var open=S.f._subjectDDOpen;
-  var q=(S.f._subjectQ||'').toLowerCase();
   var tags=sel.length?'<div class="school-tags">'+sel.map(function(s){return '<span class="school-tag">'+esc(s)+'<button onclick="event.stopPropagation();removeSubject(\''+s.replace(/'/g,"\\\\'")+'\')">&times;</button></span>';}).join('')+'</div>':'';
-  var trigger='<button class="school-trigger '+(open?'open':'')+'" onclick="S.f._subjectDDOpen=!S.f._subjectDDOpen;S.f._subjectQ=\'\';render()">'+(sel.length?sel.length+' subject'+(sel.length>1?'s':'')+' selected':'Search subjects...')+'<span class="arrow">\u25bc</span></button>';
-  var dd='';
-  if(open){
-    var eligible=allCapsSubjectsFlat().filter(function(s){return subjectAllowedForGrades(s,grs);});
-    var filtered=eligible.filter(function(s){return !q||s.toLowerCase().includes(q);});
-    var items=filtered.map(function(s){
-      var checked=sel.includes(s);
-      var se=s.replace(/'/g,"\\\\'");
-      return '<div class="school-dd-item '+(checked?'checked':'')+'" onclick="toggleSubject(\''+se+'\')"><div class="tick">'+(checked?'\u2713':'')+'</div>'+esc(s)+'</div>';
-    }).join('');
-    if(!q||'other'.includes(q)){
-      var otherChecked=sel.includes('Other');
-      items+='<div class="school-dd-item '+(otherChecked?'checked':'')+'" onclick="toggleSubject(\'Other\')"><div class="tick">'+(otherChecked?'\u2713':'')+'</div>Other (specify below)</div>';
-    }
-    if(!items)items='<div class="school-dd-hint">No subjects match your search</div>';
-    dd='<div class="school-dd"><div class="school-dd-filter"><input type="text" placeholder="Type to search subjects..." value="'+esc(S.f._subjectQ)+'" oninput="subjectFilterInput(this.value)" onclick="event.stopPropagation()"></div><div class="school-dd-list" style="max-height:250px">'+items+'</div><div class="school-dd-foot"><span>'+sel.length+' selected</span><span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="event.stopPropagation();S.f._subjectDDOpen=false;render()">Done</span></div></div>';
-  }
-  var html='<div class="school-picker">'+tags+trigger+dd+'</div>';
+  var label=sel.length?'Add another subject':'Find subject';
+  var subHint=sel.length?'Tap to add or change':'Tap to choose the subject(s) covered';
+  var trigger='<button type="button" class="sf-btn" onclick="openSubjectFinder()">'+label+'<span>'+subHint+'</span></button>';
+  var html='<div class="school-picker">'+tags+trigger+subjectDropdownHTML()+'</div>';
   html+='<div id="atp-anchor">'+renderAtpCoverage()+'</div>';
   var other=sel.includes('Other')?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Subject \u2014 please specify:</div><input type="text" placeholder="e.g. Computer Applications Technology, Tourism..." value="'+esc(S.f.subjects_other)+'" oninput="S.f.subjects_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':'';
   html+=other;
@@ -7124,7 +7162,7 @@ function resetForm() {
  S.f = {
  province:S.f.province, district:S.f.district, circuit:S.f.circuit, schools:'', _schoolQ:'', _schoolDDOpen:false, _schoolPhaseFilter:'ALL', term:deriveTermFromDate(today()), activity_date:today(),
  report_level:'school',
- activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', _subjectQ:'', _subjectDDOpen:false, grades:[], atp:{}, description:'',
+ activity_type:'', activity_types:[], _actTypeDDOpen:false, activity_type_other:'', intervention_theme:'', intervention_themes:[], _themeDDOpen:false, intervention_theme_other:'', subjects:[], subjects_other:'', grades:[], atp:{}, description:'',
  ddd_used:'', ddd_reports:[], ddd_reports_other:'', ddd_access_date:'', ddd_dashboard_confirmed:'', ddd_data_source:'', ddd_data_source_person:'', other_data_source:'', additional_data_sources:'', decision_type:'', decision_other:'', action_type:'', action_other:'', decision_types:[], action_types:[], _decDDOpen:false, _actDDOpen:false,
  ctx_staffing:[], ctx_resources:[], ctx_learners:[], ctx_notes:'', ctx_staffing_other:'', ctx_resources_other:'', ctx_learners_other:'',
  obs:{apip_current:'',apip_implemented:'',cur_plans:'',cur_dh_monitor:'',lw_sufficient:'',lw_marking:'',tm_registers:'',tm_learner_att:'',tm_educator_att:'',tm_departures:''},_obsOpen:false,
