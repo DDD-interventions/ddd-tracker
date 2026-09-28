@@ -18,19 +18,19 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.80 — index.html updated: "Other" is now offered inside every topic
-// group of Step 3's "What made you decide to act?" (Learner performance,
-// Attendance and retention, Curriculum and teaching, School level) and
-// "What did you do?" (Most common, With learners, With educators,
-// Assessment, With the school, Data and referral), instead of only in a
-// single catch-all row at the end of the list. Every "Other" chip still
-// reads and writes the same single value, so ticking any one of them reveals
-// the same "please specify" box and behaves identically to before — this
-// just makes it reachable from whichever topic you're already browsing. No
-// new precached assets or CDN hosts were added, so only the version bumps
-// here — that's what forces the new app shell past old caches on the next
-// visit.
-const VERSION = 'v1.0.80';
+// v1.0.81 — index.html updated: the Step 2 subject search is redesigned to
+// match the school search — it now opens a full-screen finder with the
+// search bar fixed at the top and a separately-scrolling results list below
+// it. The finder doesn't pre-list every eligible subject when it opens; it
+// shows only what's already selected plus a "Start typing" hint, and
+// matches appear once you type a letter. A plain "Or choose from the
+// list…" dropdown also sits underneath for anyone who'd rather scan a short
+// list than type — the same alternative already offered for schools.
+// Selecting, deselecting, and the "Other" specify box all work exactly as
+// before; only how the search is presented has changed. No new precached
+// assets or CDN hosts were added, so only the version bumps here — that's
+// what forces the new app shell past old caches on the next visit.
+const VERSION = 'v1.0.81';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
