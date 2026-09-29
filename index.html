@@ -1330,7 +1330,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.28.125';
+const APP_VERSION = '2026.09.29.126';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -2113,6 +2113,7 @@ function tagOfficial(need, official) {
   if (!S.f.tagged_officials[need]) S.f.tagged_officials[need] = [];
   if (S.f.tagged_officials[need].some(function(o){return o.id === official.id;})) return;
   S.f.tagged_officials[need].push(official);
+  addRecentTagged(official);
   S.f._offSearchQ[need] = ''; S.f._offSearchResults[need] = [];
   render();
 }
@@ -2136,15 +2137,48 @@ function renderOfficialQuickPickInner(need) {
   if (loading && !list.length) return '<div style="font-size:13px;color:var(--grey);padding:4px 0 6px">Loading officials in ' + esc(scope.label) + '\u2026</div>';
   var untagged = list.filter(function(o){ return !tagged.some(function(t){ return t.id === o.id; }); });
   if (!untagged.length) return '';
-  var html = '<div style="font-size:12.5px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 5px">Officials in ' + esc(scope.label) + ' \u2014 tap to tag</div>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">';
+
+  // Group by familiarity: officials you tag often surface first, then ones
+  // you've tagged at least once, then everyone else in scope you haven't
+  // tagged yet — the same "visited before" idea already used for schools,
+  // applied here to people. All cards sit in one row, side by side, in that
+  // order — a small badge on each card (not a section break) shows which
+  // group it's in.
+  var famById = {};
+  getRecentTagged().forEach(function(f){ famById[f.id] = f; });
+  var freq = [], recent = [], rest = [];
   untagged.forEach(function(o) {
-    html += '<button type="button" onclick="tagOfficial(\'' + needKey + '\',' + JSON.stringify(o).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')" style="text-align:left;padding:7px 10px;border:1px solid #e0ded9;border-radius:8px;background:#fff;cursor:pointer;font:inherit;min-height:44px">' +
-      '<div style="font-weight:700;font-size:13.5px;color:var(--navy)">' + esc(o.name) + '</div>' +
-      '<div style="font-size:12px;color:var(--grey)">' + esc(o.role) + (o.circuit ? ' \xb7 ' + esc(o.circuit) : '') + '</div>' +
-      '</button>';
+    var f = famById[o.id];
+    if (f && f.count >= 2) freq.push(Object.assign({}, o, { _fam:'freq', _ts:f.ts, _count:f.count }));
+    else if (f) recent.push(Object.assign({}, o, { _fam:'recent', _ts:f.ts, _count:f.count }));
+    else rest.push(Object.assign({}, o, { _fam:'' }));
   });
-  html += '</div>';
+  freq.sort(function(a,b){ return (b._count - a._count) || (b._ts - a._ts); });
+  recent.sort(function(a,b){ return b._ts - a._ts; });
+  var ordered = freq.concat(recent, rest);
+
+  function offCard(o) {
+    var metaBits = [];
+    if (o.district) metaBits.push(o.district);
+    if (o.circuit) metaBits.push(o.circuit);
+    var badge = o._fam === 'freq'
+      ? '<span style="display:inline-block;margin-bottom:3px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--teal-dk);background:var(--teal-lt);border-radius:4px;padding:1px 6px">Frequently tagged</span>'
+      : o._fam === 'recent'
+      ? '<span style="display:inline-block;margin-bottom:3px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--blue);background:var(--blue-lt);border-radius:4px;padding:1px 6px">Recently tagged</span>'
+      : '';
+    // Payload sent to tagOfficial is the clean record only — the _fam/_ts/
+    // _count fields above are for rendering this card and must never leak
+    // into stored/tagged official data.
+    var payload = { id:o.id, name:o.name, role:o.role, email:o.email, circuit:o.circuit, district:o.district };
+    return '<button type="button" onclick="tagOfficial(\'' + needKey + '\',' + JSON.stringify(payload).replace(/'/g,"\\x27").replace(/"/g,'&quot;') + ')" style="text-align:left;padding:7px 10px;border:1px solid #e0ded9;border-radius:8px;background:#fff;cursor:pointer;font:inherit;min-height:44px;max-width:210px;flex:0 0 auto">' +
+      badge +
+      '<div style="font-weight:700;font-size:13.5px;color:var(--navy)">' + esc(o.name) + '</div>' +
+      '<div style="font-size:12px;color:var(--grey)">' + esc(o.role) + '</div>' +
+      (metaBits.length ? '<div style="font-size:11.5px;color:var(--grey)">' + esc(metaBits.join(' \xb7 ')) + '</div>' : '') +
+      '</button>';
+  }
+  var html = '<div style="font-size:12.5px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 5px">Officials in ' + esc(scope.label) + ' \u2014 tap to tag</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">' + ordered.map(offCard).join('') + '</div>';
   return html;
 }
 function updateOffQuickPickUI(need) {
@@ -2226,12 +2260,20 @@ var _mentionDoneNames = [];
 function getRecentTagged() {
   try { var raw = localStorage.getItem('ddd_recent_tagged'); return raw ? JSON.parse(raw) : []; } catch(e) { return []; }
 }
+// Tracks who you tag, and how often — across every tagging flow (the
+// officials quick-pick, its search box, and @mentions). This is the single
+// "familiarity" signal the officials quick-pick groups people by, so an
+// official you tag anywhere becomes "familiar" everywhere. Keeps a running
+// per-official count plus the last time they were tagged; capped so it
+// can't grow without bound.
 function addRecentTagged(official) {
   try {
-    var recents = getRecentTagged().filter(function(o){return o.id !== official.id;});
-    recents.unshift({id:official.id, name:official.name, role:official.role, email:official.email, ts:Date.now()});
-    if (recents.length > 10) recents = recents.slice(0, 10);
-    localStorage.setItem('ddd_recent_tagged', JSON.stringify(recents));
+    var recents = getRecentTagged();
+    var prior = recents.filter(function(o){return o.id === official.id;})[0];
+    var rest = recents.filter(function(o){return o.id !== official.id;});
+    rest.unshift({id:official.id, name:official.name, role:official.role, email:official.email, district:official.district||'', circuit:official.circuit||'', count:(prior&&prior.count?prior.count:0)+1, ts:Date.now()});
+    if (rest.length > 30) rest = rest.slice(0, 30);
+    localStorage.setItem('ddd_recent_tagged', JSON.stringify(rest));
   } catch(e) {}
 }
 
