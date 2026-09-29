@@ -18,19 +18,18 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.81 — index.html updated: the Step 2 subject search is redesigned to
-// match the school search — it now opens a full-screen finder with the
-// search bar fixed at the top and a separately-scrolling results list below
-// it. The finder doesn't pre-list every eligible subject when it opens; it
-// shows only what's already selected plus a "Start typing" hint, and
-// matches appear once you type a letter. A plain "Or choose from the
-// list…" dropdown also sits underneath for anyone who'd rather scan a short
-// list than type — the same alternative already offered for schools.
-// Selecting, deselecting, and the "Other" specify box all work exactly as
-// before; only how the search is presented has changed. No new precached
-// assets or CDN hosts were added, so only the version bumps here — that's
-// what forces the new app shell past old caches on the next visit.
-const VERSION = 'v1.0.81';
+// v1.0.82 — index.html updated: the officials "tap to tag" quick-pick (shown
+// under Support Needed, Step 4) now lays every official out in a single
+// side-by-side row/grid, ordered by familiarity — officials you tag often
+// first, then ones you've tagged before, then everyone else in the district
+// — instead of stacking them under separate section headers. A small badge
+// on each card ("Frequently tagged" / "Recently tagged") shows the group;
+// cards with neither badge are officials you haven't tagged yet. Each card
+// still shows name, role and district, and tapping one still tags them
+// instantly. No new precached assets or CDN hosts were added, so only the
+// version bumps here — that's what forces the new app shell past old caches
+// on the next visit.
+const VERSION = 'v1.0.82';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
