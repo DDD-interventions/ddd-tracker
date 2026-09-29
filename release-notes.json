@@ -1,4 +1,14 @@
 {
+  "2026.09.29.126": {
+    "title": "Officials quick-pick grouped by familiarity, cards side by side",
+    "released": "2026-09-29",
+    "highlights": [
+      "The tap-to-tag officials list under Support Needed (Step 4) now lays every card out in one side-by-side row/grid, ordered by familiarity, instead of stacking them under separate section headers",
+      "A small badge on each card — “Frequently tagged” or “Recently tagged” — shows officials you tag often or have tagged before; cards with no badge are officials you haven't tagged yet, and fill out the rest of the row",
+      "Familiarity is tracked across every way you tag someone — this quick-pick, its search box, and @mentions — so tagging someone anywhere makes them show up as familiar everywhere",
+      "Each card still shows name, role and district, and tapping one still tags that official instantly"
+    ]
+  },
   "2026.09.28.125": {
     "title": "Subject search redesigned to match the school search",
     "released": "2026-09-28",
