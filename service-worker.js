@@ -18,18 +18,18 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.83 — index.html updated: Step 3 ("Data Connection") is much shorter.
-// It uses the familiar full-width tick rows and radio lists (no drop-downs),
-// and each long question shows only its four most common options plus
-// "Other", which opens a box for the person's own answer — "what did you want
-// to know from DDD", "what did you see in the data", "what made you decide to
-// act" and "what did you do". The "Other" bugs are fixed (every "Other" no
-// longer lights up at once; typed text now reaches the review screen and the
-// PDF; un-ticking an "Other" action clears its matching planned intervention).
-// Anything already ticked that isn't shown stays visible, so older drafts and
-// reports are unaffected. No new precached assets or CDN hosts were added, so
-// only the version bumps here — that's what forces the new app shell past old
-// caches on the next visit.
+// v1.0.83 — index.html updated: Step 3 ("Data Connection") is much shorter. Every
+// topic tab under "What made you decide to act?" and "What did you do?" is still
+// there, but each shows only its three most common options plus "Other", and the
+// DDD questions ("what did you want to know", "what did you see in the data")
+// also show three options plus "Other". "Other" opens a box for the person's own
+// answer and works from every topic: only the topic you ticked it in shows it
+// ticked, typed text now reaches the review screen and the PDF, and un-ticking an
+// "Other" action clears its matching planned intervention. Anything already
+// ticked that isn't shown stays visible, so older drafts and reports are
+// unaffected. No new precached assets or CDN hosts were added, so only the
+// version bumps here — that's what forces the new app shell past old caches on
+// the next visit.
 const VERSION = 'v1.0.83';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
