@@ -1183,7 +1183,7 @@ function toggleDDDOther() {
   else S.f.ddd_reports.push('Other');
   render();
 }
-var DDD_TASKS_SHOWN = 4;   // the most common questions; "Other" covers the rest
+var DDD_TASKS_SHOWN = 3;   // the most common questions; "Other" covers the rest
 function renderDDDTasks() {
   var chk = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.5 9L10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var h = '<div class="tq-list">';
@@ -6681,43 +6681,63 @@ function toggleMergedAction(label){
 // ACTION_GROUPS / TRIGGER_GROUPS lists above are kept as data so older reports
 // and drafts still read correctly, and anything already ticked that isn't in
 // the short list is still shown (ticked) so nothing is ever hidden.
-const TRIGGER_CORE = [
-  'Learners below 30% (not passing)',
-  'Learners at 30-39% (close to passing)',
-  'Learners absent a lot and doing badly',
-  'Parts of the curriculum not being covered'
-];
+// Per-topic lists: every topic (tab) stays visible with its heading; each shows its
+// three most common options plus "Other". Anything already ticked that is beyond
+// the first four stays visible (ticked) so older drafts/reports lose nothing.
+var GROUP_SHOWN = 3;
+// "Other" is stored once (one 'Other' value + one description) but offered in
+// every topic. Remember which topic it was ticked in so only THAT topic shows it
+// ticked and shows the description box, instead of every "Other" lighting up.
+function _otherGroup(kind,groups){
+  var o=(S.f._otherFrom||{})[kind];
+  for(var i=0;i<groups.length;i++) if(groups[i].g===o) return o;
+  return groups[0].g;
+}
+function toggleOtherPick(kind,gi){
+  var groups=(kind==='trig')?TRIGGER_GROUPS:ACTION_GROUPS;
+  var arr=(kind==='trig')?S.f.intervention_triggers:S.f.action_types;
+  var gname=groups[gi].g;
+  var has=arr.indexOf('Other')>-1;
+  var here=has&&_otherGroup(kind,groups)===gname;
+  S.f._otherFrom=S.f._otherFrom||{};
+  if(has&&!here){ S.f._otherFrom[kind]=gname; render(); return; }   // move it to this topic
+  S.f._otherFrom[kind]=gname;
+  if(kind==='trig') toggleTrigger('Other'); else toggleMergedAction('Other');
+}
 function _otherSpecify(kind){
   if(kind==='trig') return '<div class="sp-box"><label>You selected \u201cOther\u201d \u2014 please describe what made you act:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value"></div>';
   return '<div class="sp-box"><label>You selected \u201cOther\u201d \u2014 please describe what you did:</label><textarea rows="2" placeholder="e.g. Arranged mentoring from neighbouring school..." oninput="S.f.action_other=this.value">'+esc(S.f.action_other)+'</textarea></div>';
 }
 function renderTriggerGroups(){
-  var sel=S.f.intervention_triggers;
-  var extra=sel.filter(function(t){return t!=='Other'&&TRIGGER_CORE.indexOf(t)<0;});
-  var rows=TRIGGER_CORE.concat(extra).map(function(t){
-    return _voRow(t, sel.indexOf(t)>-1, "toggleTrigger('"+_jsq(t)+"')");
+  var oFrom=_otherGroup('trig',TRIGGER_GROUPS), sel=S.f.intervention_triggers;
+  return TRIGGER_GROUPS.map(function(g,gi){
+    var items=g.items.filter(function(t){return t!=='Other';});
+    var rows=items.filter(function(t,i){return i<GROUP_SHOWN||sel.indexOf(t)>-1;}).map(function(t){
+      return _voRow(t, sel.indexOf(t)>-1, "toggleTrigger('"+_jsq(t)+"')");
+    }).join('');
+    var on=sel.indexOf('Other')>-1&&oFrom===g.g;
+    rows+=_voRow('Other',on,"toggleOtherPick('trig',"+gi+")")+(on?_otherSpecify('trig'):'');
+    return '<div class="vo-grp"><h5>'+esc(g.g)+'</h5>'+rows+'</div>';
   }).join('');
-  var otherOn=sel.indexOf('Other')>-1;
-  rows+=_voRow('Other', otherOn, "toggleTrigger('Other')");
-  return rows+(otherOn?_otherSpecify('trig'):'');
 }
 function renderMergedActions(){
-  var core=ACTION_GROUPS[0].items.filter(function(i){return i.t!=='Other';}).slice(0,4);
-  var extra=[];
-  ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){
-    if(i.t!=='Other' && core.indexOf(i)<0 && isMergedActionOn(i)) extra.push(i);
-  }); });
-  var rows=core.concat(extra).map(function(i){
-    return _voRow(i.t, isMergedActionOn(i), "toggleMergedAction('"+_jsq(i.t)+"')");
+  var oFrom=_otherGroup('act',ACTION_GROUPS), n=0;
+  var html=ACTION_GROUPS.map(function(g,gi){
+    var items=g.items.filter(function(i){return i.t!=='Other';});
+    var rows=items.filter(function(i,k){return k<GROUP_SHOWN||isMergedActionOn(i);}).map(function(i){
+      var on=isMergedActionOn(i); if(on) n++;
+      return _voRow(i.t, on, "toggleMergedAction('"+_jsq(i.t)+"')");
+    }).join('');
+    var on=S.f.action_types.indexOf('Other')>-1&&oFrom===g.g; if(on) n++;
+    rows+=_voRow('Other',on,"toggleOtherPick('act',"+gi+")")+(on?_otherSpecify('act'):'');
+    return '<div class="vo-grp"><h5>'+esc(g.g)+'</h5>'+rows+'</div>';
   }).join('');
-  var otherOn=S.f.action_types.indexOf('Other')>-1;
-  rows+=_voRow('Other', otherOn, "toggleMergedAction('Other')");
-  return rows+(otherOn?_otherSpecify('act'):'');
+  return html+(n?'<p class="vo-count"><b>'+n+'</b> selected</p>':'');
 }
-var INSIGHT_SHOWN = ['subject-performance','learner-attendance','educator-attendance','sba-exam-gap','other-issue'];
+var INSIGHT_SHOWN = ['subject-performance','learner-attendance','educator-attendance','other-issue'];
 function renderInsightVisible(){
   return INSIGHT_TYPE_OPTIONS.filter(function(o){
-    // the four most common + Other; anything else only if already ticked
+    // the three most common + Other; anything else only if already ticked
     return INSIGHT_SHOWN.indexOf(o.value)>-1 || S.f.insight_types.indexOf(o.value)>-1;
   }).map(function(o){
     var on=S.f.insight_types.indexOf(o.value)>-1;
