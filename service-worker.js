@@ -18,7 +18,7 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.83 — index.html updated: Step 3 ("Data Connection") is much shorter. Every
+// v1.0.84 — index.html updated: Step 3 ("Data Connection") is much shorter. Every
 // topic tab under "What made you decide to act?" and "What did you do?" is still
 // there, but each shows only its three most common options plus "Other", and the
 // DDD questions ("what did you want to know", "what did you see in the data")
@@ -30,7 +30,7 @@
 // unaffected. No new precached assets or CDN hosts were added, so only the
 // version bumps here — that's what forces the new app shell past old caches on
 // the next visit.
-const VERSION = 'v1.0.83';
+const VERSION = 'v1.0.84';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
