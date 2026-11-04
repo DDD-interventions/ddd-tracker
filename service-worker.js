@@ -18,18 +18,19 @@
  *   the user sees the updated app shell on the next reload.
  */
 
-// v1.0.82 — index.html updated: the officials "tap to tag" quick-pick (shown
-// under Support Needed, Step 4) now lays every official out in a single
-// side-by-side row/grid, ordered by familiarity — officials you tag often
-// first, then ones you've tagged before, then everyone else in the district
-// — instead of stacking them under separate section headers. A small badge
-// on each card ("Frequently tagged" / "Recently tagged") shows the group;
-// cards with neither badge are officials you haven't tagged yet. Each card
-// still shows name, role and district, and tapping one still tags them
-// instantly. No new precached assets or CDN hosts were added, so only the
-// version bumps here — that's what forces the new app shell past old caches
-// on the next visit.
-const VERSION = 'v1.0.82';
+// v1.0.83 — index.html updated: Step 3 ("Data Connection") is much shorter.
+// It uses the familiar full-width tick rows and radio lists (no drop-downs),
+// and each long question shows only its four most common options plus
+// "Other", which opens a box for the person's own answer — "what did you want
+// to know from DDD", "what did you see in the data", "what made you decide to
+// act" and "what did you do". The "Other" bugs are fixed (every "Other" no
+// longer lights up at once; typed text now reaches the review screen and the
+// PDF; un-ticking an "Other" action clears its matching planned intervention).
+// Anything already ticked that isn't shown stays visible, so older drafts and
+// reports are unaffected. No new precached assets or CDN hosts were added, so
+// only the version bumps here — that's what forces the new app shell past old
+// caches on the next visit.
+const VERSION = 'v1.0.83';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
