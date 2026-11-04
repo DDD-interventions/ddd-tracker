@@ -893,6 +893,14 @@ html,body{overscroll-behavior-y:none}
 .vo-opt.warn.on{border-color:#E8952E;background:#fff6e8;color:#8a5410}
 .vo-opt.warn.on .vo-box{background:#E8952E;border-color:#E8952E}
 .vo-count{font-size:13px;color:var(--grey,#5e6e6c);margin:2px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:9px 14px;border:2px solid #d6e1df;border-radius:22px;font-size:14.5px;line-height:1.25;cursor:pointer;background:#fff;user-select:none;color:#22312F}
+.chip.on{border-color:#0B8E8D;background:#eaf5f5;color:#074445;font-weight:600}
+.chip.on::before{content:"\2713";font-weight:700;color:#0B8E8D}
+.chip.radio.on::before{content:"\25CF";font-size:11px}
+.sp-box{margin:2px 0 10px;padding:10px 12px;background:#fff6e8;border:1px solid #E8952E;border-radius:8px}
+.sp-box label{display:block;font-size:13px;font-weight:700;color:#8a5410;margin-bottom:5px}
+.sp-box input,.sp-box textarea{width:100%;padding:9px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14.5px;font-family:inherit;background:#fff}
 .vo-count b{color:#074445}
 
 /* Subject groups: heading rows open inline, chips beneath */
@@ -1158,17 +1166,41 @@ function toggleDDDTask(idx) {
 }
 function isDDDTaskSel(idx) { return S.f.ddd_reports.includes(DDD_TASKS[idx].q); }
 
+function _chip(label,on,onclick,cls){
+  return '<div class="chip'+(cls?' '+cls:'')+(on?' on':'')+'" onclick="'+onclick+'">'+esc(label)+'</div>';
+}
+// "Other" for the DDD questions is a real chip now (it used to be a bare text box
+// that only registered on blur, and its text never reached the review or the PDF).
+function setDDDSource(v) {
+  S.f.ddd_data_source = v;
+  S.f.ddd_dashboard_confirmed = (v === 'dashboard') ? 'yes' : 'no';
+  if (v === 'dashboard') S.f.ddd_data_source_person = '';
+  render();
+}
+function toggleDDDOther() {
+  var i = S.f.ddd_reports.indexOf('Other');
+  if (i !== -1) { S.f.ddd_reports.splice(i, 1); S.f.ddd_reports_other = ''; }
+  else S.f.ddd_reports.push('Other');
+  render();
+}
+var DDD_TASKS_SHOWN = 4;   // the most common questions; "Other" covers the rest
 function renderDDDTasks() {
   var chk = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.5 9L10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var h = '<div class="tq-list">';
   for (var i = 0; i < DDD_TASKS.length; i++) {
+    // beyond the shown few, only list a question if it is already ticked (older drafts/reports)
+    if (i >= DDD_TASKS_SHOWN && !isDDDTaskSel(i)) continue;
     var sel = isDDDTaskSel(i) ? ' sel' : '';
     h += '<div class="tq-card' + sel + '" onclick="toggleDDDTask(' + i + ')">'
       + '<div class="tq-chk">' + chk + '</div>'
       + '<div><div class="tq-q">' + DDD_TASKS[i].q + '</div></div></div>';
   }
+  var otherOn = S.f.ddd_reports.includes('Other');
+  h += '<div class="tq-card' + (otherOn ? ' sel' : '') + '" onclick="toggleDDDOther()"><div class="tq-chk">' + chk + '</div><div><div class="tq-q">Other</div></div></div>';
   h += '</div>';
-  h += '<div class="tq-other"><input type="text" placeholder="Something else? Describe briefly\u2026" value="' + ((S.f.ddd_reports_other || '').replace(/"/g,'&quot;')) + '" oninput="S.f.ddd_reports_other=this.value" onchange="if(this.value&&!S.f.ddd_reports.includes(\'Other\'))S.f.ddd_reports.push(\'Other\');if(!this.value){var i=S.f.ddd_reports.indexOf(\'Other\');if(i!==-1)S.f.ddd_reports.splice(i,1);}"></div>';
+  if (otherOn) {
+    h += '<div class="sp-box"><label>You selected \u201cOther\u201d \u2014 what else did you want to know?</label><input type="text" placeholder="Describe briefly\u2026" value="' + esc(S.f.ddd_reports_other || '') + '" oninput="S.f.ddd_reports_other=this.value"></div>';
+  }
   return h;
 }
 
@@ -1330,7 +1362,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.09.29.126';
+const APP_VERSION = '2026.11.04.127';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6631,7 +6663,7 @@ function toggleMergedAction(label){
     S.f.action_types=S.f.action_types.filter(function(x){return x!==item.a;});
     // drop the paired decision only if nothing else selected still needs it
     var stillNeeded=false;
-    ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){ if(i!==item && i.d===item.d && isMergedActionOn(i)) stillNeeded=true; }); });
+    ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){ if(i.a!==item.a && i.d===item.d && isMergedActionOn(i)) stillNeeded=true; }); });
     if(!stillNeeded) S.f.decision_types=S.f.decision_types.filter(function(x){return x!==item.d;});
   } else {
     if(S.f.action_types.indexOf(item.a)<0) S.f.action_types.push(item.a);
@@ -6643,17 +6675,51 @@ function toggleMergedAction(label){
   if(!S.f.decision_types.includes('Other')) S.f.decision_other='';
   render();
 }
-function renderMergedActions(){
-  var n=0;
-  var html=ACTION_GROUPS.map(function(g){
-    return '<div class="vo-grp">'+(g.g?'<h5>'+esc(g.g)+'</h5>':'')+
-      g.items.map(function(i){ var on=isMergedActionOn(i); if(on) n++; return _voRow(i.t, on, "toggleMergedAction('"+_jsq(i.t)+"')"); }).join('')+
-    '</div>';
-  }).join('');
-  return html+(n?'<p class="vo-count"><b>'+n+'</b> selected</p>':'');
+// ── Step 3: short, flat pick-lists ──
+// Only the most important options are shown (no drop-downs or topic groups),
+// plus ONE "Other" that opens a box for the person's own answer. The full
+// ACTION_GROUPS / TRIGGER_GROUPS lists above are kept as data so older reports
+// and drafts still read correctly, and anything already ticked that isn't in
+// the short list is still shown (ticked) so nothing is ever hidden.
+const TRIGGER_CORE = [
+  'Learners below 30% (not passing)',
+  'Learners at 30-39% (close to passing)',
+  'Learners absent a lot and doing badly',
+  'Parts of the curriculum not being covered'
+];
+function _otherSpecify(kind){
+  if(kind==='trig') return '<div class="sp-box"><label>You selected \u201cOther\u201d \u2014 please describe what made you act:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value"></div>';
+  return '<div class="sp-box"><label>You selected \u201cOther\u201d \u2014 please describe what you did:</label><textarea rows="2" placeholder="e.g. Arranged mentoring from neighbouring school..." oninput="S.f.action_other=this.value">'+esc(S.f.action_other)+'</textarea></div>';
 }
+function renderTriggerGroups(){
+  var sel=S.f.intervention_triggers;
+  var extra=sel.filter(function(t){return t!=='Other'&&TRIGGER_CORE.indexOf(t)<0;});
+  var rows=TRIGGER_CORE.concat(extra).map(function(t){
+    return _voRow(t, sel.indexOf(t)>-1, "toggleTrigger('"+_jsq(t)+"')");
+  }).join('');
+  var otherOn=sel.indexOf('Other')>-1;
+  rows+=_voRow('Other', otherOn, "toggleTrigger('Other')");
+  return rows+(otherOn?_otherSpecify('trig'):'');
+}
+function renderMergedActions(){
+  var core=ACTION_GROUPS[0].items.filter(function(i){return i.t!=='Other';}).slice(0,4);
+  var extra=[];
+  ACTION_GROUPS.forEach(function(g){ g.items.forEach(function(i){
+    if(i.t!=='Other' && core.indexOf(i)<0 && isMergedActionOn(i)) extra.push(i);
+  }); });
+  var rows=core.concat(extra).map(function(i){
+    return _voRow(i.t, isMergedActionOn(i), "toggleMergedAction('"+_jsq(i.t)+"')");
+  }).join('');
+  var otherOn=S.f.action_types.indexOf('Other')>-1;
+  rows+=_voRow('Other', otherOn, "toggleMergedAction('Other')");
+  return rows+(otherOn?_otherSpecify('act'):'');
+}
+var INSIGHT_SHOWN = ['subject-performance','learner-attendance','educator-attendance','sba-exam-gap','other-issue'];
 function renderInsightVisible(){
-  return INSIGHT_TYPE_OPTIONS.map(function(o){
+  return INSIGHT_TYPE_OPTIONS.filter(function(o){
+    // the four most common + Other; anything else only if already ticked
+    return INSIGHT_SHOWN.indexOf(o.value)>-1 || S.f.insight_types.indexOf(o.value)>-1;
+  }).map(function(o){
     var on=S.f.insight_types.indexOf(o.value)>-1;
     return _voRow(o.label, on, "toggleInsightType('"+_jsq(o.label)+"')");
   }).join('');
@@ -6664,24 +6730,21 @@ function renderFormStep3(){
   return `<div class="section fade-in"><div class="sec-hdr blue" style="border-color:var(--blue)"><div><h2>3. Data That Informed Your Response</h2><p>What data guided your decision and action</p></div></div><div class="sec-body">
     <div class="field" id="fld-ddd-used"><label>Did you use data to inform this intervention?<span class="req">*</span></label><div class="hint">Did you look at any data before or during this activity?</div><div class="radio-grp">${['Yes \u2014 DDD data directly triggered this','Yes \u2014 DDD data informed my approach','DDD data partially used','Yes \u2014 but from another source (not DDD)','No data used'].map((v,i)=>{const val=['yes-direct','yes-informed','partially','other-data','no'][i];return`<label><input type="radio" name="dddUsed" value="${val}" ${S.f.ddd_used===val?'checked':''} onchange="S.f.ddd_used=this.value;render()"><span>${v}</span></label>`}).join('')}</div></div>
     ${usedDDD ? `
-      <div class="field"><label>What did you want to know from DDD?</label><div style="font-size:13.5px;color:var(--grey);margin:-4px 0 10px;line-height:1.4">Tap all that apply</div>${renderDDDTasks()}</div>
+      <div class="field"><label>What did you want to know from DDD? <span style="font-weight:400;color:var(--grey)">Tap all that apply</span></label>${renderDDDTasks()}</div>
       <div class="field"><label>How did you access the DDD data?<span class="req">*</span></label><div class="hint">Select how you received or viewed the data</div><div class="radio-grp"><label><input type="radio" name="dddSource" value="dashboard" ${S.f.ddd_data_source==='dashboard'?'checked':''} onchange="S.f.ddd_data_source='dashboard';S.f.ddd_dashboard_confirmed='yes';S.f.ddd_data_source_person='';render()"><span>Logged into the DDD Dashboard myself</span></label><label><input type="radio" name="dddSource" value="presentation" ${S.f.ddd_data_source==='presentation'?'checked':''} onchange="S.f.ddd_data_source='presentation';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a presentation (e.g. PowerPoint) with DDD data</span></label><label><input type="radio" name="dddSource" value="spreadsheet" ${S.f.ddd_data_source==='spreadsheet'?'checked':''} onchange="S.f.ddd_data_source='spreadsheet';S.f.ddd_dashboard_confirmed='no';render()"><span>Received a spreadsheet (e.g. Excel) with DDD data</span></label><label><input type="radio" name="dddSource" value="shared" ${S.f.ddd_data_source==='shared'?'checked':''} onchange="S.f.ddd_data_source='shared';S.f.ddd_dashboard_confirmed='no';render()"><span>Someone showed or presented the data to me</span></label></div>
-      ${S.f.ddd_data_source==='dashboard'?`<div style="background:#E7F6EA;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:1px solid #E4E7EA"><div style="font-size:13.5px;color:#2E7D32;line-height:1.5">Great \u2014 logging in directly gives you the most current data and lets you explore further.</div></div>`:''}
-      ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div style="background:#E3F2FD;border-radius:8px;padding:10px 14px;margin:4px 0 8px;border-left:1px solid #E4E7EA"><div style="font-size:13.5px;color:#1565C0;line-height:1.5">Good \u2014 using DDD data in any form strengthens your support.</div></div>`:''}
+      ${S.f.ddd_data_source==='dashboard'?`<div style="font-size:13.5px;color:#2E7D32;margin:0 0 8px">\u2713 Great \u2014 logging in directly gives you the most current data.</div>`:''}
+      ${S.f.ddd_data_source && S.f.ddd_data_source!=='dashboard'?`<div style="font-size:13.5px;color:#1565C0;margin:0 0 8px">\u2713 Good \u2014 using DDD data in any form strengthens your support.</div></div>`:'</div>'}
       <div style="background:var(--off);border-radius:8px;padding:14px;margin:8px 0">
-        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px">What did you see in the data?</div>
-        <div style="font-size:13.5px;color:var(--grey);margin-bottom:10px;line-height:1.5">Select all types of issues you observed</div>
-        <div style="margin-bottom:10px">${renderInsightVisible()}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px">What did you see in the data? <span style="font-weight:400;color:var(--grey)">Select all that apply</span></div>
+        <div>${renderInsightVisible()}</div>
         ${S.f.insight_types.length?`<div style="margin-top:10px"><label style="font-size:14px;font-weight:600;color:#323130;margin-bottom:4px;display:block">Describe what you found in the data</label><div class="voice-row"><textarea id="ta-insight" rows="4" placeholder="e.g. 35 learners clustered at 25-29% in Maths — just below the pass mark..." oninput="S.f.insight_detail=this.value" style="flex:1;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px">${esc(S.f.insight_detail)}</textarea>${micBtn('insight_detail','ta-insight')}</div></div>`:''}
         ${S.f.insight_types.length&&!(S.f.insight_types.length===1&&S.f.insight_types[0]==='other-issue'&&!S.f.insight_detail)?(buildInsightStatement()?`<div style="margin-top:10px;background:var(--green-lt);border-radius:8px;padding:10px 12px;border-left:1px solid #E4E7EA"><div style="font-size:13px;font-weight:700;color:var(--green-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What you found</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.6">${buildInsightStatement()}</div></div>`:''):''}      </div>
     ` : ''}
     ${S.f.ddd_used==='other-data'?`<div style="background:#E3F2FD;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:14px;color:#1565C0;line-height:1.6;margin-bottom:10px">Good \u2014 using any data to inform your support is valuable. Please tell us what data you used.</div></div><div class="field"><label>What data source did you use?</label><div class="hint">e.g. SA-SAMS reports, school assessment records, provincial data, LURITS, own records</div><textarea rows="2" placeholder="Describe the data source briefly\u2026" oninput="S.f.other_data_source=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit;resize:vertical">${esc(S.f.other_data_source||'')}</textarea></div>`:''}
     ${S.f.ddd_used==='no'?`<div style="background:#f8f9fa;border-radius:8px;padding:12px 14px;margin:8px 0"><div style="font-size:14px;color:var(--grey-dk);line-height:1.6">No problem \u2014 not every activity needs data. But next time, try starting from the data. You can log into the DDD Dashboard yourself, use SA-SAMS reports, or ask your Programme Manager or Subject Advisor for a data pack.</div></div>`:''}
 
-    <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What did you see in the data or at the school that prompted you to step in? Tap all that apply.</div>${renderVisibleGroups(TRIGGER_GROUPS, S.f.intervention_triggers, 'toggleTrigger')}</div>
-    ${S.f.intervention_triggers.includes('Other')?'<div class="field"><label>You selected \u201cOther\u201d for what made you act \u2014 please describe:</label><input type="text" placeholder="e.g. Parent complaint, ministerial directive..." value="'+esc(S.f.intervention_trigger_other)+'" oninput="S.f.intervention_trigger_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}
-    <div class="field" id="fld-action"><label>What did you do?<span class="req">*</span></label><div class="hint">Tap everything you did or put in place. The most common are first.</div>${renderMergedActions()}</div>
-    ${S.f.action_types.includes('Other')?`<div class="field"><label>You selected \u201cOther\u201d for Action Taken \u2014 please describe:</label><textarea rows="2" placeholder="e.g. Arranged mentoring from neighbouring school..." oninput="S.f.action_other=this.value">${esc(S.f.action_other)}</textarea></div>`:''}
+    <div class="field"><label>What made you decide to act? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">What prompted you to step in? Tap all that apply, or choose Other to write your own.</div>${renderTriggerGroups()}</div>
+    <div class="field" id="fld-action"><label>What did you do?<span class="req">*</span></label><div class="hint">Tap everything you did or put in place, or choose Other to write your own.</div>${renderMergedActions()}</div>
     
     <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=1;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(2,3)">Next &rarr;</button></div>
     ${_saveLaterBar()}
@@ -6731,7 +6794,7 @@ function renderFormReview(){
     ${S._validationErrors && S._validationErrors.length ? renderValidationBanner(S._validationErrors) : ''}
     <div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Location & Date</div>${rvRow('Report level',f.report_level==='province'?'Province Monitoring':f.report_level==='district'?'District Monitoring':'')}${rvRow('Term',f.term)}${rvRow('Province',f.province)}${rvRow('District',f.district)}${rvRow('Circuit',f.circuit)}${rvRow('Date',f.activity_date)}${rvRow('School(s)',f.schools||(f.report_level!=='school'?'None — report covers the '+(f.report_level==='province'?'province':'district')+' as a whole':''))}${rvRow('Official',f.official_name)}${rvRow('Email',f.official_email)}${rvRow('Designation',f.official_role)}${rvRow('Specialisation',f.official_specialisation)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?mergeOtherDisplay(f.sip_focus_areas,f.sip_focus_areas_other).join('; '):'')}${rvRow('Description',f.description)}</div>
-    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',f.ddd_reports.join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:13px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
+    <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',mergeOtherDisplay(f.ddd_reports,f.ddd_reports_other).join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:13px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?mergeOtherDisplay(f.support_needed,f.support_needed_other).join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...mergeOtherDisplay(f.ctx_staffing,f.ctx_staffing_other),...mergeOtherDisplay(f.ctx_resources,f.ctx_resources_other),...mergeOtherDisplay(f.ctx_learners,f.ctx_learners_other)].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
     <div class="field" style="margin:14px 0 4px;padding:12px 14px;background:#f7f9fc;border-radius:8px">
       <label style="font-size:14.5px;font-weight:600;color:var(--navy)">Send a copy to a colleague <span style="font-weight:400;color:var(--grey)">(optional)</span></label>
@@ -6939,7 +7002,7 @@ async function submitForm() {
  intervention_themes:S.f.intervention_themes,
  cc_email:(S.f.cc_email||'').trim()||null,
  subjects:S.f.subjects.map(s=>s==='Other'&&S.f.subjects_other?'Other: '+S.f.subjects_other:s), grades:S.f.grades, atp_coverage:atpPayload(), description:S.f.description,
- ddd_used:S.f.ddd_used, ddd_reports:S.f.ddd_reports, ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return !!v && a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, ddd_data_source:S.f.ddd_data_source||null, ddd_data_source_person:S.f.ddd_data_source_person||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
+ ddd_used:S.f.ddd_used, ddd_reports:mergeOtherDisplay(S.f.ddd_reports,S.f.ddd_reports_other), ddd_tasks:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.q}), ddd_task_cats:DDD_TASKS.filter(function(_,i){return isDDDTaskSel(i)}).map(function(t){return t.cat}).filter(function(v,i,a){return !!v && a.indexOf(v)===i}), ddd_access_date:S.f.ddd_access_date||null, ddd_dashboard_confirmed:S.f.ddd_dashboard_confirmed||null, ddd_data_source:S.f.ddd_data_source||null, ddd_data_source_person:S.f.ddd_data_source_person||null, other_data_source:S.f.other_data_source||null, additional_data_sources:S.f.additional_data_sources||null,
  insight_type:S.f.insight_types[0]||S.f.insight_type,
  insight_types:S.f.insight_types,
  insight_detail:S.f.insight_detail,
@@ -6986,7 +7049,7 @@ async function submitForm() {
  id: decId,
  official_id: S._officialId,
  intervention_id: S.interventions[0]?.id || null,
- ddd_tool: S.f.ddd_reports.join(', '),
+ ddd_tool: mergeOtherDisplay(S.f.ddd_reports,S.f.ddd_reports_other).join(', '),
  data_viewed: (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type) + ' — ' + scopeSummaryText(),
  insight: buildInsightStatement() || S.f.insight_detail || S.f.description,
  decision_made: (S.f.decision_types.length?(S.f.decision_types.includes('Other')&&S.f.decision_other?S.f.decision_types.filter(d=>d!=='Other').concat(['Other: '+S.f.decision_other]).join('; '):S.f.decision_types.join('; ')):'') || (S.f.activity_type==='Other'&&S.f.activity_type_other?'Other: '+S.f.activity_type_other:S.f.activity_type),
