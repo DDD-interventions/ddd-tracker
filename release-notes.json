@@ -1,4 +1,14 @@
 {
+  "2026.11.04.127": {
+    "title": "Shorter Step 3, and “Other” fixed",
+    "released": "2026-11-04",
+    "highlights": [
+      "Step 3 (Data Connection) is much shorter: each long question now shows only its four most common options, then “Other” — “What did you want to know from DDD?”, “What did you see in the data?”, “What made you decide to act?” and “What did you do?”",
+      "Tapping “Other” opens a box for your own answer, and what you type is kept on the review screen and the PDF (before, the DDD question only ever showed “Other”)",
+      "“Other” no longer lights up in several places at once, and un-ticking an “Other” action also clears its description and the matching planned intervention",
+      "Anything already ticked on an older report or saved draft that isn't in the short lists still shows, ticked"
+    ]
+  },
   "2026.09.29.126": {
     "title": "Officials quick-pick grouped by familiarity, cards side by side",
     "released": "2026-09-29",
