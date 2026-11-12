@@ -30,7 +30,14 @@
 // unaffected. No new precached assets or CDN hosts were added, so only the
 // version bumps here — that's what forces the new app shell past old caches on
 // the next visit.
-const VERSION = 'v1.0.84';
+// v1.0.85 — index.html updated (app 2026.11.09.129): DBE monitoring tools for
+// District and Province Monitoring (CM and SES instruments and feedback reports,
+// DIP Quality Assurance) with a four-step monitoring form, voice notes, a
+// schools-visited drop-down, a Monitoring tools section on the Dashboard and
+// monitoring tables in the audit PDF. Data is saved inside the existing
+// decisions.details JSON, so no Supabase change. No new precached assets or CDN
+// hosts were added, so only the version bumps here.
+const VERSION = 'v1.0.85';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
