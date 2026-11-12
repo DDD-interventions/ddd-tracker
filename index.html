@@ -998,6 +998,203 @@ html,body{overscroll-behavior-y:none}
   .att-chev{margin-top:2px}
   .dash-more-sum{font-size:14px}
 }
+/* MONITORING TOOLS */
+.mon-group-hdr{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 8px}
+.mon-group-hdr span{font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px}
+.mon-group-hdr small{font-size:12.5px;color:var(--grey)}
+.mon-tool{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px;border-radius:10px;border:1.5px solid #d6dde3;background:#fff;cursor:pointer;font:inherit;margin-bottom:8px;min-height:44px;color:inherit}
+.mon-tool.on{border:2px solid var(--teal-md);background:#F3F9FB}
+.mon-box{flex-shrink:0;width:22px;height:22px;border-radius:5px;border:2px solid #8a96a3;background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;box-sizing:border-box}
+.mon-tool.on .mon-box{background:var(--teal-md);border-color:var(--teal-md)}
+.mon-tool-name{display:block;font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3}
+.mon-tool-purpose{display:block;font-size:13px;color:var(--grey);line-height:1.4;margin-top:3px}
+.mon-tag{display:inline-block;font-size:12px;font-weight:700;border-radius:10px;padding:2px 8px;white-space:nowrap}
+.mon-note{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--grey-dk);background:var(--grey-lt);border-radius:8px;padding:10px 12px}
+.mon-sel-sum{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--grey-lt);margin-top:6px;padding-top:6px;font-size:13.5px;color:var(--grey-dk)}
+.mon-sel-sum button{background:none;border:none;color:var(--teal);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;min-height:44px;padding:0 6px}
+.mon-prog{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.mon-prog-lbl{font-size:13px;font-weight:700;color:var(--orange-text)}
+.mon-chip{border:1.5px solid var(--orange-hi);background:var(--orange-lt);color:var(--orange-text);border-radius:14px;padding:4px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;min-height:34px}
+.mon-chip.on{background:var(--orange-hi);color:#fff}
+.mon-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-bottom:14px}
+.mon-tab{min-height:50px;border-radius:8px;border:2px solid #d0d4db;background:#fff;color:var(--grey-dk);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;line-height:1.25;padding:6px}
+.mon-tab small{display:block;font-weight:600;font-size:12px;color:var(--grey)}
+.mon-tab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.mon-tab.on small{color:#EAF6FA}
+.mon-head h3{font-size:15px;font-weight:700;color:var(--navy)}
+.mon-head p{font-size:13.5px;color:var(--grey);line-height:1.5;margin:3px 0 12px}
+.mon-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mon-ro{background:var(--off);border-radius:6px;padding:8px 10px;min-width:0}
+.mon-ro span{display:block;font-size:12px;font-weight:600;color:var(--grey)}
+.mon-ro b{display:block;font-size:14px;font-weight:600;color:var(--navy);overflow-wrap:anywhere}
+.mon-scale{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.mon-scale div{text-align:center;border-radius:6px;padding:6px 2px}
+.mon-scale b{display:block;font-size:16px}
+.mon-scale span{display:block;font-size:11.5px;font-weight:600;line-height:1.2}
+.mon-item{border:1px solid #e1e6ea;border-radius:8px;padding:12px;margin-bottom:10px;background:#fff}
+.mon-item-top{display:flex;flex-direction:column;gap:5px;align-items:flex-start;margin-bottom:6px}
+.mon-item-top h4{font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3}
+.mon-ind{font-size:13.5px;color:var(--grey-dk);line-height:1.45}
+.mon-ev{font-size:13px;color:var(--grey);line-height:1.45;margin-top:3px}
+.mon-seg{display:grid;gap:6px;margin-top:10px}
+.mon-seg4{grid-template-columns:repeat(4,1fr)}
+.mon-seg3{grid-template-columns:repeat(3,1fr);margin-top:0}
+.mon-seg button{min-height:44px;border-radius:8px;border:1.5px solid #d6dde3;background:#fff;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.mon-segyn{display:flex;gap:4px;margin:0;flex-shrink:0}
+.mon-segyn button{min-width:52px;font-size:13.5px}
+.mon-item-foot{margin-top:6px}
+.mon-status{font-size:13px;font-weight:700}
+.mon-comment{width:100%;margin-top:8px;padding:9px 10px;border:1px solid #c8c6c4;border-radius:4px;font-family:inherit;font-size:16px;box-sizing:border-box;min-height:44px}
+.mon-visits{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.mon-visits label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;color:var(--grey-dk)}
+.mon-visits input{width:100%;padding:8px;border:1px solid #c8c6c4;border-radius:4px;font-family:inherit;font-size:16px;box-sizing:border-box;min-height:44px}
+.mon-summary{background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px;margin:6px 0 12px}
+.mon-summary-lbl{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.8)}
+.mon-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.mon-summary-grid div{text-align:center;background:rgba(255,255,255,.08);border-radius:6px;padding:8px 2px}
+.mon-summary-grid b{display:block;font-size:20px}
+.mon-summary-grid span{display:block;font-size:11.5px;color:rgba(255,255,255,.85)}
+.mon-summary-top{display:flex;justify-content:space-between;align-items:baseline}
+.mon-summary-top b{font-size:22px}
+.mon-summary-top small{font-size:14px;font-weight:600;color:rgba(255,255,255,.8)}
+.mon-summary-sub{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:6px}
+.mon-meter{display:block;flex:1;height:10px;border-radius:5px;background:rgba(127,127,127,.2);overflow:hidden;margin-top:8px}
+.mon-meter > div,.mon-meter > span{display:block;height:100%;background:var(--green-hi)}
+.mon-details{border:1px solid #e1e6ea;border-radius:8px;padding:0 12px;margin:4px 0 8px}
+.mon-details summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--teal);min-height:44px;display:flex;align-items:center}
+.mon-riskbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 10px}
+.mon-riskbar span{flex:1;font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px}
+.mon-riskbar b{font-size:12px;border-radius:10px;padding:3px 8px}
+.mon-acc{border:1px solid #e1e6ea;border-radius:8px;margin-bottom:10px;background:#fff;overflow:hidden}
+.mon-acc-hdr{width:100%;display:flex;align-items:center;gap:10px;padding:12px;min-height:54px;border:none;background:none;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.mon-acc-title{display:block;font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3}
+.mon-acc-kicker{display:block;font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px}
+.mon-acc-flag{display:block;font-size:12.5px;font-weight:600;color:var(--orange-text);margin-top:2px}
+.mon-chev{flex-shrink:0;color:var(--grey);font-size:16px;transition:transform .15s}
+.mon-acc-body{padding:4px 12px 12px;border-top:1px solid var(--grey-lt)}
+.mon-yn-row{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--grey-lt)}
+.mon-yn-n{flex-shrink:0;width:22px;font-size:12.5px;font-weight:700;color:var(--grey)}
+.mon-yn-t{flex:1;font-size:13.5px;line-height:1.4}
+.mon-sec-report{padding:12px 14px;background:var(--off)}
+.mon-dash-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:6px}
+.mon-dash-tiles div{border:1px solid var(--grey-lt);border-radius:8px;padding:10px}
+.mon-dash-tiles b{display:block;font-size:22px;color:var(--teal)}
+.mon-dash-tiles span{font-size:12.5px;color:var(--grey-dk)}
+.mon-dash-h{font-size:13.5px;font-weight:700;color:var(--navy);margin:14px 0 8px;display:flex;gap:8px;align-items:center}
+.mon-dash-risk{padding:10px 0;border-bottom:1px solid var(--grey-lt)}
+.mon-dash-risk div{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.mon-dash-risk b{font-size:14px;color:var(--navy)}
+.mon-dash-risk small{display:block;font-size:12.5px;color:var(--grey);margin-top:3px}
+.mon-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--grey-dk);margin-bottom:8px}
+.mon-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.mon-bar-row{margin-bottom:8px;font-size:13px;font-weight:600}
+.mon-bar-row small{font-weight:400;color:var(--grey)}
+.mon-bar{display:flex;height:14px;border-radius:4px;overflow:hidden;gap:2px;margin-top:4px}
+.mon-dip-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--grey-lt);font-size:13px}
+.mon-dip-row > span:first-child{width:130px;font-weight:600}
+.mon-dip-row .mon-meter{margin-top:0}
+.mon-dip-row b{width:48px;text-align:right;color:var(--green-dk)}
+@media (max-width:420px){.mon-visits{grid-template-columns:repeat(2,1fr)}.mon-scale span{font-size:10.5px}}
+div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var(--grey-lt)}
+.mon-report{border:1px solid #e1e6ea;border-radius:8px;padding:12px;margin:4px 0 8px}
+.mon-line{margin-top:8px}
+.mon-line .mon-comment{margin-top:0}
+.mon-line [data-voice-label]{display:none}
+.mon-radio{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:2px solid #8a96a3;background:#fff;box-sizing:border-box;margin-top:1px}
+.mon-tool.on .mon-radio{border:7px solid var(--teal-md)}
+.mon-doc-h{font-size:13.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
+.mon-doc-tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:10px;background:#fff}
+.mon-doc-tbl th,.mon-doc-tbl td{border:1px solid #d6dde3;padding:7px 8px;text-align:left;vertical-align:top;line-height:1.4}
+.mon-doc-tbl thead th{background:var(--teal-lt);color:var(--teal);font-weight:700}
+.mon-doc-tbl tbody th{background:var(--off);font-weight:600;color:var(--grey-dk);width:40%}
+.mon-details td select,.mon-details td input{width:100%;padding:8px;border:1px solid #c8c6c4;border-radius:4px;font-size:16px;font-family:inherit;background:#fff;min-height:40px;box-sizing:border-box}
+.mon-rating-key td:first-child{width:56px;text-align:center}
+.mon-swatch{display:inline-block;width:100%;min-width:40px;height:16px;border-radius:3px;border:1px solid rgba(0,0,0,.08)}
+.mon-purpose{font-size:13.5px;line-height:1.5;color:var(--grey-dk);margin:4px 0 6px}
+.mon-define{display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:var(--grey-dk);background:var(--teal-lt);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.mon-cell{padding:6px 0;border-top:1px solid #eef1f4}
+.mon-cell:first-child{border-top:none;padding-top:0}
+.mon-cell > div{font-size:13.5px;line-height:1.45;color:var(--grey-dk)}
+.mon-cell h4{font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3}
+.mon-col{display:block;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--teal);margin-bottom:2px}
+.mon-sublbl{font-size:12.5px!important;font-weight:600;color:var(--grey)!important;margin-top:4px}
+.mon-sub{margin-left:14px;border-left:3px solid var(--teal-lt)}
+.mon-seg5{grid-template-columns:repeat(5,1fr);margin-top:6px}
+.mon-seg5 button{font-size:12.5px;font-weight:700;color:var(--teal);padding:0 2px}
+.mon-seg5 button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.mon-report-cols,.mon-yn-cols{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.mon-select{width:100%;margin-top:6px;padding:9px 10px;border:1.5px solid #c8c6c4;border-radius:6px;font-size:16px;font-family:inherit;background:#fff;color:var(--navy);min-height:44px}
+.mon-select.set{border-color:var(--teal);font-weight:700}
+.mon-compact h4{font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:4px}
+.mon-line2{font-size:13px;line-height:1.4;color:var(--grey-dk);margin-top:2px}
+.mon-line2 b{color:var(--teal);font-weight:700}
+.mon-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.mon-pair label{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mon-pair label > span{font-size:11.5px;font-weight:700;letter-spacing:.3px;color:var(--teal);text-transform:uppercase;line-height:1.2}
+.mon-pair .mon-select{margin-top:2px;font-size:15px;padding:8px 6px}
+.mon-subtbl{margin:-4px 0 10px 14px;border:1px solid #e1e6ea;border-left:3px solid var(--teal-lt);border-radius:8px;background:#fff;padding:8px 10px}
+.mon-subtbl-h{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.4px}
+.mon-subrow{padding:8px 0;border-top:1px solid #eef1f4}
+.mon-subcols + .mon-subrow{border-top:none}
+.mon-subrow-t{font-size:13.5px;font-weight:700;color:var(--navy)}
+.mon-subrow .mon-pair{margin-top:4px}
+.mon-subrow .mon-pair label > span{display:none}
+.mon-subtbl .mon-subrow:first-of-type .mon-pair label > span{display:block}
+.mon-item.mon-compact{margin-bottom:10px;padding:10px 12px}
+.mon-subcols{margin-top:6px}
+.mon-subcols span{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;line-height:1.2}
+.mon-pair label > span{font-size:11px;letter-spacing:0}
+.mon-pair .mon-select{font-size:14px}
+.mon-fb{border:1px solid #e1e6ea;border-radius:8px;background:#fff;padding:10px 12px;margin-bottom:10px}
+.mon-fb-top{display:flex;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:4px}
+.mon-fb-top h4{flex:1;min-width:0;font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3;align-self:center}
+.mon-fb-risk{flex:0 0 128px;display:flex;flex-direction:column;gap:2px}
+.mon-fb-risk span{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase}
+.mon-fb-risk .mon-select{margin-top:0;font-size:14px;padding:7px 6px;min-height:40px}
+.mon-fb .field{margin-bottom:6px}
+.mon-fb .field label{font-size:13px;margin-bottom:2px}
+.mon-fb textarea{min-height:0}
+.mon-fb .voice-row [data-voice-label]{display:none}
+.mon-fb .voice-btn{width:40px;height:40px}
+.mon-pair input{width:100%;padding:8px;border:1px solid #c8c6c4;border-radius:6px;font-size:15px;font-family:inherit;min-height:40px;box-sizing:border-box;background:#fff}
+
+/* Tool header: app palette, same information as the DBE documents */
+.mon-banner{background:linear-gradient(135deg,#1A2332 0%,#00647F 100%);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;position:relative;overflow:hidden}
+.mon-banner::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(232,104,32,.22)}
+.mon-banner-k{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#FFD2B8;margin-bottom:4px}
+.mon-banner h3{font-size:16px;font-weight:700;line-height:1.3;color:#fff;position:relative;z-index:1}
+.mon-banner p{font-size:13px;color:#EAF6FA;margin-top:4px;position:relative;z-index:1}
+.mon-card{background:#fff;border:1px solid #e1e6ea;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.mon-card-h{display:flex;gap:10px;justify-content:space-between;padding:7px 12px;background:var(--off);border-bottom:1px solid #e1e6ea;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--grey)}
+.mon-tiles{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e9edf1}
+.mon-tile{background:#fff;padding:9px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.mon-tile-wide{grid-column:1/-1}
+.mon-tile-l{font-size:11.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.3px}
+.mon-tile-v{font-size:14.5px;font-weight:600;color:var(--navy);overflow-wrap:anywhere}
+.mon-tile-v select,.mon-tile-v input{width:100%;margin-top:2px;padding:8px;border:1px solid #c8c6c4;border-radius:6px;font-size:16px;font-family:inherit;background:#fff;min-height:42px;box-sizing:border-box;font-weight:400}
+.mon-purpose{display:flex;flex-direction:column;gap:6px;background:var(--teal-lt);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+.mon-purpose p{font-size:14px;line-height:1.5;color:var(--navy);margin:0}
+.mon-pill{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:var(--teal);color:#fff;border-radius:10px;padding:2px 9px}
+.mon-focus{list-style:none;margin:0;padding:0;counter-reset:f}
+.mon-focus li{counter-increment:f;display:grid;grid-template-columns:26px 1fr;column-gap:10px;padding:9px 12px;border-top:1px solid #eef1f4}
+.mon-focus li:first-child{border-top:none}
+.mon-focus li::before{content:counter(f);grid-row:1/3;width:24px;height:24px;border-radius:50%;background:var(--orange-lt);color:var(--orange-text);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.mon-focus b{font-size:14px;color:var(--navy)}
+.mon-focus span{font-size:13px;line-height:1.45;color:var(--grey-dk)}
+.mon-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px}
+.mon-chips span{font-size:13px;font-weight:600;color:var(--teal);background:var(--teal-lt);border-radius:14px;padding:5px 11px}
+.mon-key{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}
+.mon-key-2{grid-template-columns:1fr 1fr}
+.mon-key-i{border-radius:8px;padding:8px 6px 0;text-align:center;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.mon-key-i b{font-size:20px;line-height:1}
+.mon-key-i span{font-size:11.5px;font-weight:700;line-height:1.2;min-height:28px;display:flex;align-items:center;justify-content:center}
+.mon-key-i i{display:block;height:5px;margin:4px -6px 0}
+.mon-key{grid-template-columns:repeat(2,1fr)}
+.mon-key-i{flex-direction:row;align-items:center;gap:8px;text-align:left;padding:8px 10px 8px 0;position:relative}
+.mon-key-i b{width:28px;flex-shrink:0;text-align:center;margin-left:4px}
+.mon-key-i span{min-height:0;justify-content:flex-start;font-size:12.5px}
+.mon-key-2 .mon-key-i span{padding-left:10px}
+.mon-key-i i{position:absolute;left:0;top:0;bottom:0;width:5px;height:auto;margin:0}
 </style>
 </head>
 <body>
@@ -1362,7 +1559,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.04.128';
+const APP_VERSION = '2026.11.09.129';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -1837,6 +2034,22 @@ function generateInterventionPDF(dec, act, official) {
       doc.text(wrapped, margin, y);
       y += (wrapped.length * 9);
     }
+  }
+
+  // ═══ Monitoring tools ═══
+  if (det.monitoring && det.monitoring.tools && det.monitoring.tools.length && typeof monPdfBlocks === 'function') {
+    monPdfBlocks(det.monitoring).forEach(function(b){
+      sectionHeader(b.title, PDF_COLOR.orange);
+      kvTable(b.meta);
+      [[b.head, b.body], [b.head2, b.body2]].forEach(function(t){
+        if (!t[0] || !t[1] || !t[1].length) return;
+        if (y > pageH - 90) { doc.addPage(); y = margin; }
+        doc.autoTable({ startY:y, margin:{ left:margin, right:margin }, head:[t[0]], body:t[1], theme:'grid',
+          styles:{ font:'helvetica', fontSize:8.5, cellPadding:4, valign:'top', textColor:PDF_COLOR.navy },
+          headStyles:{ fillColor:PDF_COLOR.tealDk, textColor:PDF_COLOR.white, fontStyle:'bold' } });
+        y = doc.lastAutoTable.finalY + 16;
+      });
+    });
   }
 
   // ═══ Footer on every page ═══
@@ -2588,6 +2801,7 @@ function _commitVoiceTranscript() {
     // Fire input event so any oninput handlers (e.g. mention dropdown) run.
     try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
   }
+  if (_voiceField.indexOf('mon:') === 0) return;
   var parts = _voiceField.split('.');
   if (parts.length === 2) S[parts[0]][parts[1]] = newVal;
   else if (parts.length === 1) S.f[parts[0]] = newVal;
@@ -4757,9 +4971,10 @@ function renderForm() {
   const progressMessages = ['Let\'s start with the basics','Describe what you did','Link your work to the data','Nearly there \u2014 just context and follow-up','Check everything before submitting'];
   return `<div class="form-wrap">
     ${renderLiveProgress()}
-    <div class="form-progress">${steps.map((s,i)=>{const hasErr=allErrs.some(e=>e.step===i);return`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};render()">${i+1}. ${s}${hasErr?'<span class="step-error-dot"></span>':''}</div>`}).join('')}</div>
-    <div class="form-progress-msg">${progressMessages[step]||''}</div>
-    ${step===0?renderFormStep1():step===1?renderFormStep2():step===2?renderFormStep3():step===3?renderFormStep4():renderFormReview()}
+    <div class="form-progress">${monActiveTools().length?renderMonSteps(step):steps.map((s,i)=>{const hasErr=allErrs.some(e=>e.step===i);return`<div class="form-progress-step ${i===step?'active':i<step?'done':'upcoming'}" onclick="S.f.formStep=${i};S.f._monView=false;render()">${i+1}. ${s}${hasErr?'<span class="step-error-dot"></span>':''}</div>`}).join('')}</div>
+    ${renderMonProgressPill()}
+    <div class="form-progress-msg">${monActiveTools().length?monProgressMsg(step):(progressMessages[step]||'')}</div>
+    ${step===0?(S.f._monView&&monActiveTools().length?renderMonitoringStep():renderFormStep1()):step===1?renderFormStep2():step===2?renderFormStep3():step===3?(monActiveTools().length?renderMonTagStep():renderFormStep4()):renderFormReview()}
   </div>`;
 }
 
@@ -6049,7 +6264,7 @@ function schoolPickerHTML(){
   }
   const label=selected.length?'Add another school':'Find school';
   const sub=selected.length?'Tap to add or change':'Tap to choose the school you visited';
-  return tags+'<button type="button" class="sf-btn" onclick="openSchoolFinder()">'+label+'<span>'+sub+'</span></button>'+schoolDropdownHTML();
+  return tags+'<button type="button" class="sf-btn" onclick="openSchoolFinder()">'+label+'<span>'+sub+'</span></button>'+schoolVisitedDropdownHTML()+schoolDropdownHTML();
 }
 // Plain <select> alternative to the full-screen finder above — same district
 // scope, same addSchool() call, so the two stay in sync. Officials who'd
@@ -6114,7 +6329,7 @@ function renderLocationSelects(districtOptional){
 function renderDistrictCircuitFields(districtOptional){
   var distLabel = districtOptional ? 'District <span style="font-weight:400;color:var(--grey)">(optional)</span>' : 'District<span class="req">*</span>';
   var fieldOnly = `<div class="field" id="fld-district"><label>${distLabel}</label><select onchange="S.f.district=this.value;S.f.circuit='';S.f.schools='';S.f._schoolQ='';S.f._schoolDDOpen=false;if(S.f.intervention_theme==='Lejweleputswa Underperforming Schools Support Programme'&&this.value!=='Lejweleputswa')S.f.intervention_theme='';render()"><option value="">Select district</option>${(DISTRICTS[S.f.province]||[]).map(d=>`<option ${S.f.district===d?'selected':''}>${d}</option>`).join('')}</select></div>`;
-  var circuitRow = `<div class="field-row"><div class="field"><label>Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span></label><select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
+  var circuitRow = `<div class="field-row"><div class="field" id="fld-circuit"><label>${monCircuitRequired()?'Circuit<span class="req">*</span>':'Circuit <span style="font-weight:400;color:var(--grey)">(optional)</span>'}</label>${monCircuitRequired()?'<div class="hint">Required for the Circuit Manager tools</div>':''}<select onchange="S.f.circuit=this.value;S.f.schools='';S.f._schoolQ='';render()"><option value="">Select circuit</option>${(CIRCUITS_MAP[S.f.district]||[]).map(c=>`<option ${S.f.circuit===c?'selected':''}>${c}</option>`).join('')}</select></div></div>`;
   return { fieldOnly:fieldOnly, circuitRow:circuitRow };
 }
 function renderDistrictCircuitSelects(districtOptional){
@@ -6132,6 +6347,773 @@ function setReportLevel(lv){
   if (lv === 'province') { S.f.district=''; S.f.circuit=''; S.f.schools=''; S.f._provinceExpand=false; }
   render();
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// MONITORING TOOLS (added 2026.11.09)
+// DBE monitoring instruments that open when an official chooses District or
+// Province Monitoring as the report level. Everything is held in S.f.mon and
+// saved inside decisions.details.monitoring, so no database change is needed.
+// School-visit records are untouched: with no tools ticked, the form behaves
+// exactly as before.
+// ═══════════════════════════════════════════════════════════════════════
+const MON_ORDER = ['cm','cmfb','ses','sesfb','dip'];
+// Each tool follows its DBE Word document: same title, details block, purpose, tables and row order.
+const MON_TOOLS = {
+  cm:   { short:'CM Monitoring', name:'Circuit Manager Monitoring instrument',
+          docTitle:'District Monitoring, support and reporting instrument (Circuit Managers)',
+          purpose:'To monitor, support and evaluate the effective supervision, management functionality and performance of Circuit Managers in the execution of their responsibilities.',
+          pick:'Monitor, support and evaluate how Circuit Managers supervise and support their schools.', size:'9 areas', scale:'Target % · Rating 1–4' },
+  cmfb: { short:'CM Feedback', name:'CM Analysis & feedback report',
+          docTitle:'Analysis and feedback report on District Monitoring, support and reporting instrument by Circuit Managers',
+          purpose:'To provide feedback on the District Monitoring, support and reporting instrument completed by Circuit Managers.',
+          pick:'Feed back on the completed CM instrument: strengths, risk level and recommendations.', size:'8 areas', scale:'Risk H / M / L' },
+  ses:  { short:'SES CDMR', name:'SES Curriculum Delivery, Monitoring & Reporting instrument',
+          docTitle:'SES Curriculum delivery and Monitoring & Reporting instrument',
+          purpose:'Support and Monitoring of policy implementation and development of educators by Senior Education Specialists (SES).',
+          pick:'Monitor Senior Education Specialists on curriculum support, SBA moderation and teacher development.', size:'10 areas', scale:'Target % · Rating 1–4' },
+  sesfb:{ short:'SES Feedback', name:'SES Analysis & feedback report',
+          docTitle:'SES Analysis and feedback report',
+          purpose:'Analysis and feedback report on the Support and Monitoring of policy implementation and development of educators by Senior Education Specialists (SES).',
+          pick:'Feed back on the SES instrument per responsibility area, with risk and due dates.', size:'6 areas', scale:'Risk H / M / L' },
+  dip:  { short:'DIP QA', name:'DIP Quality Assurance instrument',
+          docTitle:'Monitoring, Support and Reporting instrument for DIP',
+          purpose:'District Improvement Plan (DIP) Quality Assurance Instrument.',
+          pick:'Quality-assure the District Improvement Plan: compliance, planning quality, targets and alignment.', size:'25 indicators', scale:'Yes / No' }
+};
+const MON_CM_FOCUS = [
+  ['Leadership','Lead and coordinate schools within the circuit; promote accountability and improvement.'],
+  ['Curriculum Delivery','Monitor teaching, learner performance, curriculum coverage, and intervention plans.'],
+  ['School Governance','Support SGBs and principals on governance matters.'],
+  ['Management Support','Assist schools with planning, compliance, and operational challenges.'],
+  ['Staff Development','Identify educator development needs and facilitate training.'],
+  ['Financial Management','Monitor school financial management and compliance.'],
+  ['Policy Compliance','Ensure implementation of departmental policies and regulations.'],
+  ['Communication','Maintain communication between schools, district office, and stakeholders.'],
+  ['Research & Development','Analyze school performance data and recommend improvements.'],
+  ['Administration','Submit reports and maintain circuit records.']
+];
+const MON_SES_FOCUS_LIST = ['Curriculum support, monitoring and evaluation','Results analysis, interpretation and intervention','Arrange & facilitation, workshops and training','Mediation of policies and all relevant documents','Support and monitoring of examinations','Moderation of school based assessment'];
+const MON_SES_FOCUS = [
+  ['Leadership','Lead and coordinate support to subject teachers within the district; promote quality teaching and learning.'],
+  ['Curriculum Delivery','Monitor teaching, learner performance, curriculum coverage, and intervention plans.'],
+  ['Resource management','Monitor and support optimal usage of resources.'],
+  ['Management Support','Assist subject teachers with planning, compliance, and operational challenges.'],
+  ['Teacher Development','Arrange & facilitate workshops and training.'],
+  ['Policy Compliance','Ensure implementation of departmental policies and regulations.'],
+  ['Communication','Maintain communication between schools, district office, and stakeholders.'],
+  ['Administration','Submit reports and maintain subject records.']
+];
+// Instrument rows, in the Word document's order: [area, indicator, evidence required, target, isSubRow]
+const MON_CM_ROWS = [
+  ['School Visits (for specific month)','Name of schools visited','Visit & feedback reports','100% of planned visits'],
+  ['Attendance of any capacity building meetings/workshops','Type of workshop/focus/topic','Evidence (attendance register, summary on content covered)','100% of planned meetings attended'],
+  ['Curriculum Monitoring & Coverage','Curriculum verification on coverage','Monitoring report & Curriculum trackers','90%+'],
+  ['Learner Performance','Analysis of results and reflection meetings conducted','Analysis report, result schedules, DDD verification, minutes of meeting and attendance registers','Quarterly'],
+  ['Principal & SMT Support','Principals mentored, one on one meetings, principals cluster meetings, development workshops','Mentoring records, invitations to meetings, agenda, minutes, attendance registers, evidence of attendance of workshops','Monthly'],
+  ['Governance Support','SGB meetings attended, SGB development workshops, sharing of documents, attendance of parents’ meetings','Records, invitations to meetings, agenda, minutes, attendance registers, evidence of attendance of workshops','Quarterly'],
+  ['Financial management & Monitoring','Name of schools monitored for compliance','Compliance reports, evidence of records','100%'],
+  ['Policy Compliance','Verification on compliance & resolving non-compliance cases','Availability of policies & implementation tracking, action reports','Quarterly'],
+  ['Stakeholder Communication & meetings','Attendance of stakeholder meetings','Invitation, agenda, minutes & attendance registers','Monthly']
+];
+const MON_CM_REPORT = ['School visits','Curriculum Monitoring & coverage','Learner Performance','Principal & SMT support','School Governance Support','Financial Management monitoring','Policy Compliance & Implementation','Stakeholder interaction'];
+const MON_SES_ROWS = [
+  ['School support visit to teachers','Number of schools visited','Recorded visit & feedback reports','80–100% of planned visits'],
+  ['Support & monitor the utilization of subject resources and other tools of trade','Curriculum verification on coverage','Monitoring report & Curriculum trackers','90%+'],
+  ['Mediation, support and monitoring of subject policy and other relevant policies (LTSM, Assessment)','Recorded dates of activities','Analysis report, result schedules, DDD verification, minutes of meeting and attendance registers','Quarterly'],
+  ['Evidence of mediation, implementation on ATP and SBA coverage','Recorded dates of activities','Mentoring records, invitations to meetings, agenda, minutes, attendance registers, evidence of attendance of workshops','Monthly'],
+  ['Support and monitoring of lesson delivery','Recorded dates of activities','Records, invitations to meetings, agenda, minutes, attendance registers, evidence of attendance of workshops','Quarterly'],
+  ['Analyze educator/learner subject attendance','Recorded dates of activities','Compliance reports, evidence of records','100%'],
+  ['Analyses of results and intervention implementation','Recorded dates of activities on verification and compliance, including resolving non-compliance cases','Availability of policies & implementation tracking, action reports, recorded activities','Quarterly'],
+  ['Facilitate and arrange subject related training, development and workshops','Recorded dates of activities, attendance of stakeholder meetings','Invitation, agenda, minutes & attendance registers','Monthly'],
+  ['Exam readiness and support, monitoring','Recorded dates of activities','Monitoring instruments and timetable','Quarterly'],
+  ['Moderation of school-based assessment','Recorded support and monitoring and moderated activities','Moderation tool, evidence of moderated activities','Monthly']
+];
+const MON_SES_REPORT = ['School support & monitoring','Curriculum delivery & implementation','Workshops conducted & teacher development','Monitoring of resources','Analyses of results, support and monitoring of intervention','Reporting and Compliance'];
+const MON_DIP = [
+  ['Compliance and administrative requirements', [
+    'Correct year and name of District on front page',
+    'Signed off by District Director and dated',
+    'Correct template & 9 Focus areas (WSE)',
+    'Period of plan: 1 Jan to 31 Dec {year}']],
+  ['Planning quality and strategic focus', [
+    'Plan prefaced with national and provincial mandates, performance data and challenges',
+    'Maximum of 3 challenges per focus area to be addressed in a specific year',
+    'Attention given to both ECD, GET and FET, including proportional resourcing',
+    'Plan for teacher development programme: teacher development targets and training duration are sufficient to bring about change in teacher practice over the medium term',
+    'Plan for Reading improvement programmes (attached as annexure)',
+    'Plan for Maths improvement programmes (attached as annexure)',
+    'Clearly identified strategies responding to identified challenges']],
+  ['Targets, indicators and implementation mechanisms', [
+    'Realistic targets mentioned',
+    'Performance/success indicator mentioned',
+    'Realistic timeframe and responsible person/unit',
+    'Quarterly progress indication/column']],
+  ['Alignment and strategic coherence', [
+    'Is the DIP based on School Self Evaluation, SIP, Annual Academic Report',
+    'Vertical policy integration across system levels (MTD, DBE, PED and District) is followed',
+    'Does the DIP have the following elements: alignment to Minister’s/MEC Delivery Agreement; MTEF; Action Plan 2030; NDP',
+    'DIP based on analysis & causes of poor performance',
+    'Results analysis, preparation and support to schools',
+    'Priorities for the year and district targets for NSC, GET Reading and Mathematics',
+    'Theory of change articulated to clarify levers of change and envisaged outcome (Inputs → Activities → Outputs → Outcomes → Impact)',
+    'Outcomes and indicators clarified',
+    'SMART principle is used to frame the performance indicators',
+    'Risk Management Register included']]
+];
+// Evaluation table codes, with the colours used in the DIP Word document
+const MON_DIP_EVAL = [['Does not meet requirements','#C62222','#FDECEC'],['Needs some attention','#B84A0C','#FFF6F1'],['Low quality','#8A6100','#FFF5D6'],['Poor quality','#155F22','#E7F6EA']];
+// Rating | Description | Status, with the colours used in the CM and SES Word documents
+const MON_RATING = { 4:['Outstanding','#155F22','#E7F6EA','#00B050'], 3:['Acceptable','#00647F','#E6F3F7','#D9F2D0'], 2:['Needs Improvement','#B84A0C','#FFF6F1','#FFC000'], 1:['Unsatisfactory','#C62222','#FDECEC','#EE0000'] };
+const MON_RISK = { H:['High','#C62222','#FDECEC'], M:['Medium','#B84A0C','#FFF6F1'], L:['Low','#155F22','#E7F6EA'] };
+// Target achieved: the share of the row's target that was met
+const MON_TBANDS = [['0-24','0–24%'],['25-49','25–49%'],['50-74','50–74%'],['75-89','75–89%'],['90-100','90–100%']];
+const MON_TBAND_LABEL = { '0-24':'0–24%', '25-49':'25–49%', '50-74':'50–74%', '75-89':'75–89%', '90-100':'90–100%' };
+
+function monState(){
+  if (!S.f.mon || typeof S.f.mon !== 'object') {
+    S.f.mon = { tools:[], tab:'', open:{},
+      cm:{ cm_name:'', schools_visited:'', r:{}, t:{}, report:{} },
+      cmfb:{ a:{}, general:'' },
+      ses:{ subject:'', ses_name:'', schools_allocated:'', r:{}, t:{}, report:{} },
+      sesfb:{ a:{}, general:'' },
+      dip:{ district:'', director:'', year:'', a:{}, c:{}, sec:{}, meeting_date:'' } };
+  }
+  ['cm','ses'].forEach(function(k){ if (!S.f.mon[k].t) S.f.mon[k].t = {}; });
+  return S.f.mon;
+}
+function monGet(path){
+  var o = monState(), p = path.split('.');
+  for (var i = 0; i < p.length; i++) { if (o == null) return ''; o = o[p[i]]; }
+  return o == null ? '' : o;
+}
+function monSet(path, val, rerender){
+  var o = monState(), p = path.split('.');
+  for (var i = 0; i < p.length - 1; i++) { if (!o[p[i]] || typeof o[p[i]] !== 'object') o[p[i]] = {}; o = o[p[i]]; }
+  o[p[p.length-1]] = val;
+  if (rerender) render();
+}
+function monAvailable(){
+  var lv = S.f.report_level || 'school';
+  if (lv === 'district') return ['cm','cmfb','ses','sesfb'];
+  if (lv === 'province') {
+    var ids = ['dip'];
+    if (S.f._provinceExpand && isRealDistrict(S.f.district)) ids = ids.concat(['cm','cmfb','ses','sesfb']);
+    return ids;
+  }
+  return [];
+}
+// One tool per record
+function monActiveTools(){
+  if (!S.f || !S.f.mon) return [];
+  var av = monAvailable(), sel = S.f.mon.tools || [];
+  return MON_ORDER.filter(function(id){ return sel.indexOf(id) > -1 && av.indexOf(id) > -1; }).slice(0, 1);
+}
+function monTool(){ return monActiveTools()[0] || ''; }
+function monToggleTool(id){
+  var m = monState();
+  m.tools = (m.tools.length === 1 && m.tools[0] === id) ? [] : [id];
+  m.tab = m.tools[0] || '';
+  // The CM instrument asks for the schools visited itself, so Where & When stops asking for schools
+  if (m.tools[0] === 'cm' && S.f.schools) {
+    var a = monCMSchoolsArr();
+    parseSchoolsArr().forEach(function(n){ if (a.indexOf(n) < 0) a.push(n); });
+    m.cm.schools_visited = a.join('; ');
+    S.f.schools = '';
+  } else if (m.tools[0] && S.f.schools) {
+    S.f.schools = '';
+    showToast('School(s) cleared \u2014 this tool does not record schools');
+  }
+  render();
+}
+// The selected tool records schools itself (CM instrument, part 1)
+function monToolHasSchools(){ return monTool() === 'cm'; }
+// Where & When hides its School(s) field once any monitoring tool is chosen: the CM instrument asks for
+// the schools visited itself, and the other tools are about officials or plans, not schools
+function monHideSchools(){ return !!monTool(); }
+// Circuit becomes compulsory for the circuit-focused tools (CM instrument or CM feedback)
+function monCircuitRequired(){ var t = monTool(); return t === 'cm' || t === 'cmfb'; }
+// Step 1 shows its own circuit select inside the picker when the district is already set (location collapsed to a summary)
+function monCircuitInPicker(){ return (S.f.report_level || 'school') === 'district' && isRealDistrict(S.f.district) && !S.f._editLoc; }
+function monCircuitSelectHTML(id){
+  var opts = (CIRCUITS_MAP[S.f.district] || []);
+  return '<div class="field" id="' + id + '" style="margin:0 0 12px"><label>Circuit<span class="req">*</span></label><div class="hint">Required for the Circuit Manager tools</div><select onchange="S.f.circuit=this.value;S.f.schools=\'\';S.f._schoolQ=\'\';render()"><option value="">Select circuit</option>' +
+    opts.map(function(c){ return '<option ' + (S.f.circuit === c ? 'selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></div>';
+}
+function monLevelName(){ return S.f.report_level === 'province' ? 'Province Monitoring' : 'District Monitoring'; }
+function monRowsFor(id){ return id === 'cm' ? MON_CM_ROWS : MON_SES_ROWS; }
+
+// Progress for the selected tool: [done, total]
+function monProgress(id){
+  var m = monState();
+  if (id === 'cm' || id === 'ses') { var rows = monRowsFor(id), c = 0; rows.forEach(function(_, i){ if (m[id].r[i]) c++; }); return [c, rows.length]; }
+  if (id === 'cmfb' || id === 'sesfb') {
+    var list = id === 'cmfb' ? MON_CM_REPORT : MON_SES_REPORT, a = m[id].a || {}, k = 0;
+    list.forEach(function(_, i){ if (a[i] && a[i].risk) k++; });
+    return [k, list.length];
+  }
+  if (id === 'dip') { var dn = 0; for (var q = 1; q <= 25; q++) { if (m.dip.a && m.dip.a[q]) dn++; } return [dn, 25]; }
+  return [0, 0];
+}
+
+// ─── Step 1: tool picker (one tool per record) ───
+function renderMonitoringPicker(){
+  var lv = S.f.report_level || 'school';
+  if (lv === 'school') return '';
+  var m = monState(), av = monAvailable(), cur = monTool();
+  var groups = lv === 'district'
+    ? [['Circuit Managers','Needs a circuit',['cm','cmfb']],['Senior Education Specialists','Needs a subject',['ses','sesfb']]]
+    : [['District Improvement Plans','One plan per district',['dip']]].concat(av.indexOf('cm') > -1 ? [['Circuit Managers','Needs a circuit',['cm','cmfb']],['Senior Education Specialists','Needs a subject',['ses','sesfb']]] : []);
+  var html = '<div class="form-group mon-picker" id="fld-mon-tools" role="radiogroup" aria-label="Monitoring tool"><div class="form-group-label">Monitoring tool <span class="mon-tag" style="background:var(--orange-lt);color:var(--orange-text);margin-left:6px;text-transform:none;letter-spacing:0">' + (lv === 'district' ? 'District' : 'Province') + '</span></div>' +
+    '<div class="hint" style="margin:-6px 0 10px">' + (cur ? 'To pick a different tool, tap the selected tool or Change tool.' : 'Choose the one tool you are completing for ' + monLevelName() + '. To complete another tool, submit this record and start a new one. Optional.') + '</div>';
+  // Once a tool is chosen, only that tool is shown until it is cleared
+  if (cur) groups = groups.filter(function(g){ return g[2].indexOf(cur) > -1; }).map(function(g){ return [g[0], g[1], [cur]]; });
+  groups.forEach(function(g){
+    html += '<div class="mon-group-hdr"><span>' + g[0] + '</span><small>' + g[1] + '</small></div>';
+    var isCMGroup = g[0] === 'Circuit Managers';
+    g[2].forEach(function(id){
+      var t = MON_TOOLS[id], on = cur === id;
+      html += '<button type="button" role="radio" class="mon-tool' + (on ? ' on' : '') + '" aria-checked="' + on + '" onclick="monToggleTool(\'' + id + '\')">' +
+        '<span class="mon-radio"></span>' +
+        '<span style="flex:1;min-width:0"><span class="mon-tool-name">' + t.name + '</span><span class="mon-tool-purpose">' + t.pick + '</span>' +
+        '<span style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="mon-tag" style="background:var(--teal-lt);color:var(--teal)">' + t.size + '</span><span class="mon-tag" style="background:var(--green-lt);color:var(--green-dk)">' + t.scale + '</span></span></span></button>';
+    });
+    if (isCMGroup && monCircuitRequired() && monCircuitInPicker()) html += monCircuitSelectHTML('fld-mon-circuit-step1');
+  });
+  if (!cur && lv === 'province' && av.indexOf('cm') < 0) {
+    html += '<div class="mon-note">🔒 <span><strong>Circuit Manager and SES tools</strong> unlock when you name a district above.</span></div>';
+  }
+  html += '<div class="mon-sel-sum"><span>' + (cur ? 'Selected: <strong>' + MON_TOOLS[cur].name + '</strong>' : 'No tool selected') + '</span>' + (cur ? '<button type="button" onclick="monState().tools=[];render()">Change tool</button>' : '') + '</div></div>';
+  return html;
+}
+
+function monStep1Next(){
+  var tools = monActiveTools();
+  if (!tools.length) { validateAndNext(0, 1); return; }
+  if (getStepErrors(0).length) { validateAndNext(0, 1); return; }   // shows the usual errors, stays on step 1
+  S._validationErrors = null;
+  var m = monState();
+  m.tab = tools[0];
+  if (!m.dip.district && S.f.district) m.dip.district = S.f.district;
+  if (!m.dip.year) m.dip.year = String(new Date().getFullYear());
+  S.f._monView = true;
+  logEvent('monitoring_opened', 0);
+  render();
+  (S._suppressScrollRestore = true, window.scrollTo({ top:0, behavior:'auto' }));
+}
+function monGoTab(id){ monState().tab = id; S.f.formStep = 0; S.f._monView = true; render(); (S._suppressScrollRestore = true, window.scrollTo({ top:0, behavior:'auto' })); }
+
+// Required fields per tool. Ratings are encouraged, not forced.
+function monToolErrors(id){
+  var m = monState(), e = [];
+  if (id === 'cm' || id === 'cmfb') {
+    if (!S.f.circuit) e.push({ field:'circuit', label:'Circuit', fieldId:'fld-mon-circuit-' + id, tool:id });
+    if (!String(m.cm.cm_name || '').trim()) e.push({ field:'cm_name', label:'Name of CM', fieldId:'fld-mon-cmname-' + id, tool:id });
+  }
+  if (id === 'ses' || id === 'sesfb') {
+    if (!m.ses.subject) e.push({ field:'ses_subject', label:'Name of subject', fieldId:'fld-mon-subject-' + id, tool:id });
+    if (!String(m.ses.ses_name || '').trim()) e.push({ field:'ses_name', label:'Name of SES', fieldId:'fld-mon-sesname-' + id, tool:id });
+  }
+  if (id === 'dip' && !m.dip.district) e.push({ field:'dip_district', label:'District whose DIP is reviewed', fieldId:'fld-mon-dipdist', tool:id });
+  return e;
+}
+function monErrors(){
+  var out = [];
+  monActiveTools().forEach(function(id){ monToolErrors(id).forEach(function(x){ x.step = 0; x.mon = true; out.push(x); }); });
+  out = out.filter(function(x){ return x.field !== 'circuit'; });
+  if (monCircuitRequired() && !S.f.circuit) {
+    out.unshift({ step:0, field:'circuit', label:'Circuit (required for Circuit Manager tools)', fieldId: monCircuitInPicker() ? 'fld-mon-circuit-step1' : 'fld-circuit' });
+  }
+  return out;
+}
+function monNext(){
+  var m = monState();
+  var errs = monToolErrors(m.tab);
+  if (errs.length) {
+    showToast('Please complete: ' + errs.map(function(x){ return x.label; }).join(', '));
+    haptic(HAPTIC_ERR);
+    setTimeout(function(){ var el = document.getElementById(errs[0].fieldId); if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('field-error'); setTimeout(function(){ el.classList.remove('field-error'); }, 3000); } }, 120);
+    return;
+  }
+  S.f._monView = false; S.f.formStep = 3;   // monitoring records skip Steps 2–4: go to Tag officials
+  logEvent('step_advanced', 3);
+  render();
+  (S._suppressScrollRestore = true, window.scrollTo({ top:0, behavior:'auto' }));
+}
+function monBack(){
+  S.f._monView = false;
+  render();
+  (S._suppressScrollRestore = true, window.scrollTo({ top:0, behavior:'auto' }));
+}
+// The step bar already names the tool, so no extra chip row is needed
+function renderMonProgressPill(){ return ''; }
+
+// ─── Shared building blocks ───
+function monRo(label, value){ return '<div class="mon-ro"><span>' + label + '</span><b>' + (value ? esc(value) : '<em style="font-weight:400;color:var(--grey)">Not set</em>') + '</b></div>'; }
+function monInput(id, label, path, ph, type){
+  return '<div class="field"' + (id ? ' id="' + id + '"' : '') + '><label>' + label + '</label><input type="' + (type || 'text') + '" value="' + esc(monGet(path)) + '" placeholder="' + esc(ph || '') + '" oninput="monSet(\'' + path + '\',this.value)"></div>';
+}
+// Voice notes: the tracker's own Record voice note button, pointed at a monitoring field.
+// The transcript lands in the box and fires its input event, which saves it via monSet.
+function monVoiceId(path){ return 'mv-' + path.replace(/[^a-zA-Z0-9]/g, '-'); }
+function monMic(path){ return (typeof micBtn === 'function') ? micBtn('mon:' + path.replace(/\./g, '|'), monVoiceId(path)) : ''; }
+function monText(label, path, rows, ph){
+  var id = monVoiceId(path);
+  return '<div class="field"><label for="' + id + '">' + label + '</label><div class="voice-row"><textarea id="' + id + '" rows="' + (rows || 3) + '" placeholder="' + esc(ph || 'Type, or tap the microphone to speak') + '" oninput="monSet(\'' + path + '\',this.value)">' + esc(monGet(path)) + '</textarea>' + monMic(path) + '</div></div>';
+}
+function monLine(path, ph, aria, style){
+  var id = monVoiceId(path);
+  return '<div class="voice-row mon-line"' + (style ? ' style="' + style + '"' : '') + '><input type="text" id="' + id + '" class="mon-comment" aria-label="' + esc(aria) + '" placeholder="' + esc(ph) + '" value="' + esc(monGet(path)) + '" oninput="monSet(\'' + path + '\',this.value)">' + monMic(path) + '</div>';
+}
+function monCircuitSelect(tool){
+  var opts = (CIRCUITS_MAP[S.f.district] || []);
+  return '<select id="fld-mon-circuit-' + tool + '" aria-label="Circuit" onchange="S.f.circuit=this.value;render()"><option value="">Select circuit</option>' +
+    opts.map(function(c){ return '<option ' + (S.f.circuit === c ? 'selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>';
+}
+function monSubjectSelect(tool){
+  var subs = (typeof allCapsSubjectsFlat === 'function') ? allCapsSubjectsFlat() : [];
+  var cur = monGet('ses.subject');
+  return '<select id="fld-mon-subject-' + tool + '" aria-label="Name of subject" onchange="monSet(\'ses.subject\',this.value,true)"><option value="">Select subject</option>' +
+    subs.map(function(s){ return '<option ' + (cur === s ? 'selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>';
+}
+function monTextInput(id, path, ph, type){
+  return '<input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(monGet(path)) + '" placeholder="' + esc(ph || '') + '" oninput="monSet(\'' + path + '\',this.value)">';
+}
+// ITEMS | DETAILS block, as at the top of each Word document. rows: [label, html, required]
+// Items & details: same items as the Word document, shown as tiles
+function monDetails(rows){
+  return '<div class="mon-card mon-detail-card"><div class="mon-card-h"><span>Items</span><span>Details</span></div><div class="mon-tiles">' +
+    rows.map(function(r){ var input = /<(select|input)/.test(r[1]);
+      return '<div class="mon-tile' + (input ? ' mon-tile-wide' : '') + '"><span class="mon-tile-l">' + r[0] + (r[2] ? '<span class="req">*</span>' : '') + '</span><span class="mon-tile-v">' + r[1] + '</span></div>'; }).join('') +
+    '</div></div>';
+}
+function monRoVal(v){ return v ? esc(v) : '<em style="color:var(--grey)">Not set</em>'; }
+function monPurpose(t){ return '<div class="mon-purpose"><span class="mon-pill">Purpose</span><p>' + t + '</p></div>'; }
+function monDocTitle(t, sub){ return '<div class="mon-banner"><span class="mon-banner-k">DBE monitoring tool</span><h3>' + t + '</h3>' + (sub ? '<p>' + sub + '</p>' : '') + '</div>'; }
+function monFocusTable(rows){
+  return '<div class="mon-doc-h">Focus areas</div><div class="mon-card"><div class="mon-card-h"><span>Responsibility Area</span><span>Expected Actions</span></div><ol class="mon-focus">' +
+    rows.map(function(r){ return '<li><b>' + r[0] + '</b><span>' + r[1] + '</span></li>'; }).join('') + '</ol></div>';
+}
+// Rating | Description | Status key, plus what the Dashboard Rating is for
+function monRatingKey(whom){
+  return '<div class="mon-card"><div class="mon-card-h"><span>Rating</span><span>Description</span><span>Status</span></div><div class="mon-key">' +
+    [4,3,2,1].map(function(n){ var r = MON_RATING[n]; return '<div class="mon-key-i" style="background:' + r[2] + ';color:' + r[1] + '"><b>' + n + '</b><span>' + r[0] + '</span><i style="background:' + r[1] + '" aria-hidden="true"></i></div>'; }).join('') + '</div></div>' +
+    '<div class="mon-define"><div><strong>Target achieved (%)</strong> — how much of the target in that row was met, e.g. the share of planned visits that took place. Pick one band.</div>' +
+    '<div><strong>Dashboard Rating (1–4)</strong> — your overall judgement of how well the ' + whom + ' performs in that area, using the indicator, the evidence you saw and the target achieved. It uses the scale above and is the rating shown on the Tracker Dashboard.</div></div>';
+}
+function monBandButtons(tool, i){
+  var v = monGet(tool + '.t.' + i), id = 'mt-' + tool + '-' + i;
+  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Target achieved (%)" onchange="monSet(\'' + tool + '.t.' + i + '\',this.value,true)">' +
+    '<option value="">Select…</option>' +
+    MON_TBANDS.map(function(b){ return '<option value="' + b[0] + '"' + (v === b[0] ? ' selected' : '') + '>' + b[1] + '</option>'; }).join('') + '</select>';
+}
+function monRateButtons(tool, i){
+  var v = String(monGet(tool + '.r.' + i) || ''), id = 'mr-' + tool + '-' + i;
+  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Dashboard Rating 1 to 4"' + (v ? ' style="border-left:6px solid ' + MON_RATING[v][3] + ';color:' + MON_RATING[v][1] + '"' : '') + ' onchange="monSet(\'' + tool + '.r.' + i + '\',this.value?Number(this.value):\'\',true)">' +
+    '<option value="">Select…</option>' +
+    [4,3,2,1].map(function(n){ return '<option value="' + n + '"' + (v === String(n) ? ' selected' : '') + '>' + n + ' – ' + MON_RATING[n][0] + '</option>'; }).join('') + '</select>';
+}
+function monRatedStatus(v){
+  if (!v) return '<span class="mon-status" style="color:var(--grey)">Not rated yet</span>';
+  var r = MON_RATING[v];
+  return '<span class="mon-status" style="color:' + r[1] + '">' + v + ' · ' + r[0] + '</span>';
+}
+// Supporting documents: the tracker's own upload (same files, limits and storage as Step 4)
+function monAttachHTML(){
+  var files = S.f.doc_files || [], names = S.f.doc_file_names || [];
+  var h = '<div class="mon-doc-h">Supporting documents</div><div class="field" id="fld-mon-docs"><div class="hint">Optional — attach evidence such as visit and feedback reports, attendance registers, minutes, monitoring reports or the signed tool. Up to 5 files, 6MB each.</div>';
+  if (files.length < 5) {
+    h += '<div class="upload-area" onclick="document.getElementById(\'fileInput\').click()" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" ondrop="event.preventDefault();this.classList.remove(\'drag-over\');handleFileDrop(event)">' +
+      '<input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.csv" onchange="handleFileSelect(event)" multiple>' +
+      '<div class="upload-label">Tap to attach a document</div><div class="upload-hint">PDF, Word, Excel, images — max 6MB per file — ' + (5 - files.length) + ' slot' + (5 - files.length !== 1 ? 's' : '') + ' remaining</div></div>';
+  } else {
+    h += '<div style="text-align:center;font-size:14px;color:var(--orange-text);padding:10px;background:var(--orange-lt);border-radius:6px;margin-bottom:6px">Maximum 5 files reached</div>';
+  }
+  h += files.map(function(file, idx){ return '<div class="file-preview"><span class="file-name">' + esc(names[idx] || file.name) + '</span><span style="font-size:13px;color:var(--grey)">' + (file.size / 1024).toFixed(0) + 'KB</span><button type="button" class="file-remove" onclick="removeDocFile(' + idx + ')" title="Remove" aria-label="Remove ' + esc(names[idx] || file.name) + '">&times;</button></div>'; }).join('');
+  return h + '</div>';
+}
+function monSignOff(dateLabel){
+  return '<table class="mon-doc-tbl mon-details" style="margin-top:12px"><tbody>' +
+    '<tr><th scope="row">Name and surname</th><td>' + monRoVal(S.f.official_name) + '</td></tr>' +
+    '<tr><th scope="row">' + (dateLabel || 'Date of monitoring') + '</th><td>' + monRoVal(S.f.activity_date) + '</td></tr>' +
+    '<tr><th scope="row">Signature</th><td><span class="hint">Signed by submitting this record</span></td></tr></tbody></table>';
+}
+
+// ─── CM part 1: schools visited, picked from the district/circuit school list ───
+function monCMSchoolsArr(){ var v = monGet('cm.schools_visited'); return v ? String(v).split(/\s*;\s*/).filter(Boolean) : []; }
+function monCMSetSchools(arr){ monSet('cm.schools_visited', arr.join('; ')); render(); }
+function monCMAddSchool(name){ name = String(name || '').trim(); if (!name) return; var a = monCMSchoolsArr(); if (a.indexOf(name) < 0) a.push(name); monCMSetSchools(a); }
+function monCMRemoveSchool(i){ var a = monCMSchoolsArr(); a.splice(i, 1); monCMSetSchools(a); }
+function monCMAddOther(){ var el = document.getElementById('monCMOther'); if (el) monCMAddSchool(el.value); }
+function monCMSchoolsPicker(){
+  var sel = monCMSchoolsArr();
+  var all = (typeof getAvailableSchools === 'function') ? getAvailableSchools() : [];
+  var avail = all.filter(function(o){ return sel.indexOf(o[0]) < 0; });
+  var scope = S.f.circuit || S.f.district || 'this district';
+  var h = '<div class="field" id="fld-mon-cmschools" style="margin-top:8px">';
+  if (sel.length) {
+    h += '<div class="school-tags">' + sel.map(function(n, i){ return '<span class="school-tag"><span class="st-info"><span class="st-name">' + esc(n) + '</span></span><button type="button" onclick="monCMRemoveSchool(' + i + ')">Remove</button></span>'; }).join('') + '</div>';
+  }
+  if (all.length) {
+    h += '<select aria-label="Add a school visited" onchange="if(this.value){monCMAddSchool(this.value);}" style="width:100%;padding:9px 10px;border:1.5px solid var(--teal);border-radius:6px;font-size:16px;font-family:inherit;background:#F3F9F9;color:var(--navy);min-height:44px">' +
+      '<option value="">' + (avail.length ? 'Choose a school (' + avail.length + ' in ' + esc(scope) + ')…' : 'All schools in ' + esc(scope) + ' added') + '</option>' +
+      avail.map(function(o){ return '<option value="' + esc(o[0]) + '">' + esc(o[0]) + '</option>'; }).join('') + '</select>';
+  } else {
+    h += '<div class="hint" style="margin:0 0 4px">' + (S.f.circuit ? 'The school list for ' + esc(scope) + ' is not available. Type the school name below.' : 'Choose the circuit first to see its schools.') + '</div>';
+  }
+  h += '<div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="monCMOther" placeholder="Not on the list? Type it" onkeydown="if(event.key===\'Enter\'){event.preventDefault();monCMAddOther();}" style="flex:1;min-width:0;padding:9px 10px;border:1px solid #c8c6c4;border-radius:6px;font-size:16px;font-family:inherit;min-height:44px"><button type="button" onclick="monCMAddOther()" style="flex-shrink:0;min-height:44px;padding:0 14px;border-radius:6px;border:1.5px solid var(--teal);background:#fff;color:var(--teal);font:inherit;font-size:14px;font-weight:700;cursor:pointer">Add</button></div>';
+  h += '<div class="hint" style="margin-top:4px">' + sel.length + ' school' + (sel.length === 1 ? '' : 's') + ' selected</div></div>';
+  return h;
+}
+
+// ─── Instruments (CM and SES), laid out like the Word documents ───
+function renderMonInstrument(tool){
+  var m = monState(), isCM = tool === 'cm';
+  var rows = monRowsFor(tool), reportAreas = isCM ? MON_CM_REPORT : MON_SES_REPORT;
+  var html = monDocTitle(MON_TOOLS[tool].docTitle);
+  html += isCM
+    ? monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Circuit', monCircuitSelect(tool), 1],
+        ['Name of CM', monTextInput('fld-mon-cmname-' + tool, 'cm.cm_name', 'e.g. Mr T Nkosi'), 1], ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]])
+    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Name of subject', monSubjectSelect(tool), 1],
+        ['Name of SES', monTextInput('fld-mon-sesname-' + tool, 'ses.ses_name', 'e.g. Ms N Dlamini'), 1], ['Number of schools allocated', monTextInput('fld-mon-schools-' + tool, 'ses.schools_allocated', 'Number', 'number')],
+        ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]]);
+  html += monPurpose(MON_TOOLS[tool].purpose);
+  if (!isCM) html += '<div class="mon-doc-h">Focus areas</div><div class="mon-card"><div class="mon-card-h"><span>Responsibility Area</span></div><div class="mon-chips">' + MON_SES_FOCUS_LIST.map(function(x){ return '<span>' + x + '</span>'; }).join('') + '</div></div>';
+  html += monFocusTable(isCM ? MON_CM_FOCUS : MON_SES_FOCUS);
+  html += '<div class="mon-doc-h">' + (isCM ? 'Circuit Manager' : 'SES') + ' Monitoring, Support and Reporting Instrument</div>' + monRatingKey(isCM ? 'Circuit Manager' : 'SES');
+  var n = 0, subOpen = false;
+  function pair(i){
+    return '<div class="mon-pair"><label><span>Target achieved (%)</span>' + monBandButtons(tool, i) + '</label><label><span>Dashboard Rating (1–4)</span>' + monRateButtons(tool, i) + '</label></div>';
+  }
+  rows.forEach(function(a, i){
+    var sub = !!a[4];
+    if (sub) {
+      // School Visits by type: one small table under the School Visits row
+      if (!subOpen) { html += '<div class="mon-subtbl"><div class="mon-subtbl-h">School Visits by type</div><div class="mon-pair mon-subcols"><span>Target achieved (%)</span><span>Dashboard Rating (1\u20134)</span></div>'; subOpen = true; }
+      html += '<div class="mon-subrow"><div class="mon-subrow-t">' + (function(t){ t = t.replace('Support & monitoring visits for ', ''); return t.charAt(0).toUpperCase() + t.slice(1); })(a[0]) + '</div>' + pair(i) + '</div>';
+      if (!(rows[i + 1] && rows[i + 1][4])) { html += '</div>'; subOpen = false; }
+      return;
+    }
+    n++;
+    html += '<div class="mon-item mon-compact"><h4>' + n + '. ' + a[0] + '</h4>' +
+      (a[1] ? '<div class="mon-line2"><b>Indicator:</b> ' + a[1] + '</div>' : '') +
+      (isCM && i === 0 ? monCMSchoolsPicker() : '') +
+      (a[2] ? '<div class="mon-line2"><b>Evidence:</b> ' + a[2] + '</div>' : '') +
+      (a[3] ? '<div class="mon-line2"><b>Target:</b> ' + a[3] + '</div>' : '') +
+      pair(i) + '</div>';
+  });
+  // Instrument summary
+  var counts = { 4:0, 3:0, 2:0, 1:0 }, rated = 0;
+  rows.forEach(function(_, i){ var v = m[tool].r[i]; if (v) { counts[v]++; rated++; } });
+  html += '<div class="mon-summary"><div class="mon-summary-lbl">Dashboard Ratings · ' + rated + ' of ' + rows.length + ' rated</div><div class="mon-summary-grid">' +
+    [4,3,2,1].map(function(k){ return '<div><b>' + counts[k] + '</b><span>' + MON_RATING[k][0] + '</span></div>'; }).join('') + '</div></div>';
+  // Report: Responsibility Area | Analysis & Recommendations
+  html += '<div class="mon-doc-h">Report</div><div class="mon-report"><div class="mon-report-cols"><span>Responsibility Area</span><span>Analysis &amp; Recommendations</span></div>';
+  reportAreas.forEach(function(a, i){ html += monText(a, tool + '.report.' + i, 2); });
+  html += '</div>' + monAttachHTML() + monSignOff('Date of monitoring');
+  return html;
+}
+
+// ─── Feedback reports (CM and SES), laid out like the Word documents ───
+function renderMonFeedback(tool){
+  var m = monState(), isCM = tool === 'cmfb';
+  var areas = isCM ? MON_CM_REPORT : MON_SES_REPORT;
+  var html = monDocTitle(MON_TOOLS[tool].docTitle);
+  html += isCM
+    ? monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Circuit', monCircuitSelect(tool), 1],
+        ['Name of CM', monTextInput('fld-mon-cmname-' + tool, 'cm.cm_name', 'e.g. Mr T Nkosi'), 1], ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]])
+    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Name of subject', monSubjectSelect(tool), 1],
+        ['Name of SES', monTextInput('fld-mon-sesname-' + tool, 'ses.ses_name', 'e.g. Ms N Dlamini'), 1], ['Number of schools allocated', monTextInput('fld-mon-schools-' + tool, 'ses.schools_allocated', 'Number', 'number')],
+        ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]]);
+  html += monPurpose(MON_TOOLS[tool].purpose);
+  var cnt = { H:0, M:0, L:0 };
+  areas.forEach(function(_, i){ var r = (m[tool].a[i] || {}).risk; if (r) cnt[r]++; });
+  html += '<div class="mon-riskbar"><span>Responsibility Area</span>' + ['H','M','L'].map(function(k){ return '<b style="background:' + MON_RISK[k][2] + ';color:' + MON_RISK[k][1] + '">' + cnt[k] + ' ' + MON_RISK[k][0] + '</b>'; }).join('') + '</div>';
+  areas.forEach(function(a, i){
+    var rec = m[tool].a[i] || {}, base = tool + '.a.' + i;
+    var rk = rec.risk ? MON_RISK[rec.risk] : null;
+    html += '<div class="mon-fb">' +
+      '<div class="mon-fb-top"><h4>' + a + '</h4>' +
+        '<label class="mon-fb-risk"><span>Risk Level</span><select id="mk-' + tool + '-' + i + '" class="mon-select' + (rk ? ' set' : '') + '"' + (rk ? ' style="border-left:6px solid ' + rk[1] + ';color:' + rk[1] + '"' : '') + ' onchange="monSet(\'' + base + '.risk\',this.value,true)">' +
+          '<option value="">Select…</option>' + ['H','M','L'].map(function(k){ return '<option value="' + k + '"' + (rec.risk === k ? ' selected' : '') + '>' + MON_RISK[k][0] + '</option>'; }).join('') + '</select></label></div>' +
+      monText('Analysis', base + '.analysis', 2, 'Strengths and areas of improvement') +
+      monText('Recommendations', base + '.rec', 2, 'What should happen next') +
+      '<div class="mon-pair"><label><span>Responsible official</span><input type="text" value="' + esc(rec.resp || '') + '" placeholder="Name" oninput="monSet(\'' + base + '.resp\',this.value)"></label>' +
+        '<label><span>Due date</span><input type="date" value="' + esc(rec.due || '') + '" oninput="monSet(\'' + base + '.due\',this.value)"></label></div>' +
+      '</div>';
+  });
+  html += '<div class="mon-fb"><div class="mon-fb-top"><h4>General comments</h4></div>' + monText('General comments', tool + '.general', 2, 'Anything else to note') + '</div>';
+  html += monAttachHTML() + monSignOff('Date of monitoring');
+  return html;
+}
+
+// ─── DIP Quality Assurance, laid out like the Word document ───
+function monDipText(t){ return t.replace('{year}', esc(monGet('dip.year') || '')); }
+function renderMonDip(){
+  var m = monState(), d = m.dip;
+  var dists = (DISTRICTS[S.f.province] || []);
+  var html = monDocTitle(MON_TOOLS.dip.docTitle + ' ' + esc(d.year || ''));
+  html += monDetails([['PED', monRoVal(S.f.province)],
+    ['District', '<select id="fld-mon-dipdist" aria-label="District" onchange="monSet(\'dip.district\',this.value,true)"><option value="">Select district</option>' + dists.map(function(x){ return '<option ' + (d.district === x ? 'selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select>', 1],
+    ['District Director', monTextInput('fld-mon-dipdir', 'dip.director', 'Name')],
+    ['Year of DIP', monTextInput('fld-mon-dipyear', 'dip.year', 'e.g. 2026', 'number')],
+    ['DBE Reviewer', monRoVal(S.f.official_name)], ['Date Reviewed', monRoVal(S.f.activity_date)]]);
+  html += monPurpose(MON_TOOLS.dip.purpose);
+  html += '<div class="mon-doc-h">Evaluation table</div><div class="mon-card"><div class="mon-card-h"><span>Indicator</span><span>Code</span></div><div class="mon-key mon-key-2">' +
+    MON_DIP_EVAL.map(function(e){ return '<div class="mon-key-i" style="background:' + e[2] + ';color:' + e[1] + '"><span>' + e[0] + '</span><i style="background:' + e[1] + '" aria-hidden="true"></i></div>'; }).join('') + '</div></div>';
+  var met = 0, answered = 0, n = 0;
+  MON_DIP.forEach(function(sec){ sec[1].forEach(function(){ n++; if (d.a[n]) answered++; if (d.a[n] === 'Y') met++; }); });
+  html += '<div class="mon-summary"><div class="mon-summary-top"><span class="mon-summary-lbl">Indicators met (Yes)</span><b>' + met + ' <small>of 25</small></b></div><div class="mon-meter"><div style="width:' + Math.round(met / 25 * 100) + '%"></div></div><div class="mon-summary-sub">' + answered + ' of 25 answered</div></div>';
+  html += '<div class="mon-yn-cols"><span>Indicator</span><span>Yes / No</span></div>';
+  n = 0;
+  MON_DIP.forEach(function(sec){
+    html += '<div class="mon-acc"><div class="mon-acc-hdr"><span class="mon-acc-title" style="text-transform:uppercase;font-size:13px;letter-spacing:.4px">' + sec[0] + '</span></div><div class="mon-acc-body" style="padding:0">';
+    sec[1].forEach(function(text){
+      n++;
+      var id = n, v = d.a[id];
+      html += '<div class="mon-yn-row"><span class="mon-yn-n">' + id + '</span><span class="mon-yn-t">' + monDipText(text) + '</span><span class="mon-seg mon-segyn" role="radiogroup" aria-label="Indicator ' + id + '">' +
+        '<button type="button" role="radio" aria-checked="' + (v === 'Y') + '" onclick="monSet(\'dip.a.' + id + '\',\'Y\',true)" style="' + (v === 'Y' ? 'background:var(--green);color:#fff;border-color:var(--green)' : 'color:var(--green-dk)') + '">Yes</button>' +
+        '<button type="button" role="radio" aria-checked="' + (v === 'N') + '" onclick="monSet(\'dip.a.' + id + '\',\'N\',true)" style="' + (v === 'N' ? 'background:var(--red);color:#fff;border-color:var(--red)' : 'color:var(--red)') + '">No</button></span></div>' +
+        monLine('dip.c.' + id, 'Comments', 'Comments on indicator ' + id, 'margin:0 14px 10px');
+    });
+    html += '</div></div>';
+  });
+  // Reporting instrument: Indicator | Analysis | Risks | Recommendation
+  html += '<div class="mon-doc-h">Reporting instrument</div>';
+  MON_DIP.forEach(function(sec, si){
+    var ev = (d.sec[si] || {}).eval || '';
+    html += '<div class="mon-acc"><div class="mon-acc-hdr"><span class="mon-acc-title" style="text-transform:uppercase;font-size:13px;letter-spacing:.4px">' + sec[0] + '</span></div><div class="mon-acc-body">' +
+      monText('Analysis (key strengths &amp; weaknesses)', 'dip.sec.' + si + '.analysis', 3) + monText('Risks', 'dip.sec.' + si + '.risks', 2) +
+      monText('Recommendation (responsible official &amp; due date)', 'dip.sec.' + si + '.rec', 2) +
+      '<div class="field"><label>Evaluation code</label><select onchange="monSet(\'dip.sec.' + si + '.eval\',this.value)"><option value="">Select…</option>' +
+      MON_DIP_EVAL.map(function(x){ return '<option ' + (ev === x[0] ? 'selected' : '') + '>' + x[0] + '</option>'; }).join('') + '</select></div></div></div>';
+  });
+  html += monAttachHTML();
+  html += '<table class="mon-doc-tbl mon-details" style="margin-top:12px"><tbody>' +
+    '<tr><th scope="row">Name and Surname</th><td>' + monRoVal(S.f.official_name) + '</td></tr>' +
+    '<tr><th scope="row">Date</th><td>' + monRoVal(S.f.activity_date) + '</td></tr>' +
+    '<tr><th scope="row">Signature</th><td><span class="hint">Signed by submitting this record</span></td></tr>' +
+    '<tr><th scope="row">Date of PED/District feedback meeting</th><td>' + monTextInput('fld-mon-dipmeet', 'dip.meeting_date', '', 'date') + '</td></tr></tbody></table>';
+  return html;
+}
+
+// ─── The monitoring screen (sub-step of Step 1) ───
+function renderMonitoringStep(){
+  var m = monState(), tool = monTool();
+  m.tab = tool;
+  var body = tool === 'dip' ? renderMonDip() : (tool === 'cmfb' || tool === 'sesfb') ? renderMonFeedback(tool) : renderMonInstrument(tool);
+  return '<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--orange-hi)"><div><h2>' + MON_TOOLS[tool].name + '</h2><p>' + monLevelName() + '</p></div></div><div class="sec-body">' +
+    body +
+    '<div class="hint" style="margin-top:10px">Province, district, date and your name carry over from Where &amp; When.</div>' +
+    '<div class="form-nav"><button class="btn btn-outline" onclick="monBack()">&larr; Back</button><button class="btn btn-teal" onclick="monNext()">Next: Tag officials (optional) &rarr;</button></div>' +
+    '</div></div>';
+}
+
+// ─── Review card ───
+function renderMonitoringReview(){
+  var tool = monTool();
+  if (!tool) return '';
+  var m = monState(), p = monProgress(tool), rows = [];
+  if (tool === 'cm' || tool === 'cmfb') { rows.push(rvRow('Circuit', S.f.circuit)); rows.push(rvRow('Name of CM', m.cm.cm_name)); }
+  if (tool === 'cm') rows.push(rvRow('Schools visited', monCMSchoolsArr().join(', ')));
+  if (tool === 'ses' || tool === 'sesfb') { rows.push(rvRow('Name of SES', m.ses.ses_name)); rows.push(rvRow('Name of subject', m.ses.subject)); }
+  if (tool === 'cm' || tool === 'ses') {
+    var low = 0, banded = 0, rws = monRowsFor(tool);
+    rws.forEach(function(_, i){ if (m[tool].r[i] && m[tool].r[i] <= 2) low++; if (m[tool].t[i]) banded++; });
+    rows.push(rvRow('Dashboard Ratings', p[0] + ' of ' + p[1] + ' rated' + (low ? ' · ' + low + ' rated 1–2' : '')));
+    rows.push(rvRow('Target achieved', banded + ' of ' + rws.length + ' recorded'));
+  } else if (tool === 'dip') {
+    var met = 0; for (var q in m.dip.a) { if (m.dip.a[q] === 'Y') met++; }
+    rows.push(rvRow('District', m.dip.district)); rows.push(rvRow('Indicators met', met + ' of 25 · ' + p[0] + ' answered'));
+  } else {
+    var hi = 0; for (var a in m[tool].a) { if ((m[tool].a[a] || {}).risk === 'H') hi++; }
+    rows.push(rvRow('Risk levels set', p[0] + ' of ' + p[1] + (hi ? ' · ' + hi + ' high' : '')));
+  }
+  rows.push(rvRow('Supporting documents', (S.f.doc_file_names || []).join(', ') || 'None attached'));
+  return renderMonTagReview() + '<div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">' + MON_TOOLS[tool].name + ' <button type="button" onclick="monGoTab(\'' + tool + '\')" style="float:right;background:none;border:none;color:var(--teal);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Edit</button></div>' + rows.join('') + '</div>';
+}
+
+// ─── Saved payload (decisions.details.monitoring) ───
+function monPayload(){
+  var m = monState(), tools = monActiveTools(), out = { version:2, level:S.f.report_level, tools:tools.slice() };
+  function instr(id, rows, reportAreas){
+    return {
+      indicators: rows.map(function(a, i){ var v = m[id].r[i] || null, t = m[id].t[i] || null;
+        return { area:a[0], sub_row:!!a[4], indicator:a[1], evidence:a[2], target:a[3], target_achieved:t, target_achieved_label:t ? MON_TBAND_LABEL[t] : null, rating:v, rating_label:v ? MON_RATING[v][0] : null }; }),
+      report: reportAreas.map(function(a, i){ return { area:a, analysis:m[id].report[i] || '' }; })
+    };
+  }
+  function fb(id, areas){
+    return { areas: areas.map(function(a, i){ var r = m[id].a[i] || {}; return { area:a, analysis:r.analysis || '', risk:r.risk || null, recommendation:r.rec || '', responsible:r.resp || '', due:r.due || '' }; }), general:m[id].general || '' };
+  }
+  if (tools.indexOf('cm') > -1) out.cm = Object.assign({ circuit:S.f.circuit, cm_name:m.cm.cm_name, schools_visited:m.cm.schools_visited }, instr('cm', MON_CM_ROWS, MON_CM_REPORT));
+  if (tools.indexOf('cmfb') > -1) out.cmfb = Object.assign({ circuit:S.f.circuit, cm_name:m.cm.cm_name }, fb('cmfb', MON_CM_REPORT));
+  if (tools.indexOf('ses') > -1) out.ses = Object.assign({ subject:m.ses.subject, ses_name:m.ses.ses_name, schools_allocated:m.ses.schools_allocated }, instr('ses', MON_SES_ROWS, MON_SES_REPORT));
+  if (tools.indexOf('sesfb') > -1) out.sesfb = Object.assign({ subject:m.ses.subject, ses_name:m.ses.ses_name, schools_allocated:m.ses.schools_allocated }, fb('sesfb', MON_SES_REPORT));
+  if (tools.indexOf('dip') > -1) {
+    var n = 0, metTotal = 0;
+    out.dip = { district:m.dip.district, director:m.dip.director, year:m.dip.year, meeting_date:m.dip.meeting_date,
+      sections: MON_DIP.map(function(sec, si){
+        var met = 0, s = m.dip.sec[si] || {};
+        var items = sec[1].map(function(t){ n++; var v = m.dip.a[n] || null; if (v === 'Y') { met++; metTotal++; } return { n:n, indicator:monDipText(t), answer:v, comment:m.dip.c[n] || '' }; });
+        return { section:sec[0], met:met, total:sec[1].length, indicators:items, analysis:s.analysis || '', risks:s.risks || '', recommendation:s.rec || '', evaluation:s.eval || '' };
+      }) };
+    out.dip.met_total = metTotal;
+  }
+  return out;
+}
+
+// ─── PDF blocks (used by generateInterventionPDF) ───
+function monPdfBlocks(mon){
+  var blocks = [];
+  if (!mon || !mon.tools) return blocks;
+  function instrBody(x){ return [x.area, x.indicator || '', x.target || '', x.target_achieved_label || '—', x.rating ? x.rating + ' — ' + x.rating_label : '—']; }
+  var iHead = ['Area','Indicator','Target','Target achieved','Dashboard Rating (1–4)'];
+  if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', mon.cm.schools_visited]],
+    head:iHead, body:mon.cm.indicators.map(instrBody),
+    head2:['Responsibility Area','Analysis & Recommendations'], body2:mon.cm.report.filter(function(r){ return r.analysis; }).map(function(r){ return [r.area, r.analysis]; }) });
+  if (mon.cmfb) blocks.push({ title:MON_TOOLS.cmfb.docTitle, meta:[['Circuit', mon.cmfb.circuit], ['Name of CM', mon.cmfb.cm_name], ['General comments', mon.cmfb.general]],
+    head:['Responsibility Area','Analysis','Risk Level (H/M/L)','Recommendations (responsible official & due date)'], body:mon.cmfb.areas.map(function(a){ return [a.area, a.analysis, a.risk ? MON_RISK[a.risk][0] : '—', [a.recommendation, a.responsible, a.due].filter(Boolean).join(' · ')]; }) });
+  if (mon.ses) blocks.push({ title:MON_TOOLS.ses.docTitle, meta:[['Name of subject', mon.ses.subject], ['Name of SES', mon.ses.ses_name], ['Number of schools allocated', mon.ses.schools_allocated]],
+    head:iHead, body:mon.ses.indicators.map(instrBody),
+    head2:['Responsibility Area','Analysis & Recommendations'], body2:mon.ses.report.filter(function(r){ return r.analysis; }).map(function(r){ return [r.area, r.analysis]; }) });
+  if (mon.sesfb) blocks.push({ title:MON_TOOLS.sesfb.docTitle, meta:[['Name of subject', mon.sesfb.subject], ['Name of SES', mon.sesfb.ses_name], ['General comments', mon.sesfb.general]],
+    head:['Responsibility Area','Analysis','Risk Level (H/M/L)','Recommendations (responsible official & due date)'], body:mon.sesfb.areas.map(function(a){ return [a.area, a.analysis, a.risk ? MON_RISK[a.risk][0] : '—', [a.recommendation, a.responsible, a.due].filter(Boolean).join(' · ')]; }) });
+  if (mon.dip) {
+    var body = [];
+    mon.dip.sections.forEach(function(s){ s.indicators.forEach(function(x){ body.push([String(x.n), x.indicator, x.answer === 'Y' ? 'Yes' : x.answer === 'N' ? 'No' : '—', x.comment]); }); });
+    blocks.push({ title:MON_TOOLS.dip.docTitle + ' ' + (mon.dip.year || ''), meta:[['District', mon.dip.district], ['District Director', mon.dip.director], ['Year of DIP', mon.dip.year], ['Indicators met', mon.dip.met_total + ' of 25'], ['Date of PED/District feedback meeting', mon.dip.meeting_date]],
+      head:['#','Indicator','Yes/No','Comments'], body:body,
+      head2:['Indicator','Analysis','Risks','Recommendation','Evaluation code'], body2:mon.dip.sections.map(function(s){ return [s.section + ' (' + s.met + '/' + s.total + ')', s.analysis, s.risks, s.recommendation, s.evaluation]; }) });
+  }
+  return blocks;
+}
+
+// ─── Dashboard section ───
+function renderMonitoringDash(decs){
+  var recs = (decs || []).filter(function(d){ var mm = (d.details || {}).monitoring; return mm && mm.tools && mm.tools.length; });
+  var hdr = '<div class="dash-section mon-dash"><div class="dash-section-hdr"><h3 id="dash-monitoring">Monitoring tools</h3><span style="font-size:13.5px;color:var(--grey)">' + recs.length + ' record' + (recs.length === 1 ? '' : 's') + '</span></div><div class="dash-section-body">';
+  if (!recs.length) {
+    return hdr + '<div class="dash-section-desc" style="margin:0">No monitoring instruments captured for these filters yet. Choose <strong>District</strong> or <strong>Province Monitoring</strong> when you record, then choose the tool you used.</div></div></div>';
+  }
+  var counts = { cm:0, cmfb:0, ses:0, sesfb:0, dip:0 };
+  var risks = [], areaAgg = {}, dipBy = {};
+  var todayStr = (typeof today === 'function') ? today() : new Date().toISOString().slice(0, 10);
+  recs.forEach(function(d){
+    var mm = d.details.monitoring, det = d.details;
+    mm.tools.forEach(function(t){ if (counts[t] !== undefined) counts[t]++; });
+    ['cmfb','sesfb'].forEach(function(k){
+      if (!mm[k]) return;
+      mm[k].areas.forEach(function(a){
+        if (a.risk === 'H') risks.push({ area:a.area, src:(k === 'cmfb' ? 'CM feedback · ' + (mm[k].circuit || det.district || '') : 'SES feedback · ' + (mm[k].subject || '')), who:a.responsible || 'Not assigned', due:a.due || '', over:!!(a.due && a.due < todayStr), by:d.made_by || '' });
+      });
+    });
+    if (mm.cm) mm.cm.indicators.forEach(function(x){ if (!x.rating) return; var g = areaAgg[x.area] || (areaAgg[x.area] = { 4:0, 3:0, 2:0, 1:0 }); g[x.rating]++; });
+    if (mm.dip && mm.dip.district) { var prev = dipBy[mm.dip.district]; if (!prev || (d.date || '') > prev.date) dipBy[mm.dip.district] = { met:mm.dip.met_total || 0, date:d.date || '' }; }
+  });
+  var html = hdr + '<div class="mon-dash-tiles">' + MON_ORDER.map(function(id){ return '<div><b>' + counts[id] + '</b><span>' + MON_TOOLS[id].short + '</span></div>'; }).join('') + '</div>';
+  risks.sort(function(a, b){ return (b.over - a.over) || String(a.due || '9').localeCompare(String(b.due || '9')); });
+  html += '<div class="mon-dash-h">Open high-risk recommendations <span class="mon-tag" style="background:var(--red-lt);color:var(--red)">' + risks.length + '</span></div>';
+  html += risks.length ? risks.slice(0, 6).map(function(r){
+    return '<div class="mon-dash-risk"><div><b>' + esc(r.area) + '</b><span class="mon-tag" style="' + (r.over ? 'background:var(--red-lt);color:var(--red)' : 'background:var(--orange-lt);color:var(--orange-text)') + '">' + (r.due ? (r.over ? 'Overdue · ' : 'Due ') + esc(r.due) : 'No due date') + '</span></div><small>' + esc(r.src) + ' · Responsible: ' + esc(r.who) + '</small></div>';
+  }).join('') : '<div class="dash-section-desc">No high-risk areas recorded.</div>';
+  var areaNames = Object.keys(areaAgg);
+  if (areaNames.length) {
+    var cols = { 4:'#155F22', 3:'#0087AC', 2:'#E86820', 1:'#C62222' };
+    html += '<div class="mon-dash-h">Circuit Manager ratings by area</div><div class="mon-legend">' + [4,3,2,1].map(function(n){ return '<span><i style="background:' + cols[n] + '"></i>' + n + ' ' + MON_RATING[n][0] + '</span>'; }).join('') + '</div>';
+    areaNames.forEach(function(a){
+      var g = areaAgg[a], tot = g[4] + g[3] + g[2] + g[1];
+      html += '<div class="mon-bar-row"><div>' + esc(a) + ' <small>(' + tot + ')</small></div><div class="mon-bar" role="img" aria-label="' + esc(a) + ': ' + g[4] + ' rated 4, ' + g[3] + ' rated 3, ' + g[2] + ' rated 2, ' + g[1] + ' rated 1">' +
+        [4,3,2,1].map(function(n){ return g[n] ? '<span style="width:' + (g[n] / tot * 100) + '%;background:' + cols[n] + '"></span>' : ''; }).join('') + '</div></div>';
+    });
+  }
+  var dipNames = Object.keys(dipBy).sort();
+  if (dipNames.length) {
+    html += '<div class="mon-dash-h">DIP quality assurance by district <small style="font-weight:400;color:var(--grey)">(indicators met of 25)</small></div>';
+    dipNames.forEach(function(k){ var v = dipBy[k]; html += '<div class="mon-dip-row"><span>' + esc(k) + '</span><span class="mon-meter"><span style="width:' + (v.met / 25 * 100) + '%"></span></span><b>' + v.met + '/25</b></div>'; });
+  }
+  return html + '</div></div>';
+}
+
+// ─── Monitoring records: short flow (Where & When → tools → Tag officials → Review) ───
+// Steps 2–4 of the intervention record don't apply to a monitoring report, so they are skipped.
+function monStepIndex(step){ if (step === 0) return S.f._monView ? 1 : 0; if (step === 3) return 2; if (step === 4) return 3; return 2; }
+function renderMonSteps(step){
+  var cur = monStepIndex(step);
+  var items = [['Where & When', '0', 'false'], ['Monitoring tool', '0', 'true'], ['Tag officials (optional)', '3', 'false'], ['Review', '4', 'false']];
+  return items.map(function(it, i){
+    return '<div class="form-progress-step ' + (i === cur ? 'active' : i < cur ? 'done' : 'upcoming') + '" onclick="S.f.formStep=' + it[1] + ';S.f._monView=' + it[2] + ';render()">' + (i + 1) + '. ' + it[0] + '</div>';
+  }).join('');
+}
+function monProgressMsg(step){
+  return ['Let’s start with the basics', 'Fill in the tool you chose', 'Tag anyone who needs to act on this', 'Check everything before submitting'][monStepIndex(step)];
+}
+function monTagCount(){ var n = 0, t = S.f.tagged_officials || {}; Object.keys(t).forEach(function(k){ n += (t[k] || []).length; }); return n; }
+function renderMonTagStep(){
+  var list = SUPPORT_NEEDED.map(function(s){
+    var se = s.replace(/'/g, "\\'");
+    var isChecked = S.f.support_needed.indexOf(s) > -1, hasRoles = !!ROLE_SUPPORT_MAP[s];
+    return '<label><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="togCtx(S.f.support_needed,\'' + se + '\',this.checked,\'support\')"><span>' + s + '</span></label>' +
+      (isChecked && hasRoles ? '<div style="margin:-4px 0 8px 28px;padding:8px 10px;background:#f8f9fc;border-radius:6px;border-left:1px solid #E4E7EA"><div style="font-size:13px;color:var(--grey);margin-bottom:4px">Tag a specific official to notify (optional — leave blank to alert all matching-role officials)</div>' + renderOfficialSearch(s) + '</div>' : '');
+  }).join('');
+  var n = monTagCount();
+  return '<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--orange-hi)"><div><h2>Tag officials <span style="font-weight:400;color:var(--grey)">(optional)</span></h2><p>Who needs to act on this monitoring report?</p></div></div><div class="sec-body">' +
+    '<div class="hint" style="margin-bottom:10px">You can skip this step. If someone needs to act on this report, tick the support needed and tag the official — they are notified when you submit.</div>' +
+    '<div class="field"><div class="checkbox-grp">' + list + '</div>' +
+    (S.f.support_needed.indexOf('Other') > -1 ? otherSpecifyBlock('support_needed_other', 'Support Needed', 'Describe the support needed') : '') + '</div>' +
+    '<div class="mon-sel-sum" style="margin-bottom:4px"><span><strong>' + n + '</strong> official' + (n === 1 ? '' : 's') + ' tagged</span></div>' +
+    '<div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=0;S.f._monView=true;render()">&larr; Back</button><button class="btn btn-teal" onclick="S.f.formStep=4;render()">' + (n || (S.f.support_needed || []).length ? 'Review' : 'Skip to Review') + ' &rarr;</button></div>' +
+    '</div></div>';
+}
+// Review screen: drop the intervention-only cards and show who was tagged
+function renderFormReview(){
+  var h = _renderFormReviewCore();
+  if (!monActiveTools().length) return h;
+  if (monTool()) h = h.replace(/None \u2014 report covers the (district|province) as a whole/g, monToolHasSchools() ? 'Listed in the CM Monitoring instrument below' : 'Not needed for this tool');
+  var drop = ['>Activity Details</div>', '>Data Connection</div>', '>Context & Follow-up</div>'];
+  h = h.split('\n').filter(function(line){
+    var t = line.trim();
+    return !(t.indexOf('<div class="review-card"><div class="review-card-hdr"') === 0 && drop.some(function(d){ return t.indexOf(d) > -1; }));
+  }).join('\n');
+  return h;
+}
+function renderMonTagReview(){
+  if (!monActiveTools().length) return '';
+  var rows = '', t = S.f.tagged_officials || {};
+  Object.keys(t).forEach(function(k){ (t[k] || []).forEach(function(o){ rows += rvRow(k === '_form_mentions' ? 'Mentioned' : k, (o.name || '') + (o.role ? ' — ' + o.role : '')); }); });
+  var needs = (S.f.support_needed || []).filter(function(sn){ return !(t[sn] && t[sn].length); });
+  if (needs.length) rows += rvRow('Support needed (all matching officials alerted)', mergeOtherDisplay(needs, S.f.support_needed_other).join('; '));
+  return '<div class="review-card"><div class="review-card-hdr" style="color:var(--teal)">Officials tagged <button type="button" onclick="S.f.formStep=3;render()" style="float:right;background:none;border:none;color:var(--teal);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Edit</button></div>' + (rows || rvRow('Tagged', 'Nobody tagged')) + '</div>';
+}
+// Fill the intervention fields a monitoring record skips, so the saved record reads sensibly
+function monPrepareSubmit(){
+  if (!monActiveTools().length) return;
+  if (!S.f.activity_types.length) { S.f.activity_types = ['Monitoring / follow-up visit']; S.f.activity_type = 'Monitoring / follow-up visit'; }
+}
+function monActionText(){ return 'DBE monitoring tools: ' + monActiveTools().map(function(id){ return MON_TOOLS[id].short; }).join(', '); }
+// ═══ END MONITORING TOOLS ═══
+
+// ─── "Schools you have visited" drop-down (added 2026.11.10) ───
+// Sits under Find school, above the full "Or choose from the list…" drop-down.
+// Lists schools in the chosen district/circuit that already have a recorded
+// visit in the last two terms, most-visited first.
+function schoolVisitedDropdownHTML(){
+  if(!isRealDistrict(S.f.district)) return '';
+  var vh = (typeof _sfVisitHistory === 'function') ? _sfVisitHistory() : {};
+  var sel = parseSchoolsArr();
+  var list = getAvailableSchools().map(function(o){ return o[0]; })
+    .filter(function(n){ return vh[n] && vh[n].total > 0 && sel.indexOf(n) === -1; })
+    .sort(function(a, b){ return (vh[b].total - vh[a].total) || a.localeCompare(b); });
+  var style = 'width:100%;margin-top:8px;padding:9px 10px;border:1.5px solid var(--teal);border-radius:6px;font-size:14px;font-family:inherit;background:#F3F9F9;color:var(--navy)';
+  if (!list.length) {
+    return '<select disabled aria-label="Schools you have visited" style="' + style + ';opacity:.6"><option>No visits recorded here yet this term or last</option></select>';
+  }
+  var opts = '<option value="">Schools you have visited (' + list.length + ')…</option>' + list.map(function(n){
+    var v = vh[n], who = v.byYou ? (v.byYou === v.total ? 'you ' + v.byYou + '×' : 'you ' + v.byYou + '×, colleagues ' + (v.total - v.byYou) + '×') : 'colleagues ' + v.total + '×';
+    return '<option value="' + esc(n) + '">' + esc(n) + ' — visited by ' + who + '</option>';
+  }).join('');
+  return '<select aria-label="Schools you have visited" onchange="if(this.value){addSchool(this.value);this.value=\'\';}" style="' + style + '">' + opts + '</select>';
+}
+
 function renderReportLevelSelector(){
   var lv = S.f.report_level || 'school';
   var opts = [
@@ -6170,7 +7152,7 @@ function renderScopeSection(){
     if (provKnown) {
       if (S.f._provinceExpand) {
         extra += '<div style="margin-top:10px">' + renderDistrictCircuitSelects(true);
-        if (isRealDistrict(S.f.district)) {
+        if (isRealDistrict(S.f.district) && !monHideSchools()) {
           var _pSchoolArr = parseSchoolsArr(); var _pSchoolCount = _pSchoolArr.length;
           extra += '<div class="field" id="fld-schools"><label>School(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Only if this report also covers specific schools</div>'+schoolPickerHTML()+(_pSchoolCount>0?'<div class="school-count-indicator">'+_pSchoolCount+' school'+(_pSchoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>';
         }
@@ -6186,7 +7168,7 @@ function renderScopeSection(){
     var _dSchoolArr = parseSchoolsArr(); var _dSchoolCount = _dSchoolArr.length;
     var html = '<div class="form-group"><div class="form-group-label">Which district?</div>';
     html += isRealDistrict(S.f.district) ? '' : renderLocationSelects(false);
-    html += '<div class="field" id="fld-schools"><label>School(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">This report covers the district as a whole — add specific school(s) too if useful'+(S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):'')+'</div>'+schoolPickerHTML()+(_dSchoolCount>0?'<div class="school-count-indicator">'+_dSchoolCount+' school'+(_dSchoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>';
+    if (!monHideSchools()) html += '<div class="field" id="fld-schools"><label>School(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">This report covers the district as a whole — add specific school(s) too if useful'+(S.f.circuit?' in '+esc(S.f.circuit):S.f.district?' in '+esc(S.f.district):'')+'</div>'+schoolPickerHTML()+(_dSchoolCount>0?'<div class="school-count-indicator">'+_dSchoolCount+' school'+(_dSchoolCount!==1?'s':'')+' selected</div>':'')+renderVisitHistoryCard()+'</div>';
     html += isRealDistrict(S.f.district) ? renderLocationSummary() : '';
     html += '</div>';
     return html;
@@ -6235,6 +7217,7 @@ function renderFormStep1(){
   return `<div class="section fade-in"><div class="sec-hdr" style="border-color:var(--teal)"><div><h2>1. Where & When</h2><p>Location, date, and who is capturing this</p></div></div><div class="sec-body">
     ${renderReportLevelSelector()}
     ${renderScopeSection()}
+    ${renderMonitoringPicker()}
     <div class="form-group"><div class="form-group-label">Date and term</div>
     <div class="field-row"><div class="field"><label>Term<span class="req">*</span></label><select onchange="S.f.term=this.value">${['Term 1 2026','Term 2 2026','Term 3 2026','Term 4 2026'].map(t=>`<option ${S.f.term===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Date<span class="req">*</span></label><input type="date" value="${S.f.activity_date}" max="${today()}" onchange="S.f.activity_date=this.value;S.f.term=deriveTermFromDate(this.value);render()"></div></div>
     </div>
@@ -6242,7 +7225,7 @@ function renderFormStep1(){
     <div class="field-row"><div class="field"><label>Your name<span class="req">*</span></label><input type="text" placeholder="e.g. Ms F Moshoeshoe" value="${esc(S.f.official_name)}" oninput="S.f.official_name=this.value"></div><div class="field" id="fld-email"><label>Email address<span class="req">*</span></label><input type="email" placeholder="e.g. name@education.gov.za" value="${esc(S.f.official_email)}" oninput="S.f.official_email=this.value"></div></div>
     ${(function(){ var pk=_profileKnown(); if(pk.both && !S.f._editProfile){ return '<div class="field"><label>Logging as</label><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#F3F9F9;border:1.5px solid var(--teal);border-radius:8px;padding:11px 13px"><span style="font-size:15.5px;font-weight:600;color:var(--teal-dk)">'+esc(_profileLabel())+'</span><button type="button" onclick="S.f._editProfile=true;render()" style="background:none;border:1.5px solid var(--teal);color:var(--teal);border-radius:6px;padding:6px 10px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer">Change</button></div></div>'; } return `<div class="field-row"><div class="field" id="fld-role"><label>Designation<span class="req">*</span></label><select onchange="S.f.official_role=this.value;if(this.value!=='Other')S.f.official_role_other='';render()"><option value="">Select...</option>${['Chief Director','Chief Education Specialist','Deputy Chief Education Specialist','Deputy Director General','Deputy Minister','Director','Director General','Member','Senior Education Specialist','Circuit Manager','Subject Advisor','Cluster Lead','Provincial Manager','District Director','Principal','Deputy Principal','Departmental Head','Teacher','Other'].map(r=>'<option '+(S.f.official_role===r?'selected':'')+'>'+r+'</option>').join('')}</select>${S.f.official_role==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Designation \u2014 please specify:</div><input type="text" placeholder="e.g. Curriculum Implementer, GET Coordinator..." value="'+esc(S.f.official_role_other)+'" oninput="S.f.official_role_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div><div class="field" id="fld-spec"><label>Specialisation<span class="req">*</span></label><select onchange="S.f.official_specialisation=this.value;if(this.value!=='Other')S.f.official_specialisation_other='';render()"><option value="">Select...</option>${['Corporate Services','Curriculum','DDD Project Role','Education Partners','EMIS & IT','Management & Governance','Other'].map(s=>'<option '+(S.f.official_specialisation===s?'selected':'')+'>'+s+'</option>').join('')}</select>${S.f.official_specialisation==='Other'?'<div style="margin-top:6px"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px">You selected \u201cOther\u201d for Specialisation \u2014 please specify:</div><input type="text" placeholder="e.g. ICT in Education, Inclusive Education..." value="'+esc(S.f.official_specialisation_other)+'" oninput="S.f.official_specialisation_other=this.value" style="width:100%;padding:8px 10px;border:1px solid #c8c6c4;border-radius:4px;font-size:14px;font-family:inherit"></div>':''}</div></div>`; })()}
     </div>
-    <div class="form-nav form-nav--end"><button class="btn btn-teal" onclick="validateAndNext(0,1)">Next &rarr;</button></div>
+    <div class="form-nav form-nav--end"><button class="btn btn-teal" onclick="monStep1Next()">${monActiveTools().length?'Next: Monitoring tools':'Next'} &rarr;</button></div>
     ${_saveLaterBar()}
   </div></div>`;
 }
@@ -6446,7 +7429,7 @@ function renderFormStep2(){
     <div class="field"><label>Performance Focus Area(s) <span style="font-weight:400;color:var(--grey)">(optional)</span></label><div class="hint">Select all areas this activity addresses</div><div class="checkbox-grp">${SIP_FOCUS_AREAS.map(a=>{const ae=a.replace(/'/g,"\\\'");return`<label><input type="checkbox" ${S.f.sip_focus_areas.includes(a)?'checked':''} onchange="togArr(S.f.sip_focus_areas,'${ae}',this.checked);render()"><span>${a}</span></label>`}).join('')}</div>${S.f.sip_focus_areas.includes('Other')?otherSpecifyBlock('sip_focus_areas_other','Performance Focus Area','e.g. Sport and extracurricular participation...'):''}</div>
     <div class="field"><label>Brief description</label><div class="hint">1-2 lines: what happened?</div><div class="voice-row"><textarea id="ta-desc" rows="2" placeholder="e.g. Modelled fractions teaching strategy with 3 Foundation Phase educators..." oninput="S.f.description=this.value">${esc(S.f.description)}</textarea>${micBtn('description','ta-desc')}</div></div>
     <div style="margin:4px 0 12px"><div onclick="S.f._obsOpen=!S.f._obsOpen;render()" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0f7f7;border:1px solid #d0e4e4;border-radius:${S.f._obsOpen?'8px 8px 0 0':'8px'};transition:border-radius .2s"><span style="font-size:14px;color:var(--teal-dk);transition:transform .2s;display:inline-block;transform:rotate(${S.f._obsOpen?'90':'0'}deg)">▶</span><div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--teal-dk)">School observation checklist</div><div style="font-size:13px;color:var(--grey);margin-top:1px">Optional — quick check of school status</div></div>${(()=>{const a=SCHOOL_OBS.filter(o=>S.f.obs[o.key]!=='').length;return a>0?'<span style="font-size:13px;font-weight:700;color:var(--teal);background:#d0e4e4;padding:2px 8px;border-radius:10px">'+a+'/10</span>':'';})()}</div>${S.f._obsOpen?`<div style="border:1px solid #d0e4e4;border-top:none;border-radius:0 0 8px 8px;padding:12px 14px;background:#fafefe">${(()=>{let html='';let lastGrp='';SCHOOL_OBS.forEach(o=>{if(o.group!==lastGrp){if(lastGrp)html+='</div>';html+='<div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:'+(lastGrp?'12':'0')+'px 0 6px;padding-bottom:3px;border-bottom:1px solid #e0eded">'+esc(o.group)+'</div><div style="display:grid;gap:4px">';lastGrp=o.group;}const v=S.f.obs[o.key];const kEsc=o.key.replace(/'/g,'\x27');html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:'+(v==='yes'?'#E7F6EA':v==='no'?'#FFEBEE':'#fff')+';border:1px solid '+(v==='yes'?'#C8E6C9':v==='no'?'#FFCDD2':'#E0E0E0')+';transition:all .2s"><div style="flex:1;font-size:13.5px;color:var(--navy);line-height:1.4">'+esc(o.label)+'</div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="S.f.obs.'+kEsc+'='+(v==="yes"?"\x27\x27":"\x27yes\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='yes'?'var(--green)':'#c8c6c4')+';background:'+(v==='yes'?'var(--green)':'#fff')+';color:'+(v==='yes'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓</button><button onclick="S.f.obs.'+kEsc+'='+(v==="no"?"\x27\x27":"\x27no\x27")+';render()" style="width:32px;height:26px;border-radius:4px;border:1.5px solid '+(v==='no'?'var(--red)':'#c8c6c4')+';background:'+(v==='no'?'var(--red)':'#fff')+';color:'+(v==='no'?'#fff':'#999')+';font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✗</button></div></div>';});html+='</div>';return html;})()}</div>`:''}</div>
-    <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=0;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(1,2)">Next &rarr;</button></div>
+    <div class="form-nav"><button class="btn btn-outline" onclick="S.f.formStep=0;S.f._monView=monActiveTools().length>0;render()">&larr; Back</button><button class="btn btn-teal" onclick="validateAndNext(1,2)">Next &rarr;</button></div>
     ${_saveLaterBar()}
   </div></div>`;
 }
@@ -6803,7 +7786,7 @@ function mergeOtherDisplay(arr,otherText){
 }
 function dddLbl(v){const m={'yes-direct':'Yes \u2014 directly triggered','yes-informed':'Yes \u2014 informed approach','partially':'Partially','other-data':'Yes \u2014 other data source','no':'No'};return m[v]||'\u2014'}
 function supLbl(v){const m={'light':'Light touch','regular':'Regular support','intensive':'Intensive support'};return m[v]||'\u2014'}
-function renderFormReview(){
+function _renderFormReviewCore(){
   const f=S.f;
   // Trigger GPS capture when user reaches the review step (idempotent — won't refire)
   if (S._gpsStatus === 'idle') {
@@ -6816,6 +7799,7 @@ function renderFormReview(){
     <div class="review-card"><div class="review-card-hdr" style="color:var(--green-text)">Activity Details</div>${rvRow('Theme',f.intervention_theme==='Other'&&f.intervention_theme_other?'Other: '+f.intervention_theme_other:f.intervention_theme)}${rvRow('Activity',f.activity_type==='Other'&&f.activity_type_other?'Other: '+f.activity_type_other:f.activity_type)}${rvRow('Grades',f.grades.length?f.grades.map(g=>'Gr '+g).join(', '):'')}${rvRow('Subjects',f.subjects.map(s=>s==='Other'&&f.subjects_other?'Other: '+f.subjects_other:s).join(', '))}${rvRow('Performance Focus',f.sip_focus_areas.length?mergeOtherDisplay(f.sip_focus_areas,f.sip_focus_areas_other).join('; '):'')}${rvRow('Description',f.description)}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--blue)">Data Connection</div>${rvRow('Data used',dddLbl(f.ddd_used))}${rvRow('Reports',mergeOtherDisplay(f.ddd_reports,f.ddd_reports_other).join(', '))}${rvRow('Report Accessed',f.ddd_access_date||'')}${rvRow('Logged into Dashboard',f.ddd_dashboard_confirmed==='yes'?'Yes':f.ddd_dashboard_confirmed==='no'?'No':'')}${rvRow('Other data source',f.other_data_source||'')}${rvRow('Additional data sources',f.additional_data_sources||'')}${rvRow('Data Issue',(f.insight_types&&f.insight_types.length?f.insight_types.map(function(v){return INSIGHT_TYPE_MAP[v]||v}).join('; '):({'subject-performance':'Subject / pass rate','learner-attendance':'Learner attendance','educator-attendance':'Educator attendance','sba-exam-gap':'SBA-Exam gap','curriculum-coverage':'Curriculum coverage','promotion-criteria':'Promotion criteria','other-issue':'Other'}[f.insight_type]||'')))}${f.insight_educator_absent?rvRow('Educators Affected',f.insight_educator_absent):''}${f.insight_attendance_days?rvRow('Days Absent',f.insight_attendance_days+'+'):''}${f.insight_sba_exam_gap?rvRow('SBA-Exam Gap',f.insight_sba_exam_gap+'%'):''}${f.insight_curriculum_pct?rvRow('Curriculum Covered',f.insight_curriculum_pct+'%'):''}${rvRow('Detail',f.insight_detail)}${buildInsightStatement()?`<div style="padding:8px 14px;background:var(--green-lt);border-radius:0 0 6px 6px"><div style="font-size:13px;font-weight:700;color:var(--green-dk);margin-bottom:2px">WHAT YOU FOUND</div><div style="font-size:14px;color:var(--navy);font-weight:600;line-height:1.5">${buildInsightStatement()}</div></div>`:''}${rvRow('What Made You Act',f.intervention_triggers.length?(f.intervention_triggers.includes('Other')&&f.intervention_trigger_other?f.intervention_triggers.filter(d=>d!=='Other').concat(['Other: '+f.intervention_trigger_other]).join('; '):f.intervention_triggers.join('; ')):(f.intervention_trigger==='Other'&&f.intervention_trigger_other?'Other: '+f.intervention_trigger_other:f.intervention_trigger))}${rvRow('Planned intervention',f.decision_types.length?(f.decision_types.includes('Other')&&f.decision_other?f.decision_types.filter(d=>d!=='Other').concat(['Other: '+f.decision_other]).join('; '):f.decision_types.join('; ')):'')}${rvRow('Intervention activity',f.action_types.length?(f.action_types.includes('Other')&&f.action_other?f.action_types.filter(a=>a!=='Other').concat(['Other: '+f.action_other]).join('; '):f.action_types.join('; ')):'')}</div>
     <div class="review-card"><div class="review-card-hdr" style="color:var(--orange-text)">Context & Follow-up</div>${rvRow('Support Needed',f.support_needed.length?mergeOtherDisplay(f.support_needed,f.support_needed_other).join('; '):'')}${rvRow('Support Level',supLbl(f.support_level))}${rvRow('Context',[...mergeOtherDisplay(f.ctx_staffing,f.ctx_staffing_other),...mergeOtherDisplay(f.ctx_resources,f.ctx_resources_other),...mergeOtherDisplay(f.ctx_learners,f.ctx_learners_other)].filter(c=>c!=='All posts filled'&&c!=='Adequate'&&c!=='No major concerns').join(', '))}${f.ctx_notes?rvRow('Notes',f.ctx_notes):''}${(()=>{const answered=SCHOOL_OBS.filter(o=>f.obs[o.key]!=='');if(!answered.length)return'';const yesC=answered.filter(o=>f.obs[o.key]==='yes').length;const noC=answered.filter(o=>f.obs[o.key]==='no').length;let html='<div class="review-row"><span class="review-label">School Observation</span><span class="review-value">'+yesC+' in place, '+noC+' not in place ('+answered.length+'/10 checked)</span></div>';const issues=SCHOOL_OBS.filter(o=>f.obs[o.key]==='no');if(issues.length)html+='<div class="review-row"><span class="review-label">Issues Found</span><span class="review-value" style="color:var(--red)">'+issues.map(o=>esc(o.label)).join('; ')+'</span></div>';return html;})()}${rvRow('Educators Supported',f.educators_supported)}${rvRow('Follow-up',f.follow_up?'Yes':'No')}${f.follow_up?rvRow('Follow-up Detail',f.follow_up_desc):''}${f.doc_files&&f.doc_files.length?rvRow('Attached',f.doc_file_names.join(', ')):f.doc_file_name?rvRow('Attached',f.doc_file_name):''}${f.doc_url?rvRow('Link',f.doc_name||f.doc_url):''}</div>
+    ${renderMonitoringReview()}
     <div class="field" style="margin:14px 0 4px;padding:12px 14px;background:#f7f9fc;border-radius:8px">
       <label style="font-size:14.5px;font-weight:600;color:var(--navy)">Send a copy to a colleague <span style="font-weight:400;color:var(--grey)">(optional)</span></label>
       <div class="hint">Your School Visit Report is emailed to you automatically. Add a colleague or your line manager here to copy them in.</div>
@@ -6949,12 +7933,12 @@ function getValidationErrors() {
  if (!f.ddd_used) errs.push({step:2,field:'ddd_used',label:'Was data used?',fieldId:'fld-ddd-used'});
  if (!f.action_types.length) errs.push({step:2,field:'action_types',label:'Intervention activity (action taken)',fieldId:'fld-action'});
  if (f.action_types.includes('Other')&&!f.action_other.trim()) errs.push({step:2,field:'action_other',label:'Intervention activity (please describe)',fieldId:'fld-action'});
- return errs;
+ return (monActiveTools().length ? errs.filter(function(e){ return e.step === 0; }) : errs).concat(monErrors());
 }
 
 // Get errors for a specific step only
 function getStepErrors(stepIdx) {
- return getValidationErrors().filter(e => e.step === stepIdx);
+ return getValidationErrors().filter(e => e.step === stepIdx && !e.mon);
 }
 
 // Render inline validation banner
@@ -6964,8 +7948,8 @@ function renderValidationBanner(errors) {
  return `<div class="validation-banner">
    <h3>${errors.length} thing${errors.length>1?'s':''} still needed before you can submit</h3>
    <ul class="validation-missing">${errors.map(e =>
-     `<li onclick="S.f.formStep=${e.step};S._validationErrors=getValidationErrors();render();setTimeout(()=>{const el=document.getElementById('${e.fieldId}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('field-error');setTimeout(()=>el.classList.remove('field-error'),3000);}},200)">
-       <span class="vm-step">Step ${e.step+1}</span>
+     `<li onclick="S.f.formStep=${e.step};S.f._monView=${e.mon?'true':'false'};${e.mon&&e.tool?'monState().tab=\''+e.tool+'\';':''}S._validationErrors=getValidationErrors();render();setTimeout(()=>{const el=document.getElementById('${e.fieldId}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('field-error');setTimeout(()=>el.classList.remove('field-error'),3000);}},200)">
+       <span class="vm-step">${e.mon?'Monitoring':'Step '+(e.step+1)}</span>
        <span class="vm-field">${e.label}</span>
        <span class="vm-arrow">\u2192</span>
      </li>`).join('')}
@@ -7010,6 +7994,7 @@ async function submitForm() {
    return;
  }
  S._validationErrors = null;
+ monPrepareSubmit();
 
  S.saving = true; render();
 
@@ -7056,6 +8041,7 @@ async function submitForm() {
       official_role:S.f.official_role==='Other'&&S.f.official_role_other?'Other: '+S.f.official_role_other:S.f.official_role,
       official_specialisation:S.f.official_specialisation==='Other'&&S.f.official_specialisation_other?'Other: '+S.f.official_specialisation_other:S.f.official_specialisation
  };
+ if (monActiveTools().length) details.monitoring = monPayload();
 
  const decId = genId('DEC');
  const actId = genId('ACT');
@@ -7110,6 +8096,7 @@ async function submitForm() {
  ...meta
  };
 
+ if (monActiveTools().length && !act.action_taken) act.action_taken = monActionText();
  // Save to local queue FIRST — protects against network failure
  addToSubmitQueue(dec, act);
 
@@ -8606,6 +9593,8 @@ ${(function(){
    return '<div class="att"><div class="att-h"><span class="att-sq"></span>Needs your attention</div>' + rows.join('') + '</div>';
  })()}
 
+ ${renderMonitoringDash(decs)}
+
  <!-- ═══ CHART PANELS (collapsed) ═══ -->
  <details class="dash-more">
  <summary class="dash-more-sum"><span>📊 More detail</span><span class="dash-more-ar">▾</span></summary>
@@ -9893,7 +10882,8 @@ function draftHasContent(f) {
     || (f.ctx_staffing && f.ctx_staffing.length) || (f.ctx_resources && f.ctx_resources.length)
     || (f.ctx_learners && f.ctx_learners.length) || f.ctx_notes
     || f.educators_supported || f.follow_up_desc || f.doc_url
-    || (f.doc_files && f.doc_files.length));
+    || (f.doc_files && f.doc_files.length)
+    || (f.mon && f.mon.tools && f.mon.tools.length));
 }
 function saveFormDraft(force) {
   try {
@@ -9904,7 +10894,7 @@ function saveFormDraft(force) {
     // empty Step-1 forms every time the app updated.)
     if (!force) {
       if (S.submitted) return false;
-      if (!S.f || S.f.formStep < 1) return false;
+      if (!S.f || (S.f.formStep < 1 && !S.f._monView)) return false;
       if (!draftHasContent(S.f)) return false;
     }
     const draft = {
