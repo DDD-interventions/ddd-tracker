@@ -1,4 +1,15 @@
 {
+  "2026.11.12.130": {
+    "title": "School types and type-ahead school search in the CM Monitoring tool",
+    "released": "2026-11-12",
+    "highlights": [
+      "In the Circuit Manager Monitoring instrument, each school you pick under School Visits now shows its type — Primary, Secondary or Combined — taken from the school list",
+      "Tick Section 58B or Inclusive on a school where it applies; a running total shows support visits by type of school",
+      "Start typing a school name and matching schools from your circuit (then the rest of the district) appear as you type — tap one to add it",
+      "Schools typed in by hand get a small drop-down to choose their type",
+      "Each school's type appears on the Review screen and in your emailed PDF"
+    ]
+  },
   "2026.11.09.129": {
     "title": "Monitoring tools for District and Province Monitoring",
     "released": "2026-11-09",
@@ -8,7 +19,7 @@
       "Each tool is laid out like its DBE document: the details block, purpose, focus areas, rating key, and the rows with Area, Indicator, Evidence Required, Target and Dashboard Rating",
       "For each row you choose from drop-downs how much of the target was achieved (0–24% up to 90–100%) and the Dashboard Rating from 1 (Unsatisfactory) to 4 (Outstanding) — the rating shown on the Dashboard",
       "A monitoring report has four steps: Where & When, Monitoring tool, Tag officials (optional — you can skip straight to Review) and Review",
-      "Circuit is required for the Circuit Manager tools, the CM instrument lists the schools visited from the circuit's schools, and Where & When no longer asks for schools once a tool is chosen",
+      "Circuit is required for the Circuit Manager tools, the CM instrument lists the schools visited from the circuit's schools with each school's type (Primary, Secondary, plus Section 58B or Inclusive where it applies), and Where & When no longer asks for schools once a tool is chosen",
       "You can attach supporting documents to the tool (up to 5 files), and every text box has the Record voice note button, so you can speak instead of typing",
       "Under Find school, a drop-down lists the schools you and your colleagues have already visited",
       "The tool appears on the Review screen and in your emailed PDF, and the Dashboard has a new Monitoring tools section",
