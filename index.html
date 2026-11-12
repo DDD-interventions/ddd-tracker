@@ -1195,6 +1195,28 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-key-i span{min-height:0;justify-content:flex-start;font-size:12.5px}
 .mon-key-2 .mon-key-i span{padding-left:10px}
 .mon-key-i i{position:absolute;left:0;top:0;bottom:0;width:5px;height:auto;margin:0}
+.mon-schools{display:flex;flex-direction:column;gap:6px}
+.mon-school{border:1.5px solid var(--green-hi);background:var(--green-lt);border-radius:8px;padding:8px 10px}
+.mon-school-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mon-school-n{font-size:14.5px;font-weight:700;color:var(--navy);min-width:0;overflow-wrap:anywhere}
+.mon-school-rm{flex-shrink:0;background:#fff;border:1px solid #c8c6c4;border-radius:6px;color:var(--grey-dk);font:inherit;font-size:13px;padding:6px 10px;min-height:36px;cursor:pointer}
+.mon-stype{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.mon-stype-phase{font-size:12.5px;font-weight:700;color:#fff;background:var(--teal);border-radius:12px;padding:5px 11px}
+.mon-stype-sel{font-size:14px;font-family:inherit;padding:6px 8px;border:1.5px solid var(--teal);border-radius:6px;background:#fff;color:var(--navy);min-height:36px}
+.mon-stype-t{font:inherit;font-size:12.5px;font-weight:700;color:var(--grey-dk);background:#fff;border:1.5px dashed #a9b4be;border-radius:12px;padding:5px 11px;min-height:34px;cursor:pointer}
+.mon-stype-t.on{background:var(--orange-lt);color:var(--orange-text);border:1.5px solid var(--orange-hi)}
+.mon-stype-t.on::before{content:"\2713 "}
+.mon-stype-sum{font-size:13px;color:var(--grey-dk);background:var(--off);border-radius:6px;padding:7px 10px;margin-top:6px;line-height:1.45}
+.mon-stype-sum b{color:var(--navy)}
+.mon-stype-phase,.mon-stype-t{font-size:12px;padding:4px 9px;min-height:30px}
+.mon-sugg{display:flex;flex-direction:column;margin-top:4px;border-radius:8px;overflow:hidden}
+.mon-sugg:not(:empty){border:1.5px solid var(--teal);background:#fff;box-shadow:0 4px 14px rgba(7,68,69,.12)}
+.mon-sugg-i{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:#fff;border:none;border-top:1px solid #eef1f4;padding:10px 12px;min-height:44px;font:inherit;font-size:14.5px;color:var(--navy);cursor:pointer}
+.mon-sugg-i:first-child{border-top:none}
+.mon-sugg-i:hover,.mon-sugg-i:focus{background:var(--teal-lt);outline:none}
+.mon-sugg-i span{min-width:0;overflow-wrap:anywhere;font-weight:600}
+.mon-sugg-i small{flex-shrink:0;font-size:12px;color:var(--grey)}
+.mon-sugg-none{font-size:13px;color:var(--grey);padding:9px 12px}
 </style>
 </head>
 <body>
@@ -1559,7 +1581,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.09.129';
+const APP_VERSION = '2026.11.12.130';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6516,7 +6538,7 @@ function monToggleTool(id){
   // The CM instrument asks for the schools visited itself, so Where & When stops asking for schools
   if (m.tools[0] === 'cm' && S.f.schools) {
     var a = monCMSchoolsArr();
-    parseSchoolsArr().forEach(function(n){ if (a.indexOf(n) < 0) a.push(n); });
+    parseSchoolsArr().forEach(function(n){ if (a.indexOf(n) < 0) { a.push(n); monCMType(n); } });
     m.cm.schools_visited = a.join('; ');
     S.f.schools = '';
   } else if (m.tools[0] && S.f.schools) {
@@ -6740,10 +6762,50 @@ function monSignOff(dateLabel){
 
 // ─── CM part 1: schools visited, picked from the district/circuit school list ───
 function monCMSchoolsArr(){ var v = monGet('cm.schools_visited'); return v ? String(v).split(/\s*;\s*/).filter(Boolean) : []; }
+// School type for each school visited: phase comes from the school list; Section 58B and Inclusive are ticked by the official
+var MON_PHASES = ['Primary','Secondary','Combined','Intermediate'];
+function monCMTypes(){ var m = monState(); if (!m.cm.stype || typeof m.cm.stype !== 'object') m.cm.stype = {}; return m.cm.stype; }
+function monCMPhaseFromList(name){
+  var all = (typeof getAvailableSchools === 'function') ? getAvailableSchools() : [];
+  for (var i = 0; i < all.length; i++) { if (all[i][0] === name) return (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[all[i][1]]) || ''; }
+  return '';
+}
+function monCMType(name){ var t = monCMTypes(); if (!t[name]) t[name] = { phase: monCMPhaseFromList(name), s58b:false, incl:false }; return t[name]; }
 function monCMSetSchools(arr){ monSet('cm.schools_visited', arr.join('; ')); render(); }
-function monCMAddSchool(name){ name = String(name || '').trim(); if (!name) return; var a = monCMSchoolsArr(); if (a.indexOf(name) < 0) a.push(name); monCMSetSchools(a); }
-function monCMRemoveSchool(i){ var a = monCMSchoolsArr(); a.splice(i, 1); monCMSetSchools(a); }
+function monCMAddSchool(name){ name = String(name || '').trim(); if (!name) return; var a = monCMSchoolsArr(); if (a.indexOf(name) < 0) { a.push(name); monCMType(name); } monCMSetSchools(a); }
+function monCMRemoveSchool(i){ var a = monCMSchoolsArr(); var n = a.splice(i, 1)[0]; delete monCMTypes()[n]; monCMSetSchools(a); }
 function monCMAddOther(){ var el = document.getElementById('monCMOther'); if (el) monCMAddSchool(el.value); }
+function monCMSetPhase(i, v){ var n = monCMSchoolsArr()[i]; if (n) { monCMType(n).phase = v; render(); } }
+function monCMToggle(i, k){ var n = monCMSchoolsArr()[i]; if (n) { var t = monCMType(n); t[k] = !t[k]; render(); } }
+function monCMTypeLabel(n){ var t = monCMType(n); return [t.phase, t.s58b ? 'Section 58B' : '', t.incl ? 'Inclusive' : ''].filter(Boolean).join(', '); }
+function monCMTypeCounts(){
+  var c = { Primary:0, Secondary:0, Combined:0, Intermediate:0, s58b:0, incl:0 };
+  monCMSchoolsArr().forEach(function(n){ var t = monCMType(n); if (c[t.phase] !== undefined) c[t.phase]++; if (t.s58b) c.s58b++; if (t.incl) c.incl++; });
+  return c;
+}
+// Type-ahead: schools that match what is typed, from the circuit first, then the rest of the district
+function monCMMatches(q){
+  q = String(q || '').trim().toLowerCase();
+  if (q.length < 2) return [];
+  var sel = monCMSchoolsArr(), seen = {}, pool = [];
+  var circ = (typeof getAvailableSchools === 'function') ? getAvailableSchools() : [];
+  circ.forEach(function(o){ if (!seen[o[0]]) { seen[o[0]] = 1; pool.push({ n:o[0], p:o[1], c:S.f.circuit || '' }); } });
+  var d = SCHOOLS_MAP && SCHOOLS_MAP[S.f.district];
+  if (d) Object.keys(d).forEach(function(cc){ (d[cc] || []).forEach(function(o){ if (!seen[o[0]]) { seen[o[0]] = 1; pool.push({ n:o[0], p:o[1], c:cc }); } }); });
+  var starts = [], has = [];
+  pool.forEach(function(x){ if (sel.indexOf(x.n) > -1) return; var l = x.n.toLowerCase(); if (l.indexOf(q) === 0 || l.indexOf(' ' + q) > -1) starts.push(x); else if (l.indexOf(q) > -1) has.push(x); });
+  return starts.concat(has).slice(0, 8);
+}
+function monCMSuggest(q){
+  var box = document.getElementById('monCMSugg'); if (!box) return;
+  var hits = monCMMatches(q);
+  if (!hits.length) { box.innerHTML = String(q || '').trim().length >= 2 ? '<div class="mon-sugg-none">No matching school — tap Add to use the name as typed</div>' : ''; return; }
+  box.innerHTML = hits.map(function(x){
+    var ph = (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[x.p]) || '';
+    var other = S.f.circuit && x.c && x.c !== S.f.circuit;
+    return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(x.n) + '" onclick="monCMAddSchool(this.getAttribute(\'data-name\'))"><span>' + esc(x.n) + '</span><small>' + [ph, other ? x.c : ''].filter(Boolean).map(esc).join(' · ') + '</small></button>';
+  }).join('');
+}
 function monCMSchoolsPicker(){
   var sel = monCMSchoolsArr();
   var all = (typeof getAvailableSchools === 'function') ? getAvailableSchools() : [];
@@ -6751,17 +6813,31 @@ function monCMSchoolsPicker(){
   var scope = S.f.circuit || S.f.district || 'this district';
   var h = '<div class="field" id="fld-mon-cmschools" style="margin-top:8px">';
   if (sel.length) {
-    h += '<div class="school-tags">' + sel.map(function(n, i){ return '<span class="school-tag"><span class="st-info"><span class="st-name">' + esc(n) + '</span></span><button type="button" onclick="monCMRemoveSchool(' + i + ')">Remove</button></span>'; }).join('') + '</div>';
+    h += '<div class="mon-schools">' + sel.map(function(n, i){
+      var t = monCMType(n);
+      var phase = t.phase
+        ? '<span class="mon-stype-phase">' + esc(t.phase) + '</span>'
+        : '<select class="mon-stype-sel" aria-label="School type for ' + esc(n) + '" onchange="monCMSetPhase(' + i + ',this.value)"><option value="">Type of school…</option>' + MON_PHASES.map(function(p){ return '<option>' + p + '</option>'; }).join('') + '</select>';
+      return '<div class="mon-school"><div class="mon-school-top"><span class="mon-school-n">' + esc(n) + '</span><button type="button" class="mon-school-rm" onclick="monCMRemoveSchool(' + i + ')" aria-label="Remove ' + esc(n) + '">Remove</button></div>' +
+        '<div class="mon-stype">' + phase +
+          '<button type="button" class="mon-stype-t' + (t.s58b ? ' on' : '') + '" aria-pressed="' + !!t.s58b + '" onclick="monCMToggle(' + i + ',\'s58b\')">Section 58B</button>' +
+          '<button type="button" class="mon-stype-t' + (t.incl ? ' on' : '') + '" aria-pressed="' + !!t.incl + '" onclick="monCMToggle(' + i + ',\'incl\')">Inclusive</button>' +
+        '</div></div>';
+    }).join('') + '</div>';
+    var c = monCMTypeCounts();
+    var parts = MON_PHASES.filter(function(p){ return c[p]; }).map(function(p){ return c[p] + ' ' + p; });
+    parts.push(c.s58b + ' Section 58B'); parts.push(c.incl + ' Inclusive');
+    h += '<div class="mon-stype-sum"><b>Support visits by type of school:</b> ' + parts.join(' · ') + '</div>';
   }
   if (all.length) {
-    h += '<select aria-label="Add a school visited" onchange="if(this.value){monCMAddSchool(this.value);}" style="width:100%;padding:9px 10px;border:1.5px solid var(--teal);border-radius:6px;font-size:16px;font-family:inherit;background:#F3F9F9;color:var(--navy);min-height:44px">' +
+    h += '<select aria-label="Add a school visited" onchange="if(this.value){monCMAddSchool(this.value);}" style="width:100%;margin-top:6px;padding:9px 10px;border:1.5px solid var(--teal);border-radius:6px;font-size:16px;font-family:inherit;background:#F3F9F9;color:var(--navy);min-height:44px">' +
       '<option value="">' + (avail.length ? 'Choose a school (' + avail.length + ' in ' + esc(scope) + ')…' : 'All schools in ' + esc(scope) + ' added') + '</option>' +
-      avail.map(function(o){ return '<option value="' + esc(o[0]) + '">' + esc(o[0]) + '</option>'; }).join('') + '</select>';
+      avail.map(function(o){ var ph = (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[o[1]]) || ''; return '<option value="' + esc(o[0]) + '">' + esc(o[0]) + (ph ? ' (' + ph + ')' : '') + '</option>'; }).join('') + '</select>';
   } else {
     h += '<div class="hint" style="margin:0 0 4px">' + (S.f.circuit ? 'The school list for ' + esc(scope) + ' is not available. Type the school name below.' : 'Choose the circuit first to see its schools.') + '</div>';
   }
-  h += '<div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="monCMOther" placeholder="Not on the list? Type it" onkeydown="if(event.key===\'Enter\'){event.preventDefault();monCMAddOther();}" style="flex:1;min-width:0;padding:9px 10px;border:1px solid #c8c6c4;border-radius:6px;font-size:16px;font-family:inherit;min-height:44px"><button type="button" onclick="monCMAddOther()" style="flex-shrink:0;min-height:44px;padding:0 14px;border-radius:6px;border:1.5px solid var(--teal);background:#fff;color:var(--teal);font:inherit;font-size:14px;font-weight:700;cursor:pointer">Add</button></div>';
-  h += '<div class="hint" style="margin-top:4px">' + sel.length + ' school' + (sel.length === 1 ? '' : 's') + ' selected</div></div>';
+  h += '<div class="mon-sugg-wrap"><div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="monCMOther" autocomplete="off" placeholder="Or type a school name" aria-label="Type a school name" aria-controls="monCMSugg" oninput="monCMSuggest(this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();monCMAddOther();}" style="flex:1;min-width:0;padding:9px 10px;border:1px solid #c8c6c4;border-radius:6px;font-size:16px;font-family:inherit;min-height:44px"><button type="button" onclick="monCMAddOther()" style="flex-shrink:0;min-height:44px;padding:0 14px;border-radius:6px;border:1.5px solid var(--teal);background:#fff;color:var(--teal);font:inherit;font-size:14px;font-weight:700;cursor:pointer">Add</button></div><div id="monCMSugg" class="mon-sugg" role="listbox" aria-label="Matching schools"></div></div>';
+  h += '<div class="hint" style="margin-top:4px">' + sel.length + ' school' + (sel.length === 1 ? '' : 's') + ' selected. The type comes from the school list; tick Section 58B or Inclusive where it applies.</div></div>';
   return h;
 }
 
@@ -6914,7 +6990,7 @@ function renderMonitoringReview(){
   if (!tool) return '';
   var m = monState(), p = monProgress(tool), rows = [];
   if (tool === 'cm' || tool === 'cmfb') { rows.push(rvRow('Circuit', S.f.circuit)); rows.push(rvRow('Name of CM', m.cm.cm_name)); }
-  if (tool === 'cm') rows.push(rvRow('Schools visited', monCMSchoolsArr().join(', ')));
+  if (tool === 'cm') rows.push(rvRow('Schools visited', monCMSchoolsArr().map(function(n){ var l = monCMTypeLabel(n); return n + (l ? ' (' + l + ')' : ''); }).join('; ')));
   if (tool === 'ses' || tool === 'sesfb') { rows.push(rvRow('Name of SES', m.ses.ses_name)); rows.push(rvRow('Name of subject', m.ses.subject)); }
   if (tool === 'cm' || tool === 'ses') {
     var low = 0, banded = 0, rws = monRowsFor(tool);
@@ -6945,7 +7021,12 @@ function monPayload(){
   function fb(id, areas){
     return { areas: areas.map(function(a, i){ var r = m[id].a[i] || {}; return { area:a, analysis:r.analysis || '', risk:r.risk || null, recommendation:r.rec || '', responsible:r.resp || '', due:r.due || '' }; }), general:m[id].general || '' };
   }
-  if (tools.indexOf('cm') > -1) out.cm = Object.assign({ circuit:S.f.circuit, cm_name:m.cm.cm_name, schools_visited:m.cm.schools_visited }, instr('cm', MON_CM_ROWS, MON_CM_REPORT));
+  if (tools.indexOf('cm') > -1) {
+    var tc = monCMTypeCounts();
+    out.cm = Object.assign({ circuit:S.f.circuit, cm_name:m.cm.cm_name, schools_visited:m.cm.schools_visited,
+      schools:monCMSchoolsArr().map(function(n){ var t = monCMType(n); return { school:n, type:t.phase || null, section_58b:!!t.s58b, inclusive:!!t.incl }; }),
+      schools_by_type:{ primary:tc.Primary, secondary:tc.Secondary, combined:tc.Combined, intermediate:tc.Intermediate, section_58b:tc.s58b, inclusive:tc.incl } }, instr('cm', MON_CM_ROWS, MON_CM_REPORT));
+  }
   if (tools.indexOf('cmfb') > -1) out.cmfb = Object.assign({ circuit:S.f.circuit, cm_name:m.cm.cm_name }, fb('cmfb', MON_CM_REPORT));
   if (tools.indexOf('ses') > -1) out.ses = Object.assign({ subject:m.ses.subject, ses_name:m.ses.ses_name, schools_allocated:m.ses.schools_allocated }, instr('ses', MON_SES_ROWS, MON_SES_REPORT));
   if (tools.indexOf('sesfb') > -1) out.sesfb = Object.assign({ subject:m.ses.subject, ses_name:m.ses.ses_name, schools_allocated:m.ses.schools_allocated }, fb('sesfb', MON_SES_REPORT));
@@ -6968,7 +7049,7 @@ function monPdfBlocks(mon){
   if (!mon || !mon.tools) return blocks;
   function instrBody(x){ return [x.area, x.indicator || '', x.target || '', x.target_achieved_label || '—', x.rating ? x.rating + ' — ' + x.rating_label : '—']; }
   var iHead = ['Area','Indicator','Target','Target achieved','Dashboard Rating (1–4)'];
-  if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', mon.cm.schools_visited]],
+  if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', (mon.cm.schools && mon.cm.schools.length) ? mon.cm.schools.map(function(x){ var l = [x.type, x.section_58b ? 'Section 58B' : '', x.inclusive ? 'Inclusive' : ''].filter(Boolean).join(', '); return x.school + (l ? ' (' + l + ')' : ''); }).join('; ') : mon.cm.schools_visited], ['Visits by type of school', mon.cm.schools_by_type ? ['primary','secondary','combined','intermediate','section_58b','inclusive'].filter(function(k){ return mon.cm.schools_by_type[k]; }).map(function(k){ return mon.cm.schools_by_type[k] + ' ' + ({primary:'Primary',secondary:'Secondary',combined:'Combined',intermediate:'Intermediate',section_58b:'Section 58B',inclusive:'Inclusive'})[k]; }).join(', ') : '']],
     head:iHead, body:mon.cm.indicators.map(instrBody),
     head2:['Responsibility Area','Analysis & Recommendations'], body2:mon.cm.report.filter(function(r){ return r.analysis; }).map(function(r){ return [r.area, r.analysis]; }) });
   if (mon.cmfb) blocks.push({ title:MON_TOOLS.cmfb.docTitle, meta:[['Circuit', mon.cmfb.circuit], ['Name of CM', mon.cmfb.cm_name], ['General comments', mon.cmfb.general]],
