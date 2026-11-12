@@ -1581,7 +1581,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.12.130';
+const APP_VERSION = '2026.11.12.131';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6770,14 +6770,25 @@ function monCMPhaseFromList(name){
   for (var i = 0; i < all.length; i++) { if (all[i][0] === name) return (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[all[i][1]]) || ''; }
   return '';
 }
-function monCMType(name){ var t = monCMTypes(); if (!t[name]) t[name] = { phase: monCMPhaseFromList(name), s58b:false, incl:false }; return t[name]; }
+// Does the school's name already say what type it is? (e.g. "Alpha Primary School", "Beta High School", "Laerskool ...")
+var MON_PHASE_WORDS = {
+  Primary: /\b(primary|prim|p\.?\s?s\.?|laerskool|primêre|primere)\b/i,
+  Secondary: /\b(secondary|sec|s\.?\s?s\.?|high|hoërskool|hoerskool|sekondêre|sekondere)\b/i,
+  Combined: /\b(combined|comprehensive|c\.?\s?s\.?)\b/i,
+  Intermediate: /\bintermediate\b/i
+};
+function monPhaseFromName(name){ for (var k in MON_PHASE_WORDS) { if (MON_PHASE_WORDS[k].test(name || '')) return k; } return ''; }
+function monNameShowsPhase(name, phase){ return !!(phase && MON_PHASE_WORDS[phase] && MON_PHASE_WORDS[phase].test(name || '')); }
+// The type to show next to a name: blank when the name already says it
+function monPhaseTag(name, phase){ return monNameShowsPhase(name, phase) ? '' : (phase || ''); }
+function monCMType(name){ var t = monCMTypes(); if (!t[name]) t[name] = { phase: monCMPhaseFromList(name) || monPhaseFromName(name), s58b:false, incl:false }; return t[name]; }
 function monCMSetSchools(arr){ monSet('cm.schools_visited', arr.join('; ')); render(); }
 function monCMAddSchool(name){ name = String(name || '').trim(); if (!name) return; var a = monCMSchoolsArr(); if (a.indexOf(name) < 0) { a.push(name); monCMType(name); } monCMSetSchools(a); }
 function monCMRemoveSchool(i){ var a = monCMSchoolsArr(); var n = a.splice(i, 1)[0]; delete monCMTypes()[n]; monCMSetSchools(a); }
 function monCMAddOther(){ var el = document.getElementById('monCMOther'); if (el) monCMAddSchool(el.value); }
 function monCMSetPhase(i, v){ var n = monCMSchoolsArr()[i]; if (n) { monCMType(n).phase = v; render(); } }
 function monCMToggle(i, k){ var n = monCMSchoolsArr()[i]; if (n) { var t = monCMType(n); t[k] = !t[k]; render(); } }
-function monCMTypeLabel(n){ var t = monCMType(n); return [t.phase, t.s58b ? 'Section 58B' : '', t.incl ? 'Inclusive' : ''].filter(Boolean).join(', '); }
+function monCMTypeLabel(n){ var t = monCMType(n); return [monPhaseTag(n, t.phase), t.s58b ? 'Section 58B' : '', t.incl ? 'Inclusive' : ''].filter(Boolean).join(', '); }
 function monCMTypeCounts(){
   var c = { Primary:0, Secondary:0, Combined:0, Intermediate:0, s58b:0, incl:0 };
   monCMSchoolsArr().forEach(function(n){ var t = monCMType(n); if (c[t.phase] !== undefined) c[t.phase]++; if (t.s58b) c.s58b++; if (t.incl) c.incl++; });
@@ -6801,7 +6812,7 @@ function monCMSuggest(q){
   var hits = monCMMatches(q);
   if (!hits.length) { box.innerHTML = String(q || '').trim().length >= 2 ? '<div class="mon-sugg-none">No matching school — tap Add to use the name as typed</div>' : ''; return; }
   box.innerHTML = hits.map(function(x){
-    var ph = (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[x.p]) || '';
+    var ph = monPhaseTag(x.n, (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[x.p]) || '');
     var other = S.f.circuit && x.c && x.c !== S.f.circuit;
     return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(x.n) + '" onclick="monCMAddSchool(this.getAttribute(\'data-name\'))"><span>' + esc(x.n) + '</span><small>' + [ph, other ? x.c : ''].filter(Boolean).map(esc).join(' · ') + '</small></button>';
   }).join('');
@@ -6816,7 +6827,7 @@ function monCMSchoolsPicker(){
     h += '<div class="mon-schools">' + sel.map(function(n, i){
       var t = monCMType(n);
       var phase = t.phase
-        ? '<span class="mon-stype-phase">' + esc(t.phase) + '</span>'
+        ? (monNameShowsPhase(n, t.phase) ? '' : '<span class="mon-stype-phase">' + esc(t.phase) + '</span>')
         : '<select class="mon-stype-sel" aria-label="School type for ' + esc(n) + '" onchange="monCMSetPhase(' + i + ',this.value)"><option value="">Type of school…</option>' + MON_PHASES.map(function(p){ return '<option>' + p + '</option>'; }).join('') + '</select>';
       return '<div class="mon-school"><div class="mon-school-top"><span class="mon-school-n">' + esc(n) + '</span><button type="button" class="mon-school-rm" onclick="monCMRemoveSchool(' + i + ')" aria-label="Remove ' + esc(n) + '">Remove</button></div>' +
         '<div class="mon-stype">' + phase +
@@ -6832,7 +6843,7 @@ function monCMSchoolsPicker(){
   if (all.length) {
     h += '<select aria-label="Add a school visited" onchange="if(this.value){monCMAddSchool(this.value);}" style="width:100%;margin-top:6px;padding:9px 10px;border:1.5px solid var(--teal);border-radius:6px;font-size:16px;font-family:inherit;background:#F3F9F9;color:var(--navy);min-height:44px">' +
       '<option value="">' + (avail.length ? 'Choose a school (' + avail.length + ' in ' + esc(scope) + ')…' : 'All schools in ' + esc(scope) + ' added') + '</option>' +
-      avail.map(function(o){ var ph = (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[o[1]]) || ''; return '<option value="' + esc(o[0]) + '">' + esc(o[0]) + (ph ? ' (' + ph + ')' : '') + '</option>'; }).join('') + '</select>';
+      avail.map(function(o){ var ph = monPhaseTag(o[0], (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[o[1]]) || ''); return '<option value="' + esc(o[0]) + '">' + esc(o[0]) + (ph ? ' (' + ph + ')' : '') + '</option>'; }).join('') + '</select>';
   } else {
     h += '<div class="hint" style="margin:0 0 4px">' + (S.f.circuit ? 'The school list for ' + esc(scope) + ' is not available. Type the school name below.' : 'Choose the circuit first to see its schools.') + '</div>';
   }
@@ -7049,7 +7060,7 @@ function monPdfBlocks(mon){
   if (!mon || !mon.tools) return blocks;
   function instrBody(x){ return [x.area, x.indicator || '', x.target || '', x.target_achieved_label || '—', x.rating ? x.rating + ' — ' + x.rating_label : '—']; }
   var iHead = ['Area','Indicator','Target','Target achieved','Dashboard Rating (1–4)'];
-  if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', (mon.cm.schools && mon.cm.schools.length) ? mon.cm.schools.map(function(x){ var l = [x.type, x.section_58b ? 'Section 58B' : '', x.inclusive ? 'Inclusive' : ''].filter(Boolean).join(', '); return x.school + (l ? ' (' + l + ')' : ''); }).join('; ') : mon.cm.schools_visited], ['Visits by type of school', mon.cm.schools_by_type ? ['primary','secondary','combined','intermediate','section_58b','inclusive'].filter(function(k){ return mon.cm.schools_by_type[k]; }).map(function(k){ return mon.cm.schools_by_type[k] + ' ' + ({primary:'Primary',secondary:'Secondary',combined:'Combined',intermediate:'Intermediate',section_58b:'Section 58B',inclusive:'Inclusive'})[k]; }).join(', ') : '']],
+  if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', (mon.cm.schools && mon.cm.schools.length) ? mon.cm.schools.map(function(x){ var l = [monPhaseTag(x.school, x.type), x.section_58b ? 'Section 58B' : '', x.inclusive ? 'Inclusive' : ''].filter(Boolean).join(', '); return x.school + (l ? ' (' + l + ')' : ''); }).join('; ') : mon.cm.schools_visited], ['Visits by type of school', mon.cm.schools_by_type ? ['primary','secondary','combined','intermediate','section_58b','inclusive'].filter(function(k){ return mon.cm.schools_by_type[k]; }).map(function(k){ return mon.cm.schools_by_type[k] + ' ' + ({primary:'Primary',secondary:'Secondary',combined:'Combined',intermediate:'Intermediate',section_58b:'Section 58B',inclusive:'Inclusive'})[k]; }).join(', ') : '']],
     head:iHead, body:mon.cm.indicators.map(instrBody),
     head2:['Responsibility Area','Analysis & Recommendations'], body2:mon.cm.report.filter(function(r){ return r.analysis; }).map(function(r){ return [r.area, r.analysis]; }) });
   if (mon.cmfb) blocks.push({ title:MON_TOOLS.cmfb.docTitle, meta:[['Circuit', mon.cmfb.circuit], ['Name of CM', mon.cmfb.cm_name], ['General comments', mon.cmfb.general]],
