@@ -40,7 +40,9 @@
 // v1.0.86 — index.html updated (app 2026.11.12.130): CM Monitoring instrument
 // shows each school visited's type (Primary/Secondary/Combined, plus Section 58B
 // and Inclusive). No new precached assets or CDN hosts, so only the version bumps.
-const VERSION = 'v1.0.86';
+// v1.0.87 — index.html updated (app 2026.11.12.131): school type is only shown
+// when the school's name doesn't already say it. No new precached assets.
+const VERSION = 'v1.0.87';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
