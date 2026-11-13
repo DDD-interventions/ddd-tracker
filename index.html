@@ -329,8 +329,9 @@ nav.nav{display:flex;flex-direction:column;max-width:720px;margin:0 auto;padding
 .update-banner-btn{flex:1;padding:10px 16px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:center}
 .update-banner-btn.primary{background:var(--green);color:#fff}
 .update-banner-btn.secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
-.fade-in{animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .18s ease-out}
+body.no-anim .fade-in,body.no-anim .validation-banner{animation:none!important}
+@keyframes fadeIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* File upload */
 .upload-area{border:2px dashed #c8c6c4;border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc}
@@ -4566,6 +4567,7 @@ function renderBottomNav(){
 }
 function render() {
  const app = document.getElementById('app');
+ try { var _sk = [S.view, S.authState, S.submitted, S.f && S.f.formStep, S.f && S.f._monView, S.f && S.f.mon && S.f.mon.tools && S.f.mon.tools[0], S.dashTab].join('|'); document.body.classList.toggle('no-anim', _sk === window.__lastScreenKey); window.__lastScreenKey = _sk; } catch(e) {}
  // Preserve scroll position across re-renders (mobile: prevents the page
  // jumping every time a selection redraws the screen). Intentional
  // navigations call window.scrollTo AFTER render(), which overrides this.
