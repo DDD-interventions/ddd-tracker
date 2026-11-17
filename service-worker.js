@@ -42,7 +42,9 @@
 // and Inclusive). No new precached assets or CDN hosts, so only the version bumps.
 // v1.0.87 — index.html updated (app 2026.11.12.131): school type is only shown
 // when the school's name doesn't already say it. No new precached assets.
-const VERSION = 'v1.0.87';
+// v1.0.88 — index.html updated (app 2026.11.17.132): school type-ahead in the CM
+// Monitoring tool only suggests schools from the chosen circuit. No new precached assets.
+const VERSION = 'v1.0.88';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
