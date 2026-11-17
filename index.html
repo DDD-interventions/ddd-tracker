@@ -1582,7 +1582,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.12.131';
+const APP_VERSION = '2026.11.17.132';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6797,14 +6797,13 @@ function monCMTypeCounts(){
   return c;
 }
 // Type-ahead: schools that match what is typed, from the circuit first, then the rest of the district
+// Type-ahead: only schools in the chosen circuit (the whole district only while no circuit is chosen)
 function monCMMatches(q){
   q = String(q || '').trim().toLowerCase();
   if (q.length < 2) return [];
   var sel = monCMSchoolsArr(), seen = {}, pool = [];
   var circ = (typeof getAvailableSchools === 'function') ? getAvailableSchools() : [];
-  circ.forEach(function(o){ if (!seen[o[0]]) { seen[o[0]] = 1; pool.push({ n:o[0], p:o[1], c:S.f.circuit || '' }); } });
-  var d = SCHOOLS_MAP && SCHOOLS_MAP[S.f.district];
-  if (d) Object.keys(d).forEach(function(cc){ (d[cc] || []).forEach(function(o){ if (!seen[o[0]]) { seen[o[0]] = 1; pool.push({ n:o[0], p:o[1], c:cc }); } }); });
+  circ.forEach(function(o){ if (!seen[o[0]]) { seen[o[0]] = 1; pool.push({ n:o[0], p:o[1] }); } });
   var starts = [], has = [];
   pool.forEach(function(x){ if (sel.indexOf(x.n) > -1) return; var l = x.n.toLowerCase(); if (l.indexOf(q) === 0 || l.indexOf(' ' + q) > -1) starts.push(x); else if (l.indexOf(q) > -1) has.push(x); });
   return starts.concat(has).slice(0, 8);
@@ -6812,11 +6811,10 @@ function monCMMatches(q){
 function monCMSuggest(q){
   var box = document.getElementById('monCMSugg'); if (!box) return;
   var hits = monCMMatches(q);
-  if (!hits.length) { box.innerHTML = String(q || '').trim().length >= 2 ? '<div class="mon-sugg-none">No matching school — tap Add to use the name as typed</div>' : ''; return; }
+  if (!hits.length) { box.innerHTML = String(q || '').trim().length >= 2 ? '<div class="mon-sugg-none">No matching school in ' + esc(S.f.circuit || S.f.district || 'this circuit') + ' — tap Add to use the name as typed</div>' : ''; return; }
   box.innerHTML = hits.map(function(x){
     var ph = monPhaseTag(x.n, (typeof PHASE_LABELS !== 'undefined' && PHASE_LABELS[x.p]) || '');
-    var other = S.f.circuit && x.c && x.c !== S.f.circuit;
-    return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(x.n) + '" onclick="monCMAddSchool(this.getAttribute(\'data-name\'))"><span>' + esc(x.n) + '</span><small>' + [ph, other ? x.c : ''].filter(Boolean).map(esc).join(' · ') + '</small></button>';
+    return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(x.n) + '" onclick="monCMAddSchool(this.getAttribute(\'data-name\'))"><span>' + esc(x.n) + '</span><small>' + esc(ph) + '</small></button>';
   }).join('');
 }
 function monCMSchoolsPicker(){
