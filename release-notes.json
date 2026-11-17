@@ -1,4 +1,12 @@
 {
+  "2026.11.17.132": {
+    "title": "School search stays in your circuit",
+    "released": "2026-11-17",
+    "highlights": [
+      "When you type a school name in the CM Monitoring tool, only schools in the circuit you chose are suggested — schools from other circuits no longer appear",
+      "If nothing matches in that circuit, you can still add the name as typed"
+    ]
+  },
   "2026.11.12.131": {
     "title": "Cleaner school list in the CM Monitoring tool",
     "released": "2026-11-12",
