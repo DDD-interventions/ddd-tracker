@@ -44,7 +44,7 @@
 // when the school's name doesn't already say it. No new precached assets.
 // v1.0.88 — index.html updated (app 2026.11.17.132): school type-ahead in the CM
 // Monitoring tool only suggests schools from the chosen circuit. No new precached assets.
-const VERSION = 'v1.0.88';
+const VERSION = 'v1.0.89';
 const CACHE_NAME = `ddd-tracker-${VERSION}`;
 
 // Precached on install — minimum needed for the app to open offline
