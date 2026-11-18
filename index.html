@@ -1218,6 +1218,77 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-sugg-i span{min-width:0;overflow-wrap:anywhere;font-weight:600}
 .mon-sugg-i small{flex-shrink:0;font-size:12px;color:var(--grey)}
 .mon-sugg-none{font-size:13px;color:var(--grey);padding:9px 12px}
+/* Dashboard: Monitoring tools */
+.mon-d-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.mon-d-pills::-webkit-scrollbar{display:none}
+.mon-d-pills button{flex-shrink:0;font:inherit;font-size:13px;font-weight:600;color:var(--grey-dk);background:#fff;border:1.5px solid #d6dde3;border-radius:16px;padding:6px 12px;min-height:36px;cursor:pointer;white-space:nowrap}
+.mon-d-pills button b{display:inline-block;margin-left:4px;font-size:11.5px;background:var(--grey-lt);color:var(--grey-dk);border-radius:8px;padding:0 6px}
+.mon-d-pills button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.mon-d-pills button.on b{background:#E86820;color:#fff}
+.mon-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.mon-kpi{border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.mon-kpi span{font-size:11.5px;font-weight:700;color:var(--grey-dk);text-transform:uppercase;letter-spacing:.3px;line-height:1.25}
+.mon-kpi b{font-size:26px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.mon-kpi b small{font-size:13px;font-weight:700;opacity:.75}
+.mon-kpi em{font-style:normal;font-size:12px;color:var(--grey-dk)}
+.mon-d-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--grey-lt)}
+.mon-d-h span{font-size:14.5px;font-weight:700;color:var(--navy)}
+.mon-d-h small{font-size:12px;color:var(--grey)}
+.mon-d-risks,.mon-d-list{display:flex;flex-direction:column;gap:6px}
+.mon-d-risk,.mon-d-row,.mon-d-dip{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;font:inherit;background:#fff;border:1px solid #e1e6ea;border-radius:10px;padding:10px 12px;cursor:pointer;color:inherit}
+.mon-d-risk:hover,.mon-d-row:hover,.mon-d-dip:hover{border-color:var(--teal);background:#FAFCFD}
+.mon-d-risk-top,.mon-d-dip-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.mon-d-risk-top b,.mon-d-dip-top b{font-size:14px;color:var(--navy);line-height:1.3}
+.mon-d-dip-top span{font-weight:800;font-size:14px;white-space:nowrap}
+.mon-d-risk-rec{font-size:13px;color:var(--grey-dk);line-height:1.4}
+.mon-d-risk-meta{font-size:12px;color:var(--grey)}
+.mon-d-ok{font-size:13.5px;color:#155F22;background:#E7F6EA;border-radius:8px;padding:9px 12px}
+.mon-d-more{font-size:12.5px;color:var(--grey);text-align:center}
+.mon-d-empty{display:flex;flex-direction:column;gap:4px;background:var(--off);border-radius:10px;padding:14px;font-size:13.5px;color:var(--grey-dk)}
+.mon-d-empty b{color:var(--navy)}
+.mon-heat-wrap{overflow-x:auto}
+.mon-heat{width:100%;border-collapse:separate;border-spacing:3px;font-size:12.5px}
+.mon-heat th{font-weight:700;color:var(--grey);text-align:center;font-size:11.5px}
+.mon-heat thead th:first-child{text-align:left}
+.mon-heat tbody th{text-align:left;font-weight:600;color:var(--navy);font-size:12.5px;line-height:1.3;padding:4px 4px 4px 0}
+.mon-heat tbody th i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--teal);background:var(--teal-lt);border-radius:6px;padding:0 5px;margin-right:2px}
+.mon-heat td{width:30px;height:30px;text-align:center;border-radius:6px;background:var(--off);font-weight:800;font-variant-numeric:tabular-nums}
+.mon-heat td:last-child{width:44px;background:none}
+.mon-heat-avg{display:inline-block;border-radius:8px;padding:3px 7px;font-weight:800}
+.mon-d-secs{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.mon-d-secs span{font-size:11.5px;color:var(--grey);background:var(--off);border-radius:6px;padding:2px 7px}
+.mon-d-secs b{color:var(--navy)}
+.mon-d-row{flex-direction:row;align-items:center;gap:10px}
+.mon-d-tool{flex-shrink:0;width:62px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;text-align:center;border-radius:8px;padding:6px 4px}
+.mon-t-cm{background:#E6F3F7;color:#00647F}.mon-t-cmfb{background:#FFF6F1;color:#B84A0C}.mon-t-ses{background:#E7F6EA;color:#155F22}.mon-t-sesfb{background:#F3ECFB;color:#5B3A8C}.mon-t-dip{background:#1A2332;color:#fff}
+.mon-d-row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mon-d-row-main b{font-size:14px;color:var(--navy);overflow-wrap:anywhere;line-height:1.3}
+.mon-d-row-main small{font-size:12px;color:var(--grey)}
+.mon-d-score{flex-shrink:0;font-size:12.5px;font-weight:800;border-radius:8px;padding:4px 8px;white-space:nowrap}
+.mon-sheet-bg{position:fixed;inset:0;z-index:950;background:rgba(26,35,50,.45);display:flex;align-items:flex-end;justify-content:center}
+.mon-sheet{background:var(--off);width:100%;max-width:640px;max-height:92vh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;padding-bottom:env(safe-area-inset-bottom)}
+.mon-sheet-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:linear-gradient(135deg,#1A2332 0%,#00647F 100%);color:#fff;padding:16px}
+.mon-sheet-top h3{font-size:17px;line-height:1.3;color:#fff}
+.mon-sheet-top p{font-size:12.5px;color:#EAF6FA;margin-top:3px}
+.mon-sheet-x{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:24px;line-height:1;cursor:pointer}
+.mon-sheet-body{overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.mon-sheet-score{align-self:flex-start;font-weight:800;font-size:15px;border-radius:10px;padding:6px 12px}
+.mon-sheet-body .mon-card{margin-bottom:0}
+.mon-s-item{background:#fff;border:1px solid #e1e6ea;border-radius:10px;padding:10px 12px}
+.mon-s-item-h{font-size:14px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:4px}
+.mon-s-kv{display:grid;grid-template-columns:42% 1fr;gap:8px;padding:4px 0;border-top:1px solid #f0f2f4;font-size:13px}
+.mon-s-kv span{color:var(--grey);font-weight:600}
+.mon-s-kv div{color:var(--navy);overflow-wrap:anywhere}
+.mon-d-dip .mon-meter{flex:none;width:100%;margin-top:4px}
+.mon-d-tool{width:78px;font-size:10px;letter-spacing:.2px;padding:6px 3px}
+.mon-d-toggle{display:block;width:100%;margin-top:6px;font:inherit;font-size:13.5px;font-weight:700;color:var(--teal);background:var(--teal-lt);border:none;border-radius:8px;min-height:40px;cursor:pointer}
+.mon-sheet-body > *{flex-shrink:0}
+.mon-s-yn{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid #f0f2f4;font-size:13px}
+.mon-s-yn-n{flex-shrink:0;width:20px;color:var(--grey);font-weight:700}
+.mon-s-yn-t{flex:1;min-width:0;color:var(--navy);line-height:1.4}
+.mon-s-yn-t small{display:block;color:var(--grey);margin-top:2px}
+.mon-s-rep{margin-top:6px;background:var(--off);border-radius:8px;padding:2px 10px}
+.mon-s-rep .mon-s-kv:first-child{border-top:none}
 </style>
 </head>
 <body>
@@ -1582,7 +1653,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.17.132';
+const APP_VERSION = '2026.11.18.133';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -7081,49 +7152,184 @@ function monPdfBlocks(mon){
 }
 
 // ─── Dashboard section ───
-function renderMonitoringDash(decs){
-  var recs = (decs || []).filter(function(d){ var mm = (d.details || {}).monitoring; return mm && mm.tools && mm.tools.length; });
-  var hdr = '<div class="dash-section mon-dash"><div class="dash-section-hdr"><h3 id="dash-monitoring">Monitoring tools</h3><span style="font-size:13.5px;color:var(--grey)">' + recs.length + ' record' + (recs.length === 1 ? '' : 's') + '</span></div><div class="dash-section-body">';
-  if (!recs.length) {
-    return hdr + '<div class="dash-section-desc" style="margin:0">No monitoring instruments captured for these filters yet. Choose <strong>District</strong> or <strong>Province Monitoring</strong> when you record, then choose the tool you used.</div></div></div>';
+// Monitoring tools on the Dashboard: filter by tool, headline figures, what needs attention,
+// ratings by area as a heat table, DIP scores, and the latest submissions (tap to view in full).
+var MON_DASH_SHORT = { cm:'CM Monitoring', cmfb:'CM Feedback', ses:'SES CDMR', sesfb:'SES Feedback', dip:'DIP QA' };
+function monRgba(hex, a){ var h = hex.replace('#',''); return 'rgba(' + parseInt(h.substr(0,2),16) + ',' + parseInt(h.substr(2,2),16) + ',' + parseInt(h.substr(4,2),16) + ',' + a.toFixed(2) + ')'; }
+function monFmtD(d){ try { return (typeof fmtDate === 'function') ? fmtDate(d) : d; } catch(e) { return d; } }
+function monDashSetTool(t){ S._monDashTool = t; render(); }
+function monDashOpen(id){ S._monDashOpen = id; render(); }
+function monDashClose(){ S._monDashOpen = null; render(); }
+function monRecTool(d){ var mm = (d.details || {}).monitoring || {}; return (mm.tools || [])[0] || ''; }
+function monRecTitle(d){
+  var mm = (d.details || {}).monitoring || {}, t = monRecTool(d), x = mm[t] || {};
+  if (t === 'cm' || t === 'cmfb') return (x.cm_name || 'Circuit Manager') + (x.circuit ? ' · ' + x.circuit : '');
+  if (t === 'ses' || t === 'sesfb') return (x.ses_name || 'SES') + (x.subject ? ' · ' + x.subject : '');
+  if (t === 'dip') return 'DIP ' + (x.year || '') + ' · ' + (x.district || '');
+  return MON_DASH_SHORT[t] || 'Monitoring';
+}
+function monRecHeadline(d){
+  var mm = (d.details || {}).monitoring || {}, t = monRecTool(d), x = mm[t] || {};
+  if (t === 'cm' || t === 'ses') {
+    var r = (x.indicators || []).filter(function(i){ return i.rating; });
+    if (!r.length) return { txt:'Not rated', col:'var(--grey)' };
+    var avg = r.reduce(function(a, i){ return a + i.rating; }, 0) / r.length, k = Math.max(1, Math.min(4, Math.round(avg)));
+    return { txt:avg.toFixed(1) + ' / 4', col:MON_RATING[k][1], bg:MON_RATING[k][2] };
   }
-  var counts = { cm:0, cmfb:0, ses:0, sesfb:0, dip:0 };
-  var risks = [], areaAgg = {}, dipBy = {};
+  if (t === 'cmfb' || t === 'sesfb') {
+    var h = (x.areas || []).filter(function(a){ return a.risk === 'H'; }).length;
+    return h ? { txt:h + ' high risk', col:'#C62222', bg:'#FDECEC' } : { txt:'No high risk', col:'#155F22', bg:'#E7F6EA' };
+  }
+  if (t === 'dip') { var m = x.met_total || 0; return { txt:m + ' / 25 met', col:m >= 20 ? '#155F22' : m >= 13 ? '#B84A0C' : '#C62222', bg:m >= 20 ? '#E7F6EA' : m >= 13 ? '#FFF6F1' : '#FDECEC' }; }
+  return { txt:'', col:'var(--grey)' };
+}
+function renderMonitoringDash(decs){
+  var all = (decs || []).filter(function(d){ var mm = (d.details || {}).monitoring; return mm && mm.tools && mm.tools.length; });
+  var hdr = '<div class="dash-section mon-dash"><div class="dash-section-hdr"><h3 id="dash-monitoring">Monitoring tools</h3><span style="font-size:13.5px;color:var(--grey)">' + all.length + ' record' + (all.length === 1 ? '' : 's') + '</span></div><div class="dash-section-body">';
+  if (!all.length) {
+    return hdr + '<div class="mon-d-empty"><b>No monitoring tools captured yet</b><span>Choose District or Province Monitoring when you record, then pick the tool you used. Results appear here.</span></div></div></div>';
+  }
+  var counts = {}; MON_ORDER.forEach(function(k){ counts[k] = 0; });
+  all.forEach(function(d){ var t = monRecTool(d); if (counts[t] !== undefined) counts[t]++; });
+  var f = S._monDashTool && counts[S._monDashTool] ? S._monDashTool : 'all';
+  var recs = f === 'all' ? all : all.filter(function(d){ return monRecTool(d) === f; });
   var todayStr = (typeof today === 'function') ? today() : new Date().toISOString().slice(0, 10);
+
+  // Tool filter
+  var html = hdr + '<div class="mon-d-pills" role="tablist" aria-label="Filter by tool">' +
+    '<button type="button" role="tab" aria-selected="' + (f === 'all') + '" class="' + (f === 'all' ? 'on' : '') + '" onclick="monDashSetTool(\'all\')">All <b>' + all.length + '</b></button>' +
+    MON_ORDER.filter(function(k){ return counts[k]; }).map(function(k){ return '<button type="button" role="tab" aria-selected="' + (f === k) + '" class="' + (f === k ? 'on' : '') + '" onclick="monDashSetTool(\'' + k + '\')">' + MON_DASH_SHORT[k] + ' <b>' + counts[k] + '</b></button>'; }).join('') + '</div>';
+
+  // Aggregate
+  var rated = [], areaAgg = {}, risks = [], dipBy = {};
   recs.forEach(function(d){
-    var mm = d.details.monitoring, det = d.details;
-    mm.tools.forEach(function(t){ if (counts[t] !== undefined) counts[t]++; });
-    ['cmfb','sesfb'].forEach(function(k){
-      if (!mm[k]) return;
-      mm[k].areas.forEach(function(a){
-        if (a.risk === 'H') risks.push({ area:a.area, src:(k === 'cmfb' ? 'CM feedback · ' + (mm[k].circuit || det.district || '') : 'SES feedback · ' + (mm[k].subject || '')), who:a.responsible || 'Not assigned', due:a.due || '', over:!!(a.due && a.due < todayStr), by:d.made_by || '' });
-      });
+    var mm = d.details.monitoring, det = d.details, t = monRecTool(d), x = mm[t] || {};
+    if (t === 'cm' || t === 'ses') (x.indicators || []).forEach(function(i){
+      if (!i.rating) return; rated.push(i.rating);
+      var key = (t === 'cm' ? 'CM' : 'SES') + '|' + i.area, g = areaAgg[key] || (areaAgg[key] = { tool:t, area:i.area, 4:0, 3:0, 2:0, 1:0, n:0, sum:0 });
+      g[i.rating]++; g.n++; g.sum += i.rating;
     });
-    if (mm.cm) mm.cm.indicators.forEach(function(x){ if (!x.rating) return; var g = areaAgg[x.area] || (areaAgg[x.area] = { 4:0, 3:0, 2:0, 1:0 }); g[x.rating]++; });
-    if (mm.dip && mm.dip.district) { var prev = dipBy[mm.dip.district]; if (!prev || (d.date || '') > prev.date) dipBy[mm.dip.district] = { met:mm.dip.met_total || 0, date:d.date || '' }; }
+    if (t === 'cmfb' || t === 'sesfb') (x.areas || []).forEach(function(a){
+      if (a.risk === 'H') risks.push({ area:a.area, src:(t === 'cmfb' ? 'CM feedback · ' + (x.circuit || det.district || '') : 'SES feedback · ' + (x.subject || '')), who:a.responsible || 'Not assigned', due:a.due || '', over:!!(a.due && a.due < todayStr), rec:a.recommendation || '', id:d.id });
+    });
+    if (t === 'dip' && x.district) { var prev = dipBy[x.district]; if (!prev || (d.date || '') > prev.date) dipBy[x.district] = { met:x.met_total || 0, date:d.date || '', sections:x.sections || [], id:d.id }; }
   });
-  var html = hdr + '<div class="mon-dash-tiles">' + MON_ORDER.map(function(id){ return '<div><b>' + counts[id] + '</b><span>' + MON_TOOLS[id].short + '</span></div>'; }).join('') + '</div>';
   risks.sort(function(a, b){ return (b.over - a.over) || String(a.due || '9').localeCompare(String(b.due || '9')); });
-  html += '<div class="mon-dash-h">Open high-risk recommendations <span class="mon-tag" style="background:var(--red-lt);color:var(--red)">' + risks.length + '</span></div>';
-  html += risks.length ? risks.slice(0, 6).map(function(r){
-    return '<div class="mon-dash-risk"><div><b>' + esc(r.area) + '</b><span class="mon-tag" style="' + (r.over ? 'background:var(--red-lt);color:var(--red)' : 'background:var(--orange-lt);color:var(--orange-text)') + '">' + (r.due ? (r.over ? 'Overdue · ' : 'Due ') + esc(r.due) : 'No due date') + '</span></div><small>' + esc(r.src) + ' · Responsible: ' + esc(r.who) + '</small></div>';
-  }).join('') : '<div class="dash-section-desc">No high-risk areas recorded.</div>';
-  var areaNames = Object.keys(areaAgg);
-  if (areaNames.length) {
-    var cols = { 4:'#155F22', 3:'#0087AC', 2:'#E86820', 1:'#C62222' };
-    html += '<div class="mon-dash-h">Circuit Manager ratings by area</div><div class="mon-legend">' + [4,3,2,1].map(function(n){ return '<span><i style="background:' + cols[n] + '"></i>' + n + ' ' + MON_RATING[n][0] + '</span>'; }).join('') + '</div>';
-    areaNames.forEach(function(a){
-      var g = areaAgg[a], tot = g[4] + g[3] + g[2] + g[1];
-      html += '<div class="mon-bar-row"><div>' + esc(a) + ' <small>(' + tot + ')</small></div><div class="mon-bar" role="img" aria-label="' + esc(a) + ': ' + g[4] + ' rated 4, ' + g[3] + ' rated 3, ' + g[2] + ' rated 2, ' + g[1] + ' rated 1">' +
-        [4,3,2,1].map(function(n){ return g[n] ? '<span style="width:' + (g[n] / tot * 100) + '%;background:' + cols[n] + '"></span>' : ''; }).join('') + '</div></div>';
-    });
+
+  // Headline figures
+  var kp = [];
+  if (rated.length) {
+    var avg = rated.reduce(function(a, b){ return a + b; }, 0) / rated.length, k = Math.max(1, Math.min(4, Math.round(avg)));
+    var low = rated.filter(function(r){ return r <= 2; }).length;
+    kp.push('<div class="mon-kpi" style="background:' + MON_RATING[k][2] + '"><span>Average Dashboard Rating</span><b style="color:' + MON_RATING[k][1] + '">' + avg.toFixed(1) + '<small> / 4</small></b><em>' + MON_RATING[k][0] + '</em></div>');
+    kp.push('<div class="mon-kpi" style="background:' + (low ? '#FFF6F1' : '#E7F6EA') + '"><span>Areas rated 1–2</span><b style="color:' + (low ? '#B84A0C' : '#155F22') + '">' + Math.round(low / rated.length * 100) + '<small>%</small></b><em>' + low + ' of ' + rated.length + ' ratings</em></div>');
+  }
+  if (f === 'all' || f === 'cmfb' || f === 'sesfb') {
+    var over = risks.filter(function(r){ return r.over; }).length;
+    kp.push('<div class="mon-kpi" style="background:' + (risks.length ? '#FDECEC' : '#E7F6EA') + '"><span>High-risk recommendations</span><b style="color:' + (risks.length ? '#C62222' : '#155F22') + '">' + risks.length + '</b><em>' + (over ? over + ' overdue' : risks.length ? 'none overdue' : 'nothing flagged') + '</em></div>');
   }
   var dipNames = Object.keys(dipBy).sort();
   if (dipNames.length) {
-    html += '<div class="mon-dash-h">DIP quality assurance by district <small style="font-weight:400;color:var(--grey)">(indicators met of 25)</small></div>';
-    dipNames.forEach(function(k){ var v = dipBy[k]; html += '<div class="mon-dip-row"><span>' + esc(k) + '</span><span class="mon-meter"><span style="width:' + (v.met / 25 * 100) + '%"></span></span><b>' + v.met + '/25</b></div>'; });
+    var dm = dipNames.reduce(function(a, n){ return a + dipBy[n].met; }, 0) / dipNames.length;
+    kp.push('<div class="mon-kpi" style="background:var(--teal-lt)"><span>DIP indicators met</span><b style="color:var(--teal)">' + Math.round(dm) + '<small> / 25</small></b><em>average of ' + dipNames.length + ' district' + (dipNames.length === 1 ? '' : 's') + '</em></div>');
   }
-  return html + '</div></div>';
+  if (kp.length) html += '<div class="mon-kpis">' + kp.join('') + '</div>';
+
+  // Needs attention
+  if (f === 'all' || f === 'cmfb' || f === 'sesfb') {
+    html += '<div class="mon-d-h"><span>Needs attention</span><small>High-risk recommendations</small></div>';
+    html += risks.length ? '<div class="mon-d-risks">' + risks.slice(0, 5).map(function(r){
+      return '<button type="button" class="mon-d-risk" onclick="monDashOpen(\'' + esc(r.id) + '\')"><span class="mon-d-risk-top"><b>' + esc(r.area) + '</b><span class="mon-tag" style="' + (r.over ? 'background:#C62222;color:#fff' : 'background:#FFF6F1;color:#B84A0C') + '">' + (r.due ? (r.over ? 'Overdue · ' : 'Due ') + esc(monFmtD(r.due)) : 'No due date') + '</span></span>' +
+        (r.rec ? '<span class="mon-d-risk-rec">' + esc(r.rec) + '</span>' : '') +
+        '<span class="mon-d-risk-meta">' + esc(r.src) + ' · Responsible: ' + esc(r.who) + '</span></button>';
+    }).join('') + (risks.length > 5 ? '<div class="mon-d-more">+ ' + (risks.length - 5) + ' more</div>' : '') + '</div>'
+      : '<div class="mon-d-ok">No high-risk areas recorded.</div>';
+  }
+
+  // Ratings by area: heat table, weakest first
+  var areas = Object.keys(areaAgg).map(function(k){ return areaAgg[k]; }).sort(function(a, b){ return (a.sum / a.n) - (b.sum / b.n); });
+  var areasAll = areas.length, showAll = !!S._monDashAllAreas;
+  if (!showAll) areas = areas.slice(0, 6);
+  if (areas.length) {
+    var max = Math.max.apply(null, areas.map(function(a){ return Math.max(a[4], a[3], a[2], a[1]); }));
+    html += '<div class="mon-d-h"><span>Dashboard Ratings by area</span><small>' + (showAll || areasAll <= 6 ? 'Weakest first' : '6 weakest of ' + areasAll) + ' · number of ratings</small></div>' +
+      '<div class="mon-heat-wrap"><table class="mon-heat"><thead><tr><th scope="col">Area</th>' + [4,3,2,1].map(function(n){ return '<th scope="col" title="' + MON_RATING[n][0] + '" style="color:' + MON_RATING[n][1] + '">' + n + '</th>'; }).join('') + '<th scope="col">Avg</th></tr></thead><tbody>' +
+      areas.map(function(a){
+        var av = a.sum / a.n, k = Math.max(1, Math.min(4, Math.round(av)));
+        return '<tr><th scope="row">' + (f === 'all' ? '<i>' + (a.tool === 'cm' ? 'CM' : 'SES') + '</i> ' : '') + esc(a.area) + '</th>' +
+          [4,3,2,1].map(function(n){ var c = a[n], op = c ? (0.22 + 0.78 * c / max) : 0; return '<td' + (c ? ' style="background:' + monRgba(MON_RATING[n][1], op) + ';color:' + (op > 0.55 ? '#fff' : MON_RATING[n][1]) + '"' : '') + '>' + (c || '') + '</td>'; }).join('') +
+          '<td><span class="mon-heat-avg" style="background:' + MON_RATING[k][2] + ';color:' + MON_RATING[k][1] + '">' + av.toFixed(1) + '</span></td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      (areasAll > 6 ? '<button type="button" class="mon-d-toggle" onclick="S._monDashAllAreas=' + (!showAll) + ';render()">' + (showAll ? 'Show the 6 weakest only' : 'Show all ' + areasAll + ' areas') + '</button>' : '');
+  }
+
+  // DIP by district
+  if (dipNames.length && (f === 'all' || f === 'dip')) {
+    html += '<div class="mon-d-h"><span>DIP quality assurance</span><small>Latest review per district</small></div>';
+    html += dipNames.map(function(n){
+      var v = dipBy[n], pct = v.met / 25 * 100, col = v.met >= 20 ? '#1E7F2C' : v.met >= 13 ? '#E86820' : '#C62222';
+      return '<button type="button" class="mon-d-dip" onclick="monDashOpen(\'' + esc(v.id) + '\')"><span class="mon-d-dip-top"><b>' + esc(n) + '</b><span style="color:' + col + '">' + v.met + ' / 25</span></span>' +
+        '<span class="mon-meter"><span style="width:' + pct + '%;background:' + col + '"></span></span>' +
+        '<span class="mon-d-secs">' + v.sections.map(function(s, i){ return '<span title="' + esc(s.section) + '">S' + (i + 1) + ' <b>' + s.met + '/' + s.total + '</b></span>'; }).join('') + '</span></button>';
+    }).join('');
+  }
+
+  // Latest submissions
+  var recent = recs.slice().sort(function(a, b){ return String(b.created_at || b.date || '').localeCompare(String(a.created_at || a.date || '')); }).slice(0, 6);
+  html += '<div class="mon-d-h"><span>Latest submissions</span><small>Tap one to see it in full</small></div><div class="mon-d-list">' +
+    recent.map(function(d){
+      var t = monRecTool(d), h = monRecHeadline(d);
+      return '<button type="button" class="mon-d-row" onclick="monDashOpen(\'' + esc(d.id) + '\')"><span class="mon-d-tool mon-t-' + t + '">' + (MON_DASH_SHORT[t] || '') + '</span>' +
+        '<span class="mon-d-row-main"><b>' + esc(monRecTitle(d)) + '</b><small>' + esc([(d.details || {}).district || (d.details || {}).province || '', d.date ? monFmtD(d.date) : '', d.made_by || ''].filter(Boolean).join(' · ')) + '</small></span>' +
+        '<span class="mon-d-score" style="color:' + h.col + (h.bg ? ';background:' + h.bg : '') + '">' + h.txt + '</span></button>';
+    }).join('') + '</div>';
+
+  html += '</div></div>';
+  if (S._monDashOpen) { var od = all.filter(function(d){ return d.id === S._monDashOpen; })[0]; if (od) html += renderMonRecordSheet(od); }
+  return html;
+}
+
+// DIP record: indicators grouped by section, then the reporting per section
+function monDipSheet(x){
+  return (x.sections || []).map(function(sec){
+    var rep = [['Analysis', sec.analysis], ['Risks', sec.risks], ['Recommendation', sec.recommendation], ['Evaluation code', sec.evaluation]].filter(function(r){ return r[1]; });
+    return '<div class="mon-s-item"><div class="mon-s-item-h" style="display:flex;justify-content:space-between;gap:8px"><span>' + esc(sec.section) + '</span><span style="color:var(--teal);white-space:nowrap">' + sec.met + '/' + sec.total + '</span></div>' +
+      sec.indicators.map(function(i){
+        var a = i.answer === 'Y' ? '<span class="mon-tag" style="background:#E7F6EA;color:#155F22">Yes</span>' : i.answer === 'N' ? '<span class="mon-tag" style="background:#FDECEC;color:#C62222">No</span>' : '<span class="mon-tag" style="background:var(--grey-lt);color:var(--grey-dk)">—</span>';
+        return '<div class="mon-s-yn"><span class="mon-s-yn-n">' + i.n + '</span><span class="mon-s-yn-t">' + esc(i.indicator) + (i.comment ? '<small>' + esc(i.comment) + '</small>' : '') + '</span>' + a + '</div>';
+      }).join('') +
+      (rep.length ? '<div class="mon-s-rep">' + rep.map(function(r){ return '<div class="mon-s-kv"><span>' + r[0] + '</span><div>' + esc(r[1]) + '</div></div>'; }).join('') + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+// Full view of one submitted monitoring record (opened from the Dashboard)
+function renderMonRecordSheet(d){
+  var mm = d.details.monitoring, t = monRecTool(d), blocks = monPdfBlocks(mm), b = blocks[0], h = monRecHeadline(d);
+  if (!b) return '';
+  function cell(col, v){
+    v = v == null ? '' : String(v);
+    if (/Rating/.test(col) && /^\d/.test(v)) { var n = parseInt(v, 10); if (MON_RATING[n]) return '<span class="mon-tag" style="background:' + MON_RATING[n][2] + ';color:' + MON_RATING[n][1] + '">' + esc(v) + '</span>'; }
+    if (/Risk/.test(col)) { var rk = { High:'H', Medium:'M', Low:'L' }[v]; if (rk) return '<span class="mon-tag" style="background:' + MON_RISK[rk][2] + ';color:' + MON_RISK[rk][1] + '">' + esc(v) + '</span>'; }
+    if (/Yes\/No/.test(col) && (v === 'Yes' || v === 'No')) return '<span class="mon-tag" style="' + (v === 'Yes' ? 'background:#E7F6EA;color:#155F22' : 'background:#FDECEC;color:#C62222') + '">' + v + '</span>';
+    return esc(v) || '<span style="color:var(--grey)">—</span>';
+  }
+  function table(head, body){
+    if (!head || !body || !body.length) return '';
+    return body.map(function(row){
+      return '<div class="mon-s-item"><div class="mon-s-item-h">' + esc(row[0]) + '</div>' +
+        head.slice(1).map(function(c, i){ var v = row[i + 1]; if (v === '' || v == null || v === '—') return ''; return '<div class="mon-s-kv"><span>' + esc(c) + '</span><div>' + cell(c, v) + '</div></div>'; }).join('') + '</div>';
+    }).join('');
+  }
+  var meta = b.meta.filter(function(x){ return x[1]; });
+  return '<div class="mon-sheet-bg" onclick="if(event.target===this)monDashClose()"><div class="mon-sheet" role="dialog" aria-modal="true" aria-label="' + esc(MON_TOOLS[t].name) + '">' +
+    '<div class="mon-sheet-top"><div><span class="mon-banner-k">' + esc(MON_TOOLS[t].name) + '</span><h3>' + esc(monRecTitle(d)) + '</h3><p>' + esc([d.date ? monFmtD(d.date) : '', d.made_by || '', (d.details || {}).district || (d.details || {}).province || ''].filter(Boolean).join(' · ')) + '</p></div>' +
+      '<button type="button" class="mon-sheet-x" onclick="monDashClose()" aria-label="Close">×</button></div>' +
+    '<div class="mon-sheet-body">' +
+      (h.txt ? '<div class="mon-sheet-score" style="color:' + h.col + ';background:' + (h.bg || 'var(--off)') + '">' + h.txt + '</div>' : '') +
+      (meta.length ? '<div class="mon-card"><div class="mon-tiles">' + meta.map(function(x){ return '<div class="mon-tile mon-tile-wide"><span class="mon-tile-l">' + esc(x[0]) + '</span><span class="mon-tile-v">' + esc(x[1]) + '</span></div>'; }).join('') + '</div></div>' : '') +
+      (t === 'dip' ? monDipSheet(mm.dip) : table(b.head, b.body) +
+      (b.body2 && b.body2.length ? '<div class="mon-doc-h">Report</div>' + table(b.head2, b.body2) : '')) +
+    '</div></div></div>';
 }
 
 // ─── Monitoring records: short flow (Where & When → tools → Tag officials → Review) ───
