@@ -1,4 +1,15 @@
 {
+  "2026.11.18.133": {
+    "title": "A clearer Monitoring tools dashboard",
+    "released": "2026-11-18",
+    "highlights": [
+      "The Monitoring tools section of the Dashboard has been redesigned: filter by tool, with headline tiles for the average Dashboard Rating, areas rated 1–2, high-risk recommendations and DIP indicators met",
+      "A new Needs attention list shows high-risk recommendations, with overdue ones flagged in red",
+      "Dashboard Ratings by area are shown as a colour-coded table, weakest areas first — tap Show all to see every area",
+      "Each district's latest DIP review shows a progress bar and a score per section",
+      "Tap any submitted record under Latest submissions to read it in full, including DIP indicators answered Yes or No"
+    ]
+  },
   "2026.11.17.132": {
     "title": "School search stays in your circuit",
     "released": "2026-11-17",
