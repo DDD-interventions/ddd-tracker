@@ -1,4 +1,13 @@
 {
+  "2026.11.19.134": {
+    "title": "Find a subject faster in the SES tools",
+    "released": "2026-11-19",
+    "highlights": [
+      "Name of subject in the SES Monitoring and SES Feedback tools now has a search bar: type a few letters (for example Maths, Physics or English FAL) and tap the subject",
+      "The full list is still there underneath, now grouped by learning area (Mathematics, Sciences, Languages and so on)",
+      "The chosen subject is shown at the top with a Clear button if you need to change it"
+    ]
+  },
   "2026.11.18.133": {
     "title": "A clearer Monitoring tools dashboard",
     "released": "2026-11-18",
