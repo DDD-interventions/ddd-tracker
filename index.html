@@ -1289,6 +1289,11 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-s-yn-t small{display:block;color:var(--grey);margin-top:2px}
 .mon-s-rep{margin-top:6px;background:var(--off);border-radius:8px;padding:2px 10px}
 .mon-s-rep .mon-s-kv:first-child{border-top:none}
+.mon-subj{display:flex;flex-direction:column;gap:6px;min-width:0}
+.mon-subj input,.mon-subj select{width:100%}
+.mon-subj-cur{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--teal-lt);border:1.5px solid var(--teal);border-radius:8px;padding:8px 10px;font-weight:700;color:var(--navy);font-size:14.5px}
+.mon-subj-cur span{min-width:0;overflow-wrap:anywhere}
+.mon-subj-cur button{flex-shrink:0;background:none;border:none;color:var(--teal);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:4px 6px;min-height:32px}
 </style>
 </head>
 <body>
@@ -1653,7 +1658,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.18.133';
+const APP_VERSION = '2026.11.19.134';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6764,11 +6769,40 @@ function monCircuitSelect(tool){
   return '<select id="fld-mon-circuit-' + tool + '" aria-label="Circuit" onchange="S.f.circuit=this.value;render()"><option value="">Select circuit</option>' +
     opts.map(function(c){ return '<option ' + (S.f.circuit === c ? 'selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>';
 }
+// Name of subject: a search bar (type a few letters, tap a match) plus the full list, grouped
+var MON_SUBJ_ALIAS = { maths:'mathematics', math:'mathematics', ems:'economic and management', ns:'natural sciences', nst:'natural sciences and technology', ps:'physical sciences', physics:'physical sciences', ls:'life sciences', bio:'life sciences', biology:'life sciences', lo:'life orientation', fal:'fal', hl:' hl', it:'information technology', cat:'computer applications', egd:'engineering graphics', ss:'social sciences', geo:'geography', acc:'accounting' };
+function monSubjectsAll(){ return (typeof allCapsSubjectsFlat === 'function') ? allCapsSubjectsFlat() : []; }
+function monSubjMatches(q){
+  q = String(q || '').trim().toLowerCase(); if (!q) return [];
+  var alias = MON_SUBJ_ALIAS[q], starts = [], has = [];
+  monSubjectsAll().forEach(function(n){
+    var l = n.toLowerCase();
+    if (l.indexOf(q) === 0 || l.indexOf(' ' + q) > -1 || (alias && l.indexOf(alias.trim()) === 0)) starts.push(n);
+    else if (l.indexOf(q) > -1 || (alias && l.indexOf(alias) > -1)) has.push(n);
+  });
+  return starts.concat(has).slice(0, 8);
+}
+function monSubjSuggest(q, tool){
+  var box = document.getElementById('monSubjSugg-' + tool); if (!box) return;
+  var hits = monSubjMatches(q);
+  if (!hits.length) { box.innerHTML = String(q || '').trim() ? '<div class="mon-sugg-none">No matching subject — check the spelling or choose from the list below</div>' : ''; return; }
+  box.innerHTML = hits.map(function(n){ return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(n) + '" onclick="monSubjPick(this.getAttribute(\'data-name\'))"><span>' + esc(n) + '</span></button>'; }).join('');
+}
+function monSubjPick(n){ monSet('ses.subject', n, true); }
 function monSubjectSelect(tool){
-  var subs = (typeof allCapsSubjectsFlat === 'function') ? allCapsSubjectsFlat() : [];
   var cur = monGet('ses.subject');
-  return '<select id="fld-mon-subject-' + tool + '" aria-label="Name of subject" onchange="monSet(\'ses.subject\',this.value,true)"><option value="">Select subject</option>' +
-    subs.map(function(s){ return '<option ' + (cur === s ? 'selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>';
+  var groups = (typeof SUBJECT_GROUPS !== 'undefined') ? SUBJECT_GROUPS : [{ label:'Subjects', items:monSubjectsAll() }];
+  var seen = {};
+  var list = '<select id="fld-mon-subject-' + tool + '" aria-label="Name of subject — choose from the list" onchange="monSubjPick(this.value)"><option value="">' + (cur ? 'Change subject…' : 'Or choose from the list…') + '</option>' +
+    groups.map(function(g){
+      var items = g.items.filter(function(n){ if (seen[n]) return false; seen[n] = 1; return true; });
+      return items.length ? '<optgroup label="' + esc(g.label) + '">' + items.map(function(n){ return '<option value="' + esc(n) + '"' + (cur === n ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</optgroup>' : '';
+    }).join('') + '</select>';
+  return '<div class="mon-subj">' +
+    (cur ? '<div class="mon-subj-cur"><span>' + esc(cur) + '</span><button type="button" onclick="monSubjPick(\'\')" aria-label="Clear subject">Clear</button></div>' : '') +
+    '<input id="fld-mon-subject-q-' + tool + '" type="search" autocomplete="off" placeholder="Search, e.g. Maths" aria-label="Search subjects" aria-controls="monSubjSugg-' + tool + '" oninput="monSubjSuggest(this.value,\'' + tool + '\')">' +
+    '<div id="monSubjSugg-' + tool + '" class="mon-sugg" role="listbox" aria-label="Matching subjects"></div>' +
+    list + '</div>';
 }
 function monTextInput(id, path, ph, type){
   return '<input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(monGet(path)) + '" placeholder="' + esc(ph || '') + '" oninput="monSet(\'' + path + '\',this.value)">';
