@@ -1,4 +1,22 @@
 {
+  "2026.11.23.136": {
+    "title": "Target and rating fill each other in",
+    "released": "2026-11-23",
+    "highlights": [
+      "In the CM Monitoring and SES CDMR instruments, picking a Target achieved band now fills in the matching Dashboard Rating automatically — and if you pick the rating first, it fills in the matching band",
+      "90–100% → 4 Outstanding, 75–89% → 3 Acceptable, 50–74% → 2 Needs Improvement, below 50% → 1 Unsatisfactory",
+      "If your judgement differs, change the rating after picking the band — the band stays as you set it"
+    ]
+  },
+  "2026.11.23.135": {
+    "title": "Colour-coded Target achieved",
+    "released": "2026-11-23",
+    "highlights": [
+      "In the CM Monitoring and SES CDMR instruments, the Target achieved (%) box now changes colour as soon as you pick a band, using the same colours as the Dashboard Rating",
+      "90–100% shows green (Outstanding), 75–89% blue (Acceptable), 50–74% orange (Needs Improvement) and below 50% red (Unsatisfactory)",
+      "The Dashboard Rating box now has a matching light background, so each row reads at a glance"
+    ]
+  },
   "2026.11.19.134": {
     "title": "Find a subject faster in the SES tools",
     "released": "2026-11-19",
