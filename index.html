@@ -1301,6 +1301,16 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-why-err textarea{border-color:#C62222;background:#FFF8F8}
 .mon-why-msg{color:#C62222;font-size:13px;font-weight:600;margin-top:4px}
 .mon-why .voice-row{align-items:flex-start}
+/* Indicator / Evidence / Target: a clear panel on every row */
+.mon-iet{margin:8px 0 10px;border:1.5px solid #B9DCE6;border-radius:8px;overflow:hidden;background:#F3FAFC}
+.mon-iet-r{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-top:1px solid #D7EBF1}
+.mon-iet-r:first-child{border-top:none}
+.mon-iet-k{flex:0 0 74px;font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#fff;background:var(--teal);border-radius:4px;padding:3px 0;text-align:center;line-height:1.3;margin-top:1px}
+.mon-iet-v{flex:1;min-width:0;font-size:15px;line-height:1.4;color:var(--navy);font-weight:600;overflow-wrap:anywhere}
+.mon-iet-t{background:#FFF4EC}
+.mon-iet-t .mon-iet-k{background:#E86820}
+.mon-iet-t .mon-iet-v{color:#8A3A0A;font-weight:700}
+.mon-compact h4{font-size:16px}
 </style>
 </head>
 <body>
@@ -1665,7 +1675,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.23.137';
+const APP_VERSION = '2026.11.24.138';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -7032,10 +7042,12 @@ function renderMonInstrument(tool){
     }
     n++;
     html += '<div class="mon-item mon-compact"><h4>' + n + '. ' + a[0] + '</h4>' +
-      (a[1] ? '<div class="mon-line2"><b>Indicator:</b> ' + a[1] + '</div>' : '') +
+      '<div class="mon-iet">' +
+        (a[1] ? '<div class="mon-iet-r"><span class="mon-iet-k">Indicator</span><span class="mon-iet-v">' + a[1] + '</span></div>' : '') +
+        (a[2] ? '<div class="mon-iet-r"><span class="mon-iet-k">Evidence</span><span class="mon-iet-v">' + a[2] + '</span></div>' : '') +
+        (a[3] ? '<div class="mon-iet-r mon-iet-t"><span class="mon-iet-k">Target</span><span class="mon-iet-v">' + a[3] + '</span></div>' : '') +
+      '</div>' +
       (isCM && i === 0 ? monCMSchoolsPicker() : '') +
-      (a[2] ? '<div class="mon-line2"><b>Evidence:</b> ' + a[2] + '</div>' : '') +
-      (a[3] ? '<div class="mon-line2"><b>Target:</b> ' + a[3] + '</div>' : '') +
       pair(i) + '</div>';
   });
   // Instrument summary
