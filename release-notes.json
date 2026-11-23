@@ -1,4 +1,12 @@
 {
+  "2026.11.24.138": {
+    "title": "Indicator, Evidence and Target stand out",
+    "released": "2026-11-24",
+    "highlights": [
+      "In the CM Monitoring and SES CDMR instruments, each area's Indicator, Evidence and Target now sit in their own highlighted panel with clear labels and larger text",
+      "The Target is picked out in orange so it is easy to check before choosing Target achieved and the rating"
+    ]
+  },
   "2026.11.23.137": {
     "title": "Every rating now needs a reason",
     "released": "2026-11-23",
