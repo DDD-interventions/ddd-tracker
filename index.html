@@ -1658,7 +1658,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.19.134';
+const APP_VERSION = '2026.11.23.136';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6826,18 +6826,35 @@ function monFocusTable(rows){
 function monRatingKey(whom){
   return '<div class="mon-card"><div class="mon-card-h"><span>Rating</span><span>Description</span><span>Status</span></div><div class="mon-key">' +
     [4,3,2,1].map(function(n){ var r = MON_RATING[n]; return '<div class="mon-key-i" style="background:' + r[2] + ';color:' + r[1] + '"><b>' + n + '</b><span>' + r[0] + '</span><i style="background:' + r[1] + '" aria-hidden="true"></i></div>'; }).join('') + '</div></div>' +
-    '<div class="mon-define"><div><strong>Target achieved (%)</strong> — how much of the target in that row was met, e.g. the share of planned visits that took place. Pick one band.</div>' +
+    '<div class="mon-define"><div><strong>Target achieved (%)</strong> — how much of the target in that row was met, e.g. the share of planned visits that took place. Pick one band. It is coloured to match the rating scale: 90\u2013100% Outstanding (green), 75\u201389% Acceptable (blue), 50\u201374% Needs Improvement (orange), below 50% Unsatisfactory (red). Picking a band fills in the matching rating (and picking a rating first fills in the matching band). If your judgement differs, pick the band first and then change the rating \u2014 the band stays as you set it.</div>' +
     '<div><strong>Dashboard Rating (1–4)</strong> — your overall judgement of how well the ' + whom + ' performs in that area, using the indicator, the evidence you saw and the target achieved. It uses the scale above and is the rating shown on the Tracker Dashboard.</div></div>';
+}
+// Target bands take the colour of the matching Dashboard Rating
+var MON_TBAND_RATING = { '90-100':4, '75-89':3, '50-74':2, '25-49':1, '0-24':1 };
+// Picking one fills in the other: a target band always sets its matching rating; a rating
+// fills the band only when no band is picked yet, so the official can still rate differently.
+var MON_RATING_TBAND = { 4:'90-100', 3:'75-89', 2:'50-74', 1:'25-49' };
+function monPickBand(tool, i, v){
+  monSet(tool + '.t.' + i, v);
+  if (v && MON_TBAND_RATING[v]) monSet(tool + '.r.' + i, MON_TBAND_RATING[v]);
+  render();
+}
+function monPickRate(tool, i, v){
+  var n = v ? Number(v) : '';
+  monSet(tool + '.r.' + i, n);
+  if (n && !monGet(tool + '.t.' + i)) monSet(tool + '.t.' + i, MON_RATING_TBAND[n]);   // only fills an empty band, so a rating can differ from the band
+  render();
 }
 function monBandButtons(tool, i){
   var v = monGet(tool + '.t.' + i), id = 'mt-' + tool + '-' + i;
-  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Target achieved (%)" onchange="monSet(\'' + tool + '.t.' + i + '\',this.value,true)">' +
+  var k = v ? MON_TBAND_RATING[v] : 0;
+  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Target achieved (%)"' + (k ? ' style="border-left:6px solid ' + MON_RATING[k][1] + ';color:' + MON_RATING[k][1] + ';background:' + MON_RATING[k][2] + '"' : '') + ' onchange="monPickBand(\'' + tool + '\',' + i + ',this.value)">' +
     '<option value="">Select…</option>' +
     MON_TBANDS.map(function(b){ return '<option value="' + b[0] + '"' + (v === b[0] ? ' selected' : '') + '>' + b[1] + '</option>'; }).join('') + '</select>';
 }
 function monRateButtons(tool, i){
   var v = String(monGet(tool + '.r.' + i) || ''), id = 'mr-' + tool + '-' + i;
-  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Dashboard Rating 1 to 4"' + (v ? ' style="border-left:6px solid ' + MON_RATING[v][3] + ';color:' + MON_RATING[v][1] + '"' : '') + ' onchange="monSet(\'' + tool + '.r.' + i + '\',this.value?Number(this.value):\'\',true)">' +
+  return '<select id="' + id + '" class="mon-select' + (v ? ' set' : '') + '" aria-label="Dashboard Rating 1 to 4"' + (v ? ' style="border-left:6px solid ' + MON_RATING[v][1] + ';color:' + MON_RATING[v][1] + ';background:' + MON_RATING[v][2] + '"' : '') + ' onchange="monPickRate(\'' + tool + '\',' + i + ',this.value)">' +
     '<option value="">Select…</option>' +
     [4,3,2,1].map(function(n){ return '<option value="' + n + '"' + (v === String(n) ? ' selected' : '') + '>' + n + ' – ' + MON_RATING[n][0] + '</option>'; }).join('') + '</select>';
 }
