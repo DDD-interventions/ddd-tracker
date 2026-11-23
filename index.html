@@ -1294,6 +1294,13 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-subj-cur{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--teal-lt);border:1.5px solid var(--teal);border-radius:8px;padding:8px 10px;font-weight:700;color:var(--navy);font-size:14.5px}
 .mon-subj-cur span{min-width:0;overflow-wrap:anywhere}
 .mon-subj-cur button{flex-shrink:0;background:none;border:none;color:var(--teal);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:4px 6px;min-height:32px}
+.mon-why{margin-top:8px}
+.mon-why label{display:block;font-size:12.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.mon-why label .req{color:#C62222}
+.mon-why textarea{width:100%;min-height:58px;font-size:15px;padding:8px 10px;border:1.5px solid #c8c6c4;border-radius:6px;font-family:inherit;resize:vertical}
+.mon-why-err textarea{border-color:#C62222;background:#FFF8F8}
+.mon-why-msg{color:#C62222;font-size:13px;font-weight:600;margin-top:4px}
+.mon-why .voice-row{align-items:flex-start}
 </style>
 </head>
 <body>
@@ -1658,7 +1665,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.23.136';
+const APP_VERSION = '2026.11.23.137';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6713,6 +6720,7 @@ function monToolErrors(id){
     if (!m.ses.subject) e.push({ field:'ses_subject', label:'Name of subject', fieldId:'fld-mon-subject-' + id, tool:id });
     if (!String(m.ses.ses_name || '').trim()) e.push({ field:'ses_name', label:'Name of SES', fieldId:'fld-mon-sesname-' + id, tool:id });
   }
+  if (id === 'cm' || id === 'ses') e = e.concat(monWhyErrors(id));
   if (id === 'dip' && !m.dip.district) e.push({ field:'dip_district', label:'District whose DIP is reviewed', fieldId:'fld-mon-dipdist', tool:id });
   return e;
 }
@@ -6728,7 +6736,9 @@ function monErrors(){
 function monNext(){
   var m = monState();
   var errs = monToolErrors(m.tab);
+  S._monWhyMissing = errs.filter(function(x){ return String(x.field).indexOf('why_') === 0; }).map(function(x){ return x.fieldId; });
   if (errs.length) {
+    if (S._monWhyMissing.length) render();
     showToast('Please complete: ' + errs.map(function(x){ return x.label; }).join(', '));
     haptic(HAPTIC_ERR);
     setTimeout(function(){ var el = document.getElementById(errs[0].fieldId); if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('field-error'); setTimeout(function(){ el.classList.remove('field-error'); }, 3000); } }, 120);
@@ -6746,6 +6756,24 @@ function monBack(){
 }
 // The step bar already names the tool, so no extra chip row is needed
 function renderMonProgressPill(){ return ''; }
+
+// Reason for rating: required for every rated row, so each rating is motivated
+function monWhy(tool, i){
+  var v = monGet(tool + '.r.' + i);
+  if (!v) return '';
+  var path = tool + '.why.' + i, id = monVoiceId(path), txt = String(monGet(path) || '').trim();
+  var miss = !txt && (S._monWhyMissing || []).indexOf(id) > -1;
+  return '<div class="mon-why' + (miss ? ' mon-why-err' : '') + '"><label for="' + id + '">Reason for rating ' + v + ' <span class="req">*</span></label>' +
+    '<div class="voice-row"><textarea id="' + id + '" rows="2" placeholder="Why this rating? e.g. 18 of 20 visits done" oninput="monSet(\'' + path + '\',this.value);var w=this.closest(\'.mon-why\');if(w&&this.value.trim()){w.classList.remove(\'mon-why-err\');var g=w.querySelector(\'.mon-why-msg\');if(g)g.remove();}">' + esc(monGet(path)) + '</textarea>' + monMic(path) + '</div>' +
+    (miss ? '<div class="mon-why-msg">Please explain why you chose this rating</div>' : '') + '</div>';
+}
+function monWhyErrors(tool){
+  var rows = tool === 'cm' ? MON_CM_ROWS : MON_SES_ROWS, m = monState(), e = [];
+  rows.forEach(function(a, i){
+    if (m[tool].r[i] && !String((m[tool].why || {})[i] || '').trim()) e.push({ field:'why_' + tool + '_' + i, label:'Reason for rating — ' + a[0], fieldId:monVoiceId(tool + '.why.' + i), tool:tool });
+  });
+  return e;
+}
 
 // ─── Shared building blocks ───
 function monRo(label, value){ return '<div class="mon-ro"><span>' + label + '</span><b>' + (value ? esc(value) : '<em style="font-weight:400;color:var(--grey)">Not set</em>') + '</b></div>'; }
@@ -6991,7 +7019,7 @@ function renderMonInstrument(tool){
   html += '<div class="mon-doc-h">' + (isCM ? 'Circuit Manager' : 'SES') + ' Monitoring, Support and Reporting Instrument</div>' + monRatingKey(isCM ? 'Circuit Manager' : 'SES');
   var n = 0, subOpen = false;
   function pair(i){
-    return '<div class="mon-pair"><label><span>Target achieved (%)</span>' + monBandButtons(tool, i) + '</label><label><span>Dashboard Rating (1–4)</span>' + monRateButtons(tool, i) + '</label></div>';
+    return '<div class="mon-pair"><label><span>Target achieved (%)</span>' + monBandButtons(tool, i) + '</label><label><span>Dashboard Rating (1–4)</span>' + monRateButtons(tool, i) + '</label></div>' + monWhy(tool, i);
   }
   rows.forEach(function(a, i){
     var sub = !!a[4];
@@ -7147,7 +7175,7 @@ function monPayload(){
   function instr(id, rows, reportAreas){
     return {
       indicators: rows.map(function(a, i){ var v = m[id].r[i] || null, t = m[id].t[i] || null;
-        return { area:a[0], sub_row:!!a[4], indicator:a[1], evidence:a[2], target:a[3], target_achieved:t, target_achieved_label:t ? MON_TBAND_LABEL[t] : null, rating:v, rating_label:v ? MON_RATING[v][0] : null }; }),
+        return { area:a[0], sub_row:!!a[4], indicator:a[1], evidence:a[2], target:a[3], target_achieved:t, target_achieved_label:t ? MON_TBAND_LABEL[t] : null, rating:v, rating_label:v ? MON_RATING[v][0] : null, reason:v ? String((m[id].why || {})[i] || '').trim() : '' }; }),
       report: reportAreas.map(function(a, i){ return { area:a, analysis:m[id].report[i] || '' }; })
     };
   }
@@ -7180,7 +7208,7 @@ function monPayload(){
 function monPdfBlocks(mon){
   var blocks = [];
   if (!mon || !mon.tools) return blocks;
-  function instrBody(x){ return [x.area, x.indicator || '', x.target || '', x.target_achieved_label || '—', x.rating ? x.rating + ' — ' + x.rating_label : '—']; }
+  function instrBody(x){ return [x.area, x.indicator || '', x.target || '', x.target_achieved_label || '—', x.rating ? x.rating + ' — ' + x.rating_label + (x.reason ? '. Reason: ' + x.reason : '') : '—']; }
   var iHead = ['Area','Indicator','Target','Target achieved','Dashboard Rating (1–4)'];
   if (mon.cm) blocks.push({ title:MON_TOOLS.cm.docTitle, meta:[['Circuit', mon.cm.circuit], ['Name of CM', mon.cm.cm_name], ['Schools visited', (mon.cm.schools && mon.cm.schools.length) ? mon.cm.schools.map(function(x){ var l = [monPhaseTag(x.school, x.type), x.section_58b ? 'Section 58B' : '', x.inclusive ? 'Inclusive' : ''].filter(Boolean).join(', '); return x.school + (l ? ' (' + l + ')' : ''); }).join('; ') : mon.cm.schools_visited], ['Visits by type of school', mon.cm.schools_by_type ? ['primary','secondary','combined','intermediate','section_58b','inclusive'].filter(function(k){ return mon.cm.schools_by_type[k]; }).map(function(k){ return mon.cm.schools_by_type[k] + ' ' + ({primary:'Primary',secondary:'Secondary',combined:'Combined',intermediate:'Intermediate',section_58b:'Section 58B',inclusive:'Inclusive'})[k]; }).join(', ') : '']],
     head:iHead, body:mon.cm.indicators.map(instrBody),
