@@ -1,4 +1,14 @@
 {
+  "2026.11.23.137": {
+    "title": "Every rating now needs a reason",
+    "released": "2026-11-23",
+    "highlights": [
+      "In the CM Monitoring and SES CDMR instruments, a Reason for rating box appears under each area as soon as you choose a Dashboard Rating",
+      "A reason is required for every area you rate — the form shows which ones are missing before you can continue",
+      "Type the reason or tap the microphone to speak it",
+      "Reasons are saved with the record and shown with the rating when the record is opened from the Dashboard"
+    ]
+  },
   "2026.11.23.136": {
     "title": "Target and rating fill each other in",
     "released": "2026-11-23",
