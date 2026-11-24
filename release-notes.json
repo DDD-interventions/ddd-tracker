@@ -1,4 +1,15 @@
 {
+  "2026.11.24.139": {
+    "title": "Month and data-informed school visits, SES phase and grade, DIP colours",
+    "released": "2026-11-24",
+    "highlights": [
+      "CM Monitoring tool: the School Visits area now has a Month of the school visits box, because the visits are reported for a specific month",
+      "CM Monitoring tool: for every school visited, say whether the visit was data informed (Yes or No); the review screen and reports show how many of the visits were data informed",
+      "SES Monitoring and SES Feedback tools: choose the Phase (Foundation, Intermediate, Senior or FET) and then tap the Grade(s) in that phase",
+      "These new answers are required before you can continue, and they show on the review screen, the Dashboard record and the emailed report",
+      "DIP Quality Assurance tool: the evaluation codes are now coloured by how serious they are, and none of them is green: Does not meet requirements dark red, Poor quality red, Low quality orange, Needs some attention yellow"
+    ]
+  },
   "2026.11.24.138": {
     "title": "Indicator, Evidence and Target stand out",
     "released": "2026-11-24",
