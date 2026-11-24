@@ -1330,6 +1330,13 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-grade{min-height:40px;padding:0 12px;border-radius:20px;border:1.5px solid #c8c6c4;background:#fff;font:inherit;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer}
 .mon-grade.on{background:var(--teal);border-color:var(--teal);color:#fff}
 .mon-grades-hint{display:block;margin-top:4px;font-size:13.5px;color:var(--grey);font-style:italic}
+.mon-tile .mon-grades{gap:5px}
+.mon-tile .mon-grade{min-width:40px;padding:0 8px;text-align:center}
+.mon-tile .mon-select[id^="fld-mon-phase-"]{padding-left:8px;padding-right:4px}
+.mon-tile .mon-grades{gap:4px;flex-wrap:nowrap}
+.mon-tile .mon-grade{min-width:30px;min-height:40px;padding:0 4px;font-size:14px;border-radius:8px;flex:1 1 0}
+.mon-tile .mon-select[id^="fld-mon-phase-"]{font-size:15px}
+.mon-caps-note{display:block;font-size:12.5px;color:var(--grey);margin-top:2px}
 </style>
 </head>
 <body>
@@ -1694,7 +1701,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.24.139';
+const APP_VERSION = '2026.11.24.140';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -6851,26 +6858,55 @@ function monCircuitSelect(tool){
 // SES: phase and grade(s) the SES supports
 var MON_PHASE_GRADES = [['Foundation Phase',['R','1','2','3']],['Intermediate Phase',['4','5','6']],['Senior Phase',['7','8','9']],['FET Phase',['10','11','12']]];
 function monSesGradeList(ph){ var g = MON_PHASE_GRADES.filter(function(x){ return x[0] === ph; })[0]; return g ? g[1] : []; }
-function monSesSetPhase(v){ var m = monState(); m.ses.phase = v; var ok = monSesGradeList(v); m.ses.grades = (m.ses.grades || []).filter(function(g){ return ok.indexOf(g) > -1; }); render(); }
-function monSesToggleGrade(g){ var m = monState(), a = (m.ses.grades || []).slice(), k = a.indexOf(g); if (k > -1) a.splice(k, 1); else a.push(g); var ord = monSesGradeList(m.ses.phase); a.sort(function(x, y){ return ord.indexOf(x) - ord.indexOf(y); }); m.ses.grades = a; render(); }
+function monSesSetPhase(v){ var m = monState(); m.ses.phase = v; var ok = monSesGradeList(v); m.ses.grades = (m.ses.grades || []).filter(function(g){ return ok.indexOf(g) > -1; }); monSesCheckSubject(); render(); }
+function monSesToggleGrade(g){ var m = monState(), a = (m.ses.grades || []).slice(), k = a.indexOf(g); if (k > -1) a.splice(k, 1); else a.push(g); var ord = monSesGradeList(m.ses.phase); a.sort(function(x, y){ return ord.indexOf(x) - ord.indexOf(y); }); m.ses.grades = a; monSesCheckSubject(); render(); }
 function monSesPhaseSelect(tool){
   var cur = monGet('ses.phase');
-  return '<select id="fld-mon-phase-' + tool + '" class="mon-select' + (cur ? ' set' : '') + '" aria-label="Phase" onchange="monSesSetPhase(this.value)"><option value="">Select phase…</option>' +
-    MON_PHASE_GRADES.map(function(x){ return '<option value="' + x[0] + '"' + (cur === x[0] ? ' selected' : '') + '>' + x[0] + ' (Grade ' + x[1][0] + '–' + x[1][x[1].length - 1] + ')</option>'; }).join('') + '</select>';
+  return '<select id="fld-mon-phase-' + tool + '" class="mon-select' + (cur ? ' set' : '') + '" aria-label="Phase" onchange="monSesSetPhase(this.value)"><option value="">Select…</option>' +
+    MON_PHASE_GRADES.map(function(x){ return '<option value="' + x[0] + '"' + (cur === x[0] ? ' selected' : '') + '>' + x[0].replace(' Phase', '') + '</option>'; }).join('') + '</select>';
 }
 function monSesGrades(tool){
   var ph = monGet('ses.phase'), sel = monState().ses.grades || [];
-  if (!ph) return '<span id="fld-mon-grades-' + tool + '" class="mon-grades-hint">Choose a phase first<button type="button" hidden></button></span>';
+  if (!ph) return '<span id="fld-mon-grades-' + tool + '" class="mon-grades-hint">Choose a phase first</span>';
   return '<span id="fld-mon-grades-' + tool + '" class="mon-grades" role="group" aria-label="Grades">' + monSesGradeList(ph).map(function(g){
     var on = sel.indexOf(g) > -1;
-    return '<button type="button" class="mon-grade' + (on ? ' on' : '') + '" aria-pressed="' + on + '" onclick="monSesToggleGrade(\'' + g + '\')">Grade ' + g + '</button>';
+    return '<button type="button" class="mon-grade' + (on ? ' on' : '') + '" aria-pressed="' + on + '" aria-label="Grade ' + g + '" onclick="monSesToggleGrade(\'' + g + '\')">' + g + '</button>';
   }).join('') + '</span>';
 }
 function monSesGradesLabel(a){ return (a || []).map(function(g){ return 'Grade ' + g; }).join(', '); }
 
 // Name of subject: a search bar (type a few letters, tap a match) plus the full list, grouped
 var MON_SUBJ_ALIAS = { maths:'mathematics', math:'mathematics', ems:'economic and management', ns:'natural sciences', nst:'natural sciences and technology', ps:'physical sciences', physics:'physical sciences', ls:'life sciences', bio:'life sciences', biology:'life sciences', lo:'life orientation', fal:'fal', hl:' hl', it:'information technology', cat:'computer applications', egd:'engineering graphics', ss:'social sciences', geo:'geography', acc:'accounting' };
-function monSubjectsAll(){ return (typeof allCapsSubjectsFlat === 'function') ? allCapsSubjectsFlat() : []; }
+// CAPS: which grades each subject is offered in (R = 0). Languages by suffix: HL R–12, FAL 1–12.
+var MON_CAPS_GRADES = {
+  'Mathematics':[0,12], 'Mathematical Literacy':[10,12], 'Technical Mathematics':[10,12],
+  'Life Skills':[0,6], 'Life Orientation':[7,12], 'Coding and Robotics':[0,9],
+  'Natural Sciences and Technology':[4,6], 'Social Sciences':[4,9],
+  'Natural Sciences':[7,9], 'Technology':[7,9], 'EMS':[7,9], 'Creative Arts':[7,9]
+};
+function monGradeNum(g){ return g === 'R' ? 0 : Number(g); }
+function monCapsRange(n){
+  if (MON_CAPS_GRADES[n]) return MON_CAPS_GRADES[n];
+  if (/ HL$/.test(n)) return [0,12];
+  if (/ FAL$/.test(n)) return [1,12];
+  return [10,12];                       // every other subject on the list is an FET elective
+}
+// Grades the subject list is checked against: the grades ticked, or the whole phase until a grade is ticked
+function monSesCheckGrades(){ var m = monState(); var g = (m.ses.grades || []).length ? m.ses.grades : monSesGradeList(m.ses.phase); return g.map(monGradeNum); }
+function monCapsAllowed(n){
+  var gs = monSesCheckGrades(); if (!gs.length) return false;
+  var r = monCapsRange(n);
+  return gs.every(function(g){ return g >= r[0] && g <= r[1]; });   // offered in every grade chosen
+}
+// If a phase or grade change makes the chosen subject invalid, clear it
+function monSesCheckSubject(){
+  var m = monState();
+  if (m.ses.subject && !monCapsAllowed(m.ses.subject)) {
+    var was = m.ses.subject; m.ses.subject = '';
+    if (typeof showToast === 'function') showToast(was + ' is not a CAPS subject for the grade(s) chosen — please choose the subject again');
+  }
+}
+function monSubjectsAll(){ return ((typeof allCapsSubjectsFlat === 'function') ? allCapsSubjectsFlat() : []).filter(monCapsAllowed); }
 function monSubjMatches(q){
   q = String(q || '').trim().toLowerCase(); if (!q) return [];
   var alias = MON_SUBJ_ALIAS[q], starts = [], has = [];
@@ -6884,24 +6920,26 @@ function monSubjMatches(q){
 function monSubjSuggest(q, tool){
   var box = document.getElementById('monSubjSugg-' + tool); if (!box) return;
   var hits = monSubjMatches(q);
-  if (!hits.length) { box.innerHTML = String(q || '').trim() ? '<div class="mon-sugg-none">No matching subject — check the spelling or choose from the list below</div>' : ''; return; }
+  if (!hits.length) { box.innerHTML = String(q || '').trim() ? '<div class="mon-sugg-none">No matching CAPS subject for these grades — check the spelling or choose from the list below</div>' : ''; return; }
   box.innerHTML = hits.map(function(n){ return '<button type="button" role="option" class="mon-sugg-i" data-name="' + esc(n) + '" onclick="monSubjPick(this.getAttribute(\'data-name\'))"><span>' + esc(n) + '</span></button>'; }).join('');
 }
 function monSubjPick(n){ monSet('ses.subject', n, true); }
 function monSubjectSelect(tool){
   var cur = monGet('ses.subject');
+  if (!monGet('ses.phase')) return '<span id="fld-mon-subject-' + tool + '" class="mon-grades-hint">Choose the phase and grade(s) first — the list then shows only the CAPS subjects for those grades</span><input type="hidden">';
+  var okList = monSubjectsAll();
   var groups = (typeof SUBJECT_GROUPS !== 'undefined') ? SUBJECT_GROUPS : [{ label:'Subjects', items:monSubjectsAll() }];
   var seen = {};
   var list = '<select id="fld-mon-subject-' + tool + '" aria-label="Name of subject — choose from the list" onchange="monSubjPick(this.value)"><option value="">' + (cur ? 'Change subject…' : 'Or choose from the list…') + '</option>' +
     groups.map(function(g){
-      var items = g.items.filter(function(n){ if (seen[n]) return false; seen[n] = 1; return true; });
+      var items = g.items.filter(function(n){ if (seen[n] || okList.indexOf(n) < 0) return false; seen[n] = 1; return true; });
       return items.length ? '<optgroup label="' + esc(g.label) + '">' + items.map(function(n){ return '<option value="' + esc(n) + '"' + (cur === n ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</optgroup>' : '';
     }).join('') + '</select>';
   return '<div class="mon-subj">' +
     (cur ? '<div class="mon-subj-cur"><span>' + esc(cur) + '</span><button type="button" onclick="monSubjPick(\'\')" aria-label="Clear subject">Clear</button></div>' : '') +
     '<input id="fld-mon-subject-q-' + tool + '" type="search" autocomplete="off" placeholder="Search, e.g. Maths" aria-label="Search subjects" aria-controls="monSubjSugg-' + tool + '" oninput="monSubjSuggest(this.value,\'' + tool + '\')">' +
     '<div id="monSubjSugg-' + tool + '" class="mon-sugg" role="listbox" aria-label="Matching subjects"></div>' +
-    list + '</div>';
+    list + '<span class="mon-caps-note">CAPS subjects for ' + esc(monSesGradesLabel(monState().ses.grades) || monGet('ses.phase')) + ' (' + okList.length + ')</span></div>';
 }
 function monTextInput(id, path, ph, type){
   return '<input id="' + id + '" type="' + (type || 'text') + '" value="' + esc(monGet(path)) + '" placeholder="' + esc(ph || '') + '" oninput="monSet(\'' + path + '\',this.value)">';
@@ -6910,7 +6948,7 @@ function monTextInput(id, path, ph, type){
 // Items & details: same items as the Word document, shown as tiles
 function monDetails(rows){
   return '<div class="mon-card mon-detail-card"><div class="mon-card-h"><span>Items</span><span>Details</span></div><div class="mon-tiles">' +
-    rows.map(function(r){ var input = /<(select|input|button)/.test(r[1]);
+    rows.map(function(r){ var input = r[3] !== 'half' && /<(select|input|button)/.test(r[1]);
       return '<div class="mon-tile' + (input ? ' mon-tile-wide' : '') + '"><span class="mon-tile-l">' + r[0] + (r[2] ? '<span class="req">*</span>' : '') + '</span><span class="mon-tile-v">' + r[1] + '</span></div>'; }).join('') +
     '</div></div>';
 }
@@ -7092,7 +7130,7 @@ function renderMonInstrument(tool){
   html += isCM
     ? monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Circuit', monCircuitSelect(tool), 1],
         ['Name of CM', monTextInput('fld-mon-cmname-' + tool, 'cm.cm_name', 'e.g. Mr T Nkosi'), 1], ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]])
-    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Name of subject', monSubjectSelect(tool), 1], ['Phase', monSesPhaseSelect(tool), 1], ['Grade(s)', monSesGrades(tool), 1],
+    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Phase', monSesPhaseSelect(tool), 1, 'half'], ['Grade(s)', monSesGrades(tool), 1, 'half'], ['Name of subject', monSubjectSelect(tool), 1],
         ['Name of SES', monTextInput('fld-mon-sesname-' + tool, 'ses.ses_name', 'e.g. Ms N Dlamini'), 1], ['Number of schools allocated', monTextInput('fld-mon-schools-' + tool, 'ses.schools_allocated', 'Number', 'number')],
         ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]]);
   html += monPurpose(MON_TOOLS[tool].purpose);
@@ -7142,7 +7180,7 @@ function renderMonFeedback(tool){
   html += isCM
     ? monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Circuit', monCircuitSelect(tool), 1],
         ['Name of CM', monTextInput('fld-mon-cmname-' + tool, 'cm.cm_name', 'e.g. Mr T Nkosi'), 1], ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]])
-    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Name of subject', monSubjectSelect(tool), 1], ['Phase', monSesPhaseSelect(tool), 1], ['Grade(s)', monSesGrades(tool), 1],
+    : monDetails([['PED', monRoVal(S.f.province)], ['District', monRoVal(S.f.district)], ['Phase', monSesPhaseSelect(tool), 1, 'half'], ['Grade(s)', monSesGrades(tool), 1, 'half'], ['Name of subject', monSubjectSelect(tool), 1],
         ['Name of SES', monTextInput('fld-mon-sesname-' + tool, 'ses.ses_name', 'e.g. Ms N Dlamini'), 1], ['Number of schools allocated', monTextInput('fld-mon-schools-' + tool, 'ses.schools_allocated', 'Number', 'number')],
         ['Date of visit', monRoVal(S.f.activity_date)], ['DBE Official', monRoVal(S.f.official_name)]]);
   html += monPurpose(MON_TOOLS[tool].purpose);
