@@ -1,4 +1,13 @@
 {
+  "2026.11.24.140": {
+    "title": "CAPS-aligned subject list in the SES tools",
+    "released": "2026-11-24",
+    "highlights": [
+      "SES Monitoring and SES Feedback: choose the Phase and Grade(s) first, then the subject list shows only the CAPS subjects offered in those grades",
+      "For example, Grade R shows Home Languages, Mathematics, Life Skills and Coding and Robotics, while Physical Sciences only appears for Grades 10–12",
+      "If you change the phase or grades and the chosen subject is no longer offered, it is cleared and you are asked to choose again"
+    ]
+  },
   "2026.11.24.139": {
     "title": "Month and data-informed school visits, SES phase and grade, DIP colours",
     "released": "2026-11-24",
