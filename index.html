@@ -1337,6 +1337,25 @@ div.mon-acc-hdr{cursor:default;background:var(--off);border-bottom:1px solid var
 .mon-tile .mon-grade{min-width:30px;min-height:40px;padding:0 4px;font-size:14px;border-radius:8px;flex:1 1 0}
 .mon-tile .mon-select[id^="fld-mon-phase-"]{font-size:15px}
 .mon-caps-note{display:block;font-size:12.5px;color:var(--grey);margin-top:2px}
+/* Tagged officials glimpse */
+.tg-glimpse{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--grey-dk);line-height:1.3;min-width:0;text-align:left}
+.tg-avs{display:inline-flex;flex-shrink:0}
+.tg-av{width:24px;height:24px;border-radius:50%;color:#fff;font-size:10.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;border:2px solid #fff;letter-spacing:.2px;flex-shrink:0}
+.tg-avs .tg-av+.tg-av{margin-left:-8px}
+.tg-txt{min-width:0;overflow-wrap:anywhere}
+.tg-txt b{color:var(--navy);font-weight:700}
+.tg-more{color:var(--teal);font-weight:700}
+.tg-list{margin:10px 0;padding:10px 12px;background:#F3FAFC;border:1px solid #D7EBF1;border-radius:8px}
+.tg-list-h{font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+.tg-person{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-top:1px solid #E3EEF2}
+.tg-person:first-of-type{border-top:none}
+.tg-person .tg-av{width:30px;height:30px;font-size:12px;border:none}
+.tg-person-t{display:flex;flex-direction:column;min-width:0;font-size:14px;color:var(--navy)}
+.tg-person-t small{font-size:12.5px;color:var(--grey)}
+.tg-needs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tg-needs span{font-size:11.5px;font-weight:600;background:#fff;border:1px solid #B9DCE6;color:#00647F;border-radius:10px;padding:1px 8px}
+.mon-sheet-body .tg-list.mon-card{background:#F3FAFC}
+.mon-d-row .tg-glimpse{margin-top:5px;gap:6px;font-size:12.5px}.mon-d-row .tg-av{width:22px;height:22px;font-size:9.5px}
 </style>
 </head>
 <body>
@@ -1701,7 +1720,7 @@ const TK_POLICIES = {
 };
 
 // STATE 
-const APP_VERSION = '2026.11.24.140';
+const APP_VERSION = '2026.11.26.141';
 const RELEASE_NOTES_URL = 'release-notes.json'; // Optional release notes per version
 const VERSION_CHECK_URL = 'version.txt'; // Hosted alongside the HTML on GitHub Pages
 const VERSION_CHECK_INTERVAL = 2 * 60 * 1000; // Check every 2 minutes
@@ -3715,10 +3734,11 @@ function renderHomeFeed() {
     if ((d.ddd_used||'').toLowerCase() === 'yes' || (Array.isArray(det.ddd_reports) && det.ddd_reports.length)) badges.push('<span class="fi-badge">Informed by DDD data</span>');
     var tagN = 0; var tg = det.tagged_officials || {};
     for (var need in tg) tagN += (tg[need]||[]).length;
-    if (tagN) badges.push('<span class="fi-badge">Brought in ' + tagN + ' colleague' + (tagN>1?'s':'') + '</span>');
+
     var sc0 = sch[0] && schoolCounts[sch[0]];
     if (sc0 > 1) badges.push('<span class="fi-badge g">Visit ' + sc0 + ' to this school in 2 months</span>');
     if (badges.length) body += '<span class="fi-badges">' + badges.join('') + '</span>';
+    body += tagGlimpseHTML(det);
 
     return item({
       avatar: av(mine ? ini(o.full_name||'Me') : ini(role), mine ? 0 : (ix % 4) + 1),
@@ -7353,6 +7373,41 @@ function monPdfBlocks(mon){
   return blocks;
 }
 
+// ─── Tagged officials: a quick glimpse on every record, and the full list when opened ───
+function tagPeople(det){
+  var t = (det || {}).tagged_officials || {}, by = {}, out = [];
+  function add(o, need){
+    if (!o) return; if (typeof o === 'string') o = { email:o };
+    var k = String(o.id || o.email || o.name || '').toLowerCase(); if (!k) return;
+    if (!by[k]) { by[k] = { name:o.name || o.full_name || o.email || 'Official', role:o.role || '', needs:[] }; out.push(by[k]); }
+    if (need && need !== '_form_mentions' && by[k].needs.indexOf(need) < 0) by[k].needs.push(need);
+  }
+  if (Array.isArray(t)) t.forEach(function(o){ add(o, ''); });
+  else Object.keys(t).forEach(function(need){ (t[need] || []).forEach(function(o){ add(o, need); }); });
+  return out;
+}
+function tagInitials(n){ return String(n || '?').replace(/^(Mr|Mrs|Ms|Dr|Prof)\.?\s+/i, '').split(/\s+/).map(function(w){ return w.charAt(0); }).join('').slice(0, 2).toUpperCase(); }
+function tagShortName(n){ var p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0] + ' ' + p[p.length - 1].charAt(0) + '.' : (p[0] || 'Official'); }
+var TAG_AV_COLS = ['#0087AC','#3AB54A','#E86820','#6B4FA0','#00647F','#B84A0C'];
+function tagColour(n){ var h = 0; String(n || '').split('').forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) % 997; }); return TAG_AV_COLS[h % TAG_AV_COLS.length]; }
+// One line: up to 3 initials circles + first two names + "+N more"
+function tagGlimpseHTML(det, compact){
+  var p = tagPeople(det); if (!p.length) return '';
+  var names = compact ? '<b>' + p.length + ' tagged</b>' : p.slice(0, 2).map(function(x){ return '<b>' + esc(tagShortName(x.name)) + '</b>'; }).join(', ') + (p.length > 2 ? ' <span class="tg-more">+' + (p.length - 2) + ' more</span>' : '');
+  var full = p.map(function(x){ return x.name + (x.role ? ' (' + x.role + ')' : '') + (x.needs.length ? ' — ' + x.needs.join(', ') : ''); }).join('\n');
+  return '<span class="tg-glimpse" title="' + esc(full) + '" aria-label="Officials tagged: ' + esc(p.map(function(x){ return x.name; }).join(', ')) + '">' +
+    '<span class="tg-avs" aria-hidden="true">' + p.slice(0, 3).map(function(x){ return '<span class="tg-av" style="background:' + tagColour(x.name) + '">' + esc(tagInitials(x.name)) + '</span>'; }).join('') + '</span>' +
+    '<span class="tg-txt">' + (compact ? '' : 'Tagged: ') + names + '</span></span>';
+}
+// Full list: name, role and what each was tagged for
+function tagListHTML(det, wrapCls){
+  var p = tagPeople(det); if (!p.length) return '';
+  return '<div class="tg-list' + (wrapCls ? ' ' + wrapCls : '') + '"><div class="tg-list-h">Officials tagged (' + p.length + ')</div>' + p.map(function(x){
+    return '<div class="tg-person"><span class="tg-av" style="background:' + tagColour(x.name) + '">' + esc(tagInitials(x.name)) + '</span><span class="tg-person-t"><b>' + esc(x.name) + '</b>' +
+      (x.role ? '<small>' + esc(x.role) + '</small>' : '') + (x.needs.length ? '<span class="tg-needs">' + x.needs.map(function(n){ return '<span>' + esc(n) + '</span>'; }).join('') + '</span>' : '') + '</span></div>';
+  }).join('') + '</div>';
+}
+
 // ─── Dashboard section ───
 // Monitoring tools on the Dashboard: filter by tool, headline figures, what needs attention,
 // ratings by area as a heat table, DIP scores, and the latest submissions (tap to view in full).
@@ -7482,7 +7537,7 @@ function renderMonitoringDash(decs){
     recent.map(function(d){
       var t = monRecTool(d), h = monRecHeadline(d);
       return '<button type="button" class="mon-d-row" onclick="monDashOpen(\'' + esc(d.id) + '\')"><span class="mon-d-tool mon-t-' + t + '">' + (MON_DASH_SHORT[t] || '') + '</span>' +
-        '<span class="mon-d-row-main"><b>' + esc(monRecTitle(d)) + '</b><small>' + esc([(d.details || {}).district || (d.details || {}).province || '', d.date ? monFmtD(d.date) : '', d.made_by || ''].filter(Boolean).join(' · ')) + '</small></span>' +
+        '<span class="mon-d-row-main"><b>' + esc(monRecTitle(d)) + '</b><small>' + esc([(d.details || {}).district || (d.details || {}).province || '', d.date ? monFmtD(d.date) : '', d.made_by || ''].filter(Boolean).join(' · ')) + '</small>' + tagGlimpseHTML(d.details, true) + '</span>' +
         '<span class="mon-d-score" style="color:' + h.col + (h.bg ? ';background:' + h.bg : '') + '">' + h.txt + '</span></button>';
     }).join('') + '</div>';
 
@@ -7529,6 +7584,7 @@ function renderMonRecordSheet(d){
     '<div class="mon-sheet-body">' +
       (h.txt ? '<div class="mon-sheet-score" style="color:' + h.col + ';background:' + (h.bg || 'var(--off)') + '">' + h.txt + '</div>' : '') +
       (meta.length ? '<div class="mon-card"><div class="mon-tiles">' + meta.map(function(x){ return '<div class="mon-tile mon-tile-wide"><span class="mon-tile-l">' + esc(x[0]) + '</span><span class="mon-tile-v">' + esc(x[1]) + '</span></div>'; }).join('') + '</div></div>' : '') +
+      tagListHTML(d.details, 'mon-card') +
       (t === 'dip' ? monDipSheet(mm.dip) : table(b.head, b.body) +
       (b.body2 && b.body2.length ? '<div class="mon-doc-h">Report</div>' + table(b.head2, b.body2) : '')) +
     '</div></div></div>';
@@ -10625,7 +10681,7 @@ ${`
          if (c.det.subjects && c.det.subjects.length) c.det.subjects.slice(0,3).forEach(function(s){ html += '<span class="act-meta-tag" style="background:#E7F6EA;color:#2E7D32">'+esc(s)+'</span>'; });
          if (c.hasFollowUp) html += '<span class="act-meta-tag" style="background:#FFF8E1;color:#8A5A00;font-weight:700;border:1px solid #FFE082">Follow-up due</span>';
          if (usedDDD || c.det.ddd_used === 'other-data') html += '<span class="act-meta-tag" style="background:#E3F2FD;color:#1565C0">Data-informed</span>';
-         html += '</div></div>';
+         html += '</div>' + tagGlimpseHTML(c.det) + '</div>';
 
          // ── ACTION BAR (Facebook-style) ──
          html += '<div class="act-action-bar">';
@@ -10642,6 +10698,7 @@ ${`
            if (c.det.subjects && c.det.subjects.length) html += '<div class="acd-row"><span class="acd-label">Subjects</span><span class="acd-value">'+esc(c.det.subjects.join(', '))+'</span></div>';
            if (c.det.grades && c.det.grades.length) html += '<div class="acd-row"><span class="acd-label">Grades</span><span class="acd-value">'+esc(c.det.grades.join(', '))+'</span></div>';
            if (c.det.educators_supported) html += '<div class="acd-row"><span class="acd-label">Educators</span><span class="acd-value">'+c.det.educators_supported+' supported</span></div>';
+           html += tagListHTML(c.det);
 
            html += '<div class="acd-chain"><div class="acd-chain-title">Data to decision to action</div>';
            html += '<div class="acd-chain-step"><span class="acd-chain-dot cd-d">D</span><div><div class="acd-chain-lbl">Data</div><div class="acd-chain-text">'+esc(chainDataLabel)+'</div></div></div>';
