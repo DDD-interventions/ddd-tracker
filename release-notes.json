@@ -1,4 +1,12 @@
 {
+  "2026.11.26.141": {
+    "title": "See who was tagged on each record",
+    "released": "2026-11-26",
+    "highlights": [
+      "Every recorded visit and monitoring tool now shows who was tagged: small name circles and the first names appear on the record in the home feed, the Dashboard activity list and the Monitoring tools' Latest submissions",
+      "Open a record (See detail, or tap a monitoring submission) to see everyone tagged, their role and what they were tagged for"
+    ]
+  },
   "2026.11.24.140": {
     "title": "CAPS-aligned subject list in the SES tools",
     "released": "2026-11-24",
